@@ -1,0 +1,26 @@
+<h2>Заголовок регистрации</h2>
+
+<form [formGroup]="form" (ngSubmit)="submit()">
+  <div class="mb-3">
+    <div>
+      <label>email</label><br>
+      <input name="email"  formControlName="email" />
+    </div>
+
+    <div>
+      <label>password</label><br>
+      <input type="password" name="password"  formControlName="password" />
+    </div>
+
+    <div>
+      <label>password again</label><br>
+      <input type="password" name="passwordAgain"  formControlName="passwordAgain" />
+    </div>
+
+    <div>
+      <label>extraContact</label><br>
+      <input name="extraContact"  formControlName="extraContact" />
+    </div>
+  </div>
+  <button>регистрация</button>
+</form>
