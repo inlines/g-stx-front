@@ -1,5 +1,6 @@
 import { AsyncPipe, DatePipe, NgFor } from '@angular/common';
 import { Component } from '@angular/core';
+import { RouterModule } from '@angular/router';
 import { IProductListItem } from '@app/states/products/interfaces/product-list-item.interface';
 import { ProductsActions } from '@app/states/products/states/products.actions';
 import { ProductsState } from '@app/states/products/states/products.state';
@@ -8,7 +9,7 @@ import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-product-list',
-  imports: [NgFor, AsyncPipe, DatePipe],
+  imports: [NgFor, AsyncPipe, DatePipe, RouterModule],
   templateUrl: './product-list.component.html',
   styleUrl: './product-list.component.scss',
   standalone: true,

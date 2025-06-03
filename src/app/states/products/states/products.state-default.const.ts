@@ -4,5 +4,7 @@ import { IproductState } from "./products.state.interface";
 export const PRODUCTS_STATE_DEFAULTS: IproductState = {
   productList: [],
   productListRequestStatus: RequestStatus.NotInvoked,
-  productListRequestParams: {}
+  productListRequestParams: {},
+  productProperties: null,
+  productPropertiesRequestStatus: RequestStatus.NotInvoked,
 }

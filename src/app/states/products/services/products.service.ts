@@ -4,6 +4,7 @@ import { IEnvironment } from "@app/environments/environment.interface";
 import { Observable } from "rxjs";
 import { IProductListItem } from "@app/states/products/interfaces/product-list-item.interface";
 import { IProductListRequest } from "@app/states/products/interfaces/product-list-request.interface";
+import { IProductPropertiesResponse } from "@app/states/products/interfaces/product-properties-response.interface";
 
 @Injectable({
   providedIn: 'root',
@@ -19,6 +20,10 @@ export class ProductsService {
   }
 
   public productsRequest(params: IProductListRequest): Observable<IProductListItem[]> {
-    return this.http.get<IProductListItem[]>(this.productsPath, {params: {...params}})
+    return this.http.get<IProductListItem[]>(this.productsPath, {params: {...params}});
+  }
+
+  public productPropertiesRequest(id: string | number): Observable<IProductPropertiesResponse> {
+    return this.http.get<IProductPropertiesResponse>(`${this.productsPath}/${id}`);
   }
 }

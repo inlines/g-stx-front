@@ -1,5 +1,6 @@
-import { IProductListItem } from "../interfaces/product-list-item.interface";
-import { IProductListRequest } from "../interfaces/product-list-request.interface";
+import { IProductListItem } from '@app/states/products/interfaces/product-list-item.interface';
+import { IProductListRequest } from "@app/states/products/interfaces/product-list-request.interface";
+import { IProductPropertiesResponse } from "@app/states/products/interfaces/product-properties-response.interface";
 import { ProductsActionList } from "./products-action-list.const";
 
 export namespace ProductsActions {
@@ -23,5 +24,23 @@ export namespace ProductsActions {
 
     constructor(public payload: IProductListItem[]) {
     }
+  }
+
+  export class LoadProperties {
+    public static readonly type = ProductsActionList.LOAD_PROPERTIES;
+
+    constructor(public id: number | string) {
+    }
+  }
+
+  export class LoadPropertiesSuccess {
+    public static readonly type = ProductsActionList.LOAD_PROPERTIES_SUCCESS;
+
+    constructor(public payload: IProductPropertiesResponse) {
+    }
+  }
+
+  export class LoadPropertiesFail {
+    public static readonly type = ProductsActionList.LOAD_PROPERTIES_FAIL;
   }
 }

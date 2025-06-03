@@ -51,6 +51,29 @@ export class ProductsState {
     });
   }
 
+  @Action(ProductsActions.LoadProperties)
+  public loadProperties(ctx: StateContext<IproductState>, action: ProductsActions.LoadProperties) {
+    ctx.patchState(
+      {
+        productPropertiesRequestStatus: RequestStatus.Pending
+      }
+    );
+    return this.service.productPropertiesRequest(action.id).pipe(
+      tap((response) => {
+        ctx.dispatch(new ProductsActions.LoadPropertiesSuccess(response))
+      }),
+      catchError((err, caught) => ctx.dispatch(new ProductsActions.LoadPropertiesFail()))
+    )
+  }
+
+  @Action(ProductsActions.LoadPropertiesSuccess)
+  public loadPropertiesSuccess(ctx: StateContext<IproductState>, action: ProductsActions.LoadPropertiesSuccess) {
+    ctx.patchState({
+      productPropertiesRequestStatus: RequestStatus.Load,
+      productProperties: action.payload
+    });
+  }
+
   @Selector()
   public static loadedProducts(state: IproductState): IProductListItem[] {
     return state.productList;
