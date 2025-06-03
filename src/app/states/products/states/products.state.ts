@@ -8,6 +8,7 @@ import { RequestStatus } from "@app/constants/request-status.const";
 import { catchError, Observable, tap } from "rxjs";
 import { IProductListItem } from "@app/states/products/interfaces/product-list-item.interface";
 import { IProductListRequest } from "@app/states/products/interfaces/product-list-request.interface";
+import { IProductPropertiesResponse } from "@app/states/products/interfaces/product-properties-response.interface";
 
 @State<IproductState>({
   name: 'Products',
@@ -70,7 +71,10 @@ export class ProductsState {
   public loadPropertiesSuccess(ctx: StateContext<IproductState>, action: ProductsActions.LoadPropertiesSuccess) {
     ctx.patchState({
       productPropertiesRequestStatus: RequestStatus.Load,
-      productProperties: action.payload
+      productProperties: {
+        product: {...action.payload.product, first_release_date: (action.payload.product.first_release_date || 0) * 1000},
+        releases: action.payload.releases.map(x => ({...x, release_date: x.release_date * 1000}))
+      }
     });
   }
 
@@ -82,5 +86,15 @@ export class ProductsState {
   @Selector()
   public static productsParams(state: IproductState): IProductListRequest {
     return state.productListRequestParams;
+  }
+
+  @Selector()
+  public static productPropertiesLoaded(state: IproductState): boolean {
+    return state.productPropertiesRequestStatus === RequestStatus.Load;
+  }
+
+  @Selector()
+  public static productProperties(state: IproductState): IProductPropertiesResponse | null {
+    return state.productProperties;
   }
 }

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, Resolve } from '@angular/router';
 import { ProductsActions } from '@app/states/products/states/products.actions';
+import { ProductsState } from '@app/states/products/states/products.state';
 import { Store } from '@ngxs/store';
 import { Observable, of } from 'rxjs';
 
@@ -19,6 +20,6 @@ export class ProductPropertiesResolver implements Resolve<boolean> {
     this.store.dispatch(new ProductsActions.LoadProperties(lastSegment));
 
     //console.warn('Last segment of URL:', lastSegment);
-    return(of(true));
+    return(this.store.select(ProductsState.productPropertiesLoaded));
   }
 }
