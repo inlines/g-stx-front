@@ -23,10 +23,13 @@ export class ProductsState {
   @Action(ProductsActions.SetRequestParams)  
   public setRequestParams(ctx: StateContext<IproductState>, action: ProductsActions.SetRequestParams) {
     const currentParams = ctx.getState().productListRequestParams;
-
+    const newParams = {...currentParams, ...action.payload};
+    if (!newParams.query) {
+      delete newParams.query;
+    }
     ctx.patchState({
-      productListRequestParams: {...currentParams, ...action.payload}
-    })
+      productListRequestParams: newParams
+    });
   }
 
   @Action(ProductsActions.LoadList)
