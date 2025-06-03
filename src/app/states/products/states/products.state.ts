@@ -59,7 +59,8 @@ export class ProductsState {
   public loadProperties(ctx: StateContext<IproductState>, action: ProductsActions.LoadProperties) {
     ctx.patchState(
       {
-        productPropertiesRequestStatus: RequestStatus.Pending
+        productPropertiesRequestStatus: RequestStatus.Pending,
+        productProperties: null
       }
     );
     return this.service.productPropertiesRequest(action.id).pipe(
@@ -75,8 +76,8 @@ export class ProductsState {
     ctx.patchState({
       productPropertiesRequestStatus: RequestStatus.Load,
       productProperties: {
-        product: {...action.payload.product, first_release_date: (action.payload.product.first_release_date || 0) * 1000},
-        releases: action.payload.releases.map(x => ({...x, release_date: x.release_date * 1000}))
+        product: {...action.payload.product, first_release_date: action.payload.product.first_release_date ? action.payload.product.first_release_date * 1000 : null},
+        releases: action.payload.releases.map(x => ({...x, release_date: x.release_date ? x.release_date * 1000 : null}))
       }
     });
   }

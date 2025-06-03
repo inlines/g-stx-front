@@ -1,4 +1,4 @@
-import { AsyncPipe, DatePipe, NgFor } from '@angular/common';
+import { AsyncPipe, DatePipe, NgFor, NgIf } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { IProductListItem } from '@app/states/products/interfaces/product-list-item.interface';
@@ -13,7 +13,7 @@ import { IProductListRequest } from '@app/states/products/interfaces/product-lis
 const LIMIT = 102;
 @Component({
   selector: 'app-product-list',
-  imports: [NgFor, AsyncPipe, DatePipe, RouterModule, ReactiveFormsModule],
+  imports: [NgIf, NgFor, AsyncPipe, DatePipe, RouterModule, ReactiveFormsModule],
   templateUrl: './product-list.component.html',
   styleUrl: './product-list.component.scss',
   standalone: true,
@@ -23,6 +23,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
     this.store.dispatch(new ProductsActions.SetRequestParams({
       limit: LIMIT,
       offset: 0,
+      query: undefined
     }));
     this.products$ = this.store.select(ProductsState.loadedProducts);
     this.productParams$ = this.store.select(ProductsState.productsParams);

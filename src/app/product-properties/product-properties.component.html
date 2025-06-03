@@ -6,7 +6,15 @@
       </div>
       <div>
         <h2>{{productProperties.product.name}}</h2>
-        <p class="caption">Впервые выпущена {{productProperties.product.first_release_date | date:'dd.MM.yy':'UTC'}} </p>
+        <p class="caption">
+          впервые выпущена
+          <ng-container *ngIf="productProperties.product.first_release_date else never">
+            {{productProperties.product.first_release_date | date:'dd.MM.yy':'UTC'}}
+          </ng-container>
+          <ng-template #never>
+            никогда
+          </ng-template>
+        </p>
       </div>
     </div>
     <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">

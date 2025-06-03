@@ -10,7 +10,15 @@
     </div>
     <div class="p-3">
       <p class="fw-semibold">{{product.name}}</p>
-      <div class="caption fw-light">впервые выпущена {{product.first_release_date | date:'dd.MM.yy':'UTC'}}</div>
+      <div class="caption fw-light">
+        впервые выпущена
+        <ng-container *ngIf="product.first_release_date else never">
+          {{product.first_release_date | date:'dd.MM.yy':'UTC'}}
+        </ng-container>
+        <ng-template #never>
+          никогда
+        </ng-template>
+      </div>
     </div>
   </div>
 </div>
