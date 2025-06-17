@@ -6,6 +6,7 @@ import { provideStore } from '@ngxs/store';
 import { ProductsState } from '@app/states/products/states/products.state';
 import { environment } from '@app/environments/environment';
 import { ProductPropertiesResolver } from '@app/resolvers/product-properties.resolver';
+import { RegistrationState } from '@app/states/registration/states/registration.state';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -14,7 +15,8 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideStore(
       [
-        ProductsState
+        ProductsState,
+        RegistrationState
       ],
     ),
     ProductPropertiesResolver,
