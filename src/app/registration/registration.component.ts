@@ -35,8 +35,6 @@ export class RegistrationComponent {
 
   public submit() : void {
     if(!this.form.invalid) {
-      console.warn('submit');
-      console.warn(this.form.value);
       this.store.dispatch(new RegistrationActions.RegisterRequest(this.form.value))
     }
   }

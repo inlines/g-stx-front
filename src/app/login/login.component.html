@@ -1,6 +1,6 @@
 <div class="row justify-content-center">
   <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
-    <h2>Заголовок регистрации</h2>
+    <h2>Авторизация</h2>
     <form clas="card" [formGroup]="form" (ngSubmit)="submit()">
       <!-- Логин -->
       <div class="mb-3">
@@ -37,28 +37,7 @@
           Введите пароль.
         </div>
       </div>
-
-      <!-- Повтор пароля -->
-      <div class="mb-3">
-        <label for="passwordAgain" class="form-label">Повторите пароль</label>
-        <input
-          id="passwordAgain"
-          type="password"
-          class="form-control"
-          [ngClass]="{
-            'is-invalid': (form.get('passwordAgain')?.invalid && form.get('passwordAgain')?.touched) || form.errors?.['passwordMismatch'],
-            'is-valid': form.get('passwordAgain')?.valid && !form.errors?.['passwordMismatch'] && form.get('passwordAgain')?.touched
-          }"
-          formControlName="passwordAgain"
-        />
-        <div *ngIf="form.errors?.['passwordMismatch'] && form.get('passwordAgain')?.touched" class="invalid-feedback">
-          Пароли не совпадают.
-        </div>
-        <div *ngIf="form.get('passwordAgain')?.hasError('required') && form.get('passwordAgain')?.touched" class="invalid-feedback">
-          Повторите пароль.
-        </div>
-      </div>
-      <button type="submit" class="btn btn-primary mb-2" [disabled]="form.invalid" (click)="submit()">регистрация</button>
+      <button type="submit" class="btn btn-primary mb-2" [disabled]="form.invalid" (click)="submit">Логин</button>
     </form>
   </div>
 </div>

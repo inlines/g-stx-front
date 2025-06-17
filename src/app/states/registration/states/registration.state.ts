@@ -1,4 +1,4 @@
-import { Action, Selector, State, StateContext } from "@ngxs/store";
+import { Action, State, StateContext } from "@ngxs/store";
 import { IRegistrationState } from "./registration.state.interface";
 import { REGISTARATION_STATE_DEFAULTS } from "./registration.state-default.const";
 import { Injectable } from "@angular/core";

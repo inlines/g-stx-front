@@ -4,11 +4,11 @@ import { ProductListComponent } from '@app/product-list/product-list.component';
 import { NotFoundComponent } from '@app/not-found/not-found.component';
 import { ProductPropertiesComponent } from '@app/product-properties/product-properties.component';
 import { ProductPropertiesResolver } from '@app/resolvers/product-properties.resolver';
+import { LoginComponent } from '@app/login/login.component';
 
 export const routes: Routes = [
   {
     path: '',
-    //loadComponent: () => ProductListComponent,
     redirectTo: 'products',
     pathMatch: 'full'
   },
@@ -26,6 +26,10 @@ export const routes: Routes = [
   {
     path: 'registration',
     loadComponent: () => RegistrationComponent,
+  },
+  {
+    path: 'login',
+    loadComponent: () => LoginComponent,
   },
   {
     path: '**',
