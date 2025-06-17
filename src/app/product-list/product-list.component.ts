@@ -54,15 +54,16 @@ export class ProductListComponent implements OnInit, OnDestroy {
           limit: LIMIT
         }))
       });
-    this.subscriptions.push(
-      sub
-    );
 
-    this.productParams$.pipe(
+    const sub2 = this.productParams$.pipe(
       distinctUntilChanged((prev, curr) => prev.limit === curr.limit && prev.offset === curr.offset && prev.query === curr.query)
     ).subscribe(params => {
       this.store.dispatch(new ProductsActions.LoadList());
     });
+
+    this.subscriptions.push(
+      sub, sub2
+    );
   }
 
 }
