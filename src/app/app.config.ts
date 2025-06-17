@@ -1,6 +1,6 @@
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { HTTP_INTERCEPTORS, provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { routes } from './app.routes';
 import { provideStore } from '@ngxs/store';
 import { ProductsState } from '@app/states/products/states/products.state';
@@ -8,11 +8,16 @@ import { environment } from '@app/environments/environment';
 import { ProductPropertiesResolver } from '@app/resolvers/product-properties.resolver';
 import { RegistrationState } from '@app/states/registration/states/registration.state';
 import { AuthState } from '@app/states/auth/states/auth.state';
-import { AuthInterceptor } from '@app/interceptors/auth.interceptor';
+import { authInterceptor } from '@app/interceptors/auth.interceptor';
+import { withNgxsStoragePlugin } from '@ngxs/storage-plugin';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideHttpClient(),
+    provideHttpClient(
+      withInterceptors([
+        authInterceptor
+      ])
+    ),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideStore(
@@ -21,16 +26,16 @@ export const appConfig: ApplicationConfig = {
         RegistrationState,
         AuthState,
       ],
+      withNgxsStoragePlugin({
+        keys: ['Auth']
+      })
     ),
     ProductPropertiesResolver,
     {
       provide: 'environment',
       useValue: environment,
     },
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: AuthInterceptor,
-      multi: true,
-    },
   ],
 };
+
+

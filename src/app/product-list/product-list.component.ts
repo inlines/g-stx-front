@@ -5,7 +5,7 @@ import { IProductListItem } from '@app/states/products/interfaces/product-list-i
 import { ProductsActions } from '@app/states/products/states/products.actions';
 import { ProductsState } from '@app/states/products/states/products.state';
 import { Store } from '@ngxs/store';
-import { debounceTime, distinctUntilChanged, map, Observable, startWith, Subscription } from 'rxjs';
+import { auditTime, distinctUntilChanged, map, Observable, Subscription } from 'rxjs';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { IProductListRequest } from '@app/states/products/interfaces/product-list-request.interface';
 
@@ -46,7 +46,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
     const sub = this.queryForm.controls.query.valueChanges.pipe(
         map(query => query?.trim() || null),
         distinctUntilChanged(),
-        debounceTime(1000),
+        auditTime(1000),
       ).subscribe(query => {
         this.store.dispatch(new ProductsActions.SetRequestParams({
           query: query? query : undefined,

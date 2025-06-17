@@ -20,4 +20,8 @@ export namespace AuthActions {
   export class LoginRequestFail {
     public static readonly type = AuthActionList.LOGIN_REQUEST_FAIL;
   }
+
+  export class Logout {
+    public static readonly type = AuthActionList.LOGOUT;
+  }
 }

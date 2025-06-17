@@ -22,7 +22,8 @@ export class AuthState {
   public loginRequest(ctx: StateContext<IAuthState>, action: AuthActions.LoginRequest) {
     ctx.patchState({
       authRequestStatus: RequestStatus.Pending,
-      login: action.payload.user_login
+      login: action.payload.user_login,
+      token: null
     });
 
     return this.service.authRequest(action.payload).pipe(
@@ -45,10 +46,20 @@ export class AuthState {
   public loginRequestFail(ctx: StateContext<IAuthState>, action: AuthActions.LoginRequestFail) {
     ctx.patchState({
       authRequestStatus: RequestStatus.Error,
-      login: null
+      login: null,
+      token: null
     });
 
     console.warn('AUTH FAIL');
+  }
+
+  @Action(AuthActions.Logout)
+  public logout(ctx: StateContext<IAuthState>) {
+    ctx.patchState({
+      authRequestStatus: RequestStatus.NotInvoked,
+      login: null,
+      token: null
+    });
   }
 
   @Selector()

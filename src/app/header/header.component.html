@@ -15,12 +15,21 @@
       </span>
     </div>
     <div class="col d-flex justify-content-end align-items-center">
-      <span class="px-1">
-        профиль
-      </span>
-      <span class="px-1">
-        выход
-      </span>
+      <ng-container *ngIf="currentUser$ | async as user else auth">
+        <span class="px-1">
+          {{ user }}
+        </span>
+        <span class="px-1" (click)="logout()">
+          выход
+        </span>
+      </ng-container>
+      <ng-template #auth>
+        <span class="px-1">
+          <a routerLink="/login">
+            авторизация
+          </a>
+        </span>
+      </ng-template>
     </div>
   </div>
 </div>
