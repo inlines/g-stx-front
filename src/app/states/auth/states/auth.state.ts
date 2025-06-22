@@ -6,6 +6,7 @@ import { AuthService } from "../services/auth.service";
 import { AuthActions } from "./auth-actions";
 import { RequestStatus } from "@app/constants/request-status.const";
 import { catchError, tap } from "rxjs";
+import { Router } from "@angular/router";
 
 
 @State<IAuthState>({
@@ -15,7 +16,8 @@ import { catchError, tap } from "rxjs";
 @Injectable()
 export class AuthState {
   constructor(
-      private service: AuthService
+      private service: AuthService,
+      private router: Router
   ){}
 
   @Action(AuthActions.LoginRequest)
@@ -40,6 +42,8 @@ export class AuthState {
       authRequestStatus: RequestStatus.Load,
       token: action.payload.token,
     });
+
+    this.router.navigate(['/collection']);
   }
 
   @Action(AuthActions.LoginRequestFail)
@@ -60,6 +64,8 @@ export class AuthState {
       login: null,
       token: null
     });
+
+    this.router.navigate(['/login']);
   }
 
   @Selector()

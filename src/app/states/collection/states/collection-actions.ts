@@ -17,6 +17,20 @@ export namespace CollectionActions {
     public static readonly type = CollectionActionList.ADD_REQUEST_FAIL;
   }
 
+  export class RemoveFromCollectionRequest {
+    public static readonly type = CollectionActionList.REMOVE_REQUEST;
+
+    constructor(public payload: IEditCollectionPayload) {}
+  }
+
+  export class RemoveFromCollectionSuccess {
+    public static readonly type = CollectionActionList.REMOVE_REQUEST_SUCCESS;
+  }
+
+  export class RemoveFromCollectionFail {
+    public static readonly type = CollectionActionList.REMOVE_REQUEST_FAIL;
+  }
+
   export class GetCollectionRequest {
     public static readonly type = CollectionActionList.GET_COLLECTION_REQUEST;
   }

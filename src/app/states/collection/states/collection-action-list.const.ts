@@ -3,6 +3,10 @@ export enum CollectionActionList {
   ADD_REQUEST_FAIL = '[Collection] add request fail',
   ADD_REQUEST_SUCCESS = '[Collection] add request success',
 
+  REMOVE_REQUEST = '[Collection] rmv request',
+  REMOVE_REQUEST_FAIL = '[Collection] rmv request fail',
+  REMOVE_REQUEST_SUCCESS = '[Collection] rmv request success',
+
   GET_COLLECTION_REQUEST = '[Collection] get collection request',
   GET_COLLECTION_FAIL = '[Collection] get collection request fail',
   GET_COLLECTION_SUCCESS = '[Collection] get collection request success',

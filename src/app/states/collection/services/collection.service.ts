@@ -10,6 +10,7 @@ import { ICollectionItem } from "../interfaces/collection-item.interface";
 })
 export class CollectionService {
   private readonly addToCollectionPath: string;
+  private readonly removeFromCollectionPath: string;
   private readonly getCollectionPath: string;
 
   constructor(
@@ -18,10 +19,15 @@ export class CollectionService {
   ) {
     this.addToCollectionPath = `${this.environment.apiUrl}/add_release`;
     this.getCollectionPath = `${this.environment.apiUrl}/collection`;
+    this.removeFromCollectionPath = `${this.environment.apiUrl}/remove_release`;
   }
 
   public addToCollection(payload: IEditCollectionPayload): Observable<any> {
     return this.http.post<any>(this.addToCollectionPath, payload);
+  }
+
+  public removeFromCollection(payload: IEditCollectionPayload): Observable<any> {
+    return this.http.post<any>(this.removeFromCollectionPath, payload);
   }
 
   public getCollection(): Observable<ICollectionItem[]> {

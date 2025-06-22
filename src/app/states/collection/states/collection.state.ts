@@ -7,6 +7,7 @@ import { CollectionActions } from "./collection-actions";
 import { RequestStatus } from "@app/constants/request-status.const";
 import { catchError, Observable, tap } from "rxjs";
 import { ICollectionItem } from "../interfaces/collection-item.interface";
+import { ToastService } from "@app/services/toast.service";
 
 @State<ICollectionState>({
   name: 'Collection',
@@ -15,7 +16,8 @@ import { ICollectionItem } from "../interfaces/collection-item.interface";
 @Injectable()
 export class CollectionState {
   constructor(
-    private service: CollectionService
+    private service: CollectionService,
+    private toastService: ToastService
   ){}
 
   @Action(CollectionActions.AddToCollectionRequest)
@@ -30,6 +32,68 @@ export class CollectionState {
       }),
       catchError((err, caught) => ctx.dispatch(new CollectionActions.AddToCollectionFail()))
     )
+  }
+
+  @Action(CollectionActions.AddToCollectionSuccess)
+  public addToCollectionSuccess(ctx: StateContext<ICollectionState>) {
+    ctx.patchState({
+      changeCollectionRequestStatus: RequestStatus.Load
+    });
+
+    this.toastService.show({
+      body: 'Успешное добавление в коллекцию',
+      classname: 'bg-success text-light',
+    });
+  }
+
+  @Action(CollectionActions.AddToCollectionFail)
+  public addToCollectionFail(ctx: StateContext<ICollectionState>) {
+    ctx.patchState({
+      changeCollectionRequestStatus: RequestStatus.Error
+    });
+
+    this.toastService.show({
+      body: 'Ошибка при добавлении в коллекцию',
+      classname: 'bg-danger-subtle text-light',
+    });
+  }
+
+  @Action(CollectionActions.RemoveFromCollectionRequest)
+  public removeFromCollectionRequest(ctx: StateContext<ICollectionState>, action: CollectionActions.RemoveFromCollectionRequest) {
+    ctx.patchState({
+      changeCollectionRequestStatus: RequestStatus.Pending
+    });
+
+    return this.service.removeFromCollection(action.payload).pipe(
+      tap(() => {
+        ctx.dispatch(new CollectionActions.RemoveFromCollectionSuccess())
+      }),
+      catchError((err, caught) => ctx.dispatch(new CollectionActions.RemoveFromCollectionFail()))
+    )
+  }
+
+  @Action(CollectionActions.RemoveFromCollectionSuccess)
+  public removeFromCollectionSuccess(ctx: StateContext<ICollectionState>) {
+    ctx.patchState({
+      changeCollectionRequestStatus: RequestStatus.Load
+    });
+
+    this.toastService.show({
+      body: 'Успешное удаление из коллекции',
+      classname: 'bg-success text-light',
+    });
+  }
+
+  @Action(CollectionActions.RemoveFromCollectionFail)
+  public removeFromCollectionFail(ctx: StateContext<ICollectionState>) {
+    ctx.patchState({
+      changeCollectionRequestStatus: RequestStatus.Error
+    });
+    
+    this.toastService.show({
+      body: 'Ошибка при удалении из колеекции',
+      classname: 'bg-danger-subtle text-light',
+    });
   }
 
   @Action(CollectionActions.GetCollectionRequest)

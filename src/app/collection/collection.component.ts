@@ -1,6 +1,7 @@
 import { AsyncPipe, NgFor } from '@angular/common';
 import { Component } from '@angular/core';
 import { ICollectionItem } from '@app/states/collection/interfaces/collection-item.interface';
+import { CollectionActions } from '@app/states/collection/states/collection-actions';
 import { CollectionState } from '@app/states/collection/states/collection.state';
 import { Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
@@ -22,7 +23,7 @@ export class CollectionComponent {
   public collection$: Observable<ICollectionItem[]>;
 
   public remove(release_id: number): void {
-    
+    this.store.dispatch(new CollectionActions.RemoveFromCollectionRequest({release_id}));
   }
 }
  
