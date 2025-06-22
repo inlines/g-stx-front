@@ -4,24 +4,24 @@
       <a routerLink="/">home</a>
     </div>
     <div class="col-auto">
-      <span class="col px-1">
-        добавить товар
-      </span>
-      <span class="col px-1">
+      <a class="col px-1" *ngIf="isAuthorised$ | async" routerLink="/collection">
+        моя коллекция
+      </a>
+      <!-- <span class="col px-1">
         о нас
       </span>
       <span class="col px-1">
         новости
-      </span>
+      </span> -->
     </div>
     <div class="col d-flex justify-content-end align-items-center">
-      <ng-container *ngIf="currentUser$ | async as user else auth">
+      <ng-container *ngIf="isAuthorised$ | async else auth">
         <span class="px-1">
-          {{ user }}
+          {{ currentUser$ | async }}
         </span>
-        <span class="px-1" (click)="logout()">
+        <a class="px-1" (click)="logout()">
           выход
-        </span>
+        </a>
       </ng-container>
       <ng-template #auth>
         <span class="px-1">

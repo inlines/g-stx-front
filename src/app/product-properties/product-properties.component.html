@@ -28,7 +28,7 @@
               {{release.release_date | date:'dd.MM.yy':'UTC'}} на {{release.platform_name}} [{{release.release_region}}]
             </div>
             <ng-container *ngIf="isAuthorised$ | async">
-              <button type="submit" class="col-auto btn btn-primary mb-2 ml-auto">Добавить в коллекцию</button>
+              <button type="submit" class="col-auto btn btn-primary mb-2 ml-auto" (click)="addToCollection(release.release_id)">Добавить в коллекцию</button>
             </ng-container>
           </div>
         </li>

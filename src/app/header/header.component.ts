@@ -18,9 +18,11 @@ export class HeaderComponent {
     private readonly store: Store
   ) {
     this.currentUser$ = this.store.select(AuthState.login);
+    this.isAuthorised$ = this.store.select(AuthState.isAuthorised);
   }
 
   public readonly currentUser$: Observable<string | null>;
+  public readonly isAuthorised$: Observable<boolean>;
 
   public logout(): void {
     this.store.dispatch(new AuthActions.Logout());

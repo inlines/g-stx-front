@@ -6,6 +6,7 @@ import { ProductsState } from '@app/states/products/states/products.state';
 import { Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
 import { NgbCarouselModule } from '@ng-bootstrap/ng-bootstrap';
+import { CollectionActions } from '@app/states/collection/states/collection-actions';
 
 @Component({
   selector: 'app-product-properties',
@@ -25,4 +26,8 @@ export class ProductPropertiesComponent {
   public productProperties$: Observable<IProductPropertiesResponse | null>;
 
   public isAuthorised$: Observable<boolean>;
+
+  public addToCollection(release_id: number): void {
+    this.store.dispatch(new CollectionActions.AddToCollectionRequest({release_id}))
+  }
 }

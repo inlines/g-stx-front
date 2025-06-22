@@ -35,7 +35,7 @@ export class RegistrationComponent {
 
   public submit() : void {
     if(!this.form.invalid) {
-      this.store.dispatch(new RegistrationActions.RegisterRequest(this.form.value))
+      this.store.dispatch(new RegistrationActions.RegisterRequest(this.form.value));
     }
   }
 }

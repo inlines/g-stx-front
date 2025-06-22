@@ -18,8 +18,6 @@ export class ProductPropertiesResolver implements Resolve<boolean> {
     const lastSegment = urlSegments[urlSegments.length - 1]?.path;
 
     this.store.dispatch(new ProductsActions.LoadProperties(lastSegment));
-
-    //console.warn('Last segment of URL:', lastSegment);
     return(this.store.select(ProductsState.productPropertiesLoaded));
   }
 }

@@ -10,6 +10,7 @@ import { RegistrationState } from '@app/states/registration/states/registration.
 import { AuthState } from '@app/states/auth/states/auth.state';
 import { authInterceptor } from '@app/interceptors/auth.interceptor';
 import { withNgxsStoragePlugin } from '@ngxs/storage-plugin';
+import { CollectionState } from './states/collection/states/collection.state';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -25,6 +26,7 @@ export const appConfig: ApplicationConfig = {
         ProductsState,
         RegistrationState,
         AuthState,
+        CollectionState,
       ],
       withNgxsStoragePlugin({
         keys: ['Auth']
