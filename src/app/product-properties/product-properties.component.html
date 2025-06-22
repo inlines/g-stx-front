@@ -34,10 +34,17 @@
         </li>
       </ul>
     </div>
-    <div class="col">
+    <div class="col-12">
       <p>
         {{productProperties.product.summary}}
       </p>
+    </div>
+    <div class="col-12">
+      <ngb-carousel>
+        <ng-template ngbSlide *ngFor="let screen of productProperties.screenshots">
+          <img class="w-100" height="auto" width="100%" [src]="screen">
+        </ng-template>
+      </ngb-carousel>
     </div>
   </div>
 </ng-container>

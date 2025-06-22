@@ -5,10 +5,11 @@ import { IProductPropertiesResponse } from '@app/states/products/interfaces/prod
 import { ProductsState } from '@app/states/products/states/products.state';
 import { Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
+import { NgbCarouselModule } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-product-properties',
-  imports: [AsyncPipe, NgIf, DatePipe, NgFor],
+  imports: [AsyncPipe, NgIf, DatePipe, NgFor, NgbCarouselModule],
   templateUrl: './product-properties.component.html',
   styleUrl: './product-properties.component.scss',
   standalone: true,
