@@ -99,6 +99,10 @@ export class ProductsState {
 
   @Selector()
   public static productProperties(state: IproductState): IProductPropertiesResponse | null {
-    return state.productProperties;
+    const res = state.productProperties;
+    if(res?.product.image_url) {
+      res.product.image_url = res.product.image_url?.replace('t_thumb','t_1080p')
+    }
+    return res;
   }
 }

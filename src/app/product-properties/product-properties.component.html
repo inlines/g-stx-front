@@ -23,7 +23,14 @@
       </h2>
       <ul>
         <li *ngFor="let release of productProperties.releases">
-          {{release.release_date | date:'dd.MM.yy':'UTC'}} на {{release.platform_name}} [{{release.release_region}}]
+          <div class="row p-3">
+            <div class="col">
+              {{release.release_date | date:'dd.MM.yy':'UTC'}} на {{release.platform_name}} [{{release.release_region}}]
+            </div>
+            <ng-container *ngIf="isAuthorised$ | async">
+              <button type="submit" class="col-auto btn btn-primary mb-2 ml-auto">Добавить в коллекцию</button>
+            </ng-container>
+          </div>
         </li>
       </ul>
     </div>

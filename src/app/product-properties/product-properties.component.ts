@@ -1,5 +1,6 @@
 import { AsyncPipe, DatePipe, NgFor, NgIf } from '@angular/common';
 import { Component } from '@angular/core';
+import { AuthState } from '@app/states/auth/states/auth.state';
 import { IProductPropertiesResponse } from '@app/states/products/interfaces/product-properties-response.interface';
 import { ProductsState } from '@app/states/products/states/products.state';
 import { Store } from '@ngxs/store';
@@ -16,8 +17,11 @@ export class ProductPropertiesComponent {
   constructor(
     private readonly store: Store
   ){
-    this.productProperties$ = this.store.select(ProductsState.productProperties)
+    this.productProperties$ = this.store.select(ProductsState.productProperties);
+    this.isAuthorised$ = this.store.select(AuthState.isAuthorised);
   }
 
   public productProperties$: Observable<IProductPropertiesResponse | null>;
+
+  public isAuthorised$: Observable<boolean>;
 }

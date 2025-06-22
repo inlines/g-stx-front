@@ -71,4 +71,9 @@ export class AuthState {
   public static login(state: IAuthState): string | null {
     return state.login;
   }
+
+  @Selector()
+  public static isAuthorised(state: IAuthState): boolean {
+    return !!state.login && !!state.token;
+  }
 }
