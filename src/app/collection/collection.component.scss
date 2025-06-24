@@ -1,0 +1,10 @@
+.sticker {
+  position: sticky;
+  top: 56px;
+  z-index: 1000; /* убедись, что он выше других элементов */
+  background: white; /* или цвет фона страницы */
+}
+
+.card, a {
+  cursor: pointer;
+}

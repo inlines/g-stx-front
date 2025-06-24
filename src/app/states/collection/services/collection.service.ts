@@ -4,6 +4,7 @@ import { IEnvironment } from "@app/environments/environment.interface";
 import { Observable } from "rxjs";
 import { IEditCollectionPayload } from "../interfaces/edit-collection-payload.interface";
 import { ICollectionItem } from "../interfaces/collection-item.interface";
+import { IProductListRequest } from "@app/states/products/interfaces/product-list-request.interface";
 
 @Injectable({
   providedIn: 'root',
@@ -30,8 +31,8 @@ export class CollectionService {
     return this.http.post<any>(this.removeFromCollectionPath, payload);
   }
 
-  public getCollection(): Observable<ICollectionItem[]> {
-    return this.http.get<ICollectionItem[]>(this.getCollectionPath);
+  public getCollection(params: IProductListRequest): Observable<ICollectionItem[]> {
+    return this.http.get<ICollectionItem[]>(this.getCollectionPath, {params: {...params}});
   }
 
 }

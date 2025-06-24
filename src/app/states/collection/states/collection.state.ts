@@ -8,6 +8,7 @@ import { RequestStatus } from "@app/constants/request-status.const";
 import { catchError, Observable, tap } from "rxjs";
 import { ICollectionItem } from "../interfaces/collection-item.interface";
 import { ToastService } from "@app/services/toast.service";
+import { IProductListRequest } from "@app/states/products/interfaces/product-list-request.interface";
 
 @State<ICollectionState>({
   name: 'Collection',
@@ -109,7 +110,7 @@ export class CollectionState {
       loadCollectionStatus: RequestStatus.Pending
     });
 
-    return this.service.getCollection().pipe(
+    return this.service.getCollection(ctx.getState().collectionParams).pipe(
       tap((payload) => {
         ctx.dispatch(new CollectionActions.GetCollectionSuccess(payload))
       }),
@@ -132,8 +133,25 @@ export class CollectionState {
     });
   }
 
+  @Action(CollectionActions.SetCollectionParams)
+  public setCollectionParams(ctx: StateContext<ICollectionState>, action: CollectionActions.SetCollectionParams) {
+    const currentParams = ctx.getState().collectionParams;
+    const newParams = {...currentParams, ...action.payload};
+    if (!newParams.query) {
+      delete newParams.query;
+    }
+    ctx.patchState({
+      collectionParams: newParams
+    });
+  }
+
   @Selector()
   public static loadedCollection(state: ICollectionState): ICollectionItem[] {
     return state.loadedCollection;
+  }
+
+  @Selector()
+  public static collectionParams(state: ICollectionState): IProductListRequest {
+    return state.collectionParams;
   }
 }

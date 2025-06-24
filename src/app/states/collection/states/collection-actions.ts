@@ -1,3 +1,4 @@
+import { IProductListRequest } from "@app/states/products/interfaces/product-list-request.interface";
 import { ICollectionItem } from "../interfaces/collection-item.interface";
 import { IEditCollectionPayload } from "../interfaces/edit-collection-payload.interface";
 import { CollectionActionList } from "./collection-action-list.const";
@@ -43,6 +44,12 @@ export namespace CollectionActions {
     public static readonly type = CollectionActionList.GET_COLLECTION_SUCCESS;
 
     constructor(public payload: ICollectionItem[]){
+    }
+  }
+
+  export class SetCollectionParams {
+    public static readonly type = CollectionActionList.SET_COLLECTION_PARAMS;
+    constructor(public payload: IProductListRequest){
     }
   }
 }

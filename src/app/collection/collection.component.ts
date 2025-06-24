@@ -1,11 +1,12 @@
 import { AsyncPipe, NgFor } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { ICollectionItem } from '@app/states/collection/interfaces/collection-item.interface';
 import { CollectionActions } from '@app/states/collection/states/collection-actions';
 import { CollectionState } from '@app/states/collection/states/collection.state';
+import { IProductListRequest } from '@app/states/products/interfaces/product-list-request.interface';
 import { Store } from '@ngxs/store';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-collection',
@@ -14,11 +15,33 @@ import { Observable } from 'rxjs';
   styleUrl: './collection.component.scss',
   standalone: true,
 })
-export class CollectionComponent {
+export class CollectionComponent implements OnInit, OnDestroy {
+  subscriptions: Subscription[] = [];
   constructor(
     private readonly store: Store
   ){
     this.collection$ = this.store.select(CollectionState.loadedCollection);
+    this.collectionParams$ = this.store.select(CollectionState.collectionParams);
+  }
+
+  private collectionParams$: Observable<IProductListRequest>;
+
+  public ngOnInit(): void {
+    const sub =  this.activeCategory.subscribe(x => this.store.dispatch(new CollectionActions.SetCollectionParams({cat: x})));
+
+    const paramsSub = this.collectionParams$.subscribe(params => this.store.dispatch(new CollectionActions.GetCollectionRequest()));
+
+    this.subscriptions.push(sub, paramsSub);
+  }
+
+  public ngOnDestroy(): void {
+    this.subscriptions.forEach(x => x.unsubscribe());
+  }
+
+  public activeCategory = new BehaviorSubject(6);
+  
+  public setActiveCategory(cat: number) {
+    this.activeCategory.next(cat);
   }
 
   public collection$: Observable<ICollectionItem[]>;

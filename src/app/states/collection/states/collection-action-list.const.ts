@@ -10,4 +10,6 @@ export enum CollectionActionList {
   GET_COLLECTION_REQUEST = '[Collection] get collection request',
   GET_COLLECTION_FAIL = '[Collection] get collection request fail',
   GET_COLLECTION_SUCCESS = '[Collection] get collection request success',
+
+  SET_COLLECTION_PARAMS = '[Collection] set collection params',
 }

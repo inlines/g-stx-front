@@ -47,24 +47,9 @@ export class ProductListComponent implements OnInit, OnDestroy {
 
   public setActiveCategory(cat: number) {
     this.activeCategory.next(cat);
-  } 
+  }
 
   public ngOnInit(): void {
-    // const sub = combineLatest([this.queryForm.controls.query.valueChanges, this.activeCategory.pipe(startWith(6))]).pipe(
-    //     map(([query, category]) => ({query: query?.trim() || null, category})),
-    //     distinctUntilChanged((prev: {query: string | null, category: number}, curr: {query: string | null, category: number}) => prev.query === curr.query && prev.category === curr.category),
-    //     auditTime(1000),
-    //   ).subscribe(({query, category}) => {
-    //     debugger;
-    //     this.store.dispatch(new ProductsActions.SetRequestParams({
-    //       query: query? query : undefined,
-    //       offset: 0,
-    //       limit: LIMIT,
-    //       cat: category
-    //     }))
-    //   });
-
-
     let lastQuery: string | null = this.queryForm.controls.query.value?.trim() || null;
     let lastCategory: number = this.activeCategory.value;
 
