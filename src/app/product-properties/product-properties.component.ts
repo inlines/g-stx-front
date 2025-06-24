@@ -4,9 +4,11 @@ import { AuthState } from '@app/states/auth/states/auth.state';
 import { IProductPropertiesResponse } from '@app/states/products/interfaces/product-properties-response.interface';
 import { ProductsState } from '@app/states/products/states/products.state';
 import { Store } from '@ngxs/store';
-import { Observable } from 'rxjs';
+import { combineLatest, map, Observable, of, switchMap } from 'rxjs';
 import { NgbCarouselModule } from '@ng-bootstrap/ng-bootstrap';
 import { CollectionActions } from '@app/states/collection/states/collection-actions';
+import { IReleaseItem } from '@app/states/products/interfaces/release-item.interface';
+import { OwnershipState } from '@app/states/ownership/states/ownership.state';
 
 @Component({
   selector: 'app-product-properties',
@@ -21,11 +23,32 @@ export class ProductPropertiesComponent {
   ){
     this.productProperties$ = this.store.select(ProductsState.productProperties);
     this.isAuthorised$ = this.store.select(AuthState.isAuthorised);
+    // this.releases$ = this.productProperties$.pipe(
+    //   map(properties => properties?.releases.map(r => ({...r, owned: this.store.selectSnapshot(OwnershipState.hasRelease(r.release_id))})) || [])
+    // )
+    this.releases$ = this.productProperties$.pipe(
+    switchMap(properties => {
+      if (!properties) return of([]);
+        const releaseStreams = properties.releases.map(release =>
+          this.store.select(OwnershipState.hasRelease(release.release_id)).pipe(
+            map(owned => ({
+              ...release,
+              owned
+            }))
+          )
+        );
+
+        return releaseStreams.length > 0 ? combineLatest(releaseStreams) : of([]);
+      })
+    );
+
   }
 
   public productProperties$: Observable<IProductPropertiesResponse | null>;
 
   public isAuthorised$: Observable<boolean>;
+
+  public releases$: Observable<IReleaseItem[]>;
 
   public addToCollection(release_id: number): void {
     this.store.dispatch(new CollectionActions.AddToCollectionRequest({release_id}))

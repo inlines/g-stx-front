@@ -6,5 +6,5 @@ export const COLLECTION_STATE_DEFAULTS: ICollectionState = {
   changeCollectionRequestStatus: RequestStatus.NotInvoked,
   loadCollectionStatus:RequestStatus.NotInvoked,
   loadedCollection: [],
-  collectionParams: {cat: 6},
+  collectionParams: {},
 }

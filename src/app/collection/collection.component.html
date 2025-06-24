@@ -4,20 +4,20 @@
   <div class="col-12 px-0 mb-3 sticker">
     <div class="row p-3">
       <ul class="nav nav-pills">
-        <li class="nav-item">
-          <a class="nav-link" [class.active]="(activeCategory | async) === 6" (click)="setActiveCategory(6)">PC</a>
+        <li class="nav-item" *ngIf="(activePlatforms$ | async)?.includes(6)">
+          <a class="nav-link" [class.active]="activeCategory === 6" (click)="setActiveCategory(6)">PC</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" [class.active]="(activeCategory | async) === 38" (click)="setActiveCategory(38)">PSP</a>
+        <li class="nav-item" *ngIf="(activePlatforms$ | async)?.includes(38)">
+          <a class="nav-link" [class.active]="activeCategory === 38" (click)="setActiveCategory(38)">PSP</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" [class.active]="(activeCategory | async) === 9" (click)="setActiveCategory(9)">PS3</a>
+        <li class="nav-item" *ngIf="(activePlatforms$ | async)?.includes(9)">
+          <a class="nav-link" [class.active]="activeCategory === 9" (click)="setActiveCategory(9)">PS3</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" [class.active]="(activeCategory | async) === 48" (click)="setActiveCategory(48)">PS4</a>
+        <li class="nav-item" *ngIf="(activePlatforms$ | async)?.includes(48)">
+          <a class="nav-link" [class.active]="activeCategory === 48" (click)="setActiveCategory(48)">PS4</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" [class.active]="(activeCategory | async) === 167" (click)="setActiveCategory(167)">PS5</a>
+        <li class="nav-item" *ngIf="(activePlatforms$ | async)?.includes(167)">
+          <a class="nav-link" [class.active]="activeCategory === 167" (click)="setActiveCategory(167)">PS5</a>
         </li>
       </ul>
     </div>

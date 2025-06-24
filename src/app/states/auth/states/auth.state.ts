@@ -7,6 +7,7 @@ import { AuthActions } from "./auth-actions";
 import { RequestStatus } from "@app/constants/request-status.const";
 import { catchError, tap } from "rxjs";
 import { Router } from "@angular/router";
+import { OwnershipActions } from "@app/states/ownership/states/ownership-actions";
 
 
 @State<IAuthState>({
@@ -43,6 +44,8 @@ export class AuthState {
       token: action.payload.token,
     });
 
+    ctx.dispatch(new OwnershipActions.RequestOwnership());
+
     this.router.navigate(['/collection']);
   }
 
@@ -64,6 +67,8 @@ export class AuthState {
       login: null,
       token: null
     });
+
+    ctx.dispatch(new OwnershipActions.ResetOwnership());
 
     this.router.navigate(['/login']);
   }
