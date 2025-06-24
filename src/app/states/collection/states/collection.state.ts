@@ -40,9 +40,11 @@ export class CollectionState {
       changeCollectionRequestStatus: RequestStatus.Load
     });
 
+    this.toastService.clear();
     this.toastService.show({
       body: 'Успешное добавление в коллекцию',
       classname: 'bg-success text-light',
+      delay: 500,
     });
   }
 
@@ -51,10 +53,11 @@ export class CollectionState {
     ctx.patchState({
       changeCollectionRequestStatus: RequestStatus.Error
     });
-
+    this.toastService.clear();
     this.toastService.show({
       body: 'Ошибка при добавлении в коллекцию',
       classname: 'bg-danger-subtle text-light',
+      delay: 500,
     });
   }
 
@@ -77,11 +80,14 @@ export class CollectionState {
     ctx.patchState({
       changeCollectionRequestStatus: RequestStatus.Load
     });
-
+    this.toastService.clear();
     this.toastService.show({
       body: 'Успешное удаление из коллекции',
       classname: 'bg-success text-light',
+      delay: 500,
     });
+
+    ctx.dispatch(new CollectionActions.GetCollectionRequest());
   }
 
   @Action(CollectionActions.RemoveFromCollectionFail)
@@ -89,10 +95,11 @@ export class CollectionState {
     ctx.patchState({
       changeCollectionRequestStatus: RequestStatus.Error
     });
-    
+    this.toastService.clear();
     this.toastService.show({
       body: 'Ошибка при удалении из колеекции',
       classname: 'bg-danger-subtle text-light',
+      delay: 500,
     });
   }
 

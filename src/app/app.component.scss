@@ -11,6 +11,7 @@ main article {
 }
 
 app-toast-container {
-  position: absolute;
-  bottom: 200px;
+  position: fixed;
+  bottom: 0px;
+  right: 0px;
 }

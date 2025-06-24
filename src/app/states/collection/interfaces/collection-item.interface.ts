@@ -5,4 +5,5 @@ export interface ICollectionItem {
   product_name: string;
   image_url: string | null;
   region_name: string | null;
+  product_id: number;
 }

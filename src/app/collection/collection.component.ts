@@ -1,5 +1,6 @@
 import { AsyncPipe, NgFor } from '@angular/common';
 import { Component } from '@angular/core';
+import { RouterModule } from '@angular/router';
 import { ICollectionItem } from '@app/states/collection/interfaces/collection-item.interface';
 import { CollectionActions } from '@app/states/collection/states/collection-actions';
 import { CollectionState } from '@app/states/collection/states/collection.state';
@@ -8,7 +9,7 @@ import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-collection',
-  imports: [AsyncPipe, NgFor],
+  imports: [AsyncPipe, NgFor, RouterModule],
   templateUrl: './collection.component.html',
   styleUrl: './collection.component.scss',
   standalone: true,
@@ -22,8 +23,9 @@ export class CollectionComponent {
 
   public collection$: Observable<ICollectionItem[]>;
 
-  public remove(release_id: number): void {
+  public remove(release_id: number, event: Event): void {
     this.store.dispatch(new CollectionActions.RemoveFromCollectionRequest({release_id}));
+    event.stopImmediatePropagation();
   }
 }
  
