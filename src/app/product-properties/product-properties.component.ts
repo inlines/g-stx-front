@@ -23,9 +23,6 @@ export class ProductPropertiesComponent {
   ){
     this.productProperties$ = this.store.select(ProductsState.productProperties);
     this.isAuthorised$ = this.store.select(AuthState.isAuthorised);
-    // this.releases$ = this.productProperties$.pipe(
-    //   map(properties => properties?.releases.map(r => ({...r, owned: this.store.selectSnapshot(OwnershipState.hasRelease(r.release_id))})) || [])
-    // )
     this.releases$ = this.productProperties$.pipe(
     switchMap(properties => {
       if (!properties) return of([]);

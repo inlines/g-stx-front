@@ -9,6 +9,7 @@ import { catchError, Observable, tap } from "rxjs";
 import { ICollectionItem } from "../interfaces/collection-item.interface";
 import { ToastService } from "@app/services/toast.service";
 import { IProductListRequest } from "@app/states/products/interfaces/product-list-request.interface";
+import { OwnershipActions } from "@app/states/ownership/states/ownership-actions";
 
 @State<ICollectionState>({
   name: 'Collection',
@@ -41,6 +42,7 @@ export class CollectionState {
       changeCollectionRequestStatus: RequestStatus.Load
     });
 
+    ctx.dispatch(new OwnershipActions.RequestOwnership());
     this.toastService.clear();
     this.toastService.show({
       body: 'Успешное добавление в коллекцию',
@@ -87,7 +89,7 @@ export class CollectionState {
       classname: 'bg-success text-light',
       delay: 500,
     });
-
+    ctx.dispatch(new OwnershipActions.RequestOwnership());
     ctx.dispatch(new CollectionActions.GetCollectionRequest());
   }
 
