@@ -174,6 +174,7 @@ export class CollectionState {
       delay: 500,
     });
     ctx.dispatch(new OwnershipActions.RequestOwnership());
+    ctx.dispatch(new CollectionActions.GetWishlistRequest());
   }
 
   @Action(CollectionActions.RemoveWishFail)

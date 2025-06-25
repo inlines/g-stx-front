@@ -50,9 +50,14 @@ export class OwnershipState {
     return state.ownership;
   }
 
-  static activeplatforms = createSelector(
+  static activeCollectionPlatforms = createSelector(
     [OwnershipState.ownership],
-    (ownership: IOwnershipItem[]) => ownership.map(o => o.platform)
+    (ownership: IOwnershipItem[]) => ownership.filter(item => item.have_count > 0).map(o => o.platform)
+  );
+
+  static activeWishlistPlatforms = createSelector(
+    [OwnershipState.ownership],
+    (ownership: IOwnershipItem[]) => ownership.filter(item => item.wish_count > 0).map(o => o.platform)
   );
 
   static hasRelease = (releaseId: number) =>

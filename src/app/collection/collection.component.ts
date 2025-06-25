@@ -23,7 +23,7 @@ export class CollectionComponent implements OnInit, OnDestroy {
   ){
     this.collection$ = this.store.select(CollectionState.loadedCollection);
     this.collectionParams$ = this.store.select(CollectionState.collectionParams);
-    this.activePlatforms$ = this.store.select(OwnershipState.activeplatforms);
+    this.activePlatforms$ = this.store.select(OwnershipState.activeCollectionPlatforms);
   }
 
   private collectionParams$: Observable<IProductListRequest>;

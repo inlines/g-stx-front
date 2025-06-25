@@ -23,7 +23,7 @@ export class WishlistComponent implements OnInit, OnDestroy {
   ){
     this.collection$ = this.store.select(CollectionState.loadedWishlist);
     this.collectionParams$ = this.store.select(CollectionState.wishlistParams);
-    this.activePlatforms$ = this.store.select(OwnershipState.activeplatforms);
+    this.activePlatforms$ = this.store.select(OwnershipState.activeWishlistPlatforms);
   }
 
   private collectionParams$: Observable<IProductListRequest>;
@@ -59,6 +59,7 @@ export class WishlistComponent implements OnInit, OnDestroy {
   public collection$: Observable<ICollectionItem[]>;
 
   public remove(release_id: number, event: Event): void {
+     this.store.dispatch(new CollectionActions.RemoveWishRequest({release_id}));
      event.stopImmediatePropagation();
   }
 }

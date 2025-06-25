@@ -1,30 +1,30 @@
 <div class="header-bg position-relative w-100 py-3 px-5 px-lg-7 bg-base-weak shadowed-1">
   <div class="row">
     <div class="col-6 col-md-4 col-sm-2">
-      <a routerLink="/">каталог</a>
+      <a class="nav-link" routerLink="/">каталог</a>
     </div>
     <div class="col-auto">
-      <a class="col px-1" *ngIf="isAuthorised$ | async" routerLink="/collection">
+      <a class="col px-1 nav-link" *ngIf="isAuthorised$ | async" routerLink="/collection">
         моя коллекция
       </a>
     </div>
     <div class="col-auto">
-      <a class="col px-1" *ngIf="isAuthorised$ | async" routerLink="/wishlist">
+      <a class="col px-1 nav-link" *ngIf="isAuthorised$ | async" routerLink="/wishlist">
         мой вишлист
       </a>
     </div>
     <div class="col d-flex justify-content-end align-items-center">
       <ng-container *ngIf="isAuthorised$ | async else auth">
-        <span class="px-1">
+        <span class="px-1 h5 mb-0">
           {{ currentUser$ | async }}
         </span>
-        <a class="px-1" (click)="logout()">
+        <a class="px-1 nav-link" (click)="logout()">
           выход
         </a>
       </ng-container>
       <ng-template #auth>
         <span class="px-1">
-          <a routerLink="/login">
+          <a nav-link routerLink="/login">
             авторизация
           </a>
         </span>
