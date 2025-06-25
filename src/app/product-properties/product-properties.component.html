@@ -28,7 +28,12 @@
               {{release.release_date | date:'dd.MM.yy':'UTC'}} на {{release.platform_name}} [{{release.release_region}}]
             </div>
             <ng-container *ngIf="isAuthorised$ | async">
-              <button type="submit" [disabled]="release.owned" class="col-auto btn btn-primary mb-2 ml-auto" (click)="addToCollection(release.release_id)">{{release.owned ? 'Уже в коллекции' : 'Добавить в коллекцию'}}</button>
+              <div class="col-lg col-md-12 col-sm-12">
+                <button type="submit" [disabled]="release.owned" class="btn btn-primary mb-2 ml-auto" (click)="addToCollection(release.release_id)">{{release.owned ? 'Уже есть' : 'В коллекцию'}}</button>
+              </div>
+              <div class="col-lg col-md-12 col-sm-12">
+                <button type="submit"  [disabled]="release.wished" class="btn btn-primary mb-2 ml-auto" (click)="addWish(release.release_id)">{{release.wished ? 'Уже есть' : 'В вишлист'}}</button>
+              </div>
             </ng-container>
           </div>
         </li>

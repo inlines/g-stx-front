@@ -5,4 +5,5 @@ export interface IReleaseItem {
   platform_name: string;
   prlatform_generation: number;
   owned?: boolean;
+  wished?: boolean;
 }

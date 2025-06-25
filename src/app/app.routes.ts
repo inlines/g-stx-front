@@ -6,6 +6,7 @@ import { ProductPropertiesComponent } from '@app/product-properties/product-prop
 import { ProductPropertiesResolver } from '@app/resolvers/product-properties.resolver';
 import { LoginComponent } from '@app/login/login.component';
 import { CollectionComponent } from '@app/collection/collection.component';
+import { WishlistComponent } from './wishlist/wishlist.component';
 
 export const routes: Routes = [
   {
@@ -35,6 +36,10 @@ export const routes: Routes = [
   {
     path: 'collection',
     loadComponent: () => CollectionComponent,
+  },
+  {
+    path: 'wishlist',
+    loadComponent: () => WishlistComponent,
   },
   {
     path: '**',

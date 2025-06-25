@@ -27,10 +27,16 @@ export class ProductPropertiesComponent {
     switchMap(properties => {
       if (!properties) return of([]);
         const releaseStreams = properties.releases.map(release =>
-          this.store.select(OwnershipState.hasRelease(release.release_id)).pipe(
-            map(owned => ({
+          (
+            combineLatest([
+              this.store.select(OwnershipState.hasRelease(release.release_id)),
+              this.store.select(OwnershipState.hasWish(release.release_id)),
+            ])
+          ).pipe(
+            map(([owned, wished]) => ({
               ...release,
-              owned
+              owned,
+              wished
             }))
           )
         );
@@ -49,5 +55,9 @@ export class ProductPropertiesComponent {
 
   public addToCollection(release_id: number): void {
     this.store.dispatch(new CollectionActions.AddToCollectionRequest({release_id}))
+  }
+
+  public addWish(release_id: number): void {
+    this.store.dispatch(new CollectionActions.AddWishRequest({release_id}))
   }
 }

@@ -18,6 +18,20 @@ export namespace CollectionActions {
     public static readonly type = CollectionActionList.ADD_REQUEST_FAIL;
   }
 
+  export class AddWishRequest {
+    public static readonly type = CollectionActionList.ADD_WISH_REQUEST;
+
+    constructor(public payload: IEditCollectionPayload) {}
+  }
+
+  export class AddWishSuccess {
+    public static readonly type = CollectionActionList.ADD_WISH_REQUEST_SUCCESS;
+  }
+
+  export class AddWishFail {
+    public static readonly type = CollectionActionList.ADD_WISH_REQUEST_FAIL;
+  }
+
   export class RemoveFromCollectionRequest {
     public static readonly type = CollectionActionList.REMOVE_REQUEST;
 
@@ -30,6 +44,20 @@ export namespace CollectionActions {
 
   export class RemoveFromCollectionFail {
     public static readonly type = CollectionActionList.REMOVE_REQUEST_FAIL;
+  }
+
+  export class RemoveWishRequest {
+    public static readonly type = CollectionActionList.REMOVE_WISH_REQUEST;
+
+    constructor(public payload: IEditCollectionPayload) {}
+  }
+
+  export class RemoveWishSuccess {
+    public static readonly type = CollectionActionList.REMOVE_WISH_REQUEST_SUCCESS;
+  }
+
+  export class RemoveWishFail {
+    public static readonly type = CollectionActionList.REMOVE_WISH_REQUEST_FAIL;
   }
 
   export class GetCollectionRequest {
@@ -52,4 +80,25 @@ export namespace CollectionActions {
     constructor(public payload: IProductListRequest){
     }
   }
+  export class GetWishlistRequest {
+    public static readonly type = CollectionActionList.GET_WISHLIST_REQUEST;
+  }
+
+  export class GetWishlistFail {
+    public static readonly type = CollectionActionList.GET_WISHLIST_FAIL;
+  }
+
+  export class GetWishlistSuccess {
+    public static readonly type = CollectionActionList.GET_WISHLIST_SUCCESS;
+
+    constructor(public payload: ICollectionItem[]){
+    }
+  }
+
+  export class SetWishlistParams {
+    public static readonly type = CollectionActionList.SET_WISHLIST_PARAMS;
+    constructor(public payload: IProductListRequest){
+    }
+  }
+  
 }

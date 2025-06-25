@@ -5,6 +5,9 @@ import { ICollectionState } from "./collection.state.interface";
 export const COLLECTION_STATE_DEFAULTS: ICollectionState = {
   changeCollectionRequestStatus: RequestStatus.NotInvoked,
   loadCollectionStatus:RequestStatus.NotInvoked,
+  loadWishlistStatus:RequestStatus.NotInvoked,
   loadedCollection: [],
   collectionParams: {},
+  wishlistParams: {},
+  loadedWishlist: [],
 }

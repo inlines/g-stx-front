@@ -1,5 +1,7 @@
 export interface IOwnershipItem {
   platform: number;
-  release_count: number;
-  release_ids: number[];
+  have_count: number;
+  have_ids: number[];
+  wish_count: number;
+  wish_ids: number[];
 }

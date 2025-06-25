@@ -57,6 +57,11 @@ export class OwnershipState {
 
   static hasRelease = (releaseId: number) =>
     createSelector([OwnershipState.ownership], (ownership: IOwnershipItem[]): boolean => {
-      return ownership.some(item => item.release_ids.includes(releaseId));
+      return ownership.some(item => item.have_ids.includes(releaseId));
+  });
+
+  static hasWish = (releaseId: number) =>
+    createSelector([OwnershipState.ownership], (ownership: IOwnershipItem[]): boolean => {
+      return ownership.some(item => item.wish_ids.includes(releaseId));
   });
 }

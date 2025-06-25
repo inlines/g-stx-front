@@ -7,4 +7,8 @@ export interface ICollectionState {
   loadCollectionStatus: RequestStatus;
   loadedCollection: ICollectionItem[];
   collectionParams: IProductListRequest;
+
+  loadWishlistStatus: RequestStatus;
+  loadedWishlist: ICollectionItem[];
+  wishlistParams: IProductListRequest;
 }

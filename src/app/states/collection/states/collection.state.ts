@@ -64,6 +64,48 @@ export class CollectionState {
     });
   }
 
+  @Action(CollectionActions.AddWishRequest)
+  public addTWishRequest(ctx: StateContext<ICollectionState>, action: CollectionActions.AddWishRequest) {
+    ctx.patchState({
+      changeCollectionRequestStatus: RequestStatus.Pending
+    });
+
+    return this.service.addWish(action.payload).pipe(
+      tap(() => {
+        ctx.dispatch(new CollectionActions.AddWishSuccess())
+      }),
+      catchError((err, caught) => ctx.dispatch(new CollectionActions.AddWishFail()))
+    )
+  }
+
+  @Action(CollectionActions.AddWishSuccess)
+  public addWishSuccess(ctx: StateContext<ICollectionState>) {
+    ctx.patchState({
+      changeCollectionRequestStatus: RequestStatus.Load
+    });
+
+    ctx.dispatch(new OwnershipActions.RequestOwnership());
+    this.toastService.clear();
+    this.toastService.show({
+      body: 'Успешное добавление в вишлист',
+      classname: 'bg-success text-light',
+      delay: 500,
+    });
+  }
+
+  @Action(CollectionActions.AddWishFail)
+  public addWishFail(ctx: StateContext<ICollectionState>) {
+    ctx.patchState({
+      changeCollectionRequestStatus: RequestStatus.Error
+    });
+    this.toastService.clear();
+    this.toastService.show({
+      body: 'Ошибка при добавлении в вишлист',
+      classname: 'bg-danger-subtle text-light',
+      delay: 500,
+    });
+  }
+
   @Action(CollectionActions.RemoveFromCollectionRequest)
   public removeFromCollectionRequest(ctx: StateContext<ICollectionState>, action: CollectionActions.RemoveFromCollectionRequest) {
     ctx.patchState({
@@ -101,6 +143,47 @@ export class CollectionState {
     this.toastService.clear();
     this.toastService.show({
       body: 'Ошибка при удалении из колеекции',
+      classname: 'bg-danger-subtle text-light',
+      delay: 500,
+    });
+  }
+
+  @Action(CollectionActions.RemoveWishRequest)
+  public removeWishRequest(ctx: StateContext<ICollectionState>, action: CollectionActions.RemoveWishRequest) {
+    ctx.patchState({
+      changeCollectionRequestStatus: RequestStatus.Pending
+    });
+
+    return this.service.removeWish(action.payload).pipe(
+      tap(() => {
+        ctx.dispatch(new CollectionActions.RemoveWishSuccess())
+      }),
+      catchError((err, caught) => ctx.dispatch(new CollectionActions.RemoveWishFail()))
+    )
+  }
+
+  @Action(CollectionActions.RemoveWishSuccess)
+  public removeWishSuccess(ctx: StateContext<ICollectionState>) {
+    ctx.patchState({
+      changeCollectionRequestStatus: RequestStatus.Load
+    });
+    this.toastService.clear();
+    this.toastService.show({
+      body: 'Успешное удаление из вишлиста',
+      classname: 'bg-success text-light',
+      delay: 500,
+    });
+    ctx.dispatch(new OwnershipActions.RequestOwnership());
+  }
+
+  @Action(CollectionActions.RemoveWishFail)
+  public removeWishFail(ctx: StateContext<ICollectionState>) {
+    ctx.patchState({
+      changeCollectionRequestStatus: RequestStatus.Error
+    });
+    this.toastService.clear();
+    this.toastService.show({
+      body: 'Ошибка при удалении из вишлиста',
       classname: 'bg-danger-subtle text-light',
       delay: 500,
     });
@@ -147,6 +230,47 @@ export class CollectionState {
     });
   }
 
+  @Action(CollectionActions.GetWishlistRequest)
+  public getWishlistRequest(ctx: StateContext<ICollectionState>, action: CollectionActions.GetWishlistRequest) {
+    ctx.patchState({
+      loadWishlistStatus: RequestStatus.Pending
+    });
+
+    return this.service.getWishlist(ctx.getState().wishlistParams).pipe(
+      tap((payload) => {
+        ctx.dispatch(new CollectionActions.GetWishlistSuccess(payload))
+      }),
+      catchError((err, caught) => ctx.dispatch(new CollectionActions.GetWishlistFail()))
+    )
+  }
+
+  @Action(CollectionActions.GetWishlistSuccess)
+  public getWishlistSuccess(ctx: StateContext<ICollectionState>, action: CollectionActions.GetWishlistSuccess) {
+    ctx.patchState({
+      loadWishlistStatus: RequestStatus.Load,
+      loadedWishlist: action.payload
+    })
+  }
+
+  @Action(CollectionActions.GetWishlistFail)
+  public getWishlistFail(ctx: StateContext<ICollectionState>) {
+    ctx.patchState({
+      loadWishlistStatus: RequestStatus.Error
+    });
+  }
+
+  @Action(CollectionActions.SetWishlistParams)
+  public setWishlistParams(ctx: StateContext<ICollectionState>, action: CollectionActions.SetWishlistParams) {
+    const currentParams = ctx.getState().wishlistParams;
+    const newParams = {...currentParams, ...action.payload};
+    if (!newParams.query) {
+      delete newParams.query;
+    }
+    ctx.patchState({
+      wishlistParams: newParams
+    });
+  }
+
   @Selector()
   public static loadedCollection(state: ICollectionState): ICollectionItem[] {
     return state.loadedCollection;
@@ -155,5 +279,15 @@ export class CollectionState {
   @Selector()
   public static collectionParams(state: ICollectionState): IProductListRequest {
     return state.collectionParams;
+  }
+
+  @Selector()
+  public static loadedWishlist(state: ICollectionState): ICollectionItem[] {
+    return state.loadedWishlist;
+  }
+
+  @Selector()
+  public static wishlistParams(state: ICollectionState): IProductListRequest {
+    return state.wishlistParams;
   }
 }

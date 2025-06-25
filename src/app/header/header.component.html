@@ -8,6 +8,11 @@
         моя коллекция
       </a>
     </div>
+    <div class="col-auto">
+      <a class="col px-1" *ngIf="isAuthorised$ | async" routerLink="/wishlist">
+        мой вишлист
+      </a>
+    </div>
     <div class="col d-flex justify-content-end align-items-center">
       <ng-container *ngIf="isAuthorised$ | async else auth">
         <span class="px-1">
