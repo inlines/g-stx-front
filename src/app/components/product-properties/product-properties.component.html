@@ -22,19 +22,19 @@
         <ul class="list-group list-group-flush">
           <li *ngFor="let release of (releases$ | async)" class="list-group-item bg-dark text-white border-secondary">
             <div class="row align-items-center">
-              <div class="col">
+              <div class="col" [class.text-decoration-line-through]="release.release_status === 5">
                 <span class="fw-semibold">{{ release.release_date | date:'dd.MM.yy':'UTC' }}</span>
                 на <span class="text-warning">{{ release.platform_name }}</span>
                 [{{ release.release_region }}]
               </div>
               <ng-container *ngIf="isAuthorised$ | async">
                 <div class="col-auto">
-                  <button type="button" [disabled]="release.owned"
+                  <button type="button" [disabled]="release.owned || release.release_status === 5"
                     class="btn btn-outline-success btn-sm me-2"
                     (click)="addToCollection(release.release_id)">
                     {{ release.owned ? 'Уже есть' : 'В коллекцию' }}
                   </button>
-                  <button type="button" [disabled]="release.wished"
+                  <button type="button" [disabled]="release.wished || release.release_status === 5"
                     class="btn btn-outline-primary btn-sm"
                     (click)="addWish(release.release_id)">
                     {{ release.wished ? 'Уже есть' : 'В вишлист' }}
