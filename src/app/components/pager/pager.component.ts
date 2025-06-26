@@ -1,5 +1,5 @@
 import { NgClass, NgFor, NgIf } from '@angular/common';
-import { Component, Input, Output, EventEmitter, OnChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, OnInit } from '@angular/core';
 
 type PageItem = number | '...';
 
@@ -10,7 +10,7 @@ type PageItem = number | '...';
   styleUrls: ['./pager.component.scss'],
   imports: [NgIf, NgFor, NgClass]
 })
-export class PagerComponent implements OnChanges {
+export class PagerComponent implements OnChanges, OnInit {
   @Input() totalCount: number = 0;
   @Input() offset: number = 0;
   @Input() limit: number = 10;
@@ -21,6 +21,12 @@ export class PagerComponent implements OnChanges {
   currentPage: number = 1;
   totalPages: number = 1;
   range: number = 5; // сколько страниц показывать вокруг текущей
+
+  public ngOnInit(): void {
+    if (window.innerWidth < 576) {
+      this.range = 1; // например, для мобильных
+    }
+  }
 
   ngOnChanges(): void {
     this.currentPage = Math.floor(this.offset / this.limit) + 1;

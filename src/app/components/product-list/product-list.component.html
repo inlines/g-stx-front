@@ -1,7 +1,7 @@
 <h1 class="display-5 fw-bold mb-4 text-light">Каталог</h1>
 
 <div class="row">
-  <div class="col-12 px-0 mb-4">
+  <div class="col-12 px-0 mb-4 sticker">
     <div class="card bg-dark text-white shadow rounded-4 overflow-hidden">
       <div class="p-3">
         <ul class="nav nav-pills flex-wrap justify-content-start mb-3">
@@ -23,11 +23,10 @@
       </div>
     </div>
   </div>
-
-  <div
-    class="col-xl-2 col-lg-3 col-md-4 col-sm-6 p-3"
-    *ngFor="let product of products$ | async"
-  >
+<!-- Продукты -->
+<ng-container *ngFor="let product of products$ | async">
+  <!-- Desktop / tablet: карточки -->
+  <div class="col-xl-2 col-lg-3 col-md-4 d-none d-md-block p-3">
     <div
       class="card game-card h-100 border-0 shadow-sm hover-shadow"
       [routerLink]="product.id.toString()"
@@ -58,6 +57,40 @@
       </div>
     </div>
   </div>
+
+  <!-- Mobile: горизонтальная карточка -->
+  <div class="col-12 d-md-none mb-3">
+    <div
+      class="card bg-dark text-white shadow-sm rounded-3 d-flex flex-row overflow-hidden"
+      [routerLink]="product.id.toString()"
+      style="cursor: pointer;"
+    >
+      <div
+        class="flex-shrink-0"
+        style="width: 120px; height: 100px; overflow: hidden;"
+      >
+        <img
+          [src]="product.image_url"
+          [alt]="product.name"
+          class="img-fluid h-100 w-100"
+          style="object-fit: cover;"
+        />
+      </div>
+      <div class="p-3 d-flex flex-column justify-content-center">
+        <h6 class="mb-1 fw-bold text-truncate" style="max-width: 200px">
+          {{ product.name }}
+        </h6>
+        <small class="text-white-50">
+          впервые выпущена:
+          <ng-container *ngIf="product.first_release_date; else neverMobile">
+            {{ product.first_release_date | date: 'dd.MM.yy' : 'UTC' }}
+          </ng-container>
+          <ng-template #neverMobile>никогда</ng-template>
+        </small>
+      </div>
+    </div>
+  </div>
+</ng-container>
 
   <div class="col-12 mt-4 py-0">
     <app-pager

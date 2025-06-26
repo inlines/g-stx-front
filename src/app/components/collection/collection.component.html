@@ -58,11 +58,9 @@
   </div>
 </div>
 
-  
-  <div
-    class="col-xl-2 col-lg-3 col-md-4 col-sm-6 p-3"
-    *ngFor="let product of collection$ | async"
-  >
+  <ng-container *ngFor="let product of collection$ | async">
+  <!-- Desktop / tablet: карточки -->
+  <div class="col-xl-2 col-lg-3 col-md-4 d-none d-md-block p-3">
     <div
       class="card game-card h-100 border-0 shadow-sm hover-shadow position-relative"
       [routerLink]="'/products/' + product.product_id.toString()"
@@ -85,7 +83,6 @@
         <div class="card-subtitle small mb-2">
           {{ product.platform_name }} [{{ product.region_name }}]
         </div>
-
         <button
           type="button"
           class="btn btn-danger btn-sm w-100"
@@ -97,6 +94,46 @@
     </div>
   </div>
 
+  <!-- Mobile: горизонтальная карточка -->
+  <div class="col-12 d-md-none mb-3">
+    <div
+      class="card bg-dark text-white shadow-sm rounded-3 d-flex flex-row overflow-hidden"
+      [routerLink]="'/products/' + product.product_id.toString()"
+      style="cursor: pointer;"
+    >
+      <div
+        class="flex-shrink-0"
+        style="width: 120px; height: 100px; overflow: hidden;"
+      >
+        <img
+          [src]="product.image_url"
+          [alt]="product.product_name"
+          class="img-fluid h-100 w-100"
+          style="object-fit: cover;"
+        />
+      </div>
+      <div class="p-3 d-flex flex-column justify-content-between w-100">
+        <div>
+          <h6 class="mb-1 fw-bold text-truncate" style="max-width: 100%">
+            {{ product.product_name }}
+          </h6>
+          <small class="text-white-50 d-block mb-1">
+            {{ product.platform_name }} [{{ product.region_name }}]
+          </small>
+        </div>
+        <button
+          type="button"
+          class="btn btn-danger btn-sm w-100"
+          (click)="remove(product.release_id, $event); $event.stopPropagation();"
+        >
+          удалить
+        </button>
+      </div>
+    </div>
+  </div>
+  </ng-container>
+
+  
   <!-- <div class="col-12 mt-4 p-0">
     <app-pager (pageChange)="pageChanged($event)" [limit]="limit" [totalCount]="(productsTotalCount$ | async) || 0"></app-pager>
   </div> -->

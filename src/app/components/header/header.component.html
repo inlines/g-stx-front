@@ -1,11 +1,9 @@
-<div class="header-bg bg-dark text-white shadow-sm py-3 px-4 px-lg-5">
+<!-- <div class="header-bg bg-dark text-white shadow-sm py-3 px-4 px-lg-5">
   <div class="row align-items-center">
-    <!-- Лого или главная -->
     <div class="col-sm-4 col-6">
       <a class="nav-link text-white fw-bold fs-5" routerLink="/">🎮 Каталог</a>
     </div>
 
-    <!-- Навигация -->
     <div class="col-auto d-none d-sm-block">
       <a class="nav-link text-white" *ngIf="isAuthorised$ | async" routerLink="/collection">
         🗂️ Моя коллекция
@@ -17,7 +15,6 @@
       </a>
     </div>
 
-    <!-- Пользователь / авторизация -->
     <div class="col d-flex justify-content-end align-items-center">
       <ng-container *ngIf="isAuthorised$ | async as user; else loginLink">
         <span class="me-3 text-info fw-semibold">
@@ -30,4 +27,51 @@
       </ng-template>
     </div>
   </div>
+</div> -->
+
+<div class="header-bg bg-dark text-white shadow-sm py-3 px-3 px-lg-5">
+  <div class="row align-items-center">
+    <!-- Лого -->
+    <div class="col-6">
+      <a class="nav-link text-white fw-bold fs-5" routerLink="/">🎮 <span class="d-none d-sm-inline">Каталог</span></a>
+    </div>
+
+    <!-- Пользователь / авторизация -->
+    <div class="col-6 d-flex justify-content-end align-items-center">
+      <ng-container *ngIf="isAuthorised$ | async as user; else loginLink">
+        <span class="me-2 text-info fw-semibold d-none d-md-inline">
+          👤 {{ currentUser$ | async }}
+        </span>
+        <a class="btn btn-sm btn-outline-light px-2" (click)="logout()">
+          🚪<span class="d-none d-sm-inline"> Выйти</span>
+        </a>
+      </ng-container>
+      <ng-template #loginLink>
+        <a class="btn btn-sm btn-primary px-2" routerLink="/login">
+          🔐<span class="d-none d-sm-inline"> Войти</span>
+        </a>
+      </ng-template>
+    </div>
+  </div>
+
+  <!-- Навигация (всегда показывать, но адаптировать) -->
+  <div class="row mt-2">
+    <div class="col d-flex justify-content-center justify-content-sm-start gap-3 flex-wrap">
+      <a
+        class="nav-link text-white px-2 py-1 bg-secondary bg-opacity-25 rounded-3 d-flex align-items-center"
+        *ngIf="isAuthorised$ | async"
+        routerLink="/collection"
+      >
+        🗂️ <span class="d-none d-sm-inline ms-1">Моя коллекция</span>
+      </a>
+      <a
+        class="nav-link text-white px-2 py-1 bg-secondary bg-opacity-25 rounded-3 d-flex align-items-center"
+        *ngIf="isAuthorised$ | async"
+        routerLink="/wishlist"
+      >
+        ⭐ <span class="d-none d-sm-inline ms-1">Вишлист</span>
+      </a>
+    </div>
+  </div>
 </div>
+
