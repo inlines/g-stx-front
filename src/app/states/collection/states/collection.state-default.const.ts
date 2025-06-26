@@ -7,7 +7,9 @@ export const COLLECTION_STATE_DEFAULTS: ICollectionState = {
   loadCollectionStatus:RequestStatus.NotInvoked,
   loadWishlistStatus:RequestStatus.NotInvoked,
   loadedCollection: [],
+  collectionTotalCount: 0,
   collectionParams: {},
   wishlistParams: {},
+  wishlistTotalCount: 0,
   loadedWishlist: [],
 }

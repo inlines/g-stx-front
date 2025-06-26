@@ -110,6 +110,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
     const sub2 = this.productParams$.pipe(
       distinctUntilChanged((prev, curr) => prev.limit === curr.limit && prev.offset === curr.offset && prev.query === curr.query && prev.cat === curr.cat)
     ).subscribe(params => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       this.store.dispatch(new ProductsActions.LoadList());
     });
 

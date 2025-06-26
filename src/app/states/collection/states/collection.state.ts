@@ -208,7 +208,8 @@ export class CollectionState {
   public getCollectionSuccess(ctx: StateContext<ICollectionState>, action: CollectionActions.GetCollectionSuccess) {
     ctx.patchState({
       loadCollectionStatus: RequestStatus.Load,
-      loadedCollection: action.payload
+      loadedCollection: action.payload.items,
+      collectionTotalCount: action.payload.total_count
     })
   }
 
@@ -249,7 +250,8 @@ export class CollectionState {
   public getWishlistSuccess(ctx: StateContext<ICollectionState>, action: CollectionActions.GetWishlistSuccess) {
     ctx.patchState({
       loadWishlistStatus: RequestStatus.Load,
-      loadedWishlist: action.payload
+      loadedWishlist: action.payload.items,
+      wishlistTotalCount: action.payload.total_count
     })
   }
 
@@ -275,6 +277,16 @@ export class CollectionState {
   @Selector()
   public static loadedCollection(state: ICollectionState): ICollectionItem[] {
     return state.loadedCollection;
+  }
+
+  @Selector()
+  public static totalCountCollection(state: ICollectionState): number {
+    return state.collectionTotalCount;
+  }
+
+  @Selector()
+  public static totalCountWishlist(state: ICollectionState): number {
+    return state.wishlistTotalCount;
   }
 
   @Selector()

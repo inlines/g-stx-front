@@ -6,9 +6,11 @@ export interface ICollectionState {
   changeCollectionRequestStatus: RequestStatus;
   loadCollectionStatus: RequestStatus;
   loadedCollection: ICollectionItem[];
+  collectionTotalCount: number;
   collectionParams: IProductListRequest;
 
   loadWishlistStatus: RequestStatus;
   loadedWishlist: ICollectionItem[];
+  wishlistTotalCount: number;
   wishlistParams: IProductListRequest;
 }

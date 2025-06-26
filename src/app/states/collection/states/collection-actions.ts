@@ -2,6 +2,7 @@ import { IProductListRequest } from "@app/states/products/interfaces/product-lis
 import { ICollectionItem } from "../interfaces/collection-item.interface";
 import { IEditCollectionPayload } from "../interfaces/edit-collection-payload.interface";
 import { CollectionActionList } from "./collection-action-list.const";
+import { IcollectionResponse } from "../interfaces/collection-response.interface";
 
 export namespace CollectionActions {
   export class AddToCollectionRequest {
@@ -71,7 +72,7 @@ export namespace CollectionActions {
   export class GetCollectionSuccess {
     public static readonly type = CollectionActionList.GET_COLLECTION_SUCCESS;
 
-    constructor(public payload: ICollectionItem[]){
+    constructor(public payload: IcollectionResponse){
     }
   }
 
@@ -91,7 +92,7 @@ export namespace CollectionActions {
   export class GetWishlistSuccess {
     public static readonly type = CollectionActionList.GET_WISHLIST_SUCCESS;
 
-    constructor(public payload: ICollectionItem[]){
+    constructor(public payload: IcollectionResponse){
     }
   }
 

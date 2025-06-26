@@ -3,8 +3,8 @@ import { Inject, Injectable } from "@angular/core";
 import { IEnvironment } from "@app/environments/environment.interface";
 import { Observable } from "rxjs";
 import { IEditCollectionPayload } from "../interfaces/edit-collection-payload.interface";
-import { ICollectionItem } from "../interfaces/collection-item.interface";
 import { IProductListRequest } from "@app/states/products/interfaces/product-list-request.interface";
+import { IcollectionResponse } from "../interfaces/collection-response.interface";
 
 @Injectable({
   providedIn: 'root',
@@ -48,12 +48,12 @@ export class CollectionService {
     return this.http.post<any>(this.removeWishPath, payload);
   }
 
-  public getCollection(params: IProductListRequest): Observable<ICollectionItem[]> {
-    return this.http.get<ICollectionItem[]>(this.getCollectionPath, {params: {...params}});
+  public getCollection(params: IProductListRequest): Observable<IcollectionResponse> {
+    return this.http.get<IcollectionResponse>(this.getCollectionPath, {params: {...params}});
   }
 
-  public getWishlist(params: IProductListRequest): Observable<ICollectionItem[]> {
-    return this.http.get<ICollectionItem[]>(this.getWishlistPath, {params: {...params}});
+  public getWishlist(params: IProductListRequest): Observable<IcollectionResponse> {
+    return this.http.get<IcollectionResponse>(this.getWishlistPath, {params: {...params}});
   }
 
 }

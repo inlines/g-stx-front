@@ -8,12 +8,13 @@ import { OwnershipState } from '@app/states/ownership/states/ownership.state';
 import { IProductListRequest } from '@app/states/products/interfaces/product-list-request.interface';
 import { Store } from '@ngxs/store';
 import { filter, Observable, Subject, Subscription, take } from 'rxjs';
+import { PagerComponent } from '../pager/pager.component';
 
 
 const LIMIT = 24;
 @Component({
   selector: 'app-collection',
-  imports: [AsyncPipe, NgFor, RouterModule, NgIf],
+  imports: [AsyncPipe, NgFor, RouterModule, NgIf, PagerComponent],
   templateUrl: './collection.component.html',
   styleUrl: './collection.component.scss',
   standalone: true,
@@ -26,6 +27,7 @@ export class CollectionComponent implements OnInit, OnDestroy {
     this.collection$ = this.store.select(CollectionState.loadedCollection);
     this.collectionParams$ = this.store.select(CollectionState.collectionParams);
     this.activePlatforms$ = this.store.select(OwnershipState.activeCollectionPlatforms);
+    this.collectionTotalCount$ = this.store.select(CollectionState.totalCountCollection);
   }
 
   public limit = LIMIT;
@@ -34,10 +36,18 @@ export class CollectionComponent implements OnInit, OnDestroy {
 
   public activePlatforms$: Observable<number[]>;
 
-  public ngOnInit(): void {
-    const sub =  this.activeCategory$.subscribe(x => this.store.dispatch(new CollectionActions.SetCollectionParams({cat: x})));
+  public activeCategory$ = new Subject<number>;
 
-    const paramsSub = this.collectionParams$.pipe(filter(x => !!x.cat)).subscribe(params => this.store.dispatch(new CollectionActions.GetCollectionRequest()));
+  public activeCategory: number| null = null;
+
+  public collection$: Observable<ICollectionItem[]>;
+
+  public collectionTotalCount$: Observable<number>;
+
+  public ngOnInit(): void {
+    const sub =  this.activeCategory$.subscribe(x => this.store.dispatch(new CollectionActions.SetCollectionParams({cat: x, limit: LIMIT, offset: 0,})));
+
+    const paramsSub = this.collectionParams$.pipe(filter(x => !!x.cat && !!x.limit)).subscribe(params => this.store.dispatch(new CollectionActions.GetCollectionRequest()));
 
     this.subscriptions.push(sub, paramsSub);
 
@@ -50,17 +60,11 @@ export class CollectionComponent implements OnInit, OnDestroy {
   public ngOnDestroy(): void {
     this.subscriptions.forEach(x => x.unsubscribe());
   }
-
-  public activeCategory$ = new Subject<number>;
-
-  public activeCategory: number| null = null;
   
   public setActiveCategory(cat: number) {
     this.activeCategory$.next(cat);
     this.activeCategory = cat;
   }
-
-  public collection$: Observable<ICollectionItem[]>;
 
   public remove(release_id: number, event: Event): void {
     this.store.dispatch(new CollectionActions.RemoveFromCollectionRequest({release_id}));

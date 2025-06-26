@@ -1,4 +1,4 @@
-<h1 class="text-light">Ваша коллекция</h1>
+<h1 class="display-5 fw-bold mb-4 text-light">Ваша коллекция</h1>
 
 <div class="row">
   <div class="col-12 px-0 mb-4">
@@ -134,7 +134,7 @@
   </ng-container>
 
   
-  <!-- <div class="col-12 mt-4 p-0">
-    <app-pager (pageChange)="pageChanged($event)" [limit]="limit" [totalCount]="(productsTotalCount$ | async) || 0"></app-pager>
-  </div> -->
+  <div class="col-12 mt-4 p-0">
+    <app-pager (pageChange)="pageChanged($event)" [limit]="limit" [totalCount]="(collectionTotalCount$ | async) || 0"></app-pager>
+  </div>
 </div>
