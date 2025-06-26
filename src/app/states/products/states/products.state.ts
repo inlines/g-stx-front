@@ -51,7 +51,8 @@ export class ProductsState {
   public loadListSuccess(ctx: StateContext<IproductState>, action: ProductsActions.LoadListSuccess) {
     ctx.patchState({
       productListRequestStatus: RequestStatus.Load,
-      productList: action.payload.map(x => ({...x, first_release_date: (x.first_release_date || 0) * 1000}))
+      productList: action.payload.items.map(x => ({...x, first_release_date: (x.first_release_date || 0) * 1000})),
+      productsTotalCount: action.payload.total_count,
     });
   }
 
@@ -86,6 +87,11 @@ export class ProductsState {
   @Selector()
   public static loadedProducts(state: IproductState): IProductListItem[] {
     return state.productList;
+  }
+
+  @Selector()
+  public static totalCountProducts(state: IproductState): number {
+    return state.productsTotalCount;
   }
 
   @Selector()

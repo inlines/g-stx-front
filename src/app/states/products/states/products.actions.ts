@@ -2,6 +2,7 @@ import { IProductListItem } from '@app/states/products/interfaces/product-list-i
 import { IProductListRequest } from "@app/states/products/interfaces/product-list-request.interface";
 import { IProductPropertiesResponse } from "@app/states/products/interfaces/product-properties-response.interface";
 import { ProductsActionList } from "./products-action-list.const";
+import { IproductListResponse } from '../interfaces/product-list-response.interface';
 
 export namespace ProductsActions {
   export class SetRequestParams {
@@ -22,7 +23,7 @@ export namespace ProductsActions {
   export class LoadListSuccess {
     public static readonly type = ProductsActionList.LOAD_LIST_SUCCESS;
 
-    constructor(public payload: IProductListItem[]) {
+    constructor(public payload: IproductListResponse) {
     }
   }
 

@@ -45,4 +45,7 @@
       </div>
     </div>
   </div>
+  <div class="col-12 mt-4 p-0">
+    <app-pager (pageChange)="pageChanged($event)" [limit]="limit" [totalCount]="(productsTotalCount$ | async) || 0"></app-pager>
+  </div>
 </div>

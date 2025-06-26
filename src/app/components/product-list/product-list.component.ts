@@ -8,12 +8,13 @@ import { Store } from '@ngxs/store';
 import { auditTime, BehaviorSubject, combineLatest, debounceTime, distinctUntilChanged, map, Observable, startWith, Subscription, withLatestFrom } from 'rxjs';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { IProductListRequest } from '@app/states/products/interfaces/product-list-request.interface';
+import { PagerComponent } from '@app/components/pager/pager.component';
 
 
-const LIMIT = 102;
+const LIMIT = 24;
 @Component({
   selector: 'app-product-list',
-  imports: [NgIf, NgFor, AsyncPipe, DatePipe, RouterModule, ReactiveFormsModule],
+  imports: [NgIf, NgFor, AsyncPipe, DatePipe, RouterModule, ReactiveFormsModule, PagerComponent],
   templateUrl: './product-list.component.html',
   styleUrl: './product-list.component.scss',
   standalone: true,
@@ -27,6 +28,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
       cat: 6
     }));
     this.products$ = this.store.select(ProductsState.loadedProducts);
+    this.productsTotalCount$ = this.store.select(ProductsState.totalCountProducts);
     this.productParams$ = this.store.select(ProductsState.productsParams);
   }
   ngOnDestroy(): void {
@@ -34,6 +36,8 @@ export class ProductListComponent implements OnInit, OnDestroy {
   }
 
   public products$: Observable<IProductListItem[]>;
+
+  public productsTotalCount$: Observable<number>;
 
   public productParams$: Observable<IProductListRequest>;
 
@@ -45,8 +49,16 @@ export class ProductListComponent implements OnInit, OnDestroy {
 
   public activeCategory = new BehaviorSubject(6);
 
+  public limit = LIMIT;
+
   public setActiveCategory(cat: number) {
     this.activeCategory.next(cat);
+  }
+
+  public pageChanged(page: number): void {
+    this.store.dispatch(new ProductsActions.SetRequestParams({
+      offset: (page - 1 ) * LIMIT
+    }));
   }
 
   public ngOnInit(): void {

@@ -7,8 +7,10 @@ import { CollectionState } from '@app/states/collection/states/collection.state'
 import { OwnershipState } from '@app/states/ownership/states/ownership.state';
 import { IProductListRequest } from '@app/states/products/interfaces/product-list-request.interface';
 import { Store } from '@ngxs/store';
-import { BehaviorSubject, filter, Observable, Subject, Subscription, take } from 'rxjs';
+import { filter, Observable, Subject, Subscription, take } from 'rxjs';
 
+
+const LIMIT = 24;
 @Component({
   selector: 'app-collection',
   imports: [AsyncPipe, NgFor, RouterModule, NgIf],
@@ -25,6 +27,8 @@ export class CollectionComponent implements OnInit, OnDestroy {
     this.collectionParams$ = this.store.select(CollectionState.collectionParams);
     this.activePlatforms$ = this.store.select(OwnershipState.activeCollectionPlatforms);
   }
+
+  public limit = LIMIT;
 
   private collectionParams$: Observable<IProductListRequest>;
 
@@ -61,6 +65,12 @@ export class CollectionComponent implements OnInit, OnDestroy {
   public remove(release_id: number, event: Event): void {
     this.store.dispatch(new CollectionActions.RemoveFromCollectionRequest({release_id}));
     event.stopImmediatePropagation();
+  }
+
+  public pageChanged(page: number): void {
+    this.store.dispatch(new CollectionActions.SetCollectionParams({
+      offset: (page - 1 ) * LIMIT
+    }));
   }
 }
  

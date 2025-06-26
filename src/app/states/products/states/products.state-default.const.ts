@@ -3,6 +3,7 @@ import { IproductState } from "./products.state.interface";
 
 export const PRODUCTS_STATE_DEFAULTS: IproductState = {
   productList: [],
+  productsTotalCount: 0,
   productListRequestStatus: RequestStatus.NotInvoked,
   productListRequestParams: {cat: 6},
   productProperties: null,

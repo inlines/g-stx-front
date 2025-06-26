@@ -1,12 +1,12 @@
 import { Routes } from '@angular/router';
-import { RegistrationComponent } from '@app/registration/registration.component';
-import { ProductListComponent } from '@app/product-list/product-list.component';
-import { NotFoundComponent } from '@app/not-found/not-found.component';
-import { ProductPropertiesComponent } from '@app/product-properties/product-properties.component';
+import { RegistrationComponent } from '@app/components/registration/registration.component';
+import { ProductListComponent } from '@app/components/product-list/product-list.component';
+import { NotFoundComponent } from '@app/components/not-found/not-found.component';
+import { ProductPropertiesComponent } from '@app/components/product-properties/product-properties.component';
 import { ProductPropertiesResolver } from '@app/resolvers/product-properties.resolver';
-import { LoginComponent } from '@app/login/login.component';
-import { CollectionComponent } from '@app/collection/collection.component';
-import { WishlistComponent } from './wishlist/wishlist.component';
+import { LoginComponent } from '@app/components/login/login.component';
+import { CollectionComponent } from '@app/components/collection/collection.component';
+import { WishlistComponent } from './components/wishlist/wishlist.component';
 
 export const routes: Routes = [
   {
