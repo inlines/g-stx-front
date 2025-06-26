@@ -1,3 +1,18 @@
 a {
   cursor: pointer;
 }
+
+.page-link {
+  transition: background-color 0.2s ease;
+}
+
+.page-item.active .page-link {
+  background-color: #6c757d; // secondary
+  color: #fff;
+  border-color: #6c757d;
+}
+
+.page-item.disabled .page-link {
+  pointer-events: none;
+  opacity: 0.5;
+}

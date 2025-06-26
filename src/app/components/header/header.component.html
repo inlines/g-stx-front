@@ -1,33 +1,32 @@
-<div class="header-bg position-relative w-100 py-3 px-5 px-lg-7 bg-base-weak shadowed-1">
-  <div class="row">
-    <div class="col-6 col-md-4 col-sm-2">
-      <a class="nav-link" routerLink="/">каталог</a>
+<div class="header-bg bg-dark text-white shadow-sm py-3 px-4 px-lg-5">
+  <div class="row align-items-center">
+    <!-- Лого или главная -->
+    <div class="col-sm-4 col-6">
+      <a class="nav-link text-white fw-bold fs-5" routerLink="/">🎮 Каталог</a>
     </div>
-    <div class="col-auto">
-      <a class="col px-1 nav-link" *ngIf="isAuthorised$ | async" routerLink="/collection">
-        моя коллекция
+
+    <!-- Навигация -->
+    <div class="col-auto d-none d-sm-block">
+      <a class="nav-link text-white" *ngIf="isAuthorised$ | async" routerLink="/collection">
+        🗂️ Моя коллекция
       </a>
     </div>
-    <div class="col-auto">
-      <a class="col px-1 nav-link" *ngIf="isAuthorised$ | async" routerLink="/wishlist">
-        мой вишлист
+    <div class="col-auto d-none d-sm-block">
+      <a class="nav-link text-white" *ngIf="isAuthorised$ | async" routerLink="/wishlist">
+        ⭐ Вишлист
       </a>
     </div>
+
+    <!-- Пользователь / авторизация -->
     <div class="col d-flex justify-content-end align-items-center">
-      <ng-container *ngIf="isAuthorised$ | async else auth">
-        <span class="px-1 h5 mb-0">
-          {{ currentUser$ | async }}
+      <ng-container *ngIf="isAuthorised$ | async as user; else loginLink">
+        <span class="me-3 text-info fw-semibold">
+          👤 {{ currentUser$ | async  }}
         </span>
-        <a class="px-1 nav-link" (click)="logout()">
-          выход
-        </a>
+        <a class="btn btn-sm btn-outline-light" (click)="logout()">Выйти</a>
       </ng-container>
-      <ng-template #auth>
-        <span class="px-1">
-          <a nav-link routerLink="/login">
-            авторизация
-          </a>
-        </span>
+      <ng-template #loginLink>
+        <a class="btn btn-sm btn-primary" routerLink="/login">Войти</a>
       </ng-template>
     </div>
   </div>

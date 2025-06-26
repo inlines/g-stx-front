@@ -8,3 +8,26 @@
 .card, a {
   cursor: pointer;
 }
+
+.game-card {
+  background-color: #1e1e2f;
+  color: #f1f1f1;
+  border-radius: 0.75rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: scale(1.03);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  .card-img-top {
+    background: linear-gradient(135deg, #2a2a3f, #1a1a2f);
+    border-top-left-radius: 0.75rem;
+    border-top-right-radius: 0.75rem;
+  }
+
+  .btn-danger {
+    font-size: 0.75rem;
+    padding: 0.4rem 0.6rem;
+  }
+}

@@ -1,4 +1,4 @@
-import { NgFor, NgIf } from '@angular/common';
+import { NgClass, NgFor, NgIf } from '@angular/common';
 import { Component, Input, Output, EventEmitter, OnChanges } from '@angular/core';
 
 type PageItem = number | '...';
@@ -8,7 +8,7 @@ type PageItem = number | '...';
   standalone: true,
   templateUrl: './pager.component.html',
   styleUrls: ['./pager.component.scss'],
-  imports: [NgIf, NgFor]
+  imports: [NgIf, NgFor, NgClass]
 })
 export class PagerComponent implements OnChanges {
   @Input() totalCount: number = 0;

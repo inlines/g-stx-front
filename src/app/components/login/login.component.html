@@ -1,43 +1,53 @@
 <div class="row justify-content-center">
-  <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
-    <h2>Авторизация</h2>
-    <form clas="card" [formGroup]="form" (ngSubmit)="submit()">
-      <!-- Логин -->
-      <div class="mb-3">
-        <label for="user_login" class="form-label">Логин</label>
-        <input
-          id="user_login"
-          type="text"
-          class="form-control"
-          [ngClass]="{
-            'is-invalid': form.get('user_login')?.invalid && form.get('user_login')?.touched,
-            'is-valid': form.get('user_login')?.valid && form.get('user_login')?.touched
-          }"
-          formControlName="user_login"
-        />
-        <div class="invalid-feedback">
-          Поле обязательно для заполнения.
-        </div>
-      </div>
+  <div class="col-xl-6 col-lg-7 col-md-8 col-sm-12">
+    <div class="card bg-dark text-white shadow rounded-4 p-4">
+      <h2 class="mb-4">Авторизация</h2>
 
-      <!-- Пароль -->
-      <div class="mb-4">
-        <label for="password" class="form-label">Пароль</label>
-        <input
-          id="password"
-          type="password"
-          class="form-control"
-          [ngClass]="{
-            'is-invalid': form.get('password')?.invalid && form.get('password')?.touched,
-            'is-valid': form.get('password')?.valid && form.get('password')?.touched
-          }"
-          formControlName="password"
-        />
-        <div class="invalid-feedback">
-          Введите пароль.
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <!-- Логин -->
+        <div class="mb-3">
+          <label for="user_login" class="form-label">Логин</label>
+          <input
+            id="user_login"
+            type="text"
+            class="form-control bg-secondary text-white border-0"
+            [ngClass]="{
+              'is-invalid': form.get('user_login')?.invalid && form.get('user_login')?.touched,
+              'is-valid': form.get('user_login')?.valid && form.get('user_login')?.touched
+            }"
+            formControlName="user_login"
+          />
+          <div class="invalid-feedback">
+            Поле обязательно для заполнения.
+          </div>
         </div>
-      </div>
-      <button type="submit" class="btn w-100 btn-primary mb-2" [disabled]="form.invalid">Логин</button>
-    </form>
+
+        <!-- Пароль -->
+        <div class="mb-4">
+          <label for="password" class="form-label">Пароль</label>
+          <input
+            id="password"
+            type="password"
+            class="form-control bg-secondary text-white border-0"
+            [ngClass]="{
+              'is-invalid': form.get('password')?.invalid && form.get('password')?.touched,
+              'is-valid': form.get('password')?.valid && form.get('password')?.touched
+            }"
+            formControlName="password"
+          />
+          <div class="invalid-feedback">
+            Введите пароль.
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          class="btn btn-primary w-100 fw-semibold rounded-pill shadow-sm"
+          [disabled]="form.invalid"
+        >
+          Войти
+        </button>
+      </form>
+    </div>
   </div>
 </div>

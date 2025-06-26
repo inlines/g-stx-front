@@ -8,3 +8,25 @@
   z-index: 1000; /* убедись, что он выше других элементов */
   background: white; /* или цвет фона страницы */
 }
+
+.game-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-radius: 0.75rem;
+  background-color: #1e1e2f; // фон карты
+  color: #f1f1f1;
+
+  &:hover {
+    transform: scale(1.03);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+  }
+}
+
+.card-img-top {
+  background: linear-gradient(135deg, #2a2a3f, #1a1a2f);
+  border-top-left-radius: 0.75rem;
+  border-top-right-radius: 0.75rem;
+}
+
+.text-light-muted {
+  color: #b0b0b0;
+}

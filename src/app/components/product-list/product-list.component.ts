@@ -51,6 +51,16 @@ export class ProductListComponent implements OnInit, OnDestroy {
 
   public limit = LIMIT;
 
+  public categories = [
+    { id: 6, label: 'PC' },
+    { id: 38, label: 'PSP' },
+    { id: 8, label: 'PS2' },
+    { id: 9, label: 'PS3' },
+    { id: 48, label: 'PS4' },
+    { id: 167, label: 'PS5' }
+  ];
+
+
   public setActiveCategory(cat: number) {
     this.activeCategory.next(cat);
   }

@@ -1,0 +1,14 @@
+.footer {
+  background-color: #121212; // глубокий тёмный цвет
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  
+  a.nav-link:hover {
+    color: #ffffff;
+    text-decoration: underline;
+  }
+
+  h5 {
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+}
