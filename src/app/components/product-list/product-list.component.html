@@ -96,7 +96,9 @@
     <app-pager
       (pageChange)="pageChanged($event)"
       [limit]="limit"
-      [totalCount]="(productsTotalCount$ | async) || 0">
+      [offset]="(offset$ | async) || 0"
+      [totalCount]="(productsTotalCount$ | async) || 0"
+    >
     </app-pager>
   </div>
 </div>

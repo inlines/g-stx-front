@@ -31,7 +31,7 @@ export const appConfig: ApplicationConfig = {
         OwnershipState
       ],
       withNgxsStoragePlugin({
-        keys: ['Auth', 'Ownership']
+        keys: ['Auth', 'Ownership', 'Products']
       })
     ),
     ProductPropertiesResolver,
