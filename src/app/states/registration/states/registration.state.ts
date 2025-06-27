@@ -6,6 +6,7 @@ import { RegistrationService } from "../services/registration.service";
 import { RegistrationActions } from "./registration-actions";
 import { RequestStatus } from "@app/constants/request-status.const";
 import { catchError, tap } from "rxjs";
+import { ToastService } from "@app/services/toast.service";
 
 @State<IRegistrationState>({
   name: 'Registration',
@@ -14,7 +15,8 @@ import { catchError, tap } from "rxjs";
 @Injectable()
 export class RegistrationState {
   constructor(
-    private service: RegistrationService
+    private service: RegistrationService,
+    private toastService: ToastService
   ){}
 
   @Action(RegistrationActions.RegisterRequest)
@@ -44,6 +46,11 @@ export class RegistrationState {
     ctx.patchState({
       registrationRequestStatus: RequestStatus.Error
     });
-    console.warn('FAIL!')
+    this.toastService.clear();
+    this.toastService.show({
+      body: 'Ошибка при регистрации, возможно такой логин уже есть',
+      classname: 'bg-danger text-light w-100',
+      delay: 5000,
+    });
   }
 }

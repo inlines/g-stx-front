@@ -8,4 +8,6 @@ export enum ProductsActionList {
   LOAD_PROPERTIES = '[Products] load properties',
   LOAD_PROPERTIES_SUCCESS = '[Products] load properties success',
   LOAD_PROPERTIES_FAIL = '[Products] load properties fail',
+
+  RESET_PRODUCTS = '[Products] reset to default',
 }

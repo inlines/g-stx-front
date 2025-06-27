@@ -11,7 +11,7 @@ import { filter, Observable, Subject, Subscription, take } from 'rxjs';
 import { PagerComponent } from '../pager/pager.component';
 
 
-const LIMIT = 24;
+const LIMIT = 18;
 @Component({
   selector: 'app-collection',
   imports: [AsyncPipe, NgFor, RouterModule, NgIf, PagerComponent],

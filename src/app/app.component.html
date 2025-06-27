@@ -1,16 +1,16 @@
-<header>
-  <app-header></app-header>
-</header>
+<div class="layout-wrapper d-flex flex-column min-vh-100">
+  <header>
+    <app-header></app-header>
+  </header>
 
-<main>
-  <article>
-    <section class="container-fluid container-lg pt-5 pt-md-7">
-      <router-outlet />
-      <app-toast-container></app-toast-container>
-    </section>
-  </article>
-</main>
+  <main class="flex-grow-1">
+    <article>
+      <section class="container-fluid container-lg pt-5 pt-md-7">
+        <router-outlet></router-outlet>
+        <app-toast-container></app-toast-container>
+      </section>
+    </article>
+  </main>
 
-<div class="container">
   <app-footer></app-footer>
 </div>

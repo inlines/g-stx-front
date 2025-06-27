@@ -44,4 +44,8 @@ export namespace ProductsActions {
   export class LoadPropertiesFail {
     public static readonly type = ProductsActionList.LOAD_PROPERTIES_FAIL;
   }
+
+  export class ProductsReset {
+    public static readonly type = ProductsActionList.RESET_PRODUCTS;
+  }
 }

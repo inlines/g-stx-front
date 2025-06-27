@@ -6,7 +6,8 @@ import { ProductPropertiesComponent } from '@app/components/product-properties/p
 import { ProductPropertiesResolver } from '@app/resolvers/product-properties.resolver';
 import { LoginComponent } from '@app/components/login/login.component';
 import { CollectionComponent } from '@app/components/collection/collection.component';
-import { WishlistComponent } from './components/wishlist/wishlist.component';
+import { WishlistComponent } from '@app/components/wishlist/wishlist.component';
+import { AboutComponent } from '@app/components/about/about.component';
 
 export const routes: Routes = [
   {
@@ -40,6 +41,10 @@ export const routes: Routes = [
   {
     path: 'wishlist',
     loadComponent: () => WishlistComponent,
+  },
+  {
+    path: 'about',
+    loadComponent: () => AboutComponent,
   },
   {
     path: '**',

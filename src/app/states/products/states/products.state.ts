@@ -84,6 +84,11 @@ export class ProductsState {
     });
   }
 
+  @Action(ProductsActions.ProductsReset)
+  public reset(ctx: StateContext<IproductState>) {
+    ctx.setState(PRODUCTS_STATE_DEFAULTS);
+  }
+
   @Selector()
   public static loadedProducts(state: IproductState): IProductListItem[] {
     return state.productList;

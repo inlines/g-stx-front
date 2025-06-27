@@ -10,7 +10,7 @@ import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { IProductListRequest } from '@app/states/products/interfaces/product-list-request.interface';
 import { PagerComponent } from '@app/components/pager/pager.component';
 
-const LIMIT = 24;
+const LIMIT = 18;
 
 @Component({
   selector: 'app-product-list',

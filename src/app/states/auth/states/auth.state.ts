@@ -8,6 +8,7 @@ import { RequestStatus } from "@app/constants/request-status.const";
 import { catchError, tap } from "rxjs";
 import { Router } from "@angular/router";
 import { OwnershipActions } from "@app/states/ownership/states/ownership-actions";
+import { ProductsActions } from "@app/states/products/states/products.actions";
 
 
 @State<IAuthState>({
@@ -69,6 +70,7 @@ export class AuthState {
     });
 
     ctx.dispatch(new OwnershipActions.ResetOwnership());
+    ctx.dispatch(new ProductsActions.ProductsReset());
 
     this.router.navigate(['/login']);
   }

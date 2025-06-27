@@ -1,35 +1,4 @@
-<!-- <div class="header-bg bg-dark text-white shadow-sm py-3 px-4 px-lg-5">
-  <div class="row align-items-center">
-    <div class="col-sm-4 col-6">
-      <a class="nav-link text-white fw-bold fs-5" routerLink="/">🎮 Каталог</a>
-    </div>
-
-    <div class="col-auto d-none d-sm-block">
-      <a class="nav-link text-white" *ngIf="isAuthorised$ | async" routerLink="/collection">
-        🗂️ Моя коллекция
-      </a>
-    </div>
-    <div class="col-auto d-none d-sm-block">
-      <a class="nav-link text-white" *ngIf="isAuthorised$ | async" routerLink="/wishlist">
-        ⭐ Вишлист
-      </a>
-    </div>
-
-    <div class="col d-flex justify-content-end align-items-center">
-      <ng-container *ngIf="isAuthorised$ | async as user; else loginLink">
-        <span class="me-3 text-info fw-semibold">
-          👤 {{ currentUser$ | async  }}
-        </span>
-        <a class="btn btn-sm btn-outline-light" (click)="logout()">Выйти</a>
-      </ng-container>
-      <ng-template #loginLink>
-        <a class="btn btn-sm btn-primary" routerLink="/login">Войти</a>
-      </ng-template>
-    </div>
-  </div>
-</div> -->
-
-<div class="header-bg bg-dark text-white shadow-sm py-3 px-3 px-lg-5">
+<div class="header-bg bg-dark text-white shadow-sm py-3 px-3 px-lg-5" style="height:102px">
   <div class="row align-items-center">
     <!-- Лого -->
     <div class="col-6">
