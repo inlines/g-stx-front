@@ -7,9 +7,17 @@ export enum CollectionActionList {
   ADD_WISH_REQUEST_FAIL = '[Collection] add wish request fail',
   ADD_WISH_REQUEST_SUCCESS = '[Collection] add wish request success',
 
+  ADD_BID_REQUEST = '[Collection] add bid request',
+  ADD_BID_REQUEST_FAIL = '[Collection] add bid request fail',
+  ADD_BID_REQUEST_SUCCESS = '[Collection] add bid request success',
+
   REMOVE_WISH_REQUEST = '[Collection] remove wish request',
   REMOVE_WISH_REQUEST_FAIL = '[Collection] remove wish request fail',
   REMOVE_WISH_REQUEST_SUCCESS = '[Collection] remove wish request success',
+
+  REMOVE_BID_REQUEST = '[Collection] rmv bid request',
+  REMOVE_BID_REQUEST_FAIL = '[Collection] rmv bid request fail',
+  REMOVE_BID_REQUEST_SUCCESS = '[Collection] rmv bid request success',
 
   REMOVE_REQUEST = '[Collection] rmv request',
   REMOVE_REQUEST_FAIL = '[Collection] rmv request fail',

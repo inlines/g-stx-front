@@ -7,4 +7,6 @@ export interface IReleaseItem {
   prlatform_generation: number;
   owned?: boolean;
   wished?: boolean;
+  bided?: boolean;
+  bid_user_logins: string[];
 }

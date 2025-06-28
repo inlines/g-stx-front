@@ -2,6 +2,7 @@
 
 /* Importing Bootstrap SCSS file. */
 @import 'bootstrap/scss/bootstrap';
+@import 'animate.css/animate.min.css';
 
 
 a {
@@ -10,4 +11,21 @@ a {
 
 body {
   background-color: #1a1a1a!important;
+}
+
+.modal-content {
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.modal-dialog {
+  background-color: transparent !important;
+  margin: auto;
+  border-radius: 0 !important;
+}
+
+.modal-backdrop.show {
+  background-color: rgba(0, 0, 0, 0.75); // опционально — затемнение
 }

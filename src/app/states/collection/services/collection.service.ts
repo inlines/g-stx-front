@@ -19,6 +19,9 @@ export class CollectionService {
   private readonly getCollectionPath: string;
   private readonly getWishlistPath: string;
 
+  private readonly addBidPath: string;
+  private readonly removeBidPath: string;
+
   constructor(
     private http: HttpClient,
     @Inject('environment') private environment: IEnvironment,
@@ -30,6 +33,9 @@ export class CollectionService {
     this.addWishPath = `${this.environment.apiUrl}/add_wish`;
     this.removeWishPath = `${this.environment.apiUrl}/remove_wish`;
     this.getWishlistPath = `${this.environment.apiUrl}/wishlist`;
+
+    this.addBidPath = `${this.environment.apiUrl}/add_bid`;
+    this.removeBidPath = `${this.environment.apiUrl}/remove_bid`;
   }
 
   public addToCollection(payload: IEditCollectionPayload): Observable<any> {
@@ -44,8 +50,16 @@ export class CollectionService {
     return this.http.post<any>(this.addWishPath, payload);
   }
 
+  public addBid(payload: IEditCollectionPayload): Observable<any> {
+    return this.http.post<any>(this.addBidPath, payload);
+  }
+
   public removeWish(payload: IEditCollectionPayload): Observable<any> {
     return this.http.post<any>(this.removeWishPath, payload);
+  }
+
+  public removeBid(payload: IEditCollectionPayload): Observable<any> {
+    return this.http.post<any>(this.removeBidPath, payload);
   }
 
   public getCollection(params: IProductListRequest): Observable<IcollectionResponse> {

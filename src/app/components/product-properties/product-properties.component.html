@@ -52,15 +52,36 @@
               </div>
               <ng-container *ngIf="isAuthorised$ | async">
                 <div class="col-auto">
-                  <button type="button" [disabled]="release.owned || release.release_status === 5  || !release.release_date"
-                    class="btn btn-outline-success btn-sm me-2"
-                    (click)="addToCollection(release.release_id)">
-                    {{ release.owned ? 'Уже есть' : 'В коллекцию' }}
-                  </button>
-                  <button type="button" [disabled]="release.wished || release.release_status === 5 || !release.release_date"
-                    class="btn btn-outline-primary btn-sm"
+                  <ng-container *ngIf="!release.owned else wannaTrade">
+                    <button type="button" [disabled]="release.owned || release.release_status === 5  || !release.release_date || (collectionChanging$ | async)"
+                      class="btn btn-outline-success btn-sm me-2"
+                      (click)="addToCollection(release.release_id)">
+                      {{ release.owned ? 'Уже есть' : 'В коллекцию' }}
+                    </button>
+                  </ng-container>
+                  <ng-template #wannaTrade>
+                    <ng-container *ngIf="!release.bided else removeBidButton">
+                      <button type="button" [disabled]="release.release_status === 5  || !release.release_date || (collectionChanging$ | async)"
+                        class="btn btn-outline-success btn-sm me-2"
+                        (click)="addBid(release.release_id)">
+                          У меня есть, хочу поменять
+                      </button>
+                    </ng-container>
+                    <ng-template #removeBidButton>
+                      <button type="button" [disabled]="(collectionChanging$ | async)"
+                        class="btn btn-outline-success btn-sm me-2"
+                        (click)="removeBid(release.release_id)">
+                          Больше не хочу меняться
+                      </button>
+                    </ng-template>
+                  </ng-template>
+                  <button type="button" [disabled]="release.wished || release.release_status === 5 || !release.release_date || (collectionChanging$ | async)"
+                    class="btn btn-outline-primary btn-sm me-2"
                     (click)="addWish(release.release_id)">
                     {{ release.wished ? 'Уже есть' : 'В вишлист' }}
+                  </button>
+                  <button type="button" class="btn btn-outline-primary btn-sm" *ngIf="release.bid_user_logins.length" (click)="openBidsModal(release)">
+                    Есть предложения
                   </button>
                 </div>
               </ng-container>
@@ -96,3 +117,51 @@
     </div>
   </div>
 </ng-template>
+
+<ng-template #bidsModal let-modal>
+  <div class="modal-dialog modal-lg modal-dialog-centered animate__animated animate__fadeIn">
+    <div class="modal-content p-0 border-0 bg-transparent">
+      <div class="bg-dark text-white rounded-4 shadow-lg overflow-hidden w-100">
+
+        <div class="modal-header border-secondary">
+          <h4 class="modal-title text-warning">Игроки, готовые на обмен</h4>
+          <button type="button" class="btn-close btn-close-white" (click)="modal.dismiss()" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+          <ul class="list-unstyled m-0">
+            <li *ngFor="let user of selectedRelease?.bid_user_logins" class="mb-3">
+              <div class="d-flex align-items-center bg-secondary bg-opacity-10 p-3 rounded-3 border border-secondary">
+                
+                <!-- SVG аватар-заглушка -->
+                <div class="me-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor"
+                      class="bi bi-person-circle text-secondary" viewBox="0 0 16 16">
+                    <path d="M11 10a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+                    <path fill-rule="evenodd"
+                          d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37c.273-.58.58-1.036 
+                            1.02-1.43C4.972 10.356 6.387 10 8 10s3.028.356 4.448 1.94c.44.394.747.85 
+                            1.02 1.43A7 7 0 0 0 8 1z"/>
+                  </svg>
+                </div>
+
+                <!-- Имя пользователя и кнопка -->
+                <div class="flex-grow-1 d-flex justify-content-between align-items-center">
+                  <span class="fw-semibold fs-6">{{ user }}</span>
+                  <button type="button" class="ms-4 btn btn-outline-warning btn-sm">
+                    Написать игроку
+                  </button>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="modal-footer border-secondary">
+          <button type="button" class="btn btn-outline-light" (click)="modal.close()">Закрыть</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+

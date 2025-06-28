@@ -59,13 +59,13 @@ export class CollectionState {
     this.toastService.clear();
     this.toastService.show({
       body: 'Ошибка при добавлении в коллекцию',
-      classname: 'bg-danger-subtle text-light',
+      classname: 'bg-danger text-light',
       delay: 500,
     });
   }
 
   @Action(CollectionActions.AddWishRequest)
-  public addTWishRequest(ctx: StateContext<ICollectionState>, action: CollectionActions.AddWishRequest) {
+  public addWishRequest(ctx: StateContext<ICollectionState>, action: CollectionActions.AddWishRequest) {
     ctx.patchState({
       changeCollectionRequestStatus: RequestStatus.Pending
     });
@@ -101,7 +101,49 @@ export class CollectionState {
     this.toastService.clear();
     this.toastService.show({
       body: 'Ошибка при добавлении в вишлист',
-      classname: 'bg-danger-subtle text-light',
+      classname: 'bg-danger text-light',
+      delay: 500,
+    });
+  }
+
+  @Action(CollectionActions.AddBidRequest)
+  public addBidRequest(ctx: StateContext<ICollectionState>, action: CollectionActions.AddBidRequest) {
+    ctx.patchState({
+      changeCollectionRequestStatus: RequestStatus.Pending
+    });
+
+    return this.service.addBid(action.payload).pipe(
+      tap(() => {
+        ctx.dispatch(new CollectionActions.AddBidSuccess())
+      }),
+      catchError((err, caught) => ctx.dispatch(new CollectionActions.AddBidFail()))
+    )
+  }
+
+  @Action(CollectionActions.AddBidSuccess)
+  public addBidSuccess(ctx: StateContext<ICollectionState>) {
+    ctx.patchState({
+      changeCollectionRequestStatus: RequestStatus.Load
+    });
+
+    ctx.dispatch(new OwnershipActions.RequestOwnership());
+    this.toastService.clear();
+    this.toastService.show({
+      body: 'Успешное добавление бида',
+      classname: 'bg-success text-light',
+      delay: 500,
+    });
+  }
+
+  @Action(CollectionActions.AddBidFail)
+  public addBidFail(ctx: StateContext<ICollectionState>) {
+    ctx.patchState({
+      changeCollectionRequestStatus: RequestStatus.Error
+    });
+    this.toastService.clear();
+    this.toastService.show({
+      body: 'Ошибка при добавлении бида',
+      classname: 'bg-danger text-light',
       delay: 500,
     });
   }
@@ -143,7 +185,7 @@ export class CollectionState {
     this.toastService.clear();
     this.toastService.show({
       body: 'Ошибка при удалении из колеекции',
-      classname: 'bg-danger-subtle text-light',
+      classname: 'bg-danger text-light',
       delay: 500,
     });
   }
@@ -185,7 +227,48 @@ export class CollectionState {
     this.toastService.clear();
     this.toastService.show({
       body: 'Ошибка при удалении из вишлиста',
-      classname: 'bg-danger-subtle text-light',
+      classname: 'bg-danger text-light',
+      delay: 500,
+    });
+  }
+
+  @Action(CollectionActions.RemoveBidRequest)
+  public removeBidRequest(ctx: StateContext<ICollectionState>, action: CollectionActions.RemoveBidRequest) {
+    ctx.patchState({
+      changeCollectionRequestStatus: RequestStatus.Pending
+    });
+
+    return this.service.removeBid(action.payload).pipe(
+      tap(() => {
+        ctx.dispatch(new CollectionActions.RemoveBidSuccess())
+      }),
+      catchError((err, caught) => ctx.dispatch(new CollectionActions.RemoveBidFail()))
+    )
+  }
+
+  @Action(CollectionActions.RemoveBidSuccess)
+  public removeBidSuccess(ctx: StateContext<ICollectionState>) {
+    ctx.patchState({
+      changeCollectionRequestStatus: RequestStatus.Load
+    });
+    this.toastService.clear();
+    this.toastService.show({
+      body: 'Успешное удаление бида',
+      classname: 'bg-success text-light',
+      delay: 500,
+    });
+    ctx.dispatch(new OwnershipActions.RequestOwnership());
+  }
+
+  @Action(CollectionActions.RemoveBidFail)
+  public removeBidFail(ctx: StateContext<ICollectionState>) {
+    ctx.patchState({
+      changeCollectionRequestStatus: RequestStatus.Error
+    });
+    this.toastService.clear();
+    this.toastService.show({
+      body: 'Ошибка при удалении бида',
+      classname: 'bg-danger text-light',
       delay: 500,
     });
   }
@@ -302,5 +385,10 @@ export class CollectionState {
   @Selector()
   public static wishlistParams(state: ICollectionState): IProductListRequest {
     return state.wishlistParams;
+  }
+
+  @Selector()
+  public static collectionChanging(state: ICollectionState): boolean {
+    return state.changeCollectionRequestStatus === RequestStatus.Pending;
   }
 }
