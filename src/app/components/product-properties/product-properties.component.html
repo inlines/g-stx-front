@@ -2,7 +2,29 @@
   <div class="row g-4">
     <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
       <div class="card bg-dark text-white border-0 shadow rounded-4 overflow-hidden">
-        <img class="w-100" [src]="productProperties.product.image_url" style="object-fit: cover;" />
+        <ng-container *ngIf="productProperties.product.image_url; else noImage">
+          <img
+            class="w-100"
+            [src]="productProperties.product.image_url"
+            [alt]="productProperties.product.name"
+            style="object-fit: cover;"
+            (error)="productProperties.product.image_url = null"
+          />
+        </ng-container>
+
+        <ng-template #noImage>
+          <div class="d-flex justify-content-center align-items-center bg-secondary-subtle" style="height: 300px;">
+            <div class="text-muted text-center">
+              <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor"
+                  class="bi bi-image mb-2" viewBox="0 0 16 16">
+                <path d="M14.002 3a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2.002a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h12zM2.002 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H2.002z"/>
+                <path d="M10.648 8.646a.5.5 0 0 1 .704 0l2.25 2.25V12H2.398v-.316l3.85-3.85a.5.5 0 0 1 .704 0l2.15 2.15 1.546-1.548z"/>
+              </svg>
+              <div>Нет изображения</div>
+            </div>
+          </div>
+        </ng-template>
+
         <div class="p-4">
           <h2 class="text-warning mb-3">{{ productProperties.product.name }}</h2>
           <p class="text-light small fst-italic">
@@ -15,6 +37,7 @@
         </div>
       </div>
     </div>
+
 
     <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
       <div class="card bg-dark text-white shadow rounded-4 p-4 h-100">
@@ -49,7 +72,7 @@
 
     <div class="col-12">
       <div class="card bg-dark text-white shadow rounded-4 p-4">
-        <p class="text-light">{{ productProperties.product.summary }}</p>
+        <p class="text-light">{{ productProperties.product.summary || 'У нас нет описания этой игры' }}</p>
       </div>
     </div>
 
