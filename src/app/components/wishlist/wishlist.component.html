@@ -65,7 +65,7 @@
   >
     <div
       class="card game-card h-100 border-0 shadow-sm hover-shadow position-relative"
-      [routerLink]="'/products/' + product.product_id.toString()"
+      [routerLink]="['/products/' + product.product_id.toString(), {platform: activeCategory}]"
       style="cursor: pointer;"
       (click)="null"
     >

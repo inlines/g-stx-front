@@ -1,5 +1,5 @@
-import { AsyncPipe, DatePipe, NgFor, NgIf } from '@angular/common';
-import { Component, TemplateRef, ViewChild } from '@angular/core';
+import { AsyncPipe, DatePipe, NgClass, NgFor, NgIf, NgTemplateOutlet } from '@angular/common';
+import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { AuthState } from '@app/states/auth/states/auth.state';
 import { IProductPropertiesResponse } from '@app/states/products/interfaces/product-properties-response.interface';
 import { ProductsState } from '@app/states/products/states/products.state';
@@ -10,21 +10,23 @@ import { CollectionActions } from '@app/states/collection/states/collection-acti
 import { IReleaseItem } from '@app/states/products/interfaces/release-item.interface';
 import { OwnershipState } from '@app/states/ownership/states/ownership.state';
 import { CollectionState } from '@app/states/collection/states/collection.state';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-product-properties',
-  imports: [AsyncPipe, NgIf, DatePipe, NgFor, NgbCarouselModule],
+  imports: [AsyncPipe, NgIf, DatePipe, NgFor, NgbCarouselModule, NgClass, NgTemplateOutlet],
   templateUrl: './product-properties.component.html',
   styleUrl: './product-properties.component.scss',
   standalone: true,
 })
-export class ProductPropertiesComponent {
+export class ProductPropertiesComponent implements OnInit {
 
   @ViewChild('bidsModal', { static: true }) bidsModalRef!: TemplateRef<any>;
 
   constructor(
     private readonly store: Store,
-    private readonly modalService: NgbModal
+    private readonly modalService: NgbModal,
+    private readonly params: ActivatedRoute,
   ){
     this.productProperties$ = this.store.select(ProductsState.productProperties);
     this.isAuthorised$ = this.store.select(AuthState.isAuthorised);
@@ -53,6 +55,26 @@ export class ProductPropertiesComponent {
       })
     );
 
+  }
+
+  public platformId$!: Observable<number>;
+
+  public sortedReleases$!: Observable<{highlighted:IReleaseItem[]; others:IReleaseItem[]}>;
+
+  public ngOnInit(): void {
+    this.platformId$ = of(parseInt(this.params.snapshot.paramMap.get('platform') || '0'));
+    this.sortedReleases$ = combineLatest([this.releases$, this.platformId$]).pipe(
+      map(([releases, platformId]) => {
+        if (!platformId || platformId === 0) {
+          return { highlighted: [], others: releases };
+        }
+
+        const highlighted = releases.filter(r => r.platform_id === platformId);
+        const others = releases.filter(r => r.platform_id !== platformId);
+
+        return { highlighted, others };
+      })
+    );
   }
 
   public selectedRelease!: IReleaseItem;

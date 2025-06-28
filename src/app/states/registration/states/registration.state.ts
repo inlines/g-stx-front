@@ -7,6 +7,7 @@ import { RegistrationActions } from "./registration-actions";
 import { RequestStatus } from "@app/constants/request-status.const";
 import { catchError, tap } from "rxjs";
 import { ToastService } from "@app/services/toast.service";
+import { Router } from "@angular/router";
 
 @State<IRegistrationState>({
   name: 'Registration',
@@ -16,7 +17,8 @@ import { ToastService } from "@app/services/toast.service";
 export class RegistrationState {
   constructor(
     private service: RegistrationService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private router: Router,
   ){}
 
   @Action(RegistrationActions.RegisterRequest)
@@ -38,7 +40,12 @@ export class RegistrationState {
     ctx.patchState({
       registrationRequestStatus: RequestStatus.Load
     });
-    console.warn('success!')
+    this.toastService.show({
+      body: 'Регистрация прошла успешно, переход на форму логина',
+      classname: 'bg-success text-light w-100',
+      delay: 5000,
+    });
+    this.router.navigate(['/login']);
   }
 
   @Action(RegistrationActions.RegisterRequestFail)

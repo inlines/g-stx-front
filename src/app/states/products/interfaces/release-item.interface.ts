@@ -4,7 +4,7 @@ export interface IReleaseItem {
   release_region: string;
   release_status: number;
   platform_name: string;
-  prlatform_generation: number;
+  platform_id: number;
   owned?: boolean;
   wished?: boolean;
   bided?: boolean;

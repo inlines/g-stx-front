@@ -1,6 +1,6 @@
 <ng-container *ngIf="(productProperties$ | async) as productProperties else loading">
   <div class="row g-4">
-    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+    <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12">
       <div class="card bg-dark text-white border-0 shadow rounded-4 overflow-hidden">
         <ng-container *ngIf="productProperties.product.image_url; else noImage">
           <img
@@ -38,55 +38,78 @@
       </div>
     </div>
 
-
-    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+    <div class="col-xl-8 col-lg-8 col-md-8 col-sm-12">
       <div class="card bg-dark text-white shadow rounded-4 p-4 h-100">
         <h3 class="text-info mb-3">Релизы игры:</h3>
         <ul class="list-group list-group-flush">
-          <li *ngFor="let release of (releases$ | async)" class="list-group-item bg-dark text-white border-secondary">
-            <div class="row align-items-center">
-              <div class="col" [class.text-decoration-line-through]="release.release_status === 5  || !release.release_date">
-                <span class="fw-semibold">{{ release.release_date | date:'dd.MM.yy':'UTC' }}</span>
-                на <span class="text-warning">{{ release.platform_name }}</span>
-                [{{ release.release_region }}]
-              </div>
-              <ng-container *ngIf="isAuthorised$ | async">
-                <div class="col-auto">
-                  <ng-container *ngIf="!release.owned else wannaTrade">
-                    <button type="button" [disabled]="release.owned || release.release_status === 5  || !release.release_date || (collectionChanging$ | async)"
-                      class="btn btn-outline-success btn-sm me-2"
-                      (click)="addToCollection(release.release_id)">
-                      {{ release.owned ? 'Уже есть' : 'В коллекцию' }}
-                    </button>
-                  </ng-container>
-                  <ng-template #wannaTrade>
-                    <ng-container *ngIf="!release.bided else removeBidButton">
-                      <button type="button" [disabled]="release.release_status === 5  || !release.release_date || (collectionChanging$ | async)"
-                        class="btn btn-outline-success btn-sm me-2"
-                        (click)="addBid(release.release_id)">
-                          У меня есть, хочу поменять
-                      </button>
-                    </ng-container>
-                    <ng-template #removeBidButton>
-                      <button type="button" [disabled]="(collectionChanging$ | async)"
-                        class="btn btn-outline-success btn-sm me-2"
-                        (click)="removeBid(release.release_id)">
-                          Больше не хочу меняться
-                      </button>
-                    </ng-template>
-                  </ng-template>
-                  <button type="button" [disabled]="release.wished || release.release_status === 5 || !release.release_date || (collectionChanging$ | async)"
-                    class="btn btn-outline-primary btn-sm me-2"
-                    (click)="addWish(release.release_id)">
-                    {{ release.wished ? 'Уже есть' : 'В вишлист' }}
-                  </button>
-                  <button type="button" class="btn btn-outline-primary btn-sm" *ngIf="release.bid_user_logins.length" (click)="openBidsModal(release)">
-                    Есть предложения
-                  </button>
+          <ng-container *ngIf="(sortedReleases$ | async) as sorted">
+            <li *ngFor="let release of sorted.highlighted"
+              class="list-group-item bg-dark text-white border-secondary position-relative"
+              [ngClass]="{ 'text-decoration-line-through': release.release_status === 5  }"
+              style="box-shadow: 0 0 0 1px #ffc107;">
+              <div class="row align-items-center">
+                <div class="col">
+                  <span class="fw-semibold">{{ release.release_date | date:'dd.MM.yy':'UTC' }}</span>
+                  на <span class="text-warning">{{ release.platform_name }}</span>
+                  [{{ release.release_region }}]
                 </div>
-              </ng-container>
-            </div>
-          </li>
+                <ng-container *ngTemplateOutlet="releaseActions; context: { $implicit: release }"></ng-container>
+              </div>
+            </li>
+            <hr class="border-secondary my-3" *ngIf="sorted.highlighted.length && sorted.others.length" />
+            <li *ngFor="let release of sorted.others"
+                class="list-group-item bg-dark text-white border-secondary"
+                [class.text-decoration-line-through]="release.release_status === 5 ">
+              <div class="row align-items-center">
+                <div class="col">
+                  <span class="fw-semibold">{{ release.release_date | date:'dd.MM.yy':'UTC' }}</span>
+                  на <span class="text-warning">{{ release.platform_name }}</span>
+                  [{{ release.release_region }}]
+                </div>
+                <ng-container *ngTemplateOutlet="releaseActions; context: { $implicit: release }"></ng-container>
+              </div>
+            </li>
+          </ng-container>
+
+          <ng-template #releaseActions let-release>
+            <ng-container *ngIf="isAuthorised$ | async">
+              <div class="col-auto d-flex flex-wrap gap-2 align-items-start" style="min-height: 40px;">
+                <button type="button" class="btn btn-outline-success btn-sm"
+                  [disabled]="release.owned || release.release_status === 5 || !release.release_date || (collectionChanging$ | async)"
+                  [hidden]="release.owned"
+                  (click)="addToCollection(release.release_id)">
+                  В коллекцию
+                </button>
+
+                <button type="button" class="btn btn-outline-success btn-sm"
+                  [hidden]="!release.owned || release.bided"
+                  [disabled]="release.release_status === 5 || !release.release_date || (collectionChanging$ | async)"
+                  (click)="addBid(release.release_id)">
+                  Хочу поменять
+                </button>
+
+                <button type="button" class="btn btn-outline-success btn-sm"
+                  [hidden]="!release.bided"
+                  [disabled]="(collectionChanging$ | async)"
+                  (click)="removeBid(release.release_id)">
+                  Больше не хочу меняться
+                </button>
+
+                <button type="button" class="btn btn-outline-primary btn-sm"
+                  [disabled]="release.wished || release.release_status === 5 || !release.release_date || (collectionChanging$ | async)"
+                  [hidden]="release.wished"
+                  (click)="addWish(release.release_id)">
+                  В вишлист
+                </button>
+
+                <button type="button" class="btn btn-outline-primary btn-sm"
+                  *ngIf="release.bid_user_logins.length"
+                  (click)="openBidsModal(release)">
+                  Есть предложения
+                </button>
+              </div>
+            </ng-container>
+          </ng-template>
         </ul>
       </div>
     </div>

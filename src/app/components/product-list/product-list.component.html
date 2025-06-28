@@ -29,7 +29,7 @@
     <div class="col-xl-2 col-lg-3 col-md-4 d-none d-md-block p-3">
       <div
         class="card game-card h-100 border-0 shadow-sm hover-shadow"
-        [routerLink]="product.id.toString()"
+        [routerLink]="[product.id.toString(), {platform: activeCategory.value}]"
         style="cursor: pointer;"
       >
         <div
@@ -75,7 +75,7 @@
     <div class="col-12 d-md-none mb-3">
       <div
         class="card bg-dark text-white shadow-sm rounded-3 d-flex flex-row overflow-hidden"
-        [routerLink]="product.id.toString()"
+        [routerLink]="[product.id.toString(), {platform: activeCategory.value}]"
         style="cursor: pointer;"
       >
         <div
