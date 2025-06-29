@@ -5,7 +5,7 @@ export const PRODUCTS_STATE_DEFAULTS: IproductState = {
   productList: [],
   productsTotalCount: 0,
   productListRequestStatus: RequestStatus.NotInvoked,
-  productListRequestParams: {cat: 6},
+  productListRequestParams: {limit: 18, cat: 6, offset: 0},
   productProperties: null,
   productPropertiesRequestStatus: RequestStatus.NotInvoked,
 }
