@@ -14,12 +14,20 @@
             </a>
           </li>
         </ul>
-        <form [formGroup]="queryForm">
+        <form [formGroup]="queryForm" class="position-relative">
           <input id="query"
-                class="form-control form-control-lg bg-secondary text-white border-0 rounded-3"
+                class="form-control form-control-lg bg-secondary text-white border-0 rounded-3 pe-5"
                 type="text"
                 placeholder="🔍 Поиск по названию"
                 formControlName="query" />
+
+          <button *ngIf="queryForm.get('query')?.value"
+                  type="button"
+                  class="btn position-absolute top-50 end-0 translate-middle-y me-3 p-0 text-white"
+                  style="font-size: 1.2rem; background: none; border: none;"
+                  (click)="queryForm.get('query')?.reset()">
+            &times;
+          </button>
         </form>
       </div>
     </div>
