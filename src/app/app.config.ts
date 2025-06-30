@@ -12,6 +12,7 @@ import { authInterceptor } from '@app/interceptors/auth.interceptor';
 import { withNgxsStoragePlugin } from '@ngxs/storage-plugin';
 import { CollectionState } from './states/collection/states/collection.state';
 import { OwnershipState } from './states/ownership/states/ownership.state';
+import { PlatformState } from './states/platforms/states/platforms.state';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -28,7 +29,8 @@ export const appConfig: ApplicationConfig = {
         RegistrationState,
         AuthState,
         CollectionState,
-        OwnershipState
+        OwnershipState,
+        PlatformState
       ],
       withNgxsStoragePlugin({
         keys: ['Auth', 'Ownership', 'Products']

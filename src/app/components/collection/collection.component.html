@@ -1,56 +1,23 @@
 <h1 class="display-5 fw-bold mb-4 text-light">Ваша коллекция</h1>
 
 <div class="row">
-  <div class="col-12 px-0 mb-4"  *ngIf="!!(activePlatforms$ | async)?.length">
+  <div class="col-12 px-0 mb-4">  
+    <!-- *ngIf="!!(displayCategories$ | async)?.length" -->
     <div class="card bg-dark text-white shadow rounded-4 overflow-hidden">
       <div class="p-3">
         <ul class="nav nav-pills flex-wrap justify-content-start mb-0">
           <li class="nav-item me-2 mb-2"
-              *ngIf="(activePlatforms$ | async)?.includes(6)">
-            <a class="nav-link px-4 py-2 fw-semibold rounded-pill"
-              [class.active]="activeCategory === 6"
-              (click)="setActiveCategory(6)">
-              PC
-            </a>
-          </li>
-          <li class="nav-item me-2 mb-2"
-              *ngIf="(activePlatforms$ | async)?.includes(38)">
-            <a class="nav-link px-4 py-2 fw-semibold rounded-pill"
-              [class.active]="activeCategory === 38"
-              (click)="setActiveCategory(38)">
-              PSP
-            </a>
-          </li>
-          <li class="nav-item me-2 mb-2"
-              *ngIf="(activePlatforms$ | async)?.includes(8)">
-            <a class="nav-link px-4 py-2 fw-semibold rounded-pill"
-              [class.active]="activeCategory === 8"
-              (click)="setActiveCategory(8)">
-              PS2
-            </a>
-          </li>
-          <li class="nav-item me-2 mb-2"
-              *ngIf="(activePlatforms$ | async)?.includes(9)">
-            <a class="nav-link px-4 py-2 fw-semibold rounded-pill"
-              [class.active]="activeCategory === 9"
-              (click)="setActiveCategory(9)">
-              PS3
-            </a>
-          </li>
-          <li class="nav-item me-2 mb-2"
-              *ngIf="(activePlatforms$ | async)?.includes(48)">
-            <a class="nav-link px-4 py-2 fw-semibold rounded-pill"
-              [class.active]="activeCategory === 48"
-              (click)="setActiveCategory(48)">
-              PS4
-            </a>
-          </li>
-          <li class="nav-item me-2 mb-2"
-              *ngIf="(activePlatforms$ | async)?.includes(167)">
-            <a class="nav-link px-4 py-2 fw-semibold rounded-pill"
-              [class.active]="activeCategory === 167"
-              (click)="setActiveCategory(167)">
-              PS5
+              *ngFor="let cat of (displayCategories$ | async)">
+            <a class="nav-link d-flex justify-content-between align-items-center"
+              [class.active]="activeCategory === cat.id"
+              (click)="setActiveCategory(cat.id)">
+              <span>
+                {{ cat.abbreviation }}
+                <span *ngIf="cat.user_games === cat.total_games" class="ms-1 text-success">🏆</span>
+              </span>
+              <span class="badge bg-light text-dark">
+                {{ cat.user_games }}/{{ cat.total_games }}
+              </span>
             </a>
           </li>
         </ul>

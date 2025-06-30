@@ -5,11 +5,12 @@
     <div class="card bg-dark text-white shadow rounded-4 overflow-hidden">
       <div class="p-3">
         <ul class="nav nav-pills flex-wrap justify-content-start mb-3">
-          <li class="nav-item me-2 mb-2" *ngFor="let cat of categories">
-            <a class="nav-link px-4 py-2 fw-semibold rounded-pill"
+          <li class="nav-item me-2 mb-2" *ngFor="let cat of (categories$ | async)">
+            <a class="nav-link px-4 py-2 fw-semibold rounded-pill d-flex justify-content-between align-items-center"
               [class.active]="(activeCategory | async) === cat.id"
               (click)="setActiveCategory(cat.id)">
-              {{ cat.label }}
+              {{ cat.abbreviation }}
+              <span class="badge bg-secondary ms-2">{{ cat.total_games }}</span>
             </a>
           </li>
         </ul>

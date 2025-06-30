@@ -7,8 +7,10 @@ import { CollectionState } from '@app/states/collection/states/collection.state'
 import { OwnershipState } from '@app/states/ownership/states/ownership.state';
 import { IProductListRequest } from '@app/states/products/interfaces/product-list-request.interface';
 import { Store } from '@ngxs/store';
-import { filter, Observable, Subject, Subscription, take } from 'rxjs';
+import { combineLatest, filter, map, Observable, Subject, Subscription, take, withLatestFrom } from 'rxjs';
 import { PagerComponent } from '../pager/pager.component';
+import { IPlatformItem } from '@app/states/platforms/interfaces/platform-item.interface';
+import { PlatformState } from '@app/states/platforms/states/platforms.state';
 
 
 const LIMIT = 18;
@@ -28,13 +30,34 @@ export class CollectionComponent implements OnInit, OnDestroy {
     this.collectionParams$ = this.store.select(CollectionState.collectionParams);
     this.activePlatforms$ = this.store.select(OwnershipState.activeCollectionPlatforms);
     this.collectionTotalCount$ = this.store.select(CollectionState.totalCountCollection);
+    this.displayCategories$ = combineLatest([
+      this.activePlatforms$,
+      this.store.select(PlatformState.loadedPlatforms)
+    ]).pipe
+     (
+      map(([tupples, platforms]) => platforms.reduce(
+        (acc: IPlatformItem[], item) => {
+          const matchingTupple = tupples.find(t => t.platform === item.id);
+          if(matchingTupple) {
+            acc.push({
+              ...item,
+              user_games: matchingTupple.have_games
+            })
+          }
+          return acc;
+        },
+        []
+      ))
+    );
   }
 
   public limit = LIMIT;
 
   private collectionParams$: Observable<IProductListRequest>;
 
-  public activePlatforms$: Observable<number[]>;
+  public activePlatforms$: Observable<any[]>;
+
+  public displayCategories$: Observable<IPlatformItem[]>;
 
   public activeCategory$ = new Subject<number>;
 
@@ -43,6 +66,8 @@ export class CollectionComponent implements OnInit, OnDestroy {
   public collection$: Observable<ICollectionItem[]>;
 
   public collectionTotalCount$: Observable<number>;
+
+  public categories$!: Observable<IPlatformItem[]>;
 
   public ngOnInit(): void {
     const sub =  this.activeCategory$.subscribe(x => this.store.dispatch(new CollectionActions.SetCollectionParams({cat: x, limit: LIMIT, offset: 0,})));
@@ -54,7 +79,7 @@ export class CollectionComponent implements OnInit, OnDestroy {
     this.activePlatforms$.pipe(
       filter(platforms => platforms.length > 0),
       take(1)
-    ).subscribe(platforms => {this.activeCategory$.next(platforms[0]); this.activeCategory = platforms[0];})
+    ).subscribe(platforms => {this.activeCategory$.next(platforms[0].platform); this.activeCategory = platforms[0].platform;})
   }
 
   public ngOnDestroy(): void {

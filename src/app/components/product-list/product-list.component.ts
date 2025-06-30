@@ -9,6 +9,8 @@ import { BehaviorSubject, debounceTime, distinctUntilChanged, map, Observable, S
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { IProductListRequest } from '@app/states/products/interfaces/product-list-request.interface';
 import { PagerComponent } from '@app/components/pager/pager.component';
+import { IPlatformItem } from '@app/states/platforms/interfaces/platform-item.interface';
+import { PlatformState } from '@app/states/platforms/states/platforms.state';
 
 const LIMIT = 18;
 
@@ -30,15 +32,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
   public activeCategory!: BehaviorSubject<number>;
   public subscriptions: Subscription[] = [];
   public limit = LIMIT;
-
-  public categories = [
-    { id: 6, label: 'PC' },
-    { id: 38, label: 'PSP' },
-    { id: 8, label: 'PS2' },
-    { id: 9, label: 'PS3' },
-    { id: 48, label: 'PS4' },
-    { id: 167, label: 'PS5' }
-  ];
+  public categories$!: Observable<IPlatformItem[]>;
 
   public ngOnInit(): void {
     const params = this.store.selectSnapshot(ProductsState.productsParams);
@@ -55,6 +49,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
     this.products$ = this.store.select(ProductsState.loadedProducts);
     this.productsTotalCount$ = this.store.select(ProductsState.totalCountProducts);
     this.productParams$ = this.store.select(ProductsState.productsParams);
+    this.categories$ = this.store.select(PlatformState.loadedPlatforms);
     this.queryForm = new FormGroup({
       query: new FormControl(params?.query || '')
     });
