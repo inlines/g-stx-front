@@ -171,7 +171,7 @@
                 <!-- Имя пользователя и кнопка -->
                 <div class="flex-grow-1 d-flex justify-content-between align-items-center">
                   <span class="fw-semibold fs-6">{{ user }}</span>
-                  <button type="button" class="ms-4 btn btn-outline-warning btn-sm">
+                  <button type="button" (click)="startChatWith(user)" class="ms-4 btn btn-outline-warning btn-sm">
                     Написать игроку
                   </button>
                 </div>

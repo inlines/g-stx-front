@@ -1,0 +1,96 @@
+/* Шаблон для чата */
+.chat-container {
+  background-color: #121212; /* Тёмный фон */
+  border-left: 3px solid #333;
+}
+
+.chat-header {
+  background-color: #1e1e1e;
+  border-bottom: 2px solid #444;
+  color: #fff;
+}
+
+.chat-header .btn-close-white {
+  color: #fff;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.chat-header .btn-close-white:hover {
+  opacity: 1;
+}
+
+.chat-content {
+  background-color: #121212;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.messages {
+  max-height: calc(100% - 200px); /* Ограничиваем по высоте */
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+.messages .p-2 {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  font-size: 14px;
+}
+
+.dialog-item {
+  background-color: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 12px;
+  margin-bottom: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  &:hover {
+    transform: scale(1.03);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+  }
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #fff;
+}
+
+.dialog-companion {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.dialog-time {
+  font-size: 12px;
+  color: #bbb;
+}
+
+.dialog-message {
+  font-size: 14px;
+  color: #ddd;
+}
+
+.chat-input {
+  background-color: #1e1e1e;
+  border-top: 1px solid #333;
+  margin-bottom: 52px;
+}
+
+.chat-input .input-group input {
+  background-color: #1e1e1e;
+  color: #fff;
+  border: 1px solid #444;
+}
+
+.chat-input .input-group button {
+  background-color: #f39c12; /* Ярко-желтая кнопка */
+  color: #fff;
+  border: none;
+}
+
+.chat-input .input-group button:hover {
+  background-color: #e67e22; /* Темнее при ховере */
+}

@@ -11,6 +11,7 @@ import { IReleaseItem } from '@app/states/products/interfaces/release-item.inter
 import { OwnershipState } from '@app/states/ownership/states/ownership.state';
 import { CollectionState } from '@app/states/collection/states/collection.state';
 import { ActivatedRoute } from '@angular/router';
+import { ChatActions } from '@app/states/chat/states/chat-actions';
 
 @Component({
   selector: 'app-product-properties',
@@ -106,5 +107,12 @@ export class ProductPropertiesComponent implements OnInit {
   public openBidsModal(release: IReleaseItem) {
     this.selectedRelease = release;
     this.modalService.open(this.bidsModalRef, { centered: true });
+  }
+
+  public startChatWith(user: string) {
+    this.modalService.dismissAll();
+    this.store.dispatch(new ChatActions.SetRecepient(user));
+    this.store.dispatch(new ChatActions.RequestMessages(user));
+    this.store.dispatch(new ChatActions.ToggleChatVisibility());
   }
 }

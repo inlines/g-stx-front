@@ -1,0 +1,111 @@
+// src/app/services/websocket.service.ts
+import { Inject, Injectable } from '@angular/core';
+import { Store } from '@ngxs/store';
+import { ChatActions } from '../states/chat-actions';
+import { IMessage } from '../interfaces/message.interface';
+import { IEnvironment } from '@app/environments/environment.interface';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { IDialog } from '../interfaces/dialog.interface';
+import { ToastService } from '@app/services/toast.service';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class ChatService {
+  private socket: WebSocket | null = null;
+  private wsUrl: string;
+  private dialogsUrl: string;
+  private messagesUrl: string;
+  private isConnected: boolean = false; // Флаг для отслеживания состояния подключения
+
+  constructor(private toastService: ToastService, private store: Store, private http: HttpClient, @Inject('environment') private environment: IEnvironment,) {
+    this.wsUrl = this.environment.wsUrl;
+    this.dialogsUrl = `${this.environment.apiUrl}/dialogs`
+    this.messagesUrl = `${this.environment.apiUrl}/messages`
+  }
+
+  // Метод для подключения к WebSocket
+  connect(login: string): void {
+    if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+      console.log('WebSocket уже подключен');
+      return;
+    }
+
+    const wsUrl = `${this.wsUrl}${login}`;
+    this.socket = new WebSocket(wsUrl);
+
+    this.socket.onopen = () => {
+      this.toastService.clear();
+      this.toastService.show({
+        body: 'Сокет подключен',
+        classname: 'bg-success text-light',
+        delay: 1500,
+      });
+      this.isConnected = true;
+    };
+
+    this.socket.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+       console.log('Получено сообщение:', message);
+      this.store.dispatch(new ChatActions.SetMessages([message]));
+    };
+
+    this.socket.onerror = (error) => {
+      this.toastService.clear();
+      this.toastService.show({
+        body: 'Ошибка сокета',
+        classname: 'bg-danger text-light',
+        delay: 500,
+      });
+    };
+
+
+    this.socket.onclose = () => {
+      console.log('WebSocket closed');
+      this.isConnected = false;
+    };
+  }
+
+  // Метод для отправки сообщения через WebSocket
+  sendMessage(payload: IMessage): void {
+    if (!this.socket) {
+      console.warn('WebSocket соединение не установлено!');
+      return;
+    }
+
+    if (this.socket.readyState !== WebSocket.OPEN) {
+      this.toastService.show({
+        body: 'WebSocket не открыт для отправки сообщений',
+        classname: 'bg-danger text-light',
+        delay: 1500,
+      });
+      return;
+    }
+
+    console.log('Отправка сообщения через WebSocket...');
+    const message = {
+      ...payload,
+      created_at: new Date().toISOString(),
+    };
+    console.warn(message);
+
+    this.socket.send(JSON.stringify(message));
+  }
+
+  // Закрытие WebSocket соединения
+  closeConnection(): void {
+    if (this.socket) {
+      this.socket.close();
+      this.isConnected = false;
+    }
+  }
+
+  requestDialogs(): Observable<IDialog[]> {
+    return this.http.get<IDialog[]>(this.dialogsUrl);
+  }
+
+  requestMessages(companion: string): Observable<IMessage[]> {
+    return this.http.get<IMessage[]>(this.messagesUrl, {params: {companion}});
+  }
+}

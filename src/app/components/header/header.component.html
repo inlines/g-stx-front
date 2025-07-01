@@ -2,7 +2,7 @@
   <div class="row align-items-center">
     <!-- Лого -->
     <div class="col-6">
-      <a class="nav-link text-white fw-bold fs-5" routerLink="/">🎮 <span class="d-none d-sm-inline">Каталог</span></a>
+      <a class="nav-link text-white fw-bold fs-5" routerLink="/">🎮 <span class="d-none d-sm-inline">Каталог {{ currentUser$ | async }}</span></a>
     </div>
 
     <!-- Пользователь / авторизация -->
@@ -39,6 +39,13 @@
         routerLink="/wishlist"
       >
         ⭐ <span class="d-none d-sm-inline ms-1">Вишлист</span>
+      </a>
+      <a
+        class="nav-link text-white px-2 py-1 bg-secondary bg-opacity-25 rounded-3 d-flex align-items-center"
+        *ngIf="isAuthorised$ | async"
+        (click)="toggleChat()"
+      >
+        ⭐ <span class="d-none d-sm-inline ms-1">Чат</span>
       </a>
     </div>
   </div>

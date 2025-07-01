@@ -3,6 +3,7 @@ import { Component, } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuthActions } from '@app/states/auth/states/auth-actions';
 import { AuthState } from '@app/states/auth/states/auth.state';
+import { ChatActions } from '@app/states/chat/states/chat-actions';
 import { Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
 
@@ -26,5 +27,9 @@ export class HeaderComponent {
 
   public logout(): void {
     this.store.dispatch(new AuthActions.Logout());
+  }
+
+  public toggleChat(): void {
+    this.store.dispatch(new ChatActions.ToggleChatVisibility())
   }
 }

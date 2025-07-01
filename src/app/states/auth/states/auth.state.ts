@@ -9,6 +9,8 @@ import { catchError, tap } from "rxjs";
 import { Router } from "@angular/router";
 import { OwnershipActions } from "@app/states/ownership/states/ownership-actions";
 import { ProductsActions } from "@app/states/products/states/products.actions";
+import { ToastService } from "@app/services/toast.service";
+import { ChatActions } from "@app/states/chat/states/chat-actions";
 
 
 @State<IAuthState>({
@@ -19,6 +21,7 @@ import { ProductsActions } from "@app/states/products/states/products.actions";
 export class AuthState {
   constructor(
       private service: AuthService,
+      private toastService: ToastService,
       private router: Router
   ){}
 
@@ -47,6 +50,11 @@ export class AuthState {
 
     ctx.dispatch(new OwnershipActions.RequestOwnership());
 
+    // const state = ctx.getState();
+    // if(state.login) {
+    //   ctx.dispatch(new ChatActions.Connect(state.login));
+    // }
+
     this.router.navigate(['/collection']);
   }
 
@@ -58,7 +66,11 @@ export class AuthState {
       token: null
     });
 
-    console.warn('AUTH FAIL');
+    this.toastService.show({
+      body: 'Ошибка при авторизации, проверьте логин/пароль',
+      classname: 'bg-danger text-light w-100',
+      delay: 5000,
+    });
   }
 
   @Action(AuthActions.Logout)
