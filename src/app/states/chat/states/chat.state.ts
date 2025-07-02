@@ -23,6 +23,7 @@ export class ChatState {
     action: ChatActions.Connect
   ): void {
     this.chatService.connect(action.login);
+    this.chatService.doStateCheck();
     ctx.patchState({
       isConnected: true,
       login: action.login,

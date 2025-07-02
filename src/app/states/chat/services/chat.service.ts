@@ -18,6 +18,7 @@ export class ChatService {
   private dialogsUrl: string;
   private messagesUrl: string;
   private isConnected: boolean = false; // Флаг для отслеживания состояния подключения
+  private lastLogin!: string;
 
   constructor(private toastService: ToastService, private store: Store, private http: HttpClient, @Inject('environment') private environment: IEnvironment,) {
     this.wsUrl = this.environment.wsUrl;
@@ -43,6 +44,7 @@ export class ChatService {
         delay: 1500,
       });
       this.isConnected = true;
+      this.lastLogin = login;
     };
 
     this.socket.onmessage = (event) => {
@@ -65,6 +67,15 @@ export class ChatService {
       console.log('WebSocket closed');
       this.isConnected = false;
     };
+  }
+
+  doStateCheck(): void {
+    setInterval(() => {
+      if (this.socket?.readyState === WebSocket.CLOSED || this.socket?.readyState === WebSocket.CLOSING) {
+        console.warn('WebSocket неактивен, переподключение...');
+        this.connect(this.lastLogin); // Сохраняйте login в поле
+      }
+    }, 10000);
   }
 
   // Метод для отправки сообщения через WebSocket
