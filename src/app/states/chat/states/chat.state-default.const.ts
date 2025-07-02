@@ -10,4 +10,5 @@ export const CHAT_STATE_DEFAULTS: IChatState = {
   dialogReqeustStatus: RequestStatus.NotInvoked,
   messagesReqeustStatus: RequestStatus.NotInvoked,
   dialogs: [],
+  showWarning: false,
 }

@@ -12,5 +12,10 @@ export enum ChatActionList {
   REQUEST_MESSAGES_FAIL = '[CHAT] request messages fail',
   REQUEST_MESSAGES_SUCCESS = '[CHAT] request messages success',
 
-  TOGGLE_CHAT_VISIBILITY = '[CHAT] toggle visivility'
+  TOGGLE_CHAT_VISIBILITY = '[CHAT] toggle visivility',
+
+  ENABLE_CHAT_WARNING = '[CHAT] enable warning',
+  DISABLE_CHAT_WARNING = '[CHAT] disable warning',
+
+  RESET_STATE = '[CHAT] reset state',
 }

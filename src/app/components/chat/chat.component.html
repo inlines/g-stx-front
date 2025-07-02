@@ -1,5 +1,4 @@
 <div class="chat-container position-fixed top-0 end-0 h-100 bg-dark text-light border-start shadow-lg"
-     [ngClass]="{'open d-block': isOpen, 'd-none': !isOpen}"
      style="width: 100%; max-width: 400px; z-index: 1050;">
 
   <!-- Header -->
@@ -31,6 +30,7 @@
             <input [(ngModel)]="message"
                    class="form-control bg-dark text-light border-secondary"
                    (keydown.enter)="sendMessage()"
+                   (focus)="onFocus()"
                    placeholder="Введите сообщение" />
             <button class="btn btn-warning" (click)="sendMessage()">Отправить</button>
           </div>

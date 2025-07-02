@@ -11,4 +11,5 @@ export interface IChatState {
   dialogs: IDialog[];
   dialogReqeustStatus: RequestStatus;
   messagesReqeustStatus: RequestStatus;
+  showWarning: boolean;
 }

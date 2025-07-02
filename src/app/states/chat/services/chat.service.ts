@@ -20,6 +20,8 @@ export class ChatService {
   private isConnected: boolean = false; // Флаг для отслеживания состояния подключения
   private lastLogin!: string;
 
+  public checkInterval: any;
+
   constructor(private toastService: ToastService, private store: Store, private http: HttpClient, @Inject('environment') private environment: IEnvironment,) {
     this.wsUrl = this.environment.wsUrl;
     this.dialogsUrl = `${this.environment.apiUrl}/dialogs`
@@ -70,12 +72,13 @@ export class ChatService {
   }
 
   doStateCheck(): void {
-    setInterval(() => {
+    this.checkInterval = setInterval(() => {
+      console.warn('check==');
       if (this.socket?.readyState === WebSocket.CLOSED || this.socket?.readyState === WebSocket.CLOSING) {
         console.warn('WebSocket неактивен, переподключение...');
         this.connect(this.lastLogin); // Сохраняйте login в поле
       }
-    }, 10000);
+    }, 1000);
   }
 
   // Метод для отправки сообщения через WebSocket
@@ -110,6 +113,7 @@ export class ChatService {
       this.socket.close();
       this.isConnected = false;
     }
+    clearInterval(this.checkInterval);
   }
 
   requestDialogs(): Observable<IDialog[]> {

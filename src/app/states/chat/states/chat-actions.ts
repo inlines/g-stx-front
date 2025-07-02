@@ -62,4 +62,16 @@ export namespace ChatActions {
   export class RequestMessagesFail {
     public static readonly type = ChatActionList.REQUEST_MESSAGES_FAIL;
   }
+
+  export class EnableWarning {
+    public static readonly type = ChatActionList.ENABLE_CHAT_WARNING;
+  }
+
+  export class DisanleWarning {
+    public static readonly type = ChatActionList.DISABLE_CHAT_WARNING;
+  }
+
+  export class Reset {
+    public static readonly type = ChatActionList.RESET_STATE;
+  }
 }

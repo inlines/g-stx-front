@@ -1,12 +1,12 @@
 // src/app/components/chat/chat.component.ts
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
-import { Store, Select, Actions, ofActionCompleted } from '@ngxs/store';
-import { filter, map, Observable, take, withLatestFrom } from 'rxjs';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { Store, Actions, ofActionCompleted } from '@ngxs/store';
+import { debounceTime, filter, map, Observable, Subscription, take, withLatestFrom } from 'rxjs';
 import { ChatState } from '@app/states/chat/states/chat.state';
 import { AuthState } from '@app/states/auth/states/auth.state';
 import { ChatActions } from '@app/states/chat/states/chat-actions';
 import { FormsModule } from '@angular/forms';
-import { AsyncPipe, DatePipe, NgClass, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe, DatePipe, NgFor, NgIf } from '@angular/common';
 import { IDialog } from '@app/states/chat/interfaces/dialog.interface';
 import { ToastService } from '@app/services/toast.service';
 
@@ -15,9 +15,9 @@ import { ToastService } from '@app/services/toast.service';
   selector: 'app-chat',
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.scss'],
-  imports: [FormsModule, AsyncPipe, NgFor, NgClass, NgIf, DatePipe],
+  imports: [FormsModule, AsyncPipe, NgFor, NgIf, DatePipe],
 })
-export class ChatComponent implements OnInit, OnDestroy {
+export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('scrollbox') scrollbox!: ElementRef;
 
   messages$!: Observable<any[]>;
@@ -33,6 +33,16 @@ export class ChatComponent implements OnInit, OnDestroy {
   public dialogs$!: Observable<IDialog[]>;
 
   constructor(private store: Store, private actions$: Actions, private toastService: ToastService,) {}
+
+  public subs: Subscription[] = [];
+  
+  ngAfterViewInit(): void {
+    this.subs.push(this.messages$.pipe(debounceTime(500)).subscribe(() => {
+      if(this.scrollbox) {
+        this.scrollbox.nativeElement.scrollTop = this.scrollbox.nativeElement.scrollHeight;
+      }
+    }));
+  }
 
   ngOnInit(): void {
     this.isConnected$ = this.store.select(ChatState.isConnected);
@@ -52,15 +62,6 @@ export class ChatComponent implements OnInit, OnDestroy {
           if(this.scrollbox) {
             this.scrollbox.nativeElement.scrollTop = this.scrollbox.nativeElement.scrollHeight;
           }
-        } else {
-            debugger;
-            console.warn('notifff');
-            this.toastService.clear();
-            this.toastService.show({
-              body: 'Вам пришло новое сообщение',
-              classname: 'bg-success text-light',
-              delay: 1500,
-            });
         }
       }
     )
@@ -76,19 +77,28 @@ export class ChatComponent implements OnInit, OnDestroy {
         recipient: recepient || '',
         body: this.message
       }));
+
       this.message = ''; // Очистка поля ввода
     })
   }
 
   ngOnDestroy(): void {
     // Закрытие соединения при уничтожении компонента
-    // this.chatService.closeConnection();
+    this.subs.forEach(sub => sub.unsubscribe());
+    this.store.dispatch(new ChatActions.Reset());
   }
 
   public isOpen = true;
 
   public closeChat() {
+    this.store.dispatch(new ChatActions.SetRecepient(null));
     this.store.dispatch(new ChatActions.ToggleChatVisibility());
+  }
+
+  public onFocus(): void {
+    if(this.scrollbox) {
+      this.scrollbox.nativeElement.scrollTop = this.scrollbox.nativeElement.scrollHeight;
+    }
   }
 
   public setActiveDialog(dialog: IDialog | null) {
@@ -96,6 +106,7 @@ export class ChatComponent implements OnInit, OnDestroy {
       this.store.dispatch(new ChatActions.SetRecepient(dialog.companion));
       this.store.dispatch(new ChatActions.RequestMessages(dialog.companion));
     } else {
+      this.store.dispatch(new ChatActions.RequestDialogs());
       this.store.dispatch(new ChatActions.SetRecepient(null));
     }
   }
