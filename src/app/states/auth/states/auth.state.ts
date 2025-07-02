@@ -83,6 +83,7 @@ export class AuthState {
 
     ctx.dispatch(new OwnershipActions.ResetOwnership());
     ctx.dispatch(new ProductsActions.ProductsReset());
+    ctx.dispatch(new ChatActions.Reset());
 
     this.router.navigate(['/login']);
   }

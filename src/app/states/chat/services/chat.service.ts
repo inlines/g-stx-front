@@ -18,7 +18,7 @@ export class ChatService {
   private dialogsUrl: string;
   private messagesUrl: string;
   private isConnected: boolean = false; // Флаг для отслеживания состояния подключения
-  private lastLogin!: string;
+  private lastLogin!: string | null;
 
   public checkInterval: any;
 
@@ -73,15 +73,15 @@ export class ChatService {
 
   doStateCheck(): void {
     this.checkInterval = setInterval(() => {
-      console.warn('check==');
       if (this.socket?.readyState === WebSocket.CLOSED || this.socket?.readyState === WebSocket.CLOSING) {
         console.warn('WebSocket неактивен, переподключение...');
-        this.connect(this.lastLogin); // Сохраняйте login в поле
+        if(this.lastLogin) {
+          this.connect(this.lastLogin);
+        }
       }
     }, 1000);
   }
 
-  // Метод для отправки сообщения через WebSocket
   sendMessage(payload: IMessage): void {
     if (!this.socket) {
       console.warn('WebSocket соединение не установлено!');
@@ -112,6 +112,7 @@ export class ChatService {
     if (this.socket) {
       this.socket.close();
       this.isConnected = false;
+      this.lastLogin = null;
     }
     clearInterval(this.checkInterval);
   }
