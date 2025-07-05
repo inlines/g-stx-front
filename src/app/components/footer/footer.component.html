@@ -1,37 +1,57 @@
-<footer class="footer bg-dark text-light py-5 mt-5 border-top border-secondary">
+<footer class="footer bg-dark text-light py-4 mt-5 border-top border-secondary">
   <div class="container">
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-4">
-
+    <div class="row">
       <!-- Лого и копирайт -->
-      <div class="col mb-3">
-        <a routerLink="/" class="d-flex align-items-center mb-3 text-light text-decoration-none fs-4 fw-bold">
+      <div class="col-12 col-md-4 mb-3">
+        <a routerLink="/" class="d-flex align-items-center mb-2 text-light text-decoration-none fs-5 fw-bold">
           🎮 GSTX
         </a>
-        <p class="text-muted small">© 2025 GSTX</p>
+        <p class="text-light opacity-75 small mb-0">© 2025 GSTX</p>
       </div>
 
-      <!-- Пустая колонка для выравнивания -->
-      <div class="col mb-3 d-none d-md-block"></div>
+      <!-- Раскрывающаяся навигация для мобилы -->
+      <div class="col-12 col-md-4 mb-3">
+        <div class="d-md-none">
+          <button class="btn btn-outline-secondary w-100 mb-2" (click)="isNavOpen = !isNavOpen">
+            {{ isNavOpen ? 'Скрыть навигацию' : 'Показать навигацию' }}
+          </button>
+          <div *ngIf="isNavOpen">
+            <ul class="nav flex-column">
+              <li class="nav-item mb-2">
+                <a [routerLink]="'/products'" class="nav-link p-0 text-light">Каталог</a>
+              </li>
+              <li class="nav-item mb-2">
+                <a [routerLink]="'/registration'" class="nav-link p-0 text-light">Регистрация</a>
+              </li>
+              <li class="nav-item mb-2">
+                <a href="#" class="nav-link p-0 text-light">FAQ</a>
+              </li>
+              <li class="nav-item mb-2">
+                <a [routerLink]="'/about'" class="nav-link p-0 text-light">О проекте</a>
+              </li>
+            </ul>
+          </div>
+        </div>
 
-      <!-- Секции -->
-      <div class="col mb-3" *ngFor="let section of ['Навигация']; let i = index">
-        <h5 class="text-light">{{ section }}</h5>
-        <ul class="nav flex-column">
-          <li class="nav-item mb-2">
-            <a [routerLink]="'/products'" class="nav-link p-0 ">Каталог</a>
-          </li>
-          <li class="nav-item mb-2">
-            <a [routerLink]="'/registration'" class="nav-link p-0 ">Регистрация</a>
-          </li>
-          <li class="nav-item mb-2">
-            <a href="#" class="nav-link p-0 ">FAQ</a>
-          </li>
-          <li class="nav-item mb-2">
-            <a [routerLink]="'/about'" class="nav-link p-0 ">О проекте</a>
-          </li>
-        </ul>
+        <!-- Обычная навигация для десктопа -->
+        <div class="d-none d-md-block">
+          <h5 class="text-light">Навигация</h5>
+          <ul class="nav flex-column">
+            <li class="nav-item mb-2">
+              <a [routerLink]="'/products'" class="nav-link p-0 text-light">Каталог</a>
+            </li>
+            <li class="nav-item mb-2">
+              <a [routerLink]="'/registration'" class="nav-link p-0 text-light">Регистрация</a>
+            </li>
+            <li class="nav-item mb-2">
+              <a href="#" class="nav-link p-0 text-light">FAQ</a>
+            </li>
+            <li class="nav-item mb-2">
+              <a [routerLink]="'/about'" class="nav-link p-0 text-light">О проекте</a>
+            </li>
+          </ul>
+        </div>
       </div>
-
     </div>
   </div>
 </footer>
