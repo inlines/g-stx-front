@@ -35,8 +35,10 @@ export class ChatService {
       return;
     }
 
-    const wsUrl = `${this.wsUrl}${login}`;
-    this.socket = new WebSocket(wsUrl);
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const host = window.location.host;
+    const wsFullUrl = `${protocol}//${host}${this.wsUrl}${login}`;
+    this.socket = new WebSocket(wsFullUrl);
 
     this.socket.onopen = () => {
       this.toastService.clear();
