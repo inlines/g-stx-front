@@ -1,12 +1,44 @@
-<div class="header-bg bg-dark text-white shadow-sm py-3 px-3 px-lg-5" style="height:102px">
+<div class="header-bg bg-dark text-white shadow-sm py-3 px-3 px-lg-5">
   <div class="row align-items-center">
     <!-- Лого -->
-    <div class="col-6">
+    <div class="col-sm-6 col">
       <a class="nav-link text-white fw-bold fs-5" routerLink="/">🎮 <span class="d-none d-sm-inline">Каталог</span></a>
+    </div>
+    
+    <div class="col-auto d-sm-none d-flex justify-content-center justify-content-sm-start gap-3 flex-wrap">
+      <a
+        class="nav-link text-white px-2 py-1 bg-secondary bg-opacity-25 rounded-3 d-flex align-items-center"
+        *ngIf="isAuthorised$ | async"
+        routerLink="/collection"
+      >
+        🗂️ <span class="d-none d-sm-inline ms-1">Моя коллекция</span>
+      </a>
+      <a
+        class="nav-link text-white px-2 py-1 bg-secondary bg-opacity-25 rounded-3 d-flex align-items-center"
+        *ngIf="isAuthorised$ | async"
+        routerLink="/wishlist"
+      >
+        ⭐ <span class="d-none d-sm-inline ms-1">Вишлист</span>
+      </a>
+      <a
+        class="nav-link text-white px-2 py-1 bg-secondary bg-opacity-25 rounded-3 d-flex align-items-center position-relative"
+        *ngIf="isAuthorised$ | async"
+        (click)="toggleChat()"
+      >
+        💬
+        <span class="d-none d-sm-inline ms-1">Чаты</span>
+
+        <!-- Индикатор новых сообщений -->
+        <span
+          *ngIf="(showChatWarning$ | async)"
+          class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle animate-blink"
+          style="width: 10px; height: 10px;"
+        ></span>
+      </a>
     </div>
 
     <!-- Пользователь / авторизация -->
-    <div class="col-6 d-flex justify-content-end align-items-center">
+    <div class="col col-sm-6 d-flex justify-content-end align-items-center">
       <ng-container *ngIf="isAuthorised$ | async as user; else loginLink">
         <span class="me-2 text-info fw-semibold d-none d-md-inline">
           👤 {{ currentUser$ | async }}
@@ -23,8 +55,7 @@
     </div>
   </div>
 
-  <!-- Навигация (всегда показывать, но адаптировать) -->
-  <div class="row mt-2">
+  <div class="row mt-2 d-none d-sm-block">
     <div class="col d-flex justify-content-center justify-content-sm-start gap-3 flex-wrap">
       <a
         class="nav-link text-white px-2 py-1 bg-secondary bg-opacity-25 rounded-3 d-flex align-items-center"

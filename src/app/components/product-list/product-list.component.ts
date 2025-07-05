@@ -1,11 +1,12 @@
 import { AsyncPipe, DatePipe, NgFor, NgIf } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
+import { throttleTime } from 'rxjs/operators';
 import { RouterModule } from '@angular/router';
 import { IProductListItem } from '@app/states/products/interfaces/product-list-item.interface';
 import { ProductsActions } from '@app/states/products/states/products.actions';
 import { ProductsState } from '@app/states/products/states/products.state';
 import { Store } from '@ngxs/store';
-import { BehaviorSubject, debounceTime, distinctUntilChanged, map, Observable, Subscription } from 'rxjs';
+import { BehaviorSubject, debounceTime, distinctUntilChanged, map, Observable, Subscription, fromEvent } from 'rxjs';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { IProductListRequest } from '@app/states/products/interfaces/product-list-request.interface';
 import { PagerComponent } from '@app/components/pager/pager.component';
@@ -21,7 +22,12 @@ const LIMIT = 18;
   styleUrl: './product-list.component.scss',
   standalone: true,
 })
-export class ProductListComponent implements OnInit, OnDestroy {
+export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
+  @ViewChild('stickerContent') stickerContent!: ElementRef;
+
+  private lastScrollTop = 0;
+  private isHidden = false;
+
   constructor(private readonly store: Store) {}
 
   public products$!: Observable<IProductListItem[]>;
@@ -33,6 +39,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
   public subscriptions: Subscription[] = [];
   public limit = LIMIT;
   public categories$!: Observable<IPlatformItem[]>;
+
 
   public ngOnInit(): void {
     const params = this.store.selectSnapshot(ProductsState.productsParams);
@@ -105,6 +112,14 @@ export class ProductListComponent implements OnInit, OnDestroy {
     this.subscriptions.push(subQuery, subCat, subParams);
   }
 
+  public ngAfterViewInit(): void {
+    if (window.innerWidth <= 576) {
+      fromEvent(window, 'scroll')
+        .pipe(throttleTime(100))
+        .subscribe(() => this.handleScroll());
+    }
+  }
+
   public ngOnDestroy(): void {
     this.subscriptions.forEach(s => s.unsubscribe());
   }
@@ -117,5 +132,24 @@ export class ProductListComponent implements OnInit, OnDestroy {
     this.store.dispatch(new ProductsActions.SetRequestParams({
       offset: (page - 1) * LIMIT
     }));
+  }
+
+  private handleScroll() {
+    const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+    const goingDown = currentScroll > this.lastScrollTop;
+    const stickerTop = this.stickerContent.nativeElement.getBoundingClientRect().top;
+    const threshold = 81;
+
+    if (goingDown && stickerTop <= threshold && !this.isHidden) {
+      this.stickerContent.nativeElement.classList.add('hidden');
+      this.isHidden = true;
+    }
+
+    if (!goingDown && this.isHidden && stickerTop > threshold + 5) {
+      this.stickerContent.nativeElement.classList.remove('hidden');
+      this.isHidden = false;
+    }
+
+    this.lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
   }
 }

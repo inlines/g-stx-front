@@ -19,3 +19,9 @@
 .animate-blink {
   animation: blink 1s infinite;
 }
+
+@media (min-width: 576px) {
+  .header-bg {
+    height: 102px;
+  }
+}

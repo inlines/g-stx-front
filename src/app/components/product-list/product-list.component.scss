@@ -6,6 +6,9 @@
   position: sticky;
   top: 102px;
   z-index: 1000; /* убедись, что он выше других элементов */
+  @media (max-width: 576px) {
+    top: 64px;
+  }
 }
 
 .game-card {
@@ -28,4 +31,16 @@
 
 .text-light-muted {
   color: #b0b0b0;
+}
+
+.stickerContent {
+  overflow: hidden;
+  transition: height 0.3s ease, opacity 0.3s ease;
+  height: auto;
+  opacity: 1;
+}
+
+.stickerContent.hidden {
+  height: 0 !important;
+  opacity: 0;
 }
