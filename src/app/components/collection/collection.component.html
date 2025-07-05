@@ -2,8 +2,7 @@
 
 <div class="row">
   <div class="col-12 px-0 mb-4">  
-    <!-- *ngIf="!!(displayCategories$ | async)?.length" -->
-    <div class="card bg-dark text-white shadow rounded-4 overflow-hidden">
+    <div class="card bg-dark text-white shadow rounded-4 overflow-hidden" *ngIf="!!(displayCategories$ | async)?.length">
       <div class="p-3">
         <ul class="nav nav-pills flex-wrap justify-content-start mb-0">
           <li class="nav-item me-2 mb-2"
@@ -137,9 +136,15 @@
       <p class="text-light mb-2">
         Вы можете добавлять игры в <a class="text-info text-decoration-none fw-semibold" [routerLink]="'/wishlist'">вишлист</a>, чтобы не упустить возможность купить или обменять их, как только появятся подходящие варианты. Предложения постоянно обновляется — не упустите редкие издания и выгодные предложения!
       </p>
-      <p class="text-light mb-0">
+      <p class="text-light mb-4">
         GSTX — это не только коллекции, но и <strong>сообщество</strong>: вы можете находить игроков с похожими интересами, предлагать обмены и делать свою игровую библиотеку живой. Пусть каждая игра найдет нового владельца — начните с первой!
       </p>
+
+      <div>
+        <a [routerLink]="'/products'" class="btn btn-outline-info btn-lg fw-semibold">
+          Перейти в каталог
+        </a>
+      </div>
     </div>
   </ng-template>
 
