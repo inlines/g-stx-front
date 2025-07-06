@@ -51,7 +51,7 @@
                 <div class="col">
                   <span class="fw-semibold">{{ release.release_date | date:'dd.MM.yy':'UTC' }}</span>
                   на <span class="text-warning">{{ release.platform_name }}</span>
-                  [{{ release.release_region }}]
+                  [{{ release.release_region }}] {{release.digital_only ? 'только цифра' : ''}}
                 </div>
                 <ng-container *ngTemplateOutlet="releaseActions; context: { $implicit: release }"></ng-container>
               </div>
@@ -64,7 +64,7 @@
                 <div class="col">
                   <span class="fw-semibold">{{ release.release_date | date:'dd.MM.yy':'UTC' }}</span>
                   на <span class="text-warning">{{ release.platform_name }}</span>
-                  [{{ release.release_region }}]
+                  [{{ release.release_region }}] {{release.digital_only ? 'только цифра' : ''}}
                 </div>
                 <ng-container *ngTemplateOutlet="releaseActions; context: { $implicit: release }"></ng-container>
               </div>
@@ -75,7 +75,7 @@
             <ng-container *ngIf="isAuthorised$ | async">
               <div class="col-auto d-flex flex-wrap gap-2 align-items-start" style="min-height: 40px;">
                 <button type="button" class="btn btn-outline-success btn-sm"
-                  [disabled]="release.owned || release.release_status === 5 || !release.release_date || (collectionChanging$ | async)"
+                  [disabled]="release.owned || release.digital_only || release.release_status === 5 || !release.release_date || (collectionChanging$ | async)"
                   [hidden]="release.owned"
                   (click)="addToCollection(release.release_id)">
                   В коллекцию

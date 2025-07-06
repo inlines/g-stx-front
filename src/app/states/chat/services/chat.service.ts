@@ -49,6 +49,7 @@ export class ChatService {
       });
       this.isConnected = true;
       this.lastLogin = login;
+      this.store.dispatch(new ChatActions.RequestDialogs());
     };
 
     this.socket.onmessage = (event) => {

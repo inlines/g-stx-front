@@ -45,6 +45,7 @@ export class ChatState {
         ctx.dispatch(new ChatActions.RequestDialogs());
       }
     } else {
+      ctx.dispatch(new ChatActions.RequestDialogs());
       ctx.dispatch(new ChatActions.EnableWarning());
     }
   }
@@ -190,7 +191,7 @@ export class ChatState {
 
   @Selector()
   public static dialogs(state: IChatState) {
-    return state.dialogs;
+    return state.dialogs.sort((a,b) => new Date(b.last_message_time).getTime() - new Date(a.last_message_time).getTime());
   }
 
   @Selector()
