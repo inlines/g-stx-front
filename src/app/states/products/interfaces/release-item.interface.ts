@@ -10,4 +10,5 @@ export interface IReleaseItem {
   bided?: boolean;
   bid_user_logins: string[];
   digital_only: boolean,
+  serial: string[] | null;
 }

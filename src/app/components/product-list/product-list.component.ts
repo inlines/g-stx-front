@@ -7,7 +7,7 @@ import { ProductsActions } from '@app/states/products/states/products.actions';
 import { ProductsState } from '@app/states/products/states/products.state';
 import { Store } from '@ngxs/store';
 import { BehaviorSubject, debounceTime, distinctUntilChanged, map, Observable, Subscription, fromEvent } from 'rxjs';
-import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { IProductListRequest } from '@app/states/products/interfaces/product-list-request.interface';
 import { PagerComponent } from '@app/components/pager/pager.component';
 import { IPlatformItem } from '@app/states/platforms/interfaces/platform-item.interface';
@@ -17,7 +17,7 @@ const LIMIT = 18;
 
 @Component({
   selector: 'app-product-list',
-  imports: [NgIf, NgFor, AsyncPipe, DatePipe, RouterModule, ReactiveFormsModule, PagerComponent],
+  imports: [NgIf, NgFor, AsyncPipe, DatePipe, RouterModule, ReactiveFormsModule, PagerComponent, FormsModule],
   templateUrl: './product-list.component.html',
   styleUrl: './product-list.component.scss',
   standalone: true,
@@ -39,6 +39,7 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
   public subscriptions: Subscription[] = [];
   public limit = LIMIT;
   public categories$!: Observable<IPlatformItem[]>;
+  public skipDigitalFilter: boolean = false;
 
 
   public ngOnInit(): void {
@@ -49,7 +50,8 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
         limit: LIMIT,
         offset: 0,
         query: undefined,
-        cat: 6
+        cat: 6,
+        ignore_digital: false
       }));
     }
 
@@ -62,6 +64,7 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
     });
     this.activeCategory = new BehaviorSubject<number>(params?.cat || 6);
     this.offset$ = this.productParams$.pipe(map(p => p?.offset || 0));
+    this.skipDigitalFilter = !!params.ignore_digital;
 
     let lastCategory = this.activeCategory.value;
 
@@ -80,7 +83,8 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
         query: query || undefined,
         offset: 0,
         limit: LIMIT,
-        cat: lastCategory
+        cat: lastCategory,
+        ignore_digital: this.skipDigitalFilter
       }));
     });
 
@@ -92,7 +96,8 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
           query: undefined,
           offset: 0,
           limit: LIMIT,
-          cat: category
+          cat: category,
+          ignore_digital: this.skipDigitalFilter
         }));
       }
     });
@@ -102,7 +107,7 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
         prev.limit === curr.limit &&
         prev.offset === curr.offset &&
         prev.query === curr.query &&
-        prev.cat === curr.cat
+        prev.cat === curr.cat && prev.ignore_digital === curr.ignore_digital
       )
     ).subscribe(() => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -131,6 +136,18 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
   public pageChanged(page: number): void {
     this.store.dispatch(new ProductsActions.SetRequestParams({
       offset: (page - 1) * LIMIT
+    }));
+  }
+  
+  // Метод, вызываемый при изменении фильтра
+  public onDigitalFilterChange(): void {
+    // например, обновляем список продуктов с новым флагом
+    console.warn('*****');
+    console.warn(this.skipDigitalFilter);
+    this.store.dispatch(new ProductsActions.SetRequestParams({
+        limit: LIMIT,
+        offset: 0,
+        ignore_digital: this.skipDigitalFilter
     }));
   }
 

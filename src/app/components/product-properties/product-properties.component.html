@@ -51,7 +51,7 @@
                 <div class="col">
                   <span class="fw-semibold">{{ release.release_date | date:'dd.MM.yy':'UTC' }}</span>
                   на <span class="text-warning">{{ release.platform_name }}</span>
-                  [{{ release.release_region }}] {{release.digital_only ? 'только цифра' : ''}}
+                  [{{ release.release_region }}] {{release.digital_only ? 'только цифра' : (release?.serial || []).join('|')}}
                 </div>
                 <ng-container *ngTemplateOutlet="releaseActions; context: { $implicit: release }"></ng-container>
               </div>

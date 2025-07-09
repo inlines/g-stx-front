@@ -3,4 +3,5 @@ export interface IProductListRequest {
   offset?: number;
   query?: string;
   cat?: number;
+  ignore_digital?: boolean;
 }

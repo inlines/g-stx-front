@@ -5,7 +5,7 @@ import { ChatActions } from '../states/chat-actions';
 import { IMessage } from '../interfaces/message.interface';
 import { IEnvironment } from '@app/environments/environment.interface';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { IDialog } from '../interfaces/dialog.interface';
 import { ToastService } from '@app/services/toast.service';
 
@@ -22,6 +22,8 @@ export class ChatService {
 
   public checkInterval: any;
 
+  public connected$ = new BehaviorSubject(false);
+
   constructor(private toastService: ToastService, private store: Store, private http: HttpClient, @Inject('environment') private environment: IEnvironment,) {
     this.wsUrl = this.environment.wsUrl;
     this.dialogsUrl = `${this.environment.apiUrl}/dialogs`
@@ -32,6 +34,7 @@ export class ChatService {
   connect(login: string): void {
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
       console.log('WebSocket уже подключен');
+      this.connected$.next(true);
       return;
     }
 
@@ -47,6 +50,7 @@ export class ChatService {
         classname: 'bg-success text-light',
         delay: 1500,
       });
+      this.connected$.next(true);
       this.isConnected = true;
       this.lastLogin = login;
       this.store.dispatch(new ChatActions.RequestDialogs());
@@ -70,6 +74,7 @@ export class ChatService {
 
     this.socket.onclose = () => {
       console.log('WebSocket closed');
+      this.connected$.next(false);
       this.isConnected = false;
     };
   }
@@ -77,6 +82,7 @@ export class ChatService {
   doStateCheck(): void {
     this.checkInterval = setInterval(() => {
       if (this.socket?.readyState === WebSocket.CLOSED || this.socket?.readyState === WebSocket.CLOSING) {
+        this.connected$.next(false);
         console.warn('WebSocket неактивен, переподключение...');
         if(this.lastLogin) {
           this.connect(this.lastLogin);
@@ -115,6 +121,7 @@ export class ChatService {
     if (this.socket) {
       this.socket.close();
       this.isConnected = false;
+      this.connected$.next(false);
       this.lastLogin = null;
     }
     clearInterval(this.checkInterval);

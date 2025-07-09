@@ -1,20 +1,33 @@
 // src/app/state/chat.state.ts
-import { State, Action, StateContext, Selector } from '@ngxs/store';
-import { Injectable } from '@angular/core';
+import { State, Action, StateContext, Selector, NgxsAfterBootstrap } from '@ngxs/store';
+import { Injectable, OnDestroy } from '@angular/core';
 import { CHAT_STATE_DEFAULTS } from './chat.state-default.const';
 import { IChatState } from './chat.state.interface';
 import { ChatActions } from './chat-actions';
 import { ChatService } from '../services/chat.service';
 import { RequestStatus } from '@app/constants/request-status.const';
-import { catchError, tap } from 'rxjs';
+import { catchError, Subscription, tap } from 'rxjs';
 
 @State<IChatState>({
   name: 'chat',
   defaults: CHAT_STATE_DEFAULTS,
 })
 @Injectable()
-export class ChatState {
-  constructor(private chatService: ChatService) {}
+export class ChatState implements NgxsAfterBootstrap, OnDestroy {
+  constructor(private chatService: ChatService) {
+  }
+
+  private connectionSub!: Subscription;
+
+  ngOnDestroy(): void {
+    this.connectionSub.unsubscribe();
+  }
+
+  ngxsAfterBootstrap(ctx: StateContext<IChatState>): void {
+    this.connectionSub = this.chatService.connected$.subscribe((isConnected) => {
+      ctx.patchState({ isConnected });
+    });
+  }
 
   @Action(ChatActions.Connect)
   connectToChat(
@@ -198,4 +211,5 @@ export class ChatState {
   public static showWarning(state: IChatState) {
     return state.showWarning;
   }
+
 }

@@ -4,7 +4,8 @@
     <div class="col-sm-6 col">
       <a class="nav-link text-white fw-bold fs-5" routerLink="/">🎮 <span class="d-none d-sm-inline">Каталог</span></a>
     </div>
-    
+
+    <!-- Мобильное меню -->
     <div class="col-auto d-sm-none d-flex justify-content-center justify-content-sm-start gap-3 flex-wrap">
       <a
         class="nav-link text-white px-2 py-1 bg-secondary bg-opacity-25 rounded-3 d-flex align-items-center"
@@ -20,21 +21,29 @@
       >
         ⭐ <span class="d-none d-sm-inline ms-1">Вишлист</span>
       </a>
-      <a
-        class="nav-link text-white px-2 py-1 bg-secondary bg-opacity-25 rounded-3 d-flex align-items-center position-relative"
-        *ngIf="isAuthorised$ | async"
-        (click)="toggleChat()"
-      >
-        💬
-        <span class="d-none d-sm-inline ms-1">Чаты</span>
-
-        <!-- Индикатор новых сообщений -->
-        <span
-          *ngIf="(showChatWarning$ | async)"
-          class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle animate-blink"
-          style="width: 10px; height: 10px;"
-        ></span>
-      </a>
+      <!-- Чаты + online -->
+      <div class="position-relative">
+        <small
+          *ngIf="isConnected$ | async"
+          class="position-absolute top-0 start-50 translate-middle text-info"
+          style="font-size: 0.7rem;"
+        >
+          online
+        </small>
+        <a
+          class="nav-link text-white px-2 py-1 bg-secondary bg-opacity-25 rounded-3 d-flex align-items-center position-relative"
+          *ngIf="isAuthorised$ | async"
+          (click)="toggleChat()"
+        >
+          💬
+          <span class="d-none d-sm-inline ms-1">Чаты</span>
+          <span
+            *ngIf="(showChatWarning$ | async)"
+            class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle animate-blink"
+            style="width: 10px; height: 10px;"
+          ></span>
+        </a>
+      </div>
     </div>
 
     <!-- Пользователь / авторизация -->
@@ -55,6 +64,7 @@
     </div>
   </div>
 
+  <!-- Десктоп-меню -->
   <div class="row mt-2 d-none d-sm-block">
     <div class="col d-flex justify-content-center justify-content-sm-start gap-3 flex-wrap">
       <a
@@ -71,22 +81,29 @@
       >
         ⭐ <span class="d-none d-sm-inline ms-1">Вишлист</span>
       </a>
-      <a
-        class="nav-link text-white px-2 py-1 bg-secondary bg-opacity-25 rounded-3 d-flex align-items-center position-relative"
-        *ngIf="isAuthorised$ | async"
-        (click)="toggleChat()"
-      >
-        💬
-        <span class="d-none d-sm-inline ms-1">Чаты</span>
-
-        <!-- Индикатор новых сообщений -->
-        <span
-          *ngIf="(showChatWarning$ | async)"
-          class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle animate-blink"
-          style="width: 10px; height: 10px;"
-        ></span>
-      </a>
+      <!-- Чаты + online -->
+      <div class="position-relative">
+        <small
+          *ngIf="isConnected$ | async"
+          class="position-absolute top-0 start-50 translate-middle text-info"
+          style="font-size: 0.7rem;"
+        >
+          online
+        </small>
+        <a
+          class="nav-link text-white px-2 py-1 bg-secondary bg-opacity-25 rounded-3 d-flex align-items-center position-relative"
+          *ngIf="isAuthorised$ | async"
+          (click)="toggleChat()"
+        >
+          💬
+          <span class="d-none d-sm-inline ms-1">Чаты</span>
+          <span
+            *ngIf="(showChatWarning$ | async)"
+            class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle animate-blink"
+            style="width: 10px; height: 10px;"
+          ></span>
+        </a>
+      </div>
     </div>
   </div>
 </div>
-
