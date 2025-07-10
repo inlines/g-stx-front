@@ -10,20 +10,20 @@ export function authInterceptor(req: HttpRequest<unknown>, next: HttpHandlerFn) 
   const store = inject(Store);
   const router = inject(Router);
   const token = store.selectSnapshot(AuthState.token);
-  if (token) {
-    const cloned = req.clone({
-      headers: req.headers.set('Authorization', `Bearer ${token}`)
-    });
-    return next(cloned);
-  }
-  return next(req).pipe(
-    catchError((error: HttpErrorResponse) => {
-        if (error.status === 401) {
-          store.dispatch(new AuthActions.Logout());
-          router.navigate(['/login']); // or your login route
-        }
 
-        return throwError(() => error);
+  const clonedReq = token
+    ? req.clone({
+        headers: req.headers.set('Authorization', `Bearer ${token}`)
       })
+    : req;
+
+  return next(clonedReq).pipe(
+    catchError((error: HttpErrorResponse) => {
+      if (error.status === 401) {
+        store.dispatch(new AuthActions.Logout());
+        router.navigate(['/login']);
+      }
+      return throwError(() => error);
+    })
   );
 }
