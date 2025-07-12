@@ -40,7 +40,7 @@ export class ChatService {
 
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const host = window.location.host;
-    const wsFullUrl = `${protocol}//${host}${this.wsUrl}${login}`;
+    const wsFullUrl = this.wsUrl === 'ws://localhost:9090/ws/' ? `${this.wsUrl}${login}` : `${protocol}//${host}${this.wsUrl}${login}`;
     this.socket = new WebSocket(wsFullUrl);
 
     this.socket.onopen = () => {

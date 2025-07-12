@@ -94,3 +94,8 @@
 .chat-input .input-group button:hover {
   background-color: #e67e22; /* Темнее при ховере */
 }
+
+.highlight {
+  transform: scale(1.03);
+  border: #f39c12 2px solid;
+}

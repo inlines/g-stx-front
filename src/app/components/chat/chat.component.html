@@ -8,7 +8,7 @@
   </div>
 
   
-  <div class="chat-content d-flex flex-column h-100">
+  <div class="chat-content d-flex flex-column h-100" trapScroll trapKeyScroll>
     <div class="messages-container d-flex flex-column flex-grow-1 overflow-auto p-3">
       <ng-container *ngIf="(recepient$ | async); else dialogs">
         <div class="mb-3">
@@ -32,13 +32,17 @@
                    (keydown.enter)="sendMessage()"
                    (focus)="onFocus()"
                    placeholder="Введите сообщение" />
-            <button class="btn btn-warning" (click)="sendMessage()">Отправить</button>
+            <button class="btn btn-warning" (click)="sendMessage()" [disabled]="(isConnected$ | async) === false">Отправить</button>
           </div>
+          <p class="small text-warning" *ngIf="(isConnected$ | async) === false">
+            <br/>
+            Соединение разорвано, если оно долго не восстанавливается, попробуйте обновить страницу
+          </p>
         </div>
       </ng-container>
 
       <ng-template #dialogs>
-        <div class="messages d-flex flex-column overflow-auto mb-3 p-2">
+        <div class="messages d-flex flex-column overflow-auto mb-3 p-2" trapScroll trapKeyScroll>
           <div *ngFor="let dialog of (dialogs$ | async)" (click)="setActiveDialog(dialog)" 
                class="dialog-item d-flex flex-column p-3 mb-3 bg-dark text-light rounded-3 shadow-sm">
             <div class="dialog-header d-flex justify-content-between align-items-center">
