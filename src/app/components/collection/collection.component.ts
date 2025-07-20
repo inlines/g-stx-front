@@ -13,7 +13,7 @@ import { IPlatformItem } from '@app/states/platforms/interfaces/platform-item.in
 import { PlatformState } from '@app/states/platforms/states/platforms.state';
 
 
-const LIMIT = 18;
+const LIMIT = 1000;
 @Component({
   selector: 'app-collection',
   imports: [AsyncPipe, RouterModule, PagerComponent],

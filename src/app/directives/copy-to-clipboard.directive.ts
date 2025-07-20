@@ -1,4 +1,5 @@
 import { Directive, ElementRef, HostListener, OnInit, Renderer2 } from '@angular/core';
+import { ToastService } from '@app/services/toast.service';
 import { Clipboard } from '@angular/cdk/clipboard';
 
 @Directive({
@@ -10,12 +11,18 @@ export class CopyToClipboardDirective implements OnInit {
   constructor(
     private renderer:Renderer2,
     private element:ElementRef,
-    private clipboard: Clipboard
+    private clipboard: Clipboard,
+    private toastService: ToastService,
   ) { }
 
   @HostListener('click') onClick() {
-    console.warn('click');
     this.clipboard.copy(this.nativeElement.textContent?.trim() || '');
+    this.toastService.clear();
+    this.toastService.show({
+      body: 'Скопировано в клипборд',
+      classname: 'bg-success text-light',
+      delay: 1000,
+    });
   }
 
   private nativeElement! : Node;
