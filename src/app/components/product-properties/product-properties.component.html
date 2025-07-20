@@ -1,22 +1,32 @@
-<ng-container *ngIf="(productProperties$ | async) as productProperties else loading">
+@if ((productProperties$ | async); as productProperties) {
   <div class="row g-4">
     <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12">
       <div class="card bg-dark text-white border-0 shadow rounded-4 overflow-hidden">
-        <ng-container *ngIf="productProperties.product.image_url; else noImage">
+        @if (productProperties.product.image_url) {
           <img
             class="w-100"
             [src]="productProperties.product.image_url"
             [alt]="productProperties.product.name"
             style="object-fit: cover;"
             (error)="productProperties.product.image_url = null"
-          />
-        </ng-container>
-
+            />
+        } @else {
+          <div class="d-flex justify-content-center align-items-center bg-secondary-subtle" style="height: 300px;">
+            <div class="text-muted text-center">
+              <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor"
+                class="bi bi-image mb-2" viewBox="0 0 16 16">
+                <path d="M14.002 3a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2.002a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h12zM2.002 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H2.002z"/>
+                <path d="M10.648 8.646a.5.5 0 0 1 .704 0l2.25 2.25V12H2.398v-.316l3.85-3.85a.5.5 0 0 1 .704 0l2.15 2.15 1.546-1.548z"/>
+              </svg>
+              <div>Нет изображения</div>
+            </div>
+          </div>
+        }
         <ng-template #noImage>
           <div class="d-flex justify-content-center align-items-center bg-secondary-subtle" style="height: 300px;">
             <div class="text-muted text-center">
               <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor"
-                  class="bi bi-image mb-2" viewBox="0 0 16 16">
+                class="bi bi-image mb-2" viewBox="0 0 16 16">
                 <path d="M14.002 3a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2.002a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h12zM2.002 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H2.002z"/>
                 <path d="M10.648 8.646a.5.5 0 0 1 .704 0l2.25 2.25V12H2.398v-.316l3.85-3.85a.5.5 0 0 1 .704 0l2.15 2.15 1.546-1.548z"/>
               </svg>
@@ -24,55 +34,60 @@
             </div>
           </div>
         </ng-template>
-
         <div class="p-4">
-          <h2 class="text-warning mb-3">{{ productProperties.product.name }}</h2>
+          <h2 class="text-warning mb-3" appCopyToClipboard>{{ productProperties.product.name }}</h2>
           <p class="text-light small fst-italic">
             впервые выпущена:
-            <ng-container *ngIf="productProperties.product.first_release_date; else never">
+            @if (productProperties.product.first_release_date) {
               {{ productProperties.product.first_release_date | date:'dd.MM.yy':'UTC' }}
-            </ng-container>
+            } @else {
+              никогда
+            }
             <ng-template #never>никогда</ng-template>
           </p>
         </div>
       </div>
     </div>
-
     <div class="col-xl-8 col-lg-8 col-md-8 col-sm-12">
       <div class="card bg-dark text-white shadow rounded-4 p-4 h-100">
         <h3 class="text-info mb-3">Релизы игры:</h3>
         <ul class="list-group list-group-flush">
-          <ng-container *ngIf="(sortedReleases$ | async) as sorted">
-            <li *ngFor="let release of sorted.highlighted"
-              class="list-group-item bg-dark text-white border-secondary position-relative"
-              [ngClass]="{ 'text-decoration-line-through': release.release_status === 5  }"
-              style="box-shadow: 0 0 0 1px #ffc107;">
-              <div class="row align-items-center">
-                <div class="col">
-                  <span class="fw-semibold">{{ release.release_date | date:'dd.MM.yy':'UTC' }}</span>
-                  на <span class="text-warning">{{ release.platform_name }}</span>
-                  [{{ release.release_region }}] {{release.digital_only ? 'только цифра' : (release?.serial || []).join('|')}}
+          @if ((sortedReleases$ | async); as sorted) {
+            @for (release of sorted.highlighted; track release) {
+              <li
+                class="list-group-item bg-dark text-white border-secondary position-relative"
+                [ngClass]="{ 'text-decoration-line-through': release.release_status === 5  }"
+                style="box-shadow: 0 0 0 1px #ffc107;">
+                <div class="row align-items-center">
+                  <div class="col">
+                    <span class="fw-semibold">{{ release.release_date | date:'dd.MM.yy':'UTC' }}</span>
+                    на <span class="text-warning">{{ release.platform_name }}</span>
+                    [{{ release.release_region }}] {{release.digital_only ? 'только цифра' : (release?.serial || []).join('|')}}
+                  </div>
+                  <ng-container *ngTemplateOutlet="releaseActions; context: { $implicit: release }"></ng-container>
                 </div>
-                <ng-container *ngTemplateOutlet="releaseActions; context: { $implicit: release }"></ng-container>
-              </div>
-            </li>
-            <hr class="border-secondary my-3" *ngIf="sorted.highlighted.length && sorted.others.length" />
-            <li *ngFor="let release of sorted.others"
+              </li>
+            }
+            @if (sorted.highlighted.length && sorted.others.length) {
+              <hr class="border-secondary my-3" />
+            }
+            @for (release of sorted.others; track release) {
+              <li
                 class="list-group-item bg-dark text-white border-secondary"
                 [class.text-decoration-line-through]="release.release_status === 5 ">
-              <div class="row align-items-center">
-                <div class="col">
-                  <span class="fw-semibold">{{ release.release_date | date:'dd.MM.yy':'UTC' }}</span>
-                  на <span class="text-warning">{{ release.platform_name }}</span>
-                  [{{ release.release_region }}] {{release.digital_only ? 'только цифра' : ''}}
+                <div class="row align-items-center">
+                  <div class="col">
+                    <span class="fw-semibold">{{ release.release_date | date:'dd.MM.yy':'UTC' }}</span>
+                    на <span class="text-warning">{{ release.platform_name }}</span>
+                    [{{ release.release_region }}] {{release.digital_only ? 'только цифра' : ''}}
+                  </div>
+                  <ng-container *ngTemplateOutlet="releaseActions; context: { $implicit: release }"></ng-container>
                 </div>
-                <ng-container *ngTemplateOutlet="releaseActions; context: { $implicit: release }"></ng-container>
-              </div>
-            </li>
-          </ng-container>
-
+              </li>
+            }
+          }
           <ng-template #releaseActions let-release>
-            <ng-container *ngIf="isAuthorised$ | async">
+            @if (isAuthorised$ | async) {
               <div class="col-auto d-flex flex-wrap gap-2 align-items-start" style="min-height: 40px;">
                 <button type="button" class="btn btn-outline-success btn-sm"
                   [disabled]="release.owned || release.digital_only || release.release_status === 5 || !release.release_date || (collectionChanging$ | async)"
@@ -80,57 +95,63 @@
                   (click)="addToCollection(release.release_id)">
                   В коллекцию
                 </button>
-
                 <button type="button" class="btn btn-outline-success btn-sm"
                   [hidden]="!release.owned || release.bided"
                   [disabled]="release.release_status === 5 || !release.release_date || (collectionChanging$ | async)"
                   (click)="addBid(release.release_id)">
                   Хочу поменять
                 </button>
-
                 <button type="button" class="btn btn-outline-success btn-sm"
                   [hidden]="!release.bided"
                   [disabled]="(collectionChanging$ | async)"
                   (click)="removeBid(release.release_id)">
                   Больше не хочу меняться
                 </button>
-
                 <button type="button" class="btn btn-outline-primary btn-sm"
                   [disabled]="release.wished || release.release_status === 5 || !release.release_date || (collectionChanging$ | async)"
                   [hidden]="release.wished"
                   (click)="addWish(release.release_id)">
                   В вишлист
                 </button>
-
-                <button type="button" class="btn btn-outline-primary btn-sm"
-                  *ngIf="release.bid_user_logins.length"
-                  (click)="openBidsModal(release)">
-                  Есть предложения
-                </button>
+                @if (release.bid_user_logins.length) {
+                  <button type="button" class="btn btn-outline-primary btn-sm"
+                    (click)="openBidsModal(release)">
+                    Есть предложения
+                  </button>
+                }
               </div>
-            </ng-container>
+            }
           </ng-template>
         </ul>
       </div>
     </div>
-
     <div class="col-12">
       <div class="card bg-dark text-white shadow rounded-4 p-4">
         <p class="text-light">{{ productProperties.product.summary || 'У нас нет описания этой игры' }}</p>
       </div>
     </div>
-
-    <div class="col-12" *ngIf="productProperties.screenshots?.length">
-      <div class="card bg-dark border-0 shadow rounded-4 p-3">
-        <ngb-carousel [interval]="3000" [pauseOnHover]="true" [wrap]="true">
-          <ng-template ngbSlide *ngFor="let screen of productProperties.screenshots">
-            <img class="d-block w-100 rounded-3" [src]="screen" style="object-fit: cover; max-height: 500px;" />
-          </ng-template>
-        </ngb-carousel>
+    @if (productProperties.screenshots?.length) {
+      <div class="col-12">
+        <div class="card bg-dark border-0 shadow rounded-4 p-3">
+          <ngb-carousel [interval]="3000" [pauseOnHover]="true" [wrap]="true">
+            @for (screen of productProperties.screenshots; track screen) {
+              <ng-template ngbSlide>
+                <img class="d-block w-100 rounded-3" [src]="screen" style="object-fit: cover; max-height: 500px;" />
+              </ng-template>
+            }
+          </ngb-carousel>
+        </div>
       </div>
+    }
+  </div>
+} @else {
+  <div class="row">
+    <div class="col text-center py-5">
+      <div class="spinner-border text-primary" role="status"></div>
+      <h4 class="mt-3">Загрузка...</h4>
     </div>
   </div>
-</ng-container>
+}
 
 <ng-template #loading>
   <div class="row">
@@ -153,30 +174,30 @@
 
         <div class="modal-body">
           <ul class="list-unstyled m-0">
-            <li *ngFor="let user of selectedRelease?.bid_user_logins" class="mb-3">
-              <div class="d-flex align-items-center bg-secondary bg-opacity-10 p-3 rounded-3 border border-secondary">
-                
-                <!-- SVG аватар-заглушка -->
-                <div class="me-3">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor"
+            @for (user of selectedRelease?.bid_user_logins; track user) {
+              <li class="mb-3">
+                <div class="d-flex align-items-center bg-secondary bg-opacity-10 p-3 rounded-3 border border-secondary">
+                  <!-- SVG аватар-заглушка -->
+                  <div class="me-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor"
                       class="bi bi-person-circle text-secondary" viewBox="0 0 16 16">
-                    <path d="M11 10a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
-                    <path fill-rule="evenodd"
+                      <path d="M11 10a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+                      <path fill-rule="evenodd"
                           d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37c.273-.58.58-1.036 
                             1.02-1.43C4.972 10.356 6.387 10 8 10s3.028.356 4.448 1.94c.44.394.747.85 
                             1.02 1.43A7 7 0 0 0 8 1z"/>
-                  </svg>
+                    </svg>
+                  </div>
+                  <!-- Имя пользователя и кнопка -->
+                  <div class="flex-grow-1 d-flex justify-content-between align-items-center">
+                    <span class="fw-semibold fs-6">{{ user }}</span>
+                    <button type="button" (click)="startChatWith(user)" class="ms-4 btn btn-outline-warning btn-sm">
+                      Написать игроку
+                    </button>
+                  </div>
                 </div>
-
-                <!-- Имя пользователя и кнопка -->
-                <div class="flex-grow-1 d-flex justify-content-between align-items-center">
-                  <span class="fw-semibold fs-6">{{ user }}</span>
-                  <button type="button" (click)="startChatWith(user)" class="ms-4 btn btn-outline-warning btn-sm">
-                    Написать игроку
-                  </button>
-                </div>
-              </div>
-            </li>
+              </li>
+            }
           </ul>
         </div>
 

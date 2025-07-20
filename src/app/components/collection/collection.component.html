@@ -1,130 +1,130 @@
 <h1 class="display-5 fw-bold mb-4 text-light">Ваша коллекция</h1>
 
 <div class="row">
-  <div class="col-12 px-0 mb-4">  
-    <div class="card bg-dark text-white shadow rounded-4 overflow-hidden" *ngIf="!!(displayCategories$ | async)?.length">
-      <div class="p-3">
-        <ul class="nav nav-pills flex-wrap justify-content-start mb-0">
-          <li class="nav-item me-2 mb-2"
-              *ngFor="let cat of (displayCategories$ | async)">
-            <a class="nav-link d-flex justify-content-between align-items-center"
-              [class.active]="activeCategory === cat.id"
-              (click)="setActiveCategory(cat.id)">
-              <span>
-                {{ cat.abbreviation }}
-                <span *ngIf="cat.user_games === cat.total_games" class="ms-1 text-success">🏆</span>
-              </span>
-              <span class="badge bg-light text-dark">
-                {{ cat.user_games }}/{{ cat.total_games }}
-              </span>
-            </a>
-          </li>
-        </ul>
+  <div class="col-12 px-0 mb-4">
+    @if (!!(displayCategories$ | async)?.length) {
+      <div class="card bg-dark text-white shadow rounded-4 overflow-hidden">
+        <div class="p-3">
+          <ul class="nav nav-pills flex-wrap justify-content-start mb-0">
+            @for (cat of (displayCategories$ | async); track cat) {
+              <li class="nav-item me-2 mb-2"
+                >
+                <a class="nav-link d-flex justify-content-between align-items-center"
+                  [class.active]="activeCategory === cat.id"
+                  (click)="setActiveCategory(cat.id)">
+                  <span>
+                    {{ cat.abbreviation }}
+                    @if (cat.user_games === cat.total_games) {
+                      <span class="ms-1 text-success">🏆</span>
+                    }
+                  </span>
+                  <span class="badge bg-light text-dark">
+                    {{ cat.user_games }}/{{ cat.total_games }}
+                  </span>
+                </a>
+              </li>
+            }
+          </ul>
+        </div>
       </div>
-    </div>
+    }
   </div>
-  <ng-container *ngIf="!!(collection$ | async)?.length else emptyMessage;">
-    <ng-container *ngFor="let product of collection$ | async">
-    <!-- Desktop / tablet: карточки -->
-    <div class="col-xl-2 col-lg-3 col-md-4 d-none d-md-block p-3">
-      <div
-        class="card game-card h-100 border-0 shadow-sm hover-shadow position-relative"
-        [routerLink]="['/products/' + product.product_id.toString(), {platform: activeCategory}]"
-        style="cursor: pointer;"
-        (click)="null"
-      >
+  @if (!!(collection$ | async)?.length) {
+    @for (product of collection$ | async; track product) {
+      <!-- Desktop / tablet: карточки -->
+      <div class="col-xl-2 col-lg-3 col-md-4 d-none d-md-block p-3">
         <div
-          class="card-img-top bg-dark-subtle d-flex align-items-center justify-content-center"
-          style="height: 180px; overflow: hidden;"
-        >
-          <ng-container *ngIf="product.image_url; else noImageDesktop">
-            <img
-              [src]="product.image_url"
-              [alt]="product.product_name"
-              class="img-fluid"
-              style="max-height: 100%; object-fit: cover;"
-              (error)="product.image_url = null"
-            />
-          </ng-container>
-          <ng-template #noImageDesktop>
-            <div class="text-muted d-flex flex-column align-items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor"
-                class="bi bi-image" viewBox="0 0 16 16">
+          class="card game-card h-100 border-0 shadow-sm hover-shadow position-relative"
+          [routerLink]="['/products/' + product.product_id.toString(), {platform: activeCategory}]"
+          style="cursor: pointer;"
+          (click)="null"
+          >
+          <div
+            class="card-img-top bg-dark-subtle d-flex align-items-center justify-content-center"
+            style="height: 180px; overflow: hidden;"
+            >
+            @if (product.image_url) {
+              <img
+                [src]="product.image_url"
+                [alt]="product.product_name"
+                class="img-fluid"
+                style="max-height: 100%; object-fit: cover;"
+                (error)="product.image_url = null"
+                />
+            } @else {
+              <div class="text-muted d-flex flex-column align-items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor"
+                  class="bi bi-image" viewBox="0 0 16 16">
+                  <path d="M14.002 3a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2.002a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h12zM2.002 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H2.002z"/>
+                  <path d="M10.648 8.646a.5.5 0 0 1 .704 0l2.25 2.25V12H2.398v-.316l3.85-3.85a.5.5 0 0 1 .704 0l2.15 2.15 1.546-1.548z"/>
+                </svg>
+                <small class="mt-1">Нет изображения</small>
+              </div>
+            }
+          </div>
+          <div class="card-body">
+            <h6 class="card-title text-truncate fw-bold">{{ product.product_name }}</h6>
+            <div class="card-subtitle small mb-2">
+              {{ product.platform_name }} [{{ product.region_name }}]
+            </div>
+            <button
+              type="button"
+              class="btn btn-danger btn-sm w-100"
+              (click)="remove(product.release_id, $event); $event.stopPropagation();"
+              >
+              удалить
+            </button>
+          </div>
+        </div>
+      </div>
+      <!-- Mobile: горизонтальная карточка -->
+      <div class="col-12 d-md-none mb-3">
+        <div
+          class="card bg-dark text-white shadow-sm rounded-3 d-flex flex-row overflow-hidden"
+          [routerLink]="'/products/' + product.product_id.toString()"
+          style="cursor: pointer;"
+          >
+          <div
+            class="flex-shrink-0 d-flex align-items-center justify-content-center bg-secondary-subtle"
+            style="width: 120px; height: 100px; overflow: hidden;"
+            >
+            @if (product.image_url) {
+              <img
+                [src]="product.image_url"
+                [alt]="product.product_name"
+                class="img-fluid h-100 w-100"
+                style="object-fit: cover;"
+                (error)="product.image_url = null"
+                />
+            } @else {
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                class="bi bi-image text-muted" viewBox="0 0 16 16">
                 <path d="M14.002 3a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2.002a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h12zM2.002 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H2.002z"/>
                 <path d="M10.648 8.646a.5.5 0 0 1 .704 0l2.25 2.25V12H2.398v-.316l3.85-3.85a.5.5 0 0 1 .704 0l2.15 2.15 1.546-1.548z"/>
               </svg>
-              <small class="mt-1">Нет изображения</small>
+            }
+          </div>
+          <div class="p-3 d-flex flex-column justify-content-between w-100">
+            <div>
+              <h6 class="mb-1 fw-bold text-truncate" style="max-width: 100%">
+                {{ product.product_name }}
+              </h6>
+              <small class="text-white-50 d-block mb-1">
+                {{ product.platform_name }} [{{ product.region_name }}]
+              </small>
             </div>
-          </ng-template>
-        </div>
-
-        <div class="card-body">
-          <h6 class="card-title text-truncate fw-bold">{{ product.product_name }}</h6>
-          <div class="card-subtitle small mb-2">
-            {{ product.platform_name }} [{{ product.region_name }}]
+            <button
+              type="button"
+              class="btn btn-danger btn-sm w-100"
+              (click)="remove(product.release_id, $event); $event.stopPropagation();"
+              >
+              удалить
+            </button>
           </div>
-          <button
-            type="button"
-            class="btn btn-danger btn-sm w-100"
-            (click)="remove(product.release_id, $event); $event.stopPropagation();"
-          >
-            удалить
-          </button>
         </div>
       </div>
-    </div>
-
-    <!-- Mobile: горизонтальная карточка -->
-    <div class="col-12 d-md-none mb-3">
-      <div
-        class="card bg-dark text-white shadow-sm rounded-3 d-flex flex-row overflow-hidden"
-        [routerLink]="'/products/' + product.product_id.toString()"
-        style="cursor: pointer;"
-      >
-        <div
-          class="flex-shrink-0 d-flex align-items-center justify-content-center bg-secondary-subtle"
-          style="width: 120px; height: 100px; overflow: hidden;"
-        >
-          <ng-container *ngIf="product.image_url; else noImageMobile">
-            <img
-              [src]="product.image_url"
-              [alt]="product.product_name"
-              class="img-fluid h-100 w-100"
-              style="object-fit: cover;"
-              (error)="product.image_url = null"
-            />
-          </ng-container>
-          <ng-template #noImageMobile>
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
-              class="bi bi-image text-muted" viewBox="0 0 16 16">
-              <path d="M14.002 3a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2.002a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h12zM2.002 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H2.002z"/>
-              <path d="M10.648 8.646a.5.5 0 0 1 .704 0l2.25 2.25V12H2.398v-.316l3.85-3.85a.5.5 0 0 1 .704 0l2.15 2.15 1.546-1.548z"/>
-            </svg>
-          </ng-template>
-        </div>
-        <div class="p-3 d-flex flex-column justify-content-between w-100">
-          <div>
-            <h6 class="mb-1 fw-bold text-truncate" style="max-width: 100%">
-              {{ product.product_name }}
-            </h6>
-            <small class="text-white-50 d-block mb-1">
-              {{ product.platform_name }} [{{ product.region_name }}]
-            </small>
-          </div>
-          <button
-            type="button"
-            class="btn btn-danger btn-sm w-100"
-            (click)="remove(product.release_id, $event); $event.stopPropagation();"
-          >
-            удалить
-          </button>
-        </div>
-      </div>
-    </div>
-    </ng-container>
-  </ng-container>
-
-  <ng-template #emptyMessage>
+    }
+  } @else {
     <div class="card bg-dark text-white shadow rounded-4 p-4 text-center my-4">
       <h5 class="text-warning mb-3">Ваша коллекция пока пуста</h5>
       <p class="text-light mb-2">
@@ -139,17 +139,17 @@
       <p class="text-light mb-4">
         GSTX — это не только коллекции, но и <strong>сообщество</strong>: вы можете находить игроков с похожими интересами, предлагать обмены и делать свою игровую библиотеку живой. Пусть каждая игра найдет нового владельца — начните с первой!
       </p>
-
       <div>
         <a [routerLink]="'/products'" class="btn btn-outline-info btn-lg fw-semibold">
           Перейти в каталог
         </a>
       </div>
     </div>
-  </ng-template>
+  }
 
 
-  
+
+
   <div class="col-12 mt-4 p-0">
     <app-pager (pageChange)="pageChanged($event)" [limit]="limit" [totalCount]="(collectionTotalCount$ | async) || 0"></app-pager>
   </div>

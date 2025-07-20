@@ -8,12 +8,12 @@ import { PlatformsActions } from './states/platforms/states/platforms-actions';
 import { Observable } from 'rxjs';
 import { AuthState } from './states/auth/states/auth.state';
 import { ChatComponent } from './components/chat/chat.component';
-import { AsyncPipe, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { ChatState } from './states/chat/states/chat.state';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, HeaderComponent, ToastContainerComponent, FooterComponent, ChatComponent, AsyncPipe, NgIf],
+  imports: [RouterOutlet, HeaderComponent, ToastContainerComponent, FooterComponent, ChatComponent, AsyncPipe],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })

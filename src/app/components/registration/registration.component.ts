@@ -1,4 +1,4 @@
-import { NgClass, NgIf } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RegistrationActions } from '@app/states/registration/states/registration-actions';
@@ -9,7 +9,7 @@ import { Store } from '@ngxs/store';
   templateUrl: './registration.component.html',
   styleUrl: './registration.component.scss',
   standalone: true,
-  imports: [FormsModule, ReactiveFormsModule, NgClass, NgIf]
+  imports: [FormsModule, ReactiveFormsModule, NgClass]
 })
 export class RegistrationComponent {
   constructor(

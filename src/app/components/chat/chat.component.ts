@@ -6,7 +6,7 @@ import { ChatState } from '@app/states/chat/states/chat.state';
 import { AuthState } from '@app/states/auth/states/auth.state';
 import { ChatActions } from '@app/states/chat/states/chat-actions';
 import { FormsModule } from '@angular/forms';
-import { AsyncPipe, DatePipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe, DatePipe } from '@angular/common';
 import { IDialog } from '@app/states/chat/interfaces/dialog.interface';
 import { ToastService } from '@app/services/toast.service';
 import { TrapScrollDirective } from '@app/directives/trap-scroll.directive';
@@ -16,7 +16,7 @@ import { TrapScrollDirective } from '@app/directives/trap-scroll.directive';
   selector: 'app-chat',
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.scss'],
-  imports: [FormsModule, AsyncPipe, NgFor, NgIf, DatePipe, TrapScrollDirective],
+  imports: [FormsModule, AsyncPipe, DatePipe, TrapScrollDirective],
 })
 export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('scrollbox') scrollbox!: ElementRef;

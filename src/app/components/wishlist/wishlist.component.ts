@@ -1,4 +1,4 @@
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { ICollectionItem } from '@app/states/collection/interfaces/collection-item.interface';
@@ -13,7 +13,7 @@ import { PagerComponent } from '@app/components/pager/pager.component';
 const LIMIT = 18;
 @Component({
   selector: 'app-wishlist',
-  imports: [AsyncPipe, NgFor, RouterModule, NgIf, PagerComponent],
+  imports: [AsyncPipe, RouterModule, PagerComponent],
   templateUrl: './wishlist.component.html',
   styleUrl: './wishlist.component.scss',
   standalone: true,

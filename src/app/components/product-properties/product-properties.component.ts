@@ -1,4 +1,4 @@
-import { AsyncPipe, DatePipe, NgClass, NgFor, NgIf, NgTemplateOutlet } from '@angular/common';
+import { AsyncPipe, DatePipe, NgClass, NgTemplateOutlet } from '@angular/common';
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { AuthState } from '@app/states/auth/states/auth.state';
 import { IProductPropertiesResponse } from '@app/states/products/interfaces/product-properties-response.interface';
@@ -12,10 +12,11 @@ import { OwnershipState } from '@app/states/ownership/states/ownership.state';
 import { CollectionState } from '@app/states/collection/states/collection.state';
 import { ActivatedRoute } from '@angular/router';
 import { ChatActions } from '@app/states/chat/states/chat-actions';
+import { CopyToClipboardDirective } from '@app/directives/copy-to-clipboard.directive';
 
 @Component({
   selector: 'app-product-properties',
-  imports: [AsyncPipe, NgIf, DatePipe, NgFor, NgbCarouselModule, NgClass, NgTemplateOutlet],
+  imports: [AsyncPipe, DatePipe, NgbCarouselModule, NgClass, NgTemplateOutlet, CopyToClipboardDirective],
   templateUrl: './product-properties.component.html',
   styleUrl: './product-properties.component.scss',
   standalone: true,

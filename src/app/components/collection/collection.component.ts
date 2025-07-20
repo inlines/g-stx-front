@@ -1,4 +1,4 @@
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { ICollectionItem } from '@app/states/collection/interfaces/collection-item.interface';
@@ -16,7 +16,7 @@ import { PlatformState } from '@app/states/platforms/states/platforms.state';
 const LIMIT = 18;
 @Component({
   selector: 'app-collection',
-  imports: [AsyncPipe, NgFor, RouterModule, NgIf, PagerComponent],
+  imports: [AsyncPipe, RouterModule, PagerComponent],
   templateUrl: './collection.component.html',
   styleUrl: './collection.component.scss',
   standalone: true,
