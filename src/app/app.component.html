@@ -10,7 +10,9 @@
         <app-toast-container></app-toast-container>
       </section>
     </article>
-    <app-chat *ngIf="(isAuthorized$ | async)" [class.invisible]="!(isChatVisible$ | async)" class="chat-sidebar open"></app-chat>
+    @if ((isAuthorized$ | async)) {
+      <app-chat [class.invisible]="!(isChatVisible$ | async)" class="chat-sidebar open"></app-chat>
+    }
   </main>
 
   <app-footer></app-footer>

@@ -15,22 +15,24 @@
           <button class="btn btn-outline-secondary w-100 mb-2" (click)="isNavOpen = !isNavOpen">
             {{ isNavOpen ? 'Скрыть навигацию' : 'Показать навигацию' }}
           </button>
-          <div *ngIf="isNavOpen">
-            <ul class="nav flex-column">
-              <li class="nav-item mb-2">
-                <a [routerLink]="'/products'" class="nav-link p-0 text-light">Каталог</a>
-              </li>
-              <li class="nav-item mb-2">
-                <a [routerLink]="'/registration'" class="nav-link p-0 text-light">Регистрация</a>
-              </li>
-              <li class="nav-item mb-2">
-                <a href="#" class="nav-link p-0 text-light">FAQ</a>
-              </li>
-              <li class="nav-item mb-2">
-                <a [routerLink]="'/about'" class="nav-link p-0 text-light">О проекте</a>
-              </li>
-            </ul>
-          </div>
+          @if (isNavOpen) {
+            <div>
+              <ul class="nav flex-column">
+                <li class="nav-item mb-2">
+                  <a [routerLink]="'/products'" class="nav-link p-0 text-light">Каталог</a>
+                </li>
+                <li class="nav-item mb-2">
+                  <a [routerLink]="'/registration'" class="nav-link p-0 text-light">Регистрация</a>
+                </li>
+                <li class="nav-item mb-2">
+                  <a href="#" class="nav-link p-0 text-light">FAQ</a>
+                </li>
+                <li class="nav-item mb-2">
+                  <a [routerLink]="'/about'" class="nav-link p-0 text-light">О проекте</a>
+                </li>
+              </ul>
+            </div>
+          }
         </div>
 
         <!-- Обычная навигация для десктопа -->

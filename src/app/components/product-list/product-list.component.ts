@@ -1,4 +1,4 @@
-import { AsyncPipe, DatePipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe, DatePipe } from '@angular/common';
 import { Component, OnDestroy, OnInit, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { throttleTime } from 'rxjs/operators';
 import { RouterModule } from '@angular/router';
@@ -17,7 +17,7 @@ const LIMIT = 18;
 
 @Component({
   selector: 'app-product-list',
-  imports: [NgIf, NgFor, AsyncPipe, DatePipe, RouterModule, ReactiveFormsModule, PagerComponent, FormsModule],
+  imports: [AsyncPipe, DatePipe, RouterModule, ReactiveFormsModule, PagerComponent, FormsModule],
   templateUrl: './product-list.component.html',
   styleUrl: './product-list.component.scss',
   standalone: true,
