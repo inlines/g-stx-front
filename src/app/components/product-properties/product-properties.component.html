@@ -26,7 +26,7 @@
         </ng-template>
 
         <div class="p-4">
-          <h2 class="text-warning mb-3">{{ productProperties.product.name }}</h2>
+          <h2 class="text-warning mb-3" appCopyToClipboard>{{ productProperties.product.name }}</h2>
           <p class="text-light small fst-italic">
             впервые выпущена:
             <ng-container *ngIf="productProperties.product.first_release_date; else never">

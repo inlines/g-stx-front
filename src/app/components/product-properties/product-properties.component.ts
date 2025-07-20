@@ -12,10 +12,11 @@ import { OwnershipState } from '@app/states/ownership/states/ownership.state';
 import { CollectionState } from '@app/states/collection/states/collection.state';
 import { ActivatedRoute } from '@angular/router';
 import { ChatActions } from '@app/states/chat/states/chat-actions';
+import { CopyToClipboardDirective } from '@app/directives/copy-to-clipboard.directive';
 
 @Component({
   selector: 'app-product-properties',
-  imports: [AsyncPipe, NgIf, DatePipe, NgFor, NgbCarouselModule, NgClass, NgTemplateOutlet],
+  imports: [AsyncPipe, NgIf, DatePipe, NgFor, NgbCarouselModule, NgClass, NgTemplateOutlet, CopyToClipboardDirective],
   templateUrl: './product-properties.component.html',
   styleUrl: './product-properties.component.scss',
   standalone: true,
