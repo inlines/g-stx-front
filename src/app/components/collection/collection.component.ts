@@ -11,6 +11,7 @@ import { combineLatest, filter, map, Observable, Subject, Subscription, take, wi
 import { PagerComponent } from '../pager/pager.component';
 import { IPlatformItem } from '@app/states/platforms/interfaces/platform-item.interface';
 import { PlatformState } from '@app/states/platforms/states/platforms.state';
+import { ICollectionItemWithLetter } from '@app/states/collection/interfaces/collection-item-with-letter.interface';
 
 
 const LIMIT = 1000;
@@ -63,7 +64,11 @@ export class CollectionComponent implements OnInit, OnDestroy {
 
   public activeCategory: number| null = null;
 
+  public activeCategorCount: number| null = null;
+
   public collection$: Observable<ICollectionItem[]>;
+
+  public collectionWithLetters$!: Observable<ICollectionItemWithLetter[]>;
 
   public collectionTotalCount$: Observable<number>;
 
@@ -74,21 +79,36 @@ export class CollectionComponent implements OnInit, OnDestroy {
 
     const paramsSub = this.collectionParams$.pipe(filter(x => !!x.cat && !!x.limit)).subscribe(params => this.store.dispatch(new CollectionActions.GetCollectionRequest()));
 
+    this.collectionWithLetters$ = this.collection$.pipe(
+      map((collection) => collection.reduce((acc: ICollectionItemWithLetter[], val: ICollectionItem) => {
+        const accLength = acc.length;
+        const lastLetter = accLength >=1 ? acc[acc.length - 1].letter : null;
+
+        acc.push(
+          {
+            item: val,
+            letter: val.product_name[0] !== lastLetter ? val.product_name[0] : undefined
+          });
+        return acc;
+      }, []))
+    )
+
     this.subscriptions.push(sub, paramsSub);
 
     this.activePlatforms$.pipe(
       filter(platforms => platforms.length > 0),
       take(1)
-    ).subscribe(platforms => {this.activeCategory$.next(platforms[0].platform); this.activeCategory = platforms[0].platform;})
+    ).subscribe(platforms => {this.activeCategory$.next(platforms[0].platform); this.activeCategory = platforms[0].platform; this.activeCategorCount = platforms[0].have_games})
   }
 
   public ngOnDestroy(): void {
     this.subscriptions.forEach(x => x.unsubscribe());
   }
   
-  public setActiveCategory(cat: number) {
+  public setActiveCategory(cat: number, count: number | undefined) {
     this.activeCategory$.next(cat);
     this.activeCategory = cat;
+    this.activeCategorCount = count || null;
   }
 
   public remove(release_id: number, event: Event): void {

@@ -6,4 +6,5 @@ export interface ICollectionItem {
   image_url: string | null;
   region_name: string | null;
   product_id: number;
+  serial: string[];
 }

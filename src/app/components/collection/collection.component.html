@@ -11,7 +11,7 @@
                 >
                 <a class="nav-link d-flex justify-content-between align-items-center"
                   [class.active]="activeCategory === cat.id"
-                  (click)="setActiveCategory(cat.id)">
+                  (click)="setActiveCategory(cat.id, cat.user_games)">
                   <span>
                     {{ cat.abbreviation }}
                     @if (cat.user_games === cat.total_games) {
@@ -30,26 +30,29 @@
     }
   </div>
   @if (!!(collection$ | async)?.length) {
-    @for (product of collection$ | async; track product) {
+    @for (product of collectionWithLetters$ | async; track product) {
       <!-- Desktop / tablet: карточки -->
-      <div class="col-xl-2 col-lg-3 col-md-4 d-none d-md-block p-3">
+      <div class="col-12 d-none d-md-block p-3">
         <div
-          class="card game-card h-100 border-0 shadow-sm hover-shadow position-relative"
-          [routerLink]="['/products/' + product.product_id.toString(), {platform: activeCategory}]"
+          class="game-card h-100 border-0 shadow-sm hover-shadow position-relative row"
+          [routerLink]="['/products/' + product.item.product_id.toString(), {platform: activeCategory}]"
           style="cursor: pointer;"
           (click)="null"
           >
+          <h5 class="col-auto d-flex flex-column justify-content-center">
+            {{ product.letter || '&nbsp;&nbsp;' }}
+          </h5>
           <div
-            class="card-img-top bg-dark-subtle d-flex align-items-center justify-content-center"
-            style="height: 180px; overflow: hidden;"
+            class="col-auto"
+            style="height: 40px; overflow: hidden;"
             >
-            @if (product.image_url) {
+            @if (product.item.image_url) {
               <img
-                [src]="product.image_url"
-                [alt]="product.product_name"
+                [src]="product.item.image_url"
+                [alt]="product.item.product_name"
                 class="img-fluid"
                 style="max-height: 100%; object-fit: cover;"
-                (error)="product.image_url = null"
+                (error)="product.item.image_url = null"
                 />
             } @else {
               <div class="text-muted d-flex flex-column align-items-center">
@@ -62,15 +65,20 @@
               </div>
             }
           </div>
-          <div class="card-body">
-            <h6 class="card-title text-truncate fw-bold">{{ product.product_name }}</h6>
+          <div class="col">
+            <h6 class="card-title text-truncate fw-bold">{{ product.item.product_name }}</h6>
             <div class="card-subtitle small mb-2">
-              {{ product.platform_name }} [{{ product.region_name }}]
+              {{ product.item.platform_name }} [{{ product.item.region_name }}] ({{ product.item.serial?.join('|') }})
             </div>
+          </div>
+          <h6 class="col-auto d-flex flex-column justify-content-center">
+            {{$index + 1}} / {{activeCategorCount}}
+          </h6>
+          <div class="col-auto py-2">
             <button
               type="button"
               class="btn btn-danger btn-sm w-100"
-              (click)="remove(product.release_id, $event); $event.stopPropagation();"
+              (click)="remove(product.item.release_id, $event); $event.stopPropagation();"
               >
               удалить
             </button>
@@ -81,20 +89,20 @@
       <div class="col-12 d-md-none mb-3">
         <div
           class="card bg-dark text-white shadow-sm rounded-3 d-flex flex-row overflow-hidden"
-          [routerLink]="'/products/' + product.product_id.toString()"
+          [routerLink]="'/products/' + product.item.product_id.toString()"
           style="cursor: pointer;"
           >
           <div
             class="flex-shrink-0 d-flex align-items-center justify-content-center bg-secondary-subtle"
             style="width: 120px; height: 100px; overflow: hidden;"
             >
-            @if (product.image_url) {
+            @if (product.item.image_url) {
               <img
-                [src]="product.image_url"
-                [alt]="product.product_name"
+                [src]="product.item.image_url"
+                [alt]="product.item.product_name"
                 class="img-fluid h-100 w-100"
                 style="object-fit: cover;"
-                (error)="product.image_url = null"
+                (error)="product.item.image_url = null"
                 />
             } @else {
               <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
@@ -107,16 +115,17 @@
           <div class="p-3 d-flex flex-column justify-content-between w-100">
             <div>
               <h6 class="mb-1 fw-bold text-truncate" style="max-width: 100%">
-                {{ product.product_name }}
+                {{ product.item.product_name }}
+                <span>{{$index + 1}} / {{activeCategorCount}}</span>
               </h6>
               <small class="text-white-50 d-block mb-1">
-                {{ product.platform_name }} [{{ product.region_name }}]
+                {{ product.item.platform_name }} [{{ product.item.region_name }}]
               </small>
             </div>
             <button
               type="button"
               class="btn btn-danger btn-sm w-100"
-              (click)="remove(product.release_id, $event); $event.stopPropagation();"
+              (click)="remove(product.item.release_id, $event); $event.stopPropagation();"
               >
               удалить
             </button>

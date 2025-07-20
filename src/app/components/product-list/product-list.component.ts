@@ -24,6 +24,7 @@ const LIMIT = 18;
 })
 export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('stickerContent') stickerContent!: ElementRef;
+  @ViewChild('query') query!: ElementRef;
 
   private lastScrollTop = 0;
   private isHidden = false;
@@ -123,6 +124,8 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
         .pipe(throttleTime(100))
         .subscribe(() => this.handleScroll());
     }
+
+    this.query.nativeElement.focus();
   }
 
   public ngOnDestroy(): void {
@@ -131,6 +134,8 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
 
   public setActiveCategory(cat: number): void {
     this.activeCategory.next(cat);
+    console.warn('***');
+    this.query.nativeElement.focus();
   }
 
   public pageChanged(page: number): void {
@@ -139,11 +144,7 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
     }));
   }
   
-  // Метод, вызываемый при изменении фильтра
   public onDigitalFilterChange(): void {
-    // например, обновляем список продуктов с новым флагом
-    console.warn('*****');
-    console.warn(this.skipDigitalFilter);
     this.store.dispatch(new ProductsActions.SetRequestParams({
         limit: LIMIT,
         offset: 0,
