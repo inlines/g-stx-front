@@ -1,23 +1,21 @@
-import { ClipboardModule } from '@angular/cdk/clipboard';
-import { CommonModule } from '@angular/common';
 import { Directive, ElementRef, HostListener, OnInit, Renderer2 } from '@angular/core';
-
+import { Clipboard } from '@angular/cdk/clipboard';
 
 @Directive({
   selector: '[appCopyToClipboard]',
   standalone: true,
-  imports: [CommonModule]
 })
 export class CopyToClipboardDirective implements OnInit {
 
   constructor(
     private renderer:Renderer2,
     private element:ElementRef,
+    private clipboard: Clipboard
   ) { }
 
   @HostListener('click') onClick() {
     console.warn('click');
-    console.warn(this.nativeElement.textContent?.trim());
+    this.clipboard.copy(this.nativeElement.textContent?.trim() || '');
   }
 
   private nativeElement! : Node;
