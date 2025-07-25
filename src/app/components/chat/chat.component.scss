@@ -1,3 +1,14 @@
+.messages .p-2 {
+  transition: all 0.3s ease;
+  will-change: transform, opacity;
+}
+
+.messages-container {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
 /* Шаблон для чата */
 .chat-container {
   background-color: #121212; /* Тёмный фон */
@@ -95,7 +106,24 @@
   background-color: #e67e22; /* Темнее при ховере */
 }
 
+
 .highlight {
-  transform: scale(1.03);
-  border: #f39c12 2px solid;
+  animation: message-pop 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes message-pop {
+  0% {
+    transform: scale(0.95);
+    opacity: 0;
+    background-color: rgba(243, 156, 18, 0.3);
+  }
+  50% {
+    transform: scale(1.03);
+    background-color: rgba(243, 156, 18, 0.15);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+    background-color: rgba(255, 255, 255, 0.1);
+  }
 }
