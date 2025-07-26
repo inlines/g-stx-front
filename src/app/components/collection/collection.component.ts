@@ -84,8 +84,11 @@ export class CollectionComponent implements OnInit, OnDestroy {
 
     const paramsSub = this.collectionParams$.pipe(filter(x => !!x.cat && !!x.limit)).subscribe(params => this.store.dispatch(new CollectionActions.GetCollectionRequest()));
 
-    this.collectionWithLetters$ = this.collection$.pipe(
-      withLatestFrom(this.queryForm.valueChanges),
+    this.collectionWithLetters$ = 
+    combineLatest(
+      [this.collection$,this.queryForm.valueChanges]
+    )
+    .pipe(
       map(([collection, form]) => collection.reduce((acc: ICollectionItemWithLetter[], val: ICollectionItem) => {
         console.warn(form);
         const accLength = acc.length;
