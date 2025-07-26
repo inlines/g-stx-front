@@ -1,0 +1,58 @@
+<div class="row justify-content-center">
+  <div class="col-xl-8 col-lg-9 col-md-10 col-sm-12">
+    <div class="card bg-dark text-white shadow rounded-4 p-4">
+      <h2 class="mb-4">Часто задаваемые вопросы</h2>
+
+      <!-- Аккордеон ng-bootstrap -->
+      <div ngbAccordion [closeOthers]="true">
+        <!-- 1. Общие вопросы -->
+        <div ngbAccordionItem class="accordion-item bg-dark border-secondary mb-3 rounded-3">
+          <h3 ngbAccordionHeader>
+            <button ngbAccordionButton class="accordion-button bg-dark text-white">
+              Общие вопросы
+            </button>
+          </h3>
+          <div ngbAccordionCollapse>
+            <div ngbAccordionBody class="accordion-body text-white ">
+              <h5 class="mb-3">Что такое GSTX?</h5>
+              <p>GSTX — это платформа для геймеров, где можно каталогизировать коллекцию игр, обмениваться и находить редкие экземпляры.</p>
+              
+              <h5 class="mb-3 mt-4">Как зарегистрироваться?</h5>
+              <p>Нажмите "Войти" в верхнем правом углу и следуйте инструкциям. Регистрация даёт доступ к коллекции, вишлисту и чату.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Коллекция и вишлист -->
+        <div ngbAccordionItem class="accordion-item bg-dark border-secondary mb-3 rounded-3">
+          <h3 ngbAccordionHeader>
+            <button ngbAccordionButton class="accordion-button bg-dark text-white">
+              Коллекция и вишлист
+            </button>
+          </h3>
+          <div ngbAccordionCollapse>
+            <div ngbAccordionBody class="accordion-body text-white ">
+              <h5 class="mb-3">Как добавить игру в коллекцию?</h5>
+              <p>Найдите игру в  <code><a [routerLink]="'/products'">каталоге</a></code>, откройте её и нажмите "Добавить в коллекцию".</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Чат и безопасность -->
+        <div ngbAccordionItem class="accordion-item bg-dark border-secondary mb-3 rounded-3">
+          <h3 ngbAccordionHeader>
+            <button ngbAccordionButton class="accordion-button bg-dark text-white">
+              Чат и безопасность
+            </button>
+          </h3>
+          <div ngbAccordionCollapse>
+            <div ngbAccordionBody class="accordion-body text-white ">
+              <h5 class="mb-3">Как написать другому пользователю?</h5>
+              <p>На странице игры нажмите "Написать" рядом с предложением обмена. Чат доступен только авторизованным пользователям.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

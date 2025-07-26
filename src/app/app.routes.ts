@@ -8,7 +8,8 @@ import { LoginComponent } from '@app/components/login/login.component';
 import { CollectionComponent } from '@app/components/collection/collection.component';
 import { WishlistComponent } from '@app/components/wishlist/wishlist.component';
 import { AboutComponent } from '@app/components/about/about.component';
-import { authGuard } from './guards/auth.guard';
+import { authGuard } from '@app/guards/auth.guard';
+import { FaqComponent } from '@app/components/faq/faq.component';
 
 export const routes: Routes = [
   {
@@ -38,6 +39,10 @@ export const routes: Routes = [
   {
     path: 'about',
     loadComponent: () => AboutComponent,
+  },
+  {
+    path: 'faq',
+    loadComponent: () => FaqComponent,
   },
   {
     path: '',
