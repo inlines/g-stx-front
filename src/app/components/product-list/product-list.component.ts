@@ -134,7 +134,6 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
 
   public setActiveCategory(cat: number): void {
     this.activeCategory.next(cat);
-    console.warn('***');
     this.query.nativeElement.focus();
   }
 
