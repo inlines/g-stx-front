@@ -52,41 +52,117 @@
       <div class="card bg-dark text-white shadow rounded-4 p-4 h-100">
         <h3 class="text-info mb-3">Релизы игры:</h3>
         <ul class="list-group list-group-flush">
-          @if ((sortedReleases$ | async); as sorted) {
-            @for (release of sorted.highlighted; track release) {
-              <li
-                class="list-group-item bg-dark text-white border-secondary position-relative"
-                [ngClass]="{ 'text-decoration-line-through': release.release_status === 5  }"
-                style="box-shadow: 0 0 0 1px #ffc107;">
-                <div class="row align-items-center">
-                  <div class="col">
-                    <span class="fw-semibold">{{ release.release_date | date:'dd.MM.yy':'UTC' }}</span>
-                    на <span class="text-warning">{{ release.platform_name }}</span>
-                    [{{ release.release_region }}] {{release.digital_only ? 'только цифра' : (release?.serial || []).join('|')}}
-                  </div>
-                  <ng-container *ngTemplateOutlet="releaseActions; context: { $implicit: release }"></ng-container>
-                </div>
-              </li>
-            }
-            @if (sorted.highlighted.length && sorted.others.length) {
-              <hr class="border-secondary my-3" />
-            }
-            @for (release of sorted.others; track release) {
-              <li
-                class="list-group-item bg-dark text-white border-secondary"
-                [class.text-decoration-line-through]="release.release_status === 5 ">
-                <div class="row align-items-center">
-                  <div class="col">
-                    <span class="fw-semibold">{{ release.release_date | date:'dd.MM.yy':'UTC' }}</span>
-                    на <span class="text-warning">{{ release.platform_name }}</span>
-                    [{{ release.release_region }}] {{release.digital_only ? 'только цифра' : ''}}
-                  </div>
-                  <ng-container *ngTemplateOutlet="releaseActions; context: { $implicit: release }"></ng-container>
-                </div>
-              </li>
-            }
+  @if ((sortedReleases$ | async); as sorted) {
+    @for (release of sorted.highlighted; track release) {
+      <li class="list-group-item bg-dark text-white border-secondary position-relative release-card"
+          [ngClass]="{ 
+            'text-decoration-line-through': release.release_status === 5,
+            'highlighted-release': true 
+          }">
+          
+        <!-- Верхняя строка: Основная информация -->
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <div>
+            <span class="badge bg-secondary me-2">{{ release.release_date | date:'dd.MM.yy':'UTC' }}</span>
+            <span class="badge platform-badge me-2">{{ release.platform_name }}</span>
+            <span class="badge region-badge" [ngClass]="getRegionClass(release.release_region)">
+              {{ release.release_region }}
+            </span>
+          </div>
+          
+          @if (!release.digital_only && release?.serial?.length) {
+            <div class="serial-badge">
+              <span class="badge bg-dark text-muted">{{ release.serial?.join(' | ') }}</span>
+            </div>
           }
-          <ng-template #releaseActions let-release>
+        </div>
+
+        <!-- Нижняя строка: Действия -->
+        <div class="d-flex justify-content-between align-items-center">
+          @if (release.digital_only) {
+            <span class="small text-muted">Цифровая версия</span>
+          }
+          
+          <ng-container *ngTemplateOutlet="releaseActions; context: { $implicit: release }"></ng-container>
+        </div>
+      </li>
+    }
+
+    @if (sorted.highlighted.length && sorted.others.length) {
+      <hr class="border-secondary my-2" />
+    }
+
+    @for (release of sorted.others; track release) {
+      <li class="list-group-item bg-dark text-white border-secondary release-card"
+          [class.text-decoration-line-through]="release.release_status === 5">
+          
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <div>
+            <span class="badge bg-secondary me-2">{{ release.release_date | date:'dd.MM.yy':'UTC' }}</span>
+            <span class="badge platform-badge me-2">{{ release.platform_name }}</span>
+            <span class="badge region-badge" [ngClass]="getRegionClass(release.release_region)">
+              {{ release.release_region }}
+            </span>
+          </div>
+          
+          @if (!release.digital_only && release?.serial?.length) {
+            <!-- <div class="serial-badge">
+              <span class="badge bg-dark text-muted">{{ release.serial?.join(' | ') }}</span>
+            </div> -->
+            <div class="serial-container">
+              <!-- Десктопный вариант -->
+              <div class="d-none d-md-block">
+                @if (release.serial?.length) {
+                  @for (serial of release.serial; track serial; let last = $last) {
+                    <span class="serial-item" 
+                          [class.text-muted]="!last"
+                          >
+                      {{ serial || '' }}<span *ngIf="!last"> | </span>
+                    </span>
+                  }
+                } @else {
+                  <span class="text-muted">N/A</span>
+                }
+              </div>
+
+              <!-- Мобильный вариант -->
+              <div class="d-block d-md-none">
+                @if (release.serial?.length) {
+                  <span class="serial-item" (click)="toggleSerials()">
+                    <!-- {{ release.serial[0] || '' }} -->
+                    @if (release.serial && release.serial?.length || 0 > 1) {
+                      <!-- <span class="more-serials-badge">+{{ release.serial?.length || 0 - 1 }}</span> -->
+                    }
+                  </span>
+
+                  @if (showAllSerials) {
+                    <div class="serials-dropdown">
+                      @for (serial of release.serial?.slice(1) || ''; track serial) {
+                        <div class="dropdown-item">
+                          {{ serial || '' }}
+                        </div>
+                      }
+                    </div>
+                  }
+                } @else {
+                  <span class="text-muted">N/A</span>
+                }
+              </div>
+            </div>
+          }
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center">
+          @if (release.digital_only) {
+            <span class="small text-muted">Цифровая версия</span>
+          }
+          <ng-container *ngTemplateOutlet="releaseActions; context: { $implicit: release }"></ng-container>
+        </div>
+      </li>
+    }
+  }
+        </ul>
+        <ng-template #releaseActions let-release>
             @if (isAuthorised$ | async) {
               <div class="col-auto d-flex flex-wrap gap-2 align-items-start" style="min-height: 40px;">
                 <button type="button" class="btn btn-outline-success btn-sm"
@@ -121,8 +197,7 @@
                 }
               </div>
             }
-          </ng-template>
-        </ul>
+        </ng-template>
       </div>
     </div>
     <div class="col-12">

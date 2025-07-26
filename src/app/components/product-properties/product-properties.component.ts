@@ -116,4 +116,20 @@ export class ProductPropertiesComponent implements OnInit {
     this.store.dispatch(new ChatActions.RequestMessages(user));
     this.store.dispatch(new ChatActions.ToggleChatVisibility());
   }
+
+  public getRegionClass(region: string): string {
+    const regionMap: {[key: string]: string} = {
+      'Japan': 'ntsc-j',
+      'USA': 'ntsc-u',
+      'Europe': 'pal'
+    };
+    return regionMap[region] || 'bg-secondary';
+  }
+
+  
+  showAllSerials = false;
+
+  toggleSerials() {
+    this.showAllSerials = !this.showAllSerials;
+  }
 }
