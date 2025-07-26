@@ -12,7 +12,7 @@
             />
         } @else {
           <div class="d-flex justify-content-center align-items-center bg-secondary-subtle" style="height: 300px;">
-            <div class="text-muted text-center">
+            <div class=" text-center">
               <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor"
                 class="bi bi-image mb-2" viewBox="0 0 16 16">
                 <path d="M14.002 3a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2.002a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h12zM2.002 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H2.002z"/>
@@ -24,7 +24,7 @@
         }
         <ng-template #noImage>
           <div class="d-flex justify-content-center align-items-center bg-secondary-subtle" style="height: 300px;">
-            <div class="text-muted text-center">
+            <div class=" text-center">
               <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor"
                 class="bi bi-image mb-2" viewBox="0 0 16 16">
                 <path d="M14.002 3a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2.002a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h12zM2.002 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H2.002z"/>
@@ -72,7 +72,7 @@
           
           @if (!release.digital_only && release?.serial?.length) {
             <div class="serial-badge">
-              <span class="badge bg-dark text-muted">{{ release.serial?.join(' | ') }}</span>
+              <span class="badge bg-dark ">{{ release.serial?.join(' | ') }}</span>
             </div>
           }
         </div>
@@ -80,7 +80,7 @@
         <!-- Нижняя строка: Действия -->
         <div class="d-flex justify-content-between align-items-center">
           @if (release.digital_only) {
-            <span class="small text-muted">Цифровая версия</span>
+            <span class="small ">Цифровая версия</span>
           }
           
           <ng-container *ngTemplateOutlet="releaseActions; context: { $implicit: release }"></ng-container>
@@ -107,7 +107,7 @@
           
           @if (!release.digital_only && release?.serial?.length) {
             <!-- <div class="serial-badge">
-              <span class="badge bg-dark text-muted">{{ release.serial?.join(' | ') }}</span>
+              <span class="badge bg-dark ">{{ release.serial?.join(' | ') }}</span>
             </div> -->
             <div class="serial-container">
               <!-- Десктопный вариант -->
@@ -115,13 +115,13 @@
                 @if (release.serial?.length) {
                   @for (serial of release.serial; track serial; let last = $last) {
                     <span class="serial-item" 
-                          [class.text-muted]="!last"
+                          [class.]="!last"
                           >
                       {{ serial || '' }}<span *ngIf="!last"> | </span>
                     </span>
                   }
                 } @else {
-                  <span class="text-muted">N/A</span>
+                  <span class="">N/A</span>
                 }
               </div>
 
@@ -145,7 +145,7 @@
                     </div>
                   }
                 } @else {
-                  <span class="text-muted">N/A</span>
+                  <span class="">N/A</span>
                 }
               </div>
             </div>
@@ -154,7 +154,7 @@
 
         <div class="d-flex justify-content-between align-items-center">
           @if (release.digital_only) {
-            <span class="small text-muted">Цифровая версия</span>
+            <span class="small ">Цифровая версия</span>
           }
           <ng-container *ngTemplateOutlet="releaseActions; context: { $implicit: release }"></ng-container>
         </div>
