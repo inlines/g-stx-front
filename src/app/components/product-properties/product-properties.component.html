@@ -57,7 +57,8 @@
       <li class="list-group-item bg-dark text-white border-secondary position-relative release-card"
           [ngClass]="{ 
             'text-decoration-line-through': release.release_status === 5,
-            'highlighted-release': true 
+            'highlighted-release': true,
+            'owned-item': release.owned 
           }">
           
         <!-- Верхняя строка: Основная информация -->
@@ -94,7 +95,10 @@
 
     @for (release of sorted.others; track release) {
       <li class="list-group-item bg-dark text-white border-secondary release-card"
-          [class.text-decoration-line-through]="release.release_status === 5">
+          [ngClass]="{
+            'text-decoration-line-through': release.release_status === 5,
+            'owned-item': release.owned
+          }">
           
         <div class="d-flex justify-content-between align-items-start mb-2">
           <div>

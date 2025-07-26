@@ -12,12 +12,13 @@ import { PagerComponent } from '../pager/pager.component';
 import { IPlatformItem } from '@app/states/platforms/interfaces/platform-item.interface';
 import { PlatformState } from '@app/states/platforms/states/platforms.state';
 import { ICollectionItemWithLetter } from '@app/states/collection/interfaces/collection-item-with-letter.interface';
+import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 
 
 const LIMIT = 1000;
 @Component({
   selector: 'app-collection',
-  imports: [AsyncPipe, RouterModule, PagerComponent],
+  imports: [AsyncPipe, RouterModule, PagerComponent, ReactiveFormsModule],
   templateUrl: './collection.component.html',
   styleUrl: './collection.component.scss',
   standalone: true,
@@ -74,13 +75,19 @@ export class CollectionComponent implements OnInit, OnDestroy {
 
   public categories$!: Observable<IPlatformItem[]>;
 
+  public queryForm: FormGroup = new FormGroup({
+      query: new FormControl('')
+    });
+
   public ngOnInit(): void {
     const sub =  this.activeCategory$.subscribe(x => this.store.dispatch(new CollectionActions.SetCollectionParams({cat: x, limit: LIMIT, offset: 0,})));
 
     const paramsSub = this.collectionParams$.pipe(filter(x => !!x.cat && !!x.limit)).subscribe(params => this.store.dispatch(new CollectionActions.GetCollectionRequest()));
 
     this.collectionWithLetters$ = this.collection$.pipe(
-      map((collection) => collection.reduce((acc: ICollectionItemWithLetter[], val: ICollectionItem) => {
+      withLatestFrom(this.queryForm.valueChanges),
+      map((collection, form) => collection.reduce((acc: ICollectionItemWithLetter[], val: ICollectionItem) => {
+        console.warn(form);
         const accLength = acc.length;
         const lastLetter = accLength >=1 ? acc[acc.length - 1].letter : null;
 
@@ -99,6 +106,8 @@ export class CollectionComponent implements OnInit, OnDestroy {
       filter(platforms => platforms.length > 0),
       take(1)
     ).subscribe(platforms => {this.activeCategory$.next(platforms[0].platform); this.activeCategory = platforms[0].platform; this.activeCategorCount = platforms[0].have_games})
+
+    
   }
 
   public ngOnDestroy(): void {
