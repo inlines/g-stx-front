@@ -86,7 +86,7 @@ export class CollectionComponent implements OnInit, OnDestroy {
 
     this.collectionWithLetters$ = this.collection$.pipe(
       withLatestFrom(this.queryForm.valueChanges),
-      map((collection, form) => collection.reduce((acc: ICollectionItemWithLetter[], val: ICollectionItem) => {
+      map(([collection, form]) => collection.reduce((acc: ICollectionItemWithLetter[], val: ICollectionItem) => {
         console.warn(form);
         const accLength = acc.length;
         const lastLetter = accLength >=1 ? acc[acc.length - 1].letter : null;
