@@ -7,7 +7,7 @@ import { CollectionState } from '@app/states/collection/states/collection.state'
 import { OwnershipState } from '@app/states/ownership/states/ownership.state';
 import { IProductListRequest } from '@app/states/products/interfaces/product-list-request.interface';
 import { Store } from '@ngxs/store';
-import { combineLatest, filter, map, Observable, Subject, Subscription, take, withLatestFrom } from 'rxjs';
+import { combineLatest, filter, map, Observable, startWith, Subject, Subscription, take, withLatestFrom } from 'rxjs';
 import { PagerComponent } from '../pager/pager.component';
 import { IPlatformItem } from '@app/states/platforms/interfaces/platform-item.interface';
 import { PlatformState } from '@app/states/platforms/states/platforms.state';
@@ -86,19 +86,20 @@ export class CollectionComponent implements OnInit, OnDestroy {
 
     this.collectionWithLetters$ = 
     combineLatest(
-      [this.collection$,this.queryForm.valueChanges]
+      [this.collection$,this.queryForm.valueChanges.pipe(startWith(''))]
     )
     .pipe(
       map(([collection, form]) => collection.reduce((acc: ICollectionItemWithLetter[], val: ICollectionItem) => {
-        console.warn(form);
         const accLength = acc.length;
         const lastLetter = accLength >=1 ? acc[acc.length - 1].letter : null;
 
-        acc.push(
-          {
-            item: val,
-            letter: val.product_name[0] !== lastLetter ? val.product_name[0] : undefined
-          });
+        if(!form.query || val.product_name.toLowerCase().includes(form.query.toLowerCase())) {
+          acc.push(
+            {
+              item: val,
+              letter: val.product_name[0] !== lastLetter ? val.product_name[0] : undefined
+            });
+        }
         return acc;
       }, []))
     )
