@@ -7,7 +7,7 @@ import { CollectionState } from '@app/states/collection/states/collection.state'
 import { OwnershipState } from '@app/states/ownership/states/ownership.state';
 import { IProductListRequest } from '@app/states/products/interfaces/product-list-request.interface';
 import { Store } from '@ngxs/store';
-import { combineLatest, filter, map, Observable, startWith, Subject, Subscription, take, withLatestFrom } from 'rxjs';
+import { combineLatest, filter, map, Observable, startWith, Subject, Subscription, switchMap, take, tap, withLatestFrom } from 'rxjs';
 import { PagerComponent } from '../pager/pager.component';
 import { IPlatformItem } from '@app/states/platforms/interfaces/platform-item.interface';
 import { PlatformState } from '@app/states/platforms/states/platforms.state';
@@ -125,8 +125,39 @@ export class CollectionComponent implements OnInit, OnDestroy {
   }
 
   public remove(release_id: number, event: Event): void {
-    this.store.dispatch(new CollectionActions.RemoveFromCollectionRequest({release_id}));
     event.stopImmediatePropagation();
+    combineLatest([
+      this.collection$,
+      this.displayCategories$
+    ]).pipe(
+      take(1),
+      switchMap(([collection, categories]) => {
+        const removeAction$ = this.store.dispatch(
+          new CollectionActions.RemoveFromCollectionRequest({ release_id })
+        );
+
+        if (collection.length > 1) {
+          return removeAction$.pipe(
+            tap(() => this.store.dispatch(
+              new CollectionActions.GetCollectionRequest()
+            ))
+          );
+        } else {
+          return removeAction$.pipe(
+            tap(() => {
+              const nextCategory = categories.find(cat => cat.id !== this.activeCategory);
+              if (nextCategory) {
+                this.setActiveCategory(nextCategory.id, nextCategory.user_games);
+              } else {
+                this.store.dispatch(
+                  new CollectionActions.GetCollectionRequest()
+                );
+              }
+            })
+          );
+        }
+      })
+    ).subscribe();
   }
 
   public pageChanged(page: number): void {

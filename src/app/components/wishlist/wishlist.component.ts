@@ -7,7 +7,7 @@ import { CollectionState } from '@app/states/collection/states/collection.state'
 import { OwnershipState } from '@app/states/ownership/states/ownership.state';
 import { IProductListRequest } from '@app/states/products/interfaces/product-list-request.interface';
 import { Store } from '@ngxs/store';
-import { filter, Observable, Subject, Subscription, take } from 'rxjs';
+import { combineLatest, filter, Observable, Subject, Subscription, switchMap, take, tap } from 'rxjs';
 import { PagerComponent } from '@app/components/pager/pager.component';
 
 const LIMIT = 18;
@@ -66,8 +66,37 @@ export class WishlistComponent implements OnInit, OnDestroy {
   public collection$: Observable<ICollectionItem[]>;
 
   public remove(release_id: number, event: Event): void {
-     this.store.dispatch(new CollectionActions.RemoveWishRequest({release_id}));
-     event.stopImmediatePropagation();
+    event.stopImmediatePropagation();
+    combineLatest([
+      this.collection$,
+      this.activePlatforms$
+    ]).pipe(
+      take(1),
+      switchMap(([collection, platformIds]) => {
+        const removeAction$ = this.store.dispatch(
+          new CollectionActions.RemoveWishRequest({ release_id })
+        );
+
+        if (collection.length > 1) {
+          return removeAction$.pipe(
+            tap(() => this.store.dispatch(
+              new CollectionActions.GetWishlistRequest()
+            ))
+          );
+        } else {
+          return removeAction$.pipe(
+            tap(() => {
+              const nextCategory = platformIds.find(id => id !== this.activeCategory);
+              if (nextCategory) {
+                this.setActiveCategory(nextCategory);
+              } else {
+                this.store.dispatch(new CollectionActions.GetWishlistRequest());
+              }
+            })
+          );
+        }
+      })
+    ).subscribe();
   }
 
   public pageChanged(page: number): void {
