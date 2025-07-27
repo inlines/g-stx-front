@@ -1,58 +1,51 @@
 <div class="header-bg bg-dark text-white shadow-sm py-3 px-3 px-lg-5">
   <div class="row align-items-center">
-    <!-- Лого -->
-    <div class="col-sm-6 col">
-      <a class="nav-link text-white fw-bold fs-5" routerLink="/">🎮 <span class="d-none d-sm-inline">Каталог</span></a>
-    </div>
+    <!-- Кнопка "Назад" (только там где нужна) -->
+    @if (showBackButton$ | async) {
+      <div class="col-auto">
+        <a class="nav-link text-white p-1 rounded-3 d-flex align-items-center" (click)="goBack()">
+          ↩️ <span class="d-none d-sm-inline ms-1">Назад</span>
+        </a>
+      </div>
+    }
 
-    <!-- Мобильное меню -->
-    <div class="col-auto d-sm-none d-flex justify-content-center justify-content-sm-start gap-3 flex-wrap">
-      @if (isAuthorised$ | async) {
-        <a
-          class="nav-link text-white px-2 py-1 bg-secondary bg-opacity-25 rounded-3 d-flex align-items-center"
-          routerLink="/collection"
-          >
-          🗂️ <span class="d-none d-sm-inline ms-1">Моя коллекция</span>
-        </a>
-      }
-      @if (isAuthorised$ | async) {
-        <a
-          class="nav-link text-white px-2 py-1 bg-secondary bg-opacity-25 rounded-3 d-flex align-items-center"
-          routerLink="/wishlist"
-          >
-          ⭐ <span class="d-none d-sm-inline ms-1">Вишлист</span>
-        </a>
-      }
-      <!-- Чаты + online -->
-      <div class="position-relative">
-        @if (isConnected$ | async) {
-          <small
-            class="position-absolute top-0 start-50 translate-middle text-info"
-            style="font-size: 0.7rem;"
-            >
-            online
-          </small>
+    <!-- Лого и кнопки -->
+    <div class="col d-flex align-items-center gap-3 flex-wrap">
+      <!-- Кнопка "Каталог" -->
+      <a class="nav-link text-white fw-bold px-2 py-1 bg-secondary bg-opacity-25 rounded-3 d-flex align-items-center" routerLink="/">
+        🎮 <span class="d-none d-sm-inline ms-1">Каталог</span>
+      </a>
+
+      <!-- Меню (видно всегда на десктопе, скрыто на мобиле) -->
+      <div class="d-none d-sm-flex gap-3">
+        @if (isAuthorised$ | async) {
+          <a class="nav-link text-white px-2 py-1 bg-secondary bg-opacity-25 rounded-3 d-flex align-items-center" routerLink="/collection">
+            🗂️ <span class="ms-1">Моя коллекция</span>
+          </a>
         }
         @if (isAuthorised$ | async) {
-          <a
-            class="nav-link text-white px-2 py-1 bg-secondary bg-opacity-25 rounded-3 d-flex align-items-center position-relative"
-            (click)="toggleChat()"
-            >
-            💬
-            <span class="d-none d-sm-inline ms-1">Чаты</span>
-            @if ((showChatWarning$ | async)) {
-              <span
-                class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle animate-blink"
-                style="width: 10px; height: 10px;"
-              ></span>
-            }
+          <a class="nav-link text-white px-2 py-1 bg-secondary bg-opacity-25 rounded-3 d-flex align-items-center" routerLink="/wishlist">
+            ⭐ <span class="ms-1">Вишлист</span>
           </a>
+        }
+        @if (isAuthorised$ | async) {
+          <div class="position-relative">
+            @if (isConnected$ | async) {
+              <small class="position-absolute top-0 start-50 translate-middle text-info" style="font-size: 0.7rem;">online</small>
+            }
+            <a class="nav-link text-white px-2 py-1 bg-secondary bg-opacity-25 rounded-3 d-flex align-items-center position-relative" (click)="toggleChat()">
+              💬 <span class="ms-1">Чаты</span>
+              @if ((showChatWarning$ | async)) {
+                <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle animate-blink" style="width: 10px; height: 10px;"></span>
+              }
+            </a>
+          </div>
         }
       </div>
     </div>
 
     <!-- Пользователь / авторизация -->
-    <div class="col col-sm-6 d-flex justify-content-end align-items-center">
+    <div class="col-auto d-flex justify-content-end align-items-center">
       @if (isAuthorised$ | async; as user) {
         <span class="me-2 text-info fw-semibold d-none d-md-inline">
           👤 {{ currentUser$ | async }}
@@ -66,51 +59,32 @@
         </a>
       }
     </div>
-  </div>
 
-  <!-- Десктоп-меню -->
-  <div class="row mt-2 d-none d-sm-block">
-    <div class="col d-flex justify-content-center justify-content-sm-start gap-3 flex-wrap">
-      @if (isAuthorised$ | async) {
-        <a
-          class="nav-link text-white px-2 py-1 bg-secondary bg-opacity-25 rounded-3 d-flex align-items-center"
-          routerLink="/collection"
-          >
-          🗂️ <span class="d-none d-sm-inline ms-1">Моя коллекция</span>
-        </a>
-      }
-      @if (isAuthorised$ | async) {
-        <a
-          class="nav-link text-white px-2 py-1 bg-secondary bg-opacity-25 rounded-3 d-flex align-items-center"
-          routerLink="/wishlist"
-          >
-          ⭐ <span class="d-none d-sm-inline ms-1">Вишлист</span>
-        </a>
-      }
-      <!-- Чаты + online -->
-      <div class="position-relative">
-        @if (isConnected$ | async) {
-          <small
-            class="position-absolute top-0 start-50 translate-middle text-info"
-            style="font-size: 0.7rem;"
-            >
-            online
-          </small>
+    <!-- Мобильное меню (только на мобиле) -->
+    <div class="col-12 d-sm-none mt-2">
+      <div class="d-flex justify-content-start gap-3 flex-wrap">
+        @if (isAuthorised$ | async) {
+          <a class="nav-link text-white px-2 py-1 bg-secondary bg-opacity-25 rounded-3 d-flex align-items-center" routerLink="/collection">
+            🗂️ <span class="ms-1">Коллекция</span>
+          </a>
         }
         @if (isAuthorised$ | async) {
-          <a
-            class="nav-link text-white px-2 py-1 bg-secondary bg-opacity-25 rounded-3 d-flex align-items-center position-relative"
-            (click)="toggleChat()"
-            >
-            💬
-            <span class="d-none d-sm-inline ms-1">Чаты</span>
-            @if ((showChatWarning$ | async)) {
-              <span
-                class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle animate-blink"
-                style="width: 10px; height: 10px;"
-              ></span>
-            }
+          <a class="nav-link text-white px-2 py-1 bg-secondary bg-opacity-25 rounded-3 d-flex align-items-center" routerLink="/wishlist">
+            ⭐ <span class="ms-1">Вишлист</span>
           </a>
+        }
+        @if (isAuthorised$ | async) {
+          <div class="position-relative">
+            @if (isConnected$ | async) {
+              <small class="position-absolute top-0 start-50 translate-middle text-info" style="font-size: 0.7rem;">online</small>
+            }
+            <a class="nav-link text-white px-2 py-1 bg-secondary bg-opacity-25 rounded-3 d-flex align-items-center position-relative" (click)="toggleChat()">
+              💬 <span class="ms-1">Чаты</span>
+              @if ((showChatWarning$ | async)) {
+                <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle animate-blink" style="width: 10px; height: 10px;"></span>
+              }
+            </a>
+          </div>
         }
       </div>
     </div>

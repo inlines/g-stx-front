@@ -2,7 +2,7 @@
 
 <div class="row">
   <div class="col-12 px-0 mb-4 sticker">
-    @if (true) {
+    @if (!!(collection$ | async)?.length) {
       <div class="bg-dark text-white shadow overflow-hidden">
         <div class="p-3">
           <div #stickerContent class="stickerContent">
@@ -94,7 +94,7 @@
             </div>
           </div>
           <h6 class="col-auto d-flex flex-column justify-content-center">
-            {{$index + 1}} / {{activeCategorCount}}
+            {{$index + 1}} / {{(collectionWithLetters$ | async)?.length || ''}}
           </h6>
           <div class="col-auto py-2">
             <button

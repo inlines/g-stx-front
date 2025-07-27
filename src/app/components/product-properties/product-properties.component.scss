@@ -43,6 +43,13 @@ li:hover .bg-secondary {
   white-space: nowrap;
 }
 
+.serial-badge .badge {
+  word-wrap: break-word; /* или overflow-wrap: break-word; */
+  white-space: normal;   /* разрешает перенос строк */
+  width: 100%;
+  text-align: left;
+}
+
 .serial-container {
   position: relative;
 }

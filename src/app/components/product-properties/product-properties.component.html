@@ -133,10 +133,6 @@
               <div class="d-block d-md-none">
                 @if (release.serial?.length) {
                   <span class="serial-item" (click)="toggleSerials()">
-                    <!-- {{ release.serial[0] || '' }} -->
-                    @if (release.serial && release.serial?.length || 0 > 1) {
-                      <!-- <span class="more-serials-badge">+{{ release.serial?.length || 0 - 1 }}</span> -->
-                    }
                   </span>
 
                   @if (showAllSerials) {

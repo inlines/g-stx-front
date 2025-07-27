@@ -1,27 +1,34 @@
-.bg-base-weak {
-  background-color: #fff;
+.header-bg {
+  position: relative;
+  z-index: 1000;
 }
 
-.shadowed {
-  box-shadow: 0 0 3px #878c9e08, 0 4px 8px #878c9e14;
+/* Анимация для кнопки "Назад" при наведении */
+.nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  transition: background-color 0.2s ease;
 }
 
-.nav-link {
-  cursor: pointer;
-}
-
-@keyframes blink {
-  0% { opacity: 1; }
-  50% { opacity: 0.3; }
-  100% { opacity: 1; }
-}
-
-.animate-blink {
-  animation: blink 1s infinite;
-}
-
-@media (min-width: 576px) {
+/* Улучшенные отступы для мобильной версии */
+@media (max-width: 575.98px) {
   .header-bg {
-    height: 102px;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
   }
+  
+  .nav-link {
+    padding: 0.5rem !important;
+    font-size: 0.9rem;
+  }
+}
+
+/* Фикс для выравнивания элементов в шапке */
+.align-items-center {
+  align-items: center !important;
+}
+
+/* Плавное появление/исчезание кнопки "Назад" */
+.nav-link {
+  transition: all 0.2s ease;
+  cursor: pointer;
 }
