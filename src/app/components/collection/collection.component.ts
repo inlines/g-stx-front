@@ -97,7 +97,7 @@ export class CollectionComponent implements OnInit, OnDestroy {
           acc.push(
             {
               item: val,
-              letter: val.product_name[0] !== lastLetter ? val.product_name[0] : undefined
+              letter: val.product_name[0].toLowerCase() !== lastLetter ? val.product_name[0].toLowerCase() : undefined
             });
         }
         return acc;
