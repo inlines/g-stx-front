@@ -44,7 +44,7 @@
 }
 
 .stickerContent {
-  overflow: hidden;
+  //overflow: hidden;
   transition: height 0.3s ease, opacity 0.3s ease;
   height: auto;
   opacity: 1;
@@ -57,9 +57,40 @@
 
 .sticker {
   position: sticky;
+  overflow: visible !important;
   top: 52px;
   z-index: 1000; /* убедись, что он выше других элементов */
   @media (max-width: 576px) {
     top: 64px;
   }
+}
+
+/* Темный дропдаун */
+.dropdown-menu-dark {
+  background-color: #343a40;
+  border: 1px solid #495057;
+}
+.dropdown-item {
+  color: #f8f9fa;
+}
+.dropdown-item:hover {
+  background-color: #495057;
+}
+
+ngb-dropdown-menu {
+  position: absolute;
+  right: 0; /* Раскрывать вправо */
+  min-width: 200px; /* Фиксированная ширина */
+}
+
+.dropdown-menu { 
+  z-index: 1050; /* Чтобы меню было поверх других элементов */
+}
+
+.sort-button {
+  @media (min-width: 576px) {
+    top: 50%;
+    right: 0;
+  }
+  top: 150%;
 }

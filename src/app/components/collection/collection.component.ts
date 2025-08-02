@@ -1,4 +1,4 @@
-import { AsyncPipe } from '@angular/common';
+import { AsyncPipe, DatePipe } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { ICollectionItem } from '@app/states/collection/interfaces/collection-item.interface';
@@ -7,18 +7,19 @@ import { CollectionState } from '@app/states/collection/states/collection.state'
 import { OwnershipState } from '@app/states/ownership/states/ownership.state';
 import { IProductListRequest } from '@app/states/products/interfaces/product-list-request.interface';
 import { Store } from '@ngxs/store';
-import { combineLatest, debounceTime, filter, map, Observable, startWith, Subject, Subscription, switchMap, take, tap, withLatestFrom } from 'rxjs';
+import { BehaviorSubject, combineLatest, debounceTime, filter, map, Observable, of, startWith, Subject, Subscription, switchMap, take, tap } from 'rxjs';
 import { PagerComponent } from '../pager/pager.component';
 import { IPlatformItem } from '@app/states/platforms/interfaces/platform-item.interface';
 import { PlatformState } from '@app/states/platforms/states/platforms.state';
 import { ICollectionItemWithLetter } from '@app/states/collection/interfaces/collection-item-with-letter.interface';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 
 
 const LIMIT = 1000;
 @Component({
   selector: 'app-collection',
-  imports: [AsyncPipe, RouterModule, PagerComponent, ReactiveFormsModule],
+  imports: [AsyncPipe, RouterModule, PagerComponent, ReactiveFormsModule, DatePipe, NgbDropdownModule],
   templateUrl: './collection.component.html',
   styleUrl: './collection.component.scss',
   standalone: true,
@@ -86,21 +87,30 @@ export class CollectionComponent implements OnInit, OnDestroy {
 
     this.collectionWithLetters$ = 
     combineLatest(
-      [this.collection$,this.queryForm.valueChanges.pipe(startWith(''), debounceTime(1000))]
+      [
+        this.collection$,
+        this.queryForm.valueChanges.pipe(startWith(''), debounceTime(1000)),
+        this.sortBy$.asObservable()
+      ]
     )
     .pipe(
       take(10),
-      map(([collection, form]) => collection.reduce((acc: ICollectionItemWithLetter[], val: ICollectionItem) => {
+      map(([collection, form, sortBy]) => collection.reduce((acc: ICollectionItemWithLetter[], val: ICollectionItem) => {
         const accLength = acc.length;
         const lastLetter = accLength >=1 ? acc[accLength - 1].letter || acc[accLength - 1].item.product_name.toLowerCase()[0] : null;
         if(!form.query || val.product_name.toLowerCase().includes(form.query.toLowerCase())) {
           acc.push(
             {
               item: val,
-              letter: val.product_name.toLowerCase()[0] !== lastLetter ? val.product_name.toLowerCase()[0] : undefined
+              letter: sortBy === 'name' ? val.product_name.toLowerCase()[0] !== lastLetter ? val.product_name.toLowerCase()[0] : undefined : undefined
             });
         }
-        return acc;
+        return sortBy === 'name' ? acc : acc.sort((a, b) => {
+          if (!a.item.release_date && !b.item.release_date) return 0;
+          if (!a.item.release_date) return 1;  // null в конце
+          if (!b.item.release_date) return -1;
+          return a.item.release_date - b.item.release_date;
+        });
       }, []))
     )
 
@@ -165,5 +175,10 @@ export class CollectionComponent implements OnInit, OnDestroy {
       offset: (page - 1 ) * LIMIT
     }));
   }
+
+  public sortBy$: BehaviorSubject<'name' | 'date'> = new BehaviorSubject<'name' | 'date'>('name');
+
+  setSort(mode: 'name' | 'date') {
+    this.sortBy$.next(mode);
+  }
 }
- 

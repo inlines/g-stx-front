@@ -289,7 +289,7 @@ export class CollectionState {
   public getCollectionSuccess(ctx: StateContext<ICollectionState>, action: CollectionActions.GetCollectionSuccess) {
     ctx.patchState({
       loadCollectionStatus: RequestStatus.Load,
-      loadedCollection: action.payload.items,
+      loadedCollection: action.payload.items.map(item => ({...item, release_date: (item.release_date || 0) * 1000})),
       collectionTotalCount: action.payload.total_count
     })
   }

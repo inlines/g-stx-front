@@ -204,7 +204,7 @@
         <p class="text-light">{{ productProperties.product.summary || 'У нас нет описания этой игры' }}</p>
       </div>
     </div>
-    @if (productProperties.screenshots?.length) {
+    @if (productProperties.screenshots.length) {
       <div class="col-12">
         <div class="card bg-dark border-0 shadow rounded-4 p-3">
           <ngb-carousel [interval]="3000" [pauseOnHover]="true" [wrap]="true">
