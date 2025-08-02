@@ -138,7 +138,7 @@
             {{$index + 1}} / {{activeCategorCount}}
           </h6>
           <div class="col-8">
-            <h6 class="card-title text-truncate fw-bold">{{ product.item.product_name }}</h6>
+            <h6 class="card-title text-truncate fw-bold">{{ product.item.product_name }}({{ product.item.release_date || 0 * 1000 | date:'dd.MM.yy':'UTC' }})</h6>
             <div class="card-subtitle small mb-2">
               {{ product.item.platform_name }} [{{ product.item.region_name }}] ({{ product.item.serial?.join('|') }})
             </div>
