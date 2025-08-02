@@ -117,10 +117,8 @@
               <!-- Десктопный вариант -->
               <div class="d-none d-md-block">
                 @if (release.serial?.length) {
-                  @for (serial of release.serial; track serial; let last = $last) {
-                    <span class="serial-item" 
-                          [class.]="!last"
-                          >
+                  @for (serial of release.serial; let i = $index; track i; let last = $last) {
+                    <span class="serial-item">
                       {{ serial || '' }}<span *ngIf="!last"> | </span>
                     </span>
                   }
@@ -132,12 +130,13 @@
               <!-- Мобильный вариант -->
               <div class="d-block d-md-none">
                 @if (release.serial?.length) {
-                  <span class="serial-item" (click)="toggleSerials()">
+                  <span class="badge bg-dark" (click)="toggleSerials(release.release_id)">
+                    серийники↓
                   </span>
 
-                  @if (showAllSerials) {
+                  @if (showAllSerials === release.release_id) {
                     <div class="serials-dropdown">
-                      @for (serial of release.serial?.slice(1) || ''; track serial) {
+                      @for (serial of release.serial?.slice(1) || ''; let i = $index; track i;) {
                         <div class="dropdown-item">
                           {{ serial || '' }}
                         </div>

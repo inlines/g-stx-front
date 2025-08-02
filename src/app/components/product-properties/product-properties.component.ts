@@ -119,17 +119,20 @@ export class ProductPropertiesComponent implements OnInit {
 
   public getRegionClass(region: string): string {
     const regionMap: {[key: string]: string} = {
-      'Japan': 'ntsc-j',
-      'USA': 'ntsc-u',
-      'Europe': 'pal'
+      'japan': 'ntsc-j',
+      'north_america': 'ntsc-u',
+      'europe': 'pal'
     };
     return regionMap[region] || 'bg-secondary';
   }
 
   
-  showAllSerials = false;
+  showAllSerials: number | null = null;
 
-  toggleSerials() {
-    this.showAllSerials = !this.showAllSerials;
+  toggleSerials(releseId: number) {
+    this.showAllSerials = releseId;
+    setTimeout(() => {
+      this.showAllSerials = null;
+    }, 1500)
   }
 }
