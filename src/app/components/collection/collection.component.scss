@@ -57,7 +57,7 @@
 
 .sticker {
   position: sticky;
-  top: 102px;
+  top: 52px;
   z-index: 1000; /* убедись, что он выше других элементов */
   @media (max-width: 576px) {
     top: 64px;

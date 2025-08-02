@@ -1,4 +1,4 @@
-import { AsyncPipe, DatePipe, NgClass, NgTemplateOutlet } from '@angular/common';
+import { AsyncPipe, DatePipe, NgClass, NgIf, NgTemplateOutlet } from '@angular/common';
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { AuthState } from '@app/states/auth/states/auth.state';
 import { IProductPropertiesResponse } from '@app/states/products/interfaces/product-properties-response.interface';
@@ -16,7 +16,7 @@ import { CopyToClipboardDirective } from '@app/directives/copy-to-clipboard.dire
 
 @Component({
   selector: 'app-product-properties',
-  imports: [AsyncPipe, DatePipe, NgbCarouselModule, NgClass, NgTemplateOutlet, CopyToClipboardDirective],
+  imports: [AsyncPipe, DatePipe, NgbCarouselModule, NgClass, NgTemplateOutlet, CopyToClipboardDirective, NgIf],
   templateUrl: './product-properties.component.html',
   styleUrl: './product-properties.component.scss',
   standalone: true,

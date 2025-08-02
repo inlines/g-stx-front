@@ -1,6 +1,6 @@
 import { AsyncPipe, DatePipe } from '@angular/common';
 import { Component, OnDestroy, OnInit, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
-import { throttleTime } from 'rxjs/operators';
+import { takeUntil, throttleTime } from 'rxjs/operators';
 import { RouterModule } from '@angular/router';
 import { IProductListItem } from '@app/states/products/interfaces/product-list-item.interface';
 import { ProductsActions } from '@app/states/products/states/products.actions';
@@ -120,9 +120,13 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
 
   public ngAfterViewInit(): void {
     if (window.innerWidth <= 576) {
+      this.subscriptions.push(
       fromEvent(window, 'scroll')
-        .pipe(throttleTime(100))
-        .subscribe(() => this.handleScroll());
+        .pipe(
+          throttleTime(100)
+        )
+        .subscribe(() => this.handleScroll())
+      );
     }
 
     this.query.nativeElement.focus();

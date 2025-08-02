@@ -52,7 +52,7 @@
     }
   </div>
   @if (!!(collection$ | async)?.length) {
-    @for (product of collectionWithLetters$ | async; track product) {
+    @for (product of collectionWithLetters$ | async; track product.item.release_id) {
       <!-- Desktop / tablet: карточки -->
       <div class="col-12 d-none d-md-block p-3">
         <div
