@@ -1,0 +1,25 @@
+import { AsyncPipe, DatePipe } from '@angular/common';
+import { Component } from '@angular/core';
+import { RouterModule } from '@angular/router';
+import { ICollectionItem } from '@app/states/collection/interfaces/collection-item.interface';
+import { CollectorsState } from '@app/states/collectors/states/collectors.state';
+import { Store } from '@ngxs/store';
+import { Observable } from 'rxjs';
+
+@Component({
+  selector: 'app-collector-properties',
+  imports: [RouterModule, DatePipe, AsyncPipe],
+  templateUrl: './collector-properties.component.html',
+  styleUrl: './collector-properties.component.scss'
+})
+export class CollectorPropertiesComponent {
+  public loadedCollection$: Observable<ICollectionItem[]>;
+  public collectionPropertiesLogin$: Observable<string>;
+
+  constructor(
+    private readonly store: Store
+  ){
+    this.loadedCollection$ = this.store.select(CollectorsState.loadedCollection);
+    this.collectionPropertiesLogin$ = this.store.select(CollectorsState.collectionPropertiesLogin);
+  }
+}

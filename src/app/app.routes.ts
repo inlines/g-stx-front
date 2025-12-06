@@ -10,6 +10,9 @@ import { WishlistComponent } from '@app/components/wishlist/wishlist.component';
 import { AboutComponent } from '@app/components/about/about.component';
 import { authGuard } from '@app/guards/auth.guard';
 import { FaqComponent } from '@app/components/faq/faq.component';
+import { CollectorsComponent } from './components/collectors/collectors.component';
+import { CollectorPropertiesResolver } from './resolvers/collector-properties.resolver';
+import { CollectorPropertiesComponent } from './components/collector-properties/collector-properties.component';
 
 export const routes: Routes = [
   {
@@ -26,6 +29,17 @@ export const routes: Routes = [
     loadComponent: () => ProductPropertiesComponent,
     resolve: {
       message: ProductPropertiesResolver
+    }
+  },
+  {
+    path: 'collectors',
+    loadComponent: () => CollectorsComponent,
+  },
+  {
+    path: 'collectors/:id',
+    loadComponent: () => CollectorPropertiesComponent,
+    resolve: {
+      message: CollectorPropertiesResolver
     }
   },
   {

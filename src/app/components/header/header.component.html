@@ -16,6 +16,12 @@
         🎮 <span class="d-none d-sm-inline ms-1">Каталог</span>
       </a>
 
+      @if (isAuthorised$ | async) {
+        <a class="nav-link text-white fw-bold px-2 py-1 bg-secondary bg-opacity-25 rounded-3 d-flex align-items-center" routerLink="/collectors">
+          🕹️ <span class="d-none d-sm-inline ms-1">Игроки</span>
+        </a>
+      }
+
       <!-- Меню (видно всегда на десктопе, скрыто на мобиле) -->
       <div class="d-none d-sm-flex gap-3">
         @if (isAuthorised$ | async) {

@@ -14,6 +14,7 @@ import { CollectionState } from './states/collection/states/collection.state';
 import { OwnershipState } from './states/ownership/states/ownership.state';
 import { PlatformState } from './states/platforms/states/platforms.state';
 import { ChatState } from './states/chat/states/chat.state';
+import { CollectorsState } from './states/collectors/states/collectors.state';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -33,6 +34,7 @@ export const appConfig: ApplicationConfig = {
         OwnershipState,
         PlatformState,
         ChatState,
+        CollectorsState,
       ],
       withNgxsStoragePlugin({
         keys: ['Auth', 'Ownership', 'Products']

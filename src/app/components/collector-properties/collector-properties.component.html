@@ -1,0 +1,68 @@
+<h1 class="display-5 fw-bold mb-4 text-light">Коллекция пользователя {{collectionPropertiesLogin$ | async}}</h1>
+
+<div class="row text-white">
+  @if (!!(loadedCollection$ | async)?.length) {
+    @for (item of loadedCollection$ | async; track item.release_id) {
+      <!-- Desktop / tablet: карточки -->
+      
+      <!-- Mobile: горизонтальная карточка -->
+       <div class="col-12 d-block mb-3 overflow-hidden">
+        <div
+          class="game-card h-100 border-0 shadow-sm hover-shadow position-relative row"
+          [routerLink]="['/products/' + item.product_id.toString()]"
+          style="cursor: pointer;"
+          (click)="null"
+          >
+          <!-- <h5 class="col-2 d-flex flex-column justify-content-center">
+            {{ product.letter || '&nbsp;&nbsp;' }}
+          </h5>
+          <h6 class="col-10 d-flex flex-column justify-content-center text-end">
+            {{$index + 1}} / {{activeCategorCount}}
+          </h6> -->
+          <div
+            class="col-auto"
+            style="height: 40px; overflow: hidden;"
+            >
+            @if (item.image_url) {
+              <img
+                [src]="item.image_url"
+                [alt]="item.product_name"
+                class="img-fluid"
+                style="max-height: 100%; object-fit: cover;"
+                (error)="item.image_url = null"
+                />
+            } @else {
+              <div class="text-muted d-flex flex-column align-items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor"
+                  class="bi bi-image" viewBox="0 0 16 16">
+                  <path d="M14.002 3a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2.002a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h12zM2.002 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H2.002z"/>
+                  <path d="M10.648 8.646a.5.5 0 0 1 .704 0l2.25 2.25V12H2.398v-.316l3.85-3.85a.5.5 0 0 1 .704 0l2.15 2.15 1.546-1.548z"/>
+                </svg>
+                <small class="mt-1">Нет изображения</small>
+              </div>
+            }
+          </div>
+          <div class="col-8">
+            <h6 class="card-title text-truncate fw-bold">{{ item.product_name }}({{ item.release_date || 0 * 1000 | date:'dd.MM.yy':'UTC' }})</h6>
+            <div class="card-subtitle small mb-2">
+              {{ item.platform_name }} [{{ item.region_name }}] ({{ item.serial?.join('|') }})
+            </div>
+          </div>
+          <div class="col-4 py-2">
+          </div>
+        </div>
+      </div>
+    }
+  } @else {
+    <div class="card bg-dark text-white shadow rounded-4 p-4 text-center my-4">
+      <h5 class="text-warning mb-3">Коллекция этого пользователя пуста</h5>
+      <p class="text-light mb-4">
+        GSTX — это не только коллекции, но и <strong>сообщество</strong>: вы можете находить игроков с похожими интересами, предлагать обмены и делать свою игровую библиотеку живой. Пусть каждая игра найдет нового владельца — начните с первой!
+      </p>
+      <div>
+        <a [routerLink]="'/products'" class="btn btn-outline-info btn-lg fw-semibold">
+          Перейти в каталог
+        </a>
+      </div>
+    </div>
+  }

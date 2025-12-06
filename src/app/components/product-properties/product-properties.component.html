@@ -204,7 +204,7 @@
         <p class="text-light">{{ productProperties.product.summary || 'У нас нет описания этой игры' }}</p>
       </div>
     </div>
-    @if (productProperties.screenshots?.length) {
+    @if (productProperties.screenshots.length) {
       <div class="col-12">
         <div class="card bg-dark border-0 shadow rounded-4 p-3">
           <ngb-carousel [interval]="3000" [pauseOnHover]="true" [wrap]="true">
@@ -248,7 +248,7 @@
 
         <div class="modal-body">
           <ul class="list-unstyled m-0">
-            @for (user of selectedRelease?.bid_user_logins; track user) {
+            @for (user of selectedRelease.bid_user_logins || []; track user) {
               <li class="mb-3">
                 <div class="d-flex align-items-center bg-secondary bg-opacity-10 p-3 rounded-3 border border-secondary">
                   <!-- SVG аватар-заглушка -->
