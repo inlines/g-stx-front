@@ -1,5 +1,7 @@
 <h1 class="display-5 fw-bold mb-4 text-light">Коллекция пользователя {{collectionPropertiesLogin$ | async}}</h1>
-
+<button type="button" (click)="startChatWith()" class="ms-4 btn btn-outline-warning btn-sm">
+  Написать игроку
+</button>
 <div class="row text-white">
   @if (!!(loadedCollection$ | async)?.length) {
     @for (item of loadedCollection$ | async; track item.release_id) {
