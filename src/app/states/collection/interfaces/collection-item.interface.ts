@@ -7,4 +7,5 @@ export interface ICollectionItem {
   region_name: string | null;
   product_id: number;
   serial: string[];
+  price: number | null;
 }

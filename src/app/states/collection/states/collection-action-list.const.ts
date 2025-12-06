@@ -3,6 +3,10 @@ export enum CollectionActionList {
   ADD_REQUEST_FAIL = '[Collection] add request fail',
   ADD_REQUEST_SUCCESS = '[Collection] add request success',
 
+  SET_PRICE_REQUEST = '[Collection] set price request',
+  SET_PRICE_REQUEST_FAIL = '[Collection] set price request fail',
+  SET_PRICE_REQUEST_SUCCESS = '[Collection] set price request success',
+
   ADD_WISH_REQUEST = '[Collection] add wish request',
   ADD_WISH_REQUEST_FAIL = '[Collection] add wish request fail',
   ADD_WISH_REQUEST_SUCCESS = '[Collection] add wish request success',

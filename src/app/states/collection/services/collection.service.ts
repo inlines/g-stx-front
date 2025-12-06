@@ -12,6 +12,7 @@ import { IcollectionResponse } from "../interfaces/collection-response.interface
 export class CollectionService {
   private readonly addToCollectionPath: string;
   private readonly removeFromCollectionPath: string;
+  private readonly setReleasePricePath: string;
 
   private readonly addWishPath: string;
   private readonly removeWishPath: string;
@@ -27,6 +28,7 @@ export class CollectionService {
     @Inject('environment') private environment: IEnvironment,
   ) {
     this.addToCollectionPath = `${this.environment.apiUrl}/add_release`;
+    this.setReleasePricePath = `${this.environment.apiUrl}/set_release_price`;
     this.getCollectionPath = `${this.environment.apiUrl}/collection`;
     this.removeFromCollectionPath = `${this.environment.apiUrl}/remove_release`;
 
@@ -40,6 +42,10 @@ export class CollectionService {
 
   public addToCollection(payload: IEditCollectionPayload): Observable<any> {
     return this.http.post<any>(this.addToCollectionPath, payload);
+  }
+
+  public setReleasePrice(payload: IEditCollectionPayload): Observable<any> {
+    return this.http.post<any>(this.setReleasePricePath, payload);
   }
 
   public removeFromCollection(payload: IEditCollectionPayload): Observable<any> {

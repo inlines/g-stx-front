@@ -113,6 +113,22 @@
             {{$index + 1}} / {{(collectionWithLetters$ | async)?.length || ''}}
           </h6>
           <div class="col-auto py-2">
+            @if (product.item.price) {
+              {{ product.item.price | currency:'₽':'symbol':'1.0-2' }}
+            } @else {
+              ₽?
+            }
+          </div>
+          <div class="col-auto py-2">
+              <button
+                type="button"
+                class="btn btn-danger btn-sm w-100"
+                (click)="setPrice(product.item.release_id, product.item.product_name, $event); $event.stopPropagation()"
+              >
+              задать цену
+            </button>
+          </div>
+          <div class="col-auto py-2">
             <button
               type="button"
               class="btn btn-danger btn-sm w-100"
@@ -143,7 +159,23 @@
               {{ product.item.platform_name }} [{{ product.item.region_name }}] ({{ product.item.serial?.join('|') }})
             </div>
           </div>
-          <div class="col-4 py-2">
+          <div class="col">
+            @if (product.item.price) {
+              {{ product.item.price | currency:'₽':'symbol':'1.0-2' }}
+            } @else {
+              ₽?
+            }
+          </div>
+          <div class="col-auto py-2">
+            <button
+              type="button"
+              class="btn btn-danger btn-sm w-100"
+              (click)="setPrice(product.item.release_id, product.item.product_name, $event); $event.stopPropagation()"
+            >
+              задать цену
+            </button>
+          </div>
+          <div class="col-auto py-2">
             <button
               type="button"
               class="btn btn-danger btn-sm w-100"
@@ -185,3 +217,43 @@
     <app-pager (pageChange)="pageChanged($event)" [limit]="limit" [totalCount]="(collectionTotalCount$ | async) || 0"></app-pager>
   </div>
 </div>
+
+
+<ng-template #priceModal let-modal>
+  <div class="modal-dialog modal-lg modal-dialog-centered animate__animated animate__fadeIn">
+    <div class="modal-content p-0 border-0 bg-transparent">
+      <div class="bg-dark text-white rounded-4 shadow-lg overflow-hidden w-100">
+
+        <div class="modal-header border-secondary">
+          <h4 class="modal-title text-warning">Задайте цену</h4>
+        </div>
+
+        <div class="modal-body">
+          <ul class="list-unstyled m-0">
+              <li class="mb-3">
+                <div class="d-flex align-items-center bg-secondary bg-opacity-10 p-3 rounded-3 border border-secondary">
+                  <div>
+                    <div class="fw-semibold fs-6">
+                      {{ setPriceProductName }}
+                    </div>
+                    <div>
+                      <input type="text" [formControl]="priceControl">
+                    </div>
+                    <div>
+                      <button class="d-block" type="button" (click)="sendPrice()" class="mt-4 btn btn-outline-warning btn-sm">
+                        ок
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </li>
+          </ul>
+        </div>
+
+        <div class="modal-footer border-secondary">
+          <button type="button" class="btn btn-outline-light" (click)="modal.close()">Закрыть</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>

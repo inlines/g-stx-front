@@ -64,6 +64,48 @@ export class CollectionState {
     });
   }
 
+  @Action(CollectionActions.SetPriceRequest)
+  public setPriceRequest(ctx: StateContext<ICollectionState>, action: CollectionActions.AddToCollectionRequest) {
+    ctx.patchState({
+      changeCollectionRequestStatus: RequestStatus.Pending
+    });
+
+    return this.service.setReleasePrice(action.payload).pipe(
+      tap(() => {
+        ctx.dispatch(new CollectionActions.SetPriceSuccess())
+      }),
+      catchError((err, caught) => ctx.dispatch(new CollectionActions.AddToCollectionFail()))
+    )
+  }
+
+  @Action(CollectionActions.SetPriceSuccess)
+  public setPriceSuccess(ctx: StateContext<ICollectionState>) {
+    ctx.patchState({
+      changeCollectionRequestStatus: RequestStatus.Load
+    });
+
+    ctx.dispatch(new OwnershipActions.RequestOwnership());
+    this.toastService.clear();
+    this.toastService.show({
+      body: 'Успешное обновление',
+      classname: 'bg-success text-light',
+      delay: 500,
+    });
+  }
+
+  @Action(CollectionActions.SetPriceFail)
+  public setPriceFail(ctx: StateContext<ICollectionState>) {
+    ctx.patchState({
+      changeCollectionRequestStatus: RequestStatus.Error
+    });
+    this.toastService.clear();
+    this.toastService.show({
+      body: 'Ошибка при добавлении цены',
+      classname: 'bg-danger text-light',
+      delay: 500,
+    });
+  }
+
   @Action(CollectionActions.AddWishRequest)
   public addWishRequest(ctx: StateContext<ICollectionState>, action: CollectionActions.AddWishRequest) {
     ctx.patchState({

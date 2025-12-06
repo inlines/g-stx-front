@@ -19,6 +19,20 @@ export namespace CollectionActions {
     public static readonly type = CollectionActionList.ADD_REQUEST_FAIL;
   }
 
+  export class SetPriceRequest {
+    public static readonly type = CollectionActionList.SET_PRICE_REQUEST;
+
+    constructor(public payload: IEditCollectionPayload) {}
+  }
+
+  export class SetPriceSuccess {
+    public static readonly type = CollectionActionList.SET_PRICE_REQUEST_SUCCESS;
+  }
+
+  export class SetPriceFail {
+    public static readonly type = CollectionActionList.SET_PRICE_REQUEST_FAIL;
+  }
+
   export class AddWishRequest {
     public static readonly type = CollectionActionList.ADD_WISH_REQUEST;
 

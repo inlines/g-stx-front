@@ -1,5 +1,5 @@
-import { AsyncPipe, DatePipe } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { AsyncPipe, CurrencyPipe, DatePipe } from '@angular/common';
+import { Component, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { ICollectionItem } from '@app/states/collection/interfaces/collection-item.interface';
 import { CollectionActions } from '@app/states/collection/states/collection-actions';
@@ -12,22 +12,26 @@ import { PagerComponent } from '../pager/pager.component';
 import { IPlatformItem } from '@app/states/platforms/interfaces/platform-item.interface';
 import { PlatformState } from '@app/states/platforms/states/platforms.state';
 import { ICollectionItemWithLetter } from '@app/states/collection/interfaces/collection-item-with-letter.interface';
-import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 
 const LIMIT = 1000;
 @Component({
   selector: 'app-collection',
-  imports: [AsyncPipe, RouterModule, PagerComponent, ReactiveFormsModule, DatePipe, NgbDropdownModule],
+  imports: [AsyncPipe, RouterModule, PagerComponent, FormsModule, ReactiveFormsModule, DatePipe, NgbDropdownModule, CurrencyPipe],
   templateUrl: './collection.component.html',
   styleUrl: './collection.component.scss',
   standalone: true,
 })
 export class CollectionComponent implements OnInit, OnDestroy {
+
+  @ViewChild('priceModal', { static: true }) priceModalRef!: TemplateRef<any>;
+
   subscriptions: Subscription[] = [];
   constructor(
-    private readonly store: Store
+    private readonly store: Store,
+    private readonly modalService: NgbModal,
   ){
     this.collection$ = this.store.select(CollectionState.loadedCollection);
     this.collectionParams$ = this.store.select(CollectionState.collectionParams);
@@ -75,6 +79,12 @@ export class CollectionComponent implements OnInit, OnDestroy {
   public collectionTotalCount$: Observable<number>;
 
   public categories$!: Observable<IPlatformItem[]>;
+
+  public priceControl: FormControl = new FormControl(0, [
+    Validators.required,
+    Validators.pattern(/^\d+$/),
+    Validators.min(0)
+  ]);
 
   public queryForm: FormGroup = new FormGroup({
       query: new FormControl('')
@@ -174,6 +184,28 @@ export class CollectionComponent implements OnInit, OnDestroy {
     this.store.dispatch(new CollectionActions.SetCollectionParams({
       offset: (page - 1 ) * LIMIT
     }));
+  }
+
+  public setPriceProductName: string | null = null;
+  public setPriceReleaseId: number | null = null;
+
+  public setPrice(release_id: number, release_name: string, event: Event): void {
+    event.stopImmediatePropagation();
+    this.priceControl.setValue(0);
+    this.setPriceProductName = release_name;
+    this.setPriceReleaseId = release_id;
+    this.modalService.open(this.priceModalRef, { centered: true });
+  }
+
+  public sendPrice(): void {
+    if(this.setPriceReleaseId) {
+      this.store.dispatch(new CollectionActions.SetPriceRequest({release_id: this.setPriceReleaseId, price: parseInt(this.priceControl.value)})).subscribe(() => {
+        this.modalService.dismissAll();
+        this.store.dispatch(
+          new CollectionActions.GetCollectionRequest()
+        );
+      })
+    }
   }
 
   public sortBy$: BehaviorSubject<'name' | 'date'> = new BehaviorSubject<'name' | 'date'>('name');
