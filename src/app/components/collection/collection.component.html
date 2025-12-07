@@ -53,11 +53,12 @@
                   class="btn btn-sm btn-outline-light dropdown-toggle"
                   ngbDropdownToggle
                   type="button">
-                  Сортировка: {{ sortBy$.value === 'name' ? 'По имени' : 'По дате' }}
+                  Сортировка: {{ sortBy$.value === 'name' ? 'По имени' : sortBy$.value === 'date' ? 'По дате' : 'По цене' }}
                 </button>
                 <div ngbDropdownMenu class="dropdown-menu dropdown-menu-dark">
                   <button ngbDropdownItem (click)="setSort('name')">По имени (A-Z)</button>
                   <button ngbDropdownItem (click)="setSort('date')">По дате релиза</button>
+                  <button ngbDropdownItem (click)="setSort('price')">По цене</button>
                 </div>
               </div>
             </div>

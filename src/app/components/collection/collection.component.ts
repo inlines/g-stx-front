@@ -99,12 +99,11 @@ export class CollectionComponent implements OnInit, OnDestroy {
     combineLatest(
       [
         this.collection$,
-        this.queryForm.valueChanges.pipe(startWith(''), debounceTime(1000)),
+        this.queryForm.valueChanges.pipe(startWith('')),
         this.sortBy$.asObservable()
       ]
     )
     .pipe(
-      take(10),
       map(([collection, form, sortBy]) => collection.reduce((acc: ICollectionItemWithLetter[], val: ICollectionItem) => {
         const accLength = acc.length;
         const lastLetter = accLength >=1 ? acc[accLength - 1].letter || acc[accLength - 1].item.product_name.toLowerCase()[0] : null;
@@ -115,11 +114,16 @@ export class CollectionComponent implements OnInit, OnDestroy {
               letter: sortBy === 'name' ? val.product_name.toLowerCase()[0] !== lastLetter ? val.product_name.toLowerCase()[0] : undefined : undefined
             });
         }
-        return sortBy === 'name' ? acc : acc.sort((a, b) => {
+        return sortBy === 'name' ? acc : sortBy === 'date' ? acc.sort((a, b) => {
           if (!a.item.release_date && !b.item.release_date) return 0;
           if (!a.item.release_date) return 1;  // null в конце
           if (!b.item.release_date) return -1;
           return a.item.release_date - b.item.release_date;
+        }) : acc.sort((a, b) => {
+          if (!a.item.price && !b.item.price) return 0;
+          if (!b.item.price) return 1;  // null в конце
+          if (!a.item.price) return -1;
+          return a.item.price - b.item.price;
         });
       }, []))
     )
@@ -208,9 +212,9 @@ export class CollectionComponent implements OnInit, OnDestroy {
     }
   }
 
-  public sortBy$: BehaviorSubject<'name' | 'date'> = new BehaviorSubject<'name' | 'date'>('name');
+  public sortBy$: BehaviorSubject<'name' | 'date' | 'price'> = new BehaviorSubject<'name' | 'date' | 'price'>('name');
 
-  setSort(mode: 'name' | 'date') {
+  setSort(mode: 'name' | 'date' | 'price') {
     this.sortBy$.next(mode);
   }
 }
