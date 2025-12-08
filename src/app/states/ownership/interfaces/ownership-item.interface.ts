@@ -10,4 +10,6 @@ export interface IOwnershipItem {
 
   bid_count: number;
   bid_ids: number[];
+
+  total_spent: number;
 }

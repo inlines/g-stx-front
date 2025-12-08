@@ -48,7 +48,8 @@ export class CollectionComponent implements OnInit, OnDestroy {
           if(matchingTupple) {
             acc.push({
               ...item,
-              user_games: matchingTupple.have_games
+              user_games: matchingTupple.have_games,
+              total_spent: matchingTupple.total_spent
             })
           }
           return acc;
@@ -71,6 +72,8 @@ export class CollectionComponent implements OnInit, OnDestroy {
   public activeCategory: number| null = null;
 
   public activeCategorCount: number| null = null;
+
+  public activeCategoryTotalSpent: number| null = null;
 
   public collection$: Observable<ICollectionItem[]>;
 
@@ -133,7 +136,12 @@ export class CollectionComponent implements OnInit, OnDestroy {
     this.activePlatforms$.pipe(
       filter(platforms => platforms.length > 0),
       take(1)
-    ).subscribe(platforms => {this.activeCategory$.next(platforms[0].platform); this.activeCategory = platforms[0].platform; this.activeCategorCount = platforms[0].have_games})
+    ).subscribe(platforms => {
+      this.activeCategory$.next(platforms[0].platform);
+      this.activeCategory = platforms[0].platform;
+      this.activeCategorCount = platforms[0].have_games;
+      this.activeCategoryTotalSpent = platforms[0].total_spent
+    })
 
     
   }
@@ -142,10 +150,11 @@ export class CollectionComponent implements OnInit, OnDestroy {
     this.subscriptions.forEach(x => x.unsubscribe());
   }
   
-  public setActiveCategory(cat: number, count: number | undefined) {
+  public setActiveCategory(cat: number, count: number | undefined, spent: number | undefined) {
     this.activeCategory$.next(cat);
     this.activeCategory = cat;
     this.activeCategorCount = count || null;
+    this.activeCategoryTotalSpent = spent || null;
   }
 
   public remove(release_id: number, event: Event): void {
@@ -171,7 +180,7 @@ export class CollectionComponent implements OnInit, OnDestroy {
             tap(() => {
               const nextCategory = categories.find(cat => cat.id !== this.activeCategory);
               if (nextCategory) {
-                this.setActiveCategory(nextCategory.id, nextCategory.user_games);
+                this.setActiveCategory(nextCategory.id, nextCategory.user_games, nextCategory.total_spent);
               } else {
                 this.store.dispatch(
                   new CollectionActions.GetCollectionRequest()

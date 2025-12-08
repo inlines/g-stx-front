@@ -52,7 +52,7 @@ export class OwnershipState {
 
   static activeCollectionPlatforms = createSelector(
     [OwnershipState.ownership],
-    (ownership: IOwnershipItem[]) => ownership.filter(item => item.have_count > 0).map(o => ({platform: o.platform, have_games: o.have_games}))
+    (ownership: IOwnershipItem[]) => ownership.filter(item => item.have_count > 0).map(o => ({platform: o.platform, have_games: o.have_games, total_spent: o.total_spent}))
   );
 
   static activeWishlistPlatforms = createSelector(
