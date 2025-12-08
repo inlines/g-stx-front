@@ -99,37 +99,87 @@ export class CollectionComponent implements OnInit, OnDestroy {
     const paramsSub = this.collectionParams$.pipe(filter(x => !!x.cat && !!x.limit)).subscribe(params => this.store.dispatch(new CollectionActions.GetCollectionRequest()));
 
     this.collectionWithLetters$ = 
-    combineLatest(
-      [
+      combineLatest([
         this.collection$,
         this.queryForm.valueChanges.pipe(startWith('')),
         this.sortBy$.asObservable()
-      ]
-    )
-    .pipe(
-      map(([collection, form, sortBy]) => collection.reduce((acc: ICollectionItemWithLetter[], val: ICollectionItem) => {
-        const accLength = acc.length;
-        const lastLetter = accLength >=1 ? acc[accLength - 1].letter || acc[accLength - 1].item.product_name.toLowerCase()[0] : null;
-        if(!form.query || val.product_name.toLowerCase().includes(form.query.toLowerCase())) {
-          acc.push(
-            {
-              item: val,
-              letter: sortBy === 'name' ? val.product_name.toLowerCase()[0] !== lastLetter ? val.product_name.toLowerCase()[0] : undefined : undefined
+      ]).pipe(
+        map(([collection, form, sortBy]) => {
+          // Сначала фильтруем
+          const filtered = collection.filter(item => 
+            !form.query || item.product_name.toLowerCase().includes(form.query.toLowerCase())
+          );
+          
+          // Затем сортируем
+          let sorted;
+          if (sortBy === 'name') {
+            sorted = filtered.sort((a, b) => 
+              a.product_name.toLowerCase().localeCompare(b.product_name.toLowerCase())
+            );
+          } else if (sortBy === 'date') {
+            sorted = filtered.sort((a, b) => {
+              if (!a.release_date && !b.release_date) return 0;
+              if (!a.release_date) return 1;
+              if (!b.release_date) return -1;
+              return a.release_date - b.release_date;
             });
-        }
-        return sortBy === 'name' ? acc : sortBy === 'date' ? acc.sort((a, b) => {
-          if (!a.item.release_date && !b.item.release_date) return 0;
-          if (!a.item.release_date) return 1;  // null в конце
-          if (!b.item.release_date) return -1;
-          return a.item.release_date - b.item.release_date;
-        }) : acc.sort((a, b) => {
-          if (!a.item.price && !b.item.price) return 0;
-          if (!b.item.price) return 1;  // null в конце
-          if (!a.item.price) return -1;
-          return a.item.price - b.item.price;
-        });
-      }, []))
-    )
+          } else {
+            sorted = filtered.sort((a, b) => {
+              if (!a.price && !b.price) return 0;
+              if (!b.price) return 1;
+              if (!a.price) return -1;
+              return a.price - b.price;
+            });
+          }
+          
+          // Теперь добавляем разделители
+          const result: ICollectionItemWithLetter[] = [];
+          let lastLetter: string | null = null;
+          let lastYear: string | null = null;
+          
+          for (const item of sorted) {
+            let letter: string | undefined;
+            let release_year: string | undefined;
+            
+            if (sortBy === 'name') {
+              const currentLetter = item.product_name.toLowerCase()[0];
+              if (currentLetter !== lastLetter) {
+                letter = currentLetter;
+                lastLetter = currentLetter;
+              }
+            } else if (sortBy === 'date') {
+              // ФУНКЦИЯ ДЛЯ ПОЛУЧЕНИЯ ГОДА
+              const getYearFromTimestamp = (timestamp: number | undefined): string => {
+                if (!timestamp) return 'Unknown';
+                
+                // Попробуем понять, в чем timestamp: секундах или миллисекундах
+                // Если timestamp меньше 10^10 (31 марта 2286), вероятно это секунды
+                if (timestamp < 10000000000) {
+                  // Скорее всего секунды - умножаем на 1000
+                  return new Date(timestamp * 1000).getFullYear().toString();
+                } else {
+                  // Скорее всего уже миллисекунды
+                  return new Date(timestamp).getFullYear().toString();
+                }
+              };
+              
+              const currentYear = getYearFromTimestamp(item.release_date || 0);
+              if (currentYear !== lastYear) {
+                release_year = currentYear;
+                lastYear = currentYear;
+              }
+            }
+            
+            result.push({
+              item,
+              letter,
+              release_year
+            });
+          }
+          
+          return result;
+        })
+      );
 
     this.subscriptions.push(sub, paramsSub);
 

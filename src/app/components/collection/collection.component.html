@@ -79,7 +79,16 @@
           (click)="null"
           >
           <h5 class="col-auto d-flex flex-column justify-content-center">
-            {{ product.letter || '&nbsp;&nbsp;' }}
+            @if (sortBy$.value === 'name' ) {
+              <ng-container>
+                {{ product.letter || '&nbsp;&nbsp;' }}
+              </ng-container>
+            }
+            @if (sortBy$.value === 'date' ) {
+              <ng-container>
+                {{ product.release_year || '&nbsp;&nbsp;' }}
+              </ng-container>
+            }
           </h5>
           <div
             class="col-auto"
@@ -149,7 +158,16 @@
           (click)="null"
           >
           <h5 class="col-2 d-flex flex-column justify-content-center">
-            {{ product.letter || '&nbsp;&nbsp;' }}
+            @if (sortBy$.value === 'name' ) {
+              <ng-container>
+                {{ product.letter || '&nbsp;&nbsp;' }}
+              </ng-container>
+            }
+            @if (sortBy$.value === 'date' ) {
+              <ng-container>
+                {{ product.release_year || '&nbsp;&nbsp;' }}
+              </ng-container>
+            }
           </h5>
           <h6 class="col-10 d-flex flex-column justify-content-center text-end">
             {{$index + 1}} / {{activeCategorCount}}
