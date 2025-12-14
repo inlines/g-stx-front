@@ -1,6 +1,6 @@
 import { NgClass } from '@angular/common';
 import { Component } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthActions } from '@app/states/auth/states/auth-actions';
 import { Store } from '@ngxs/store';
@@ -19,7 +19,7 @@ export class LoginComponent {
   ) {
     this.form  = this.fb.group({
       user_login: new FormControl("", [
-            Validators.required, 
+        Validators.required,
       ]),
       password: new FormControl("", Validators.required),
     });

@@ -1,6 +1,6 @@
 import { NgClass } from '@angular/common';
 import { Component } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { RegistrationActions } from '@app/states/registration/states/registration-actions';
 import { Store } from '@ngxs/store';
 
@@ -18,7 +18,8 @@ export class RegistrationComponent {
   ) {
     this.form  = this.fb.group({
       user_login: new FormControl("", [
-            Validators.required, 
+        Validators.required,
+        this.latinAndNumbersValidator.bind(this)
       ]),
       password: new FormControl("", Validators.required),
       passwordAgain: new FormControl("", Validators.required),
@@ -29,6 +30,21 @@ export class RegistrationComponent {
     const password = form.get('password')?.value;
     const confirm = form.get('passwordAgain')?.value;
     return password === confirm ? null : { passwordMismatch: true };
+  }
+
+  private latinAndNumbersValidator(control: AbstractControl): ValidationErrors | null {
+    if (!control.value) {
+      return null;
+    }
+
+    // Разрешаем латинские буквы и цифры
+    const latinWithNumbersRegex = /^[a-zA-Z0-9]+$/;
+    
+    if (!latinWithNumbersRegex.test(control.value)) {
+      return { latinAndNumbersOnly: true };
+    }
+    
+    return null;
   }
 
   public form!: FormGroup;
