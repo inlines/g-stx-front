@@ -103,7 +103,7 @@ export class ChatState implements NgxsAfterBootstrap, OnDestroy {
   @Action(ChatActions.RequestDialogs)
   public dialogsRequest(ctx: StateContext<IChatState>, action: ChatActions.RequestDialogs) {
     ctx.patchState({
-      dialogReqeustStatus: RequestStatus.Pending,
+      dialogRequestStatus: RequestStatus.Pending,
     });
 
     return this.chatService.requestDialogs().pipe(
@@ -116,8 +116,12 @@ export class ChatState implements NgxsAfterBootstrap, OnDestroy {
 
   @Action(ChatActions.RequestDialogsSuccess)
   public dialogsRequestSuccess(ctx: StateContext<IChatState>, action: ChatActions.RequestDialogsSuccess) {
+    const state = ctx.getState();
+    if(!this.areDialogsEqual(state.dialogs, action.payload)) {
+      ctx.dispatch(new ChatActions.EnableWarning());
+    }
     ctx.patchState({
-      dialogReqeustStatus: RequestStatus.Load,
+      dialogRequestStatus: RequestStatus.Load,
       dialogs: action.payload
     });
   }
@@ -125,7 +129,7 @@ export class ChatState implements NgxsAfterBootstrap, OnDestroy {
   @Action(ChatActions.RequestDialogsFail)
   public dialogsRequestFail(ctx: StateContext<IChatState>) {
     ctx.patchState({
-      dialogReqeustStatus: RequestStatus.Error,
+      dialogRequestStatus: RequestStatus.Error,
     });
   }
 
@@ -174,7 +178,7 @@ export class ChatState implements NgxsAfterBootstrap, OnDestroy {
     });
   }
 
-  @Action(ChatActions.DisanleWarning)
+  @Action(ChatActions.DisableWarning)
   public disableWarning(ctx: StateContext<IChatState>) {
     ctx.patchState({
       showWarning: false
@@ -212,4 +216,21 @@ export class ChatState implements NgxsAfterBootstrap, OnDestroy {
     return state.showWarning;
   }
 
+
+  private areDialogsEqual(dialogs1: any[], dialogs2: any[]): boolean {
+    // Проверка длины
+    if (dialogs1.length !== dialogs2.length) {
+      return false;
+    }
+    
+    return dialogs1.every((dialog1, index) => {
+      const dialog2 = dialogs2[index];
+      
+      if (!dialog1 || !dialog2) {
+        return false;
+      }
+      
+      return dialog1.last_message_time === dialog2.last_message_time;
+    });
+  }
 }

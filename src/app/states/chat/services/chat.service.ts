@@ -58,7 +58,6 @@ export class ChatService {
 
     this.socket.onmessage = (event) => {
       const message = JSON.parse(event.data);
-       console.log('Получено сообщение:', message);
       this.store.dispatch(new ChatActions.SetMessages([message]));
     };
 
@@ -83,7 +82,6 @@ export class ChatService {
     this.checkInterval = setInterval(() => {
       if (this.socket?.readyState === WebSocket.CLOSED || this.socket?.readyState === WebSocket.CLOSING) {
         this.connected$.next(false);
-        console.warn('WebSocket неактивен, переподключение...');
         if(this.lastLogin) {
           this.connect(this.lastLogin);
         }
@@ -93,7 +91,6 @@ export class ChatService {
 
   sendMessage(payload: IMessage): void {
     if (!this.socket) {
-      console.warn('WebSocket соединение не установлено!');
       return;
     }
 

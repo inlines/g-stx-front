@@ -18,10 +18,16 @@
         <div class="messages d-flex flex-column gap-2" #scrollbox>
           @for (message of (messages$ | async); track message) {
             <div
-              class="p-2 rounded bg-secondary bg-opacity-10 text-light">
+              class="p-2 message-item rounded bg-secondary bg-opacity-10 text-light col-auto"
+              [ngClass]="{
+              'yours': message.sender === 'Вы',
+              'others': message.sender !== 'Вы'
+              }"
+              >
               <p class="mb-0">
                 <strong>{{ message.sender }}:</strong> {{ message.body }}
               </p>
+              <p class="small mt-2 mb-0">{{message.created_at | date:'dd.MM.yy':'UTC'}}</p>
             </div>
           }
         </div>

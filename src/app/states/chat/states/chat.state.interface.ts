@@ -9,7 +9,7 @@ export interface IChatState {
   isOpened: boolean;
   recepient: string | null;
   dialogs: IDialog[];
-  dialogReqeustStatus: RequestStatus;
+  dialogRequestStatus: RequestStatus;
   messagesReqeustStatus: RequestStatus;
   showWarning: boolean;
 }

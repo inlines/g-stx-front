@@ -67,7 +67,7 @@ export namespace ChatActions {
     public static readonly type = ChatActionList.ENABLE_CHAT_WARNING;
   }
 
-  export class DisanleWarning {
+  export class DisableWarning {
     public static readonly type = ChatActionList.DISABLE_CHAT_WARNING;
   }
 
