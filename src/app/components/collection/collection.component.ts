@@ -7,7 +7,7 @@ import { CollectionState } from '@app/states/collection/states/collection.state'
 import { OwnershipState } from '@app/states/ownership/states/ownership.state';
 import { IProductListRequest } from '@app/states/products/interfaces/product-list-request.interface';
 import { Store } from '@ngxs/store';
-import { BehaviorSubject, combineLatest, debounceTime, filter, map, Observable, of, startWith, Subject, Subscription, switchMap, take, tap } from 'rxjs';
+import { BehaviorSubject, combineLatest, debounceTime, filter, map, Observable, of, startWith, Subject, Subscription, switchMap, take, takeUntil, tap } from 'rxjs';
 import { PagerComponent } from '../pager/pager.component';
 import { IPlatformItem } from '@app/states/platforms/interfaces/platform-item.interface';
 import { PlatformState } from '@app/states/platforms/states/platforms.state';
@@ -181,19 +181,17 @@ export class CollectionComponent implements OnInit, OnDestroy {
         })
       );
 
-    this.subscriptions.push(sub, paramsSub);
 
-    this.activePlatforms$.pipe(
+    const subPlat = this.activePlatforms$.pipe(
       filter(platforms => platforms.length > 0),
-      take(1)
     ).subscribe(platforms => {
       this.activeCategory$.next(platforms[0].platform);
       this.activeCategory = platforms[0].platform;
       this.activeCategorCount = platforms[0].have_games;
       this.activeCategoryTotalSpent = platforms[0].total_spent
-    })
+    });
 
-    
+    this.subscriptions.push(sub, paramsSub, subPlat);
   }
 
   public ngOnDestroy(): void {

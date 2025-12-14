@@ -116,10 +116,6 @@ export class ChatState implements NgxsAfterBootstrap, OnDestroy {
 
   @Action(ChatActions.RequestDialogsSuccess)
   public dialogsRequestSuccess(ctx: StateContext<IChatState>, action: ChatActions.RequestDialogsSuccess) {
-    const state = ctx.getState();
-    if(!this.areDialogsEqual(state.dialogs, action.payload)) {
-      ctx.dispatch(new ChatActions.EnableWarning());
-    }
     ctx.patchState({
       dialogRequestStatus: RequestStatus.Load,
       dialogs: action.payload
@@ -216,21 +212,4 @@ export class ChatState implements NgxsAfterBootstrap, OnDestroy {
     return state.showWarning;
   }
 
-
-  private areDialogsEqual(dialogs1: any[], dialogs2: any[]): boolean {
-    // Проверка длины
-    if (dialogs1.length !== dialogs2.length) {
-      return false;
-    }
-    
-    return dialogs1.every((dialog1, index) => {
-      const dialog2 = dialogs2[index];
-      
-      if (!dialog1 || !dialog2) {
-        return false;
-      }
-      
-      return dialog1.last_message_time === dialog2.last_message_time;
-    });
-  }
 }
