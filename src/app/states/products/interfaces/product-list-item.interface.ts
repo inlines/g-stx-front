@@ -3,4 +3,5 @@ export interface IProductListItem {
   name: string;
   first_release_date: number | null;
   image_url: string | null
+  alternative_names: string[] | null;
 }
