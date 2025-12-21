@@ -77,11 +77,23 @@ export class ProductPropertiesComponent implements OnInit {
         return { highlighted, others };
       })
     );
+
+    this.productDevelopers$ = this.productProperties$.pipe(
+      map(properties => (properties?.companies || []).filter(c => c.developer).map(c => c.name)),
+    );
+
+    this.productPublishers$ = this.productProperties$.pipe(
+      map(properties => (properties?.companies || []).filter(c => c.publisher).map(c => c.name)),
+    );
   }
 
   public selectedRelease!: IReleaseItem;
 
   public productProperties$: Observable<IProductPropertiesResponse | null>;
+
+  public productDevelopers$!: Observable<string[] | null>;
+
+  public productPublishers$!: Observable<string[] | null>;
 
   public collectionChanging$: Observable<boolean>;
 

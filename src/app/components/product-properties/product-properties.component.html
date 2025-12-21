@@ -36,11 +36,31 @@
         </ng-template>
         <div class="p-4">
           <h2 class="text-warning mb-3" appCopyToClipboard>{{ productProperties.product.name }}</h2>
-          <div>
+          <div *ngIf="productProperties?.product?.alternative_names?.length">
             Также известна как:
             @if (productProperties?.product?.alternative_names?.length || 0 > 0) {
               <div class="serial-badge text-center" style="width:100%; max-width: 100%;">
                 <span class="badge bg-dark mb-2">{{ (productProperties?.product?.alternative_names || []).join(' | ') }}</span>
+              </div>
+            }
+          </div>
+          <div class="mt-2">
+            Разработчики:
+            @for (developer of (productDevelopers$ | async); track developer) {
+              <div class="serial-badge text-center" style="width:100%; max-width: 100%;">
+                <span class="badge bg-dark">
+                  {{ developer }}
+                </span>
+              </div>
+            }
+          </div>
+          <div>
+            Издатели:
+            @for (publisher of (productPublishers$ | async); track publisher) {
+              <div class="serial-badge text-center" style="width:100%; max-width: 100%;">
+                <span class="badge bg-dark">
+                  {{ publisher }}
+                </span>
               </div>
             }
           </div>
