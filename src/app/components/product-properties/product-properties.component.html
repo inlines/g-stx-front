@@ -44,6 +44,16 @@
               </div>
             }
           </div>
+          <div *ngIf="productProperties?.product?.alternative_names?.length">
+            Является частью франшиз:
+            @if (productProperties?.franschises?.length || 0 > 0) {
+              @for (franschise of productProperties?.franschises; track franschise) {
+                <div class="serial-badge text-center" style="width:100%; max-width: 100%;">
+                  <span class="badge bg-dark mb-2">{{ franschise.franschise_name }} ({{ franschise.total_games_count }} игры)</span>
+                </div>
+              }
+            }
+          </div>
           <div class="mt-2">
             Разработчики:
             @for (developer of (productDevelopers$ | async); track developer) {

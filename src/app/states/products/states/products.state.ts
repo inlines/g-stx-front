@@ -77,10 +77,10 @@ export class ProductsState {
     ctx.patchState({
       productPropertiesRequestStatus: RequestStatus.Load,
       productProperties: {
+        ...action.payload,
         product: {...action.payload.product, first_release_date: action.payload.product.first_release_date ? action.payload.product.first_release_date * 1000 : null},
         releases: action.payload.releases.map(x => ({...x, release_date: x.release_date ? x.release_date * 1000 : null})),
         screenshots: action.payload.screenshots.map(x => x.replace('t_thumb','t_1080p')),
-        companies: action.payload.companies,
       }
     });
   }
