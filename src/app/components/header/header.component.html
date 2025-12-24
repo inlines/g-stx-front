@@ -1,98 +1,122 @@
-<div class="header-bg bg-dark text-white shadow-sm py-3 px-3 px-lg-5">
-  <div class="row align-items-center">
-    <!-- Кнопка "Назад" (только там где нужна) -->
-    @if (showBackButton$ | async) {
-      <div class="col-auto">
-        <a class="nav-link text-white p-1 rounded-3 d-flex align-items-center" (click)="goBack()">
-          ↩️ <span class="d-none d-sm-inline ms-1">Назад</span>
-        </a>
-      </div>
-    }
+<div class="header-bg text-white">
+  <div class="container-fluid container-lg">
+    <div class="py-4 d-flex align-items-center" style="height: 82px;">
+      
+      <svg width="176" height="33" viewBox="0 0 176 33" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M57.0417 24.625V8.50004H62.4167V3.12504H83.9167V8.50004H67.7917V24.625H73.1667V13.875H83.9167V30H62.4167V24.625H57.0417Z" fill="white"/>
+        <path d="M89.2917 30V24.625H105.417V19.25H89.2917V8.50004H94.6667V3.12504H116.167V8.50004H100.042V13.875H116.167V24.625H110.792V30H89.2917Z" fill="white"/>
+        <path d="M121.542 8.50004V3.12504H143.042V8.50004H137.667V30H126.917V8.50004H121.542Z" fill="white"/>
+        <path d="M148.417 30V19.25H153.792V13.875H148.417V3.12504H159.167V13.875H164.542V3.12504H175.292V13.875H169.917V19.25H175.292V30H164.542V19.25H159.167V30H148.417Z" fill="white"/>
+        <path d="M31.3333 0.833374C34.4496 0.833374 37.4383 2.07132 39.6418 4.27487C41.8454 6.47842 43.0833 9.46708 43.0833 12.5834V20.4167C43.0833 23.533 41.8454 26.5217 39.6418 28.7252C37.4383 30.9288 34.4496 32.1667 31.3333 32.1667H11.75C8.63371 32.1667 5.64505 30.9288 3.4415 28.7252C1.23794 26.5217 0 23.533 0 20.4167V12.5834C0 9.46708 1.23794 6.47842 3.4415 4.27487C5.64505 2.07132 8.63371 0.833374 11.75 0.833374H31.3333ZM17.625 10.625H13.7083V14.5417H9.79167V18.4584H13.7064L13.7083 22.375H17.625L17.623 18.4584H21.5417V14.5417H17.625V10.625ZM33.2917 18.4584H29.375V22.375H33.2917V18.4584ZM29.375 10.625H25.4583V14.5417H29.375V10.625Z" fill="white"/>
+      </svg>
+      <span class="mx-4" style="font-size: 34px;">|</span>
+      <span>GameStockx</span>
+      
+      <div class="w-100 d-flex justify-content-end align-items-center">
+        @if (isAuthorised$ | async; as user) {
 
-    <!-- Лого и кнопки -->
-    <div class="col d-flex align-items-center gap-3 flex-wrap">
-      <!-- Кнопка "Каталог" -->
-      <a class="nav-link text-white fw-bold px-2 py-1 bg-secondary bg-opacity-25 rounded-3 d-flex align-items-center" routerLink="/">
-        🎮 <span class="d-none d-sm-inline ms-1">Каталог</span>
-      </a>
-
-      @if (isAuthorised$ | async) {
-        <a class="nav-link text-white fw-bold px-2 py-1 bg-secondary bg-opacity-25 rounded-3 d-flex align-items-center" routerLink="/collectors">
-          🕹️ <span class="d-none d-sm-inline ms-1">Игроки</span>
-        </a>
-      }
-
-      <!-- Меню (видно всегда на десктопе, скрыто на мобиле) -->
-      <div class="d-none d-sm-flex gap-3">
-        @if (isAuthorised$ | async) {
-          <a class="nav-link text-white px-2 py-1 bg-secondary bg-opacity-25 rounded-3 d-flex align-items-center" routerLink="/collection">
-            🗂️ <span class="ms-1">Моя коллекция</span>
-          </a>
-        }
-        @if (isAuthorised$ | async) {
-          <a class="nav-link text-white px-2 py-1 bg-secondary bg-opacity-25 rounded-3 d-flex align-items-center" routerLink="/wishlist">
-            ⭐ <span class="ms-1">Вишлист</span>
-          </a>
-        }
-        @if (isAuthorised$ | async) {
-          <div class="position-relative">
+          <div class="position-relative" style="margin-right: 47px;">
             @if (isConnected$ | async) {
-              <small class="position-absolute top-0 start-50 translate-middle text-info" style="font-size: 0.7rem;">online</small>
+              <small class="position-absolute top-0 start-50 translate-middle text-info" style="font-size: 0.7rem;">12</small>
             }
-            <a class="nav-link text-white px-2 py-1 bg-secondary bg-opacity-25 rounded-3 d-flex align-items-center position-relative" (click)="toggleChat()">
-              💬 <span class="ms-1">Чаты</span>
-              @if ((showChatWarning$ | async)) {
+            <a class="position-relative" (click)="toggleChat()">
+              <svg width="38" height="34" viewBox="0 0 38 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M21 21.3929C21 25.7521 16.968 29.2857 12 29.2857C10.5538 29.2949 9.1221 28.9927 7.80005 28.3993L7.02005 28.7393L3.00007 30.5L4.38007 25.6429C3.47741 24.4148 2.99314 22.9234 3.00007 21.3929C3.00007 17.0336 7.03205 13.5 12 13.5C16.356 13.5 19.992 16.22 20.82 19.8264C20.941 20.3395 21.0014 20.8653 21 21.3929Z" stroke="#68A9EF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <!-- @if ((showChatWarning$ | async)) {
                 <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle animate-blink" style="width: 10px; height: 10px;"></span>
-              }
+              } -->
             </a>
           </div>
+          
+          <span class="me-2">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2C11.0111 2 10.0444 2.29324 9.22215 2.84265C8.3999 3.39206 7.75904 4.17295 7.3806 5.08658C7.00216 6.00021 6.90315 7.00555 7.09607 7.97545C7.289 8.94536 7.7652 9.83627 8.46447 10.5355C9.16373 11.2348 10.0546 11.711 11.0245 11.9039C11.9945 12.0969 12.9998 11.9978 13.9134 11.6194C14.827 11.241 15.6079 10.6001 16.1573 9.77785C16.7068 8.95561 17 7.98891 17 7C17 5.67392 16.4732 4.40215 15.5355 3.46447C14.5979 2.52678 13.3261 2 12 2ZM12 10C11.4067 10 10.8266 9.82405 10.3333 9.49441C9.83994 9.16476 9.45542 8.69623 9.22836 8.14805C9.0013 7.59987 8.94189 6.99667 9.05764 6.41473C9.1734 5.83279 9.45912 5.29824 9.87868 4.87868C10.2982 4.45912 10.8328 4.1734 11.4147 4.05764C11.9967 3.94189 12.5999 4.0013 13.1481 4.22836C13.6962 4.45542 14.1648 4.83994 14.4944 5.33329C14.8241 5.82664 15 6.40666 15 7C15 7.79565 14.6839 8.55871 14.1213 9.12132C13.5587 9.68393 12.7956 10 12 10ZM21 21V20C21 18.1435 20.2625 16.363 18.9497 15.0503C17.637 13.7375 15.8565 13 14 13H10C8.14348 13 6.36301 13.7375 5.05025 15.0503C3.7375 16.363 3 18.1435 3 20V21H5V20C5 18.6739 5.52678 17.4021 6.46447 16.4645C7.40215 15.5268 8.67392 15 10 15H14C15.3261 15 16.5979 15.5268 17.5355 16.4645C18.4732 17.4021 19 18.6739 19 20V21H21Z" fill="#2D587E"/>
+            </svg>
+            {{ currentUser$ | async }}
+          </span>
+          <a class="btn-blue px-2" (click)="logout()">
+            Выйти
+          </a>
+        } @else {
+          <a class="btn-blue px-2" routerLink="/login">
+            Войти
+          </a>
         }
       </div>
     </div>
+  </div>
 
-    <!-- Пользователь / авторизация -->
-    <div class="col-auto d-flex justify-content-end align-items-center">
-      @if (isAuthorised$ | async; as user) {
-        <span class="me-2 text-info fw-semibold d-none d-md-inline">
-          👤 {{ currentUser$ | async }}
-        </span>
-        <a class="btn btn-sm btn-outline-light px-2" (click)="logout()">
-          🚪<span class="d-none d-sm-inline"> Выйти</span>
-        </a>
-      } @else {
-        <a class="btn btn-sm btn-primary px-2" routerLink="/login">
-          🔐<span class="d-none d-sm-inline"> Войти</span>
-        </a>
-      }
-    </div>
-
-    <!-- Мобильное меню (только на мобиле) -->
-    <div class="col-12 d-sm-none mt-2">
-      <div class="d-flex justify-content-start gap-3 flex-wrap">
-        @if (isAuthorised$ | async) {
-          <a class="nav-link text-white px-2 py-1 bg-secondary bg-opacity-25 rounded-3 d-flex align-items-center" routerLink="/collection">
-            🗂️ <span class="ms-1">Коллекция</span>
-          </a>
-        }
-        @if (isAuthorised$ | async) {
-          <a class="nav-link text-white px-2 py-1 bg-secondary bg-opacity-25 rounded-3 d-flex align-items-center" routerLink="/wishlist">
-            ⭐ <span class="ms-1">Вишлист</span>
-          </a>
-        }
-        @if (isAuthorised$ | async) {
-          <div class="position-relative">
-            @if (isConnected$ | async) {
-              <small class="position-absolute top-0 start-50 translate-middle text-info" style="font-size: 0.7rem;">online</small>
-            }
-            <a class="nav-link text-white px-2 py-1 bg-secondary bg-opacity-25 rounded-3 d-flex align-items-center position-relative" (click)="toggleChat()">
-              💬 <span class="ms-1">Чаты</span>
-              @if ((showChatWarning$ | async)) {
-                <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle animate-blink" style="width: 10px; height: 10px;"></span>
-              }
+  <div style="background-color: rgba(0, 0, 0, 0.5);">
+  @if (isAuthorised$ | async;) {
+    <div class="container-fluid container-lg">
+      <div class="row align-items-center" style="height: 60px;">
+        <!-- Кнопка "Назад" (только там где нужна) -->
+        <!-- @if (showBackButton$ | async) {
+          <div class="col-auto">
+            <a class="nav-link text-white p-1 rounded-3 d-flex align-items-center" (click)="goBack()">
+              ↩️ <span class="d-none d-sm-inline ms-1">Назад</span>
             </a>
           </div>
-        }
+        } -->
+
+        <!-- Лого и кнопки -->
+        <div class="col d-flex align-items-center gap-5 flex-wrap">
+          <!-- Кнопка "Каталог" -->
+          <a class="nav-link text-white d-flex align-items-center" routerLink="/products" routerLinkActive="nav-active"
+   [routerLinkActiveOptions]="{exact: true}">
+            Каталог
+          </a>
+
+          
+          <a class="text-white d-flex align-items-center" routerLink="/collectors" routerLinkActive="nav-active"
+   [routerLinkActiveOptions]="{exact: true}">
+            Игроки
+          </a>
+          
+          <a class="text-white d-flex align-items-center" routerLink="/collection" routerLinkActive="nav-active"
+   [routerLinkActiveOptions]="{exact: true}">
+            Моя коллекция
+          </a>
+        
+          <a class="text-white d-flex align-items-center" routerLink="/wishlist" routerLinkActive="nav-active"
+   [routerLinkActiveOptions]="{exact: true}">
+            Вишлист
+          </a>
+        </div>
+
+        <!-- Пользователь / авторизация -->
+
+        <!-- Мобильное меню (только на мобиле) -->
+        <!-- <div class="col-12 d-sm-none mt-2">
+          <div class="d-flex justify-content-start gap-3 flex-wrap">
+            @if (isAuthorised$ | async) {
+              <a class="nav-link text-white px-2 py-1 bg-secondary bg-opacity-25 rounded-3 d-flex align-items-center" routerLink="/collection">
+                🗂️ <span class="ms-1">Коллекция</span>
+              </a>
+            }
+            @if (isAuthorised$ | async) {
+              <a class="nav-link text-white px-2 py-1 bg-secondary bg-opacity-25 rounded-3 d-flex align-items-center" routerLink="/wishlist">
+                ⭐ <span class="ms-1">Вишлист</span>
+              </a>
+            }
+            @if (isAuthorised$ | async) {
+              <div class="position-relative">
+                @if (isConnected$ | async) {
+                  <small class="position-absolute top-0 start-50 translate-middle text-info" style="font-size: 0.7rem;">online</small>
+                }
+                <a class="nav-link text-white px-2 py-1 bg-secondary bg-opacity-25 rounded-3 d-flex align-items-center position-relative" (click)="toggleChat()">
+                  💬 <span class="ms-1">Чаты</span>
+                  @if ((showChatWarning$ | async)) {
+                    <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle animate-blink" style="width: 10px; height: 10px;"></span>
+                  }
+                </a>
+              </div>
+            }
+          </div>
+        </div> -->
       </div>
     </div>
+  }
   </div>
 </div>

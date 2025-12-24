@@ -1,5 +1,5 @@
 .footer {
-  background-color: #121212; // глубокий тёмный цвет
+  background-color: rgba(10, 24, 37, 1);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   
   a.nav-link:hover {
@@ -10,5 +10,12 @@
   h5 {
     font-weight: 600;
     margin-bottom: 1rem;
+  }
+
+  .text-light {
+    color: rgba(138, 172, 201, 1)!important;
+    font-size: 16px;
+    line-height: 20px;
+    margin-top: 16px;
   }
 }

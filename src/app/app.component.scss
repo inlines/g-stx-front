@@ -7,7 +7,11 @@ header {
 }
 
 main article {
-  margin-top: 64px;
+  margin-top: 82px;
+  &.authenticated {
+    margin-top: 142px;
+  }
+  margin-bottom: 70px;
 }
 
 app-toast-container {

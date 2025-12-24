@@ -4,23 +4,42 @@
 
 .sticker {
   position: sticky;
-  top: 62px;
+  top: 142px;
   z-index: 1000; /* убедись, что он выше других элементов */
+  background: linear-gradient(
+    90deg, 
+    rgba(6, 19, 24, 1) 0%, 
+    rgba(14, 37, 63, 1) 100%
+  );
   @media (max-width: 576px) {
     top: 30px;
   }
 }
 
 .game-card {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  border-radius: 0.75rem;
-  background-color: #1e1e2f; // фон карты
-  color: #f1f1f1;
+  border-radius: 8px;
+  background-color: rgba(7, 16, 25, 1);
+  color: rgba(255, 255, 255, 1);
 
   &:hover {
     transform: scale(1.03);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
   }
+}
+
+.game-content {
+  padding: 12px;
+}
+
+.game-first-release {
+  color: rgba(138, 172, 201, 1);
+  font-size: 12px;
+  line-height: 14px;
+  margin-top: 12px;
+}
+
+.card-subtitle {
+  margin-top: 12px;
 }
 
 .card-img-top {
@@ -43,4 +62,13 @@
 .stickerContent.hidden {
   height: 0 !important;
   opacity: 0;
+}
+
+.products-box {
+  padding-top: 48px;
+}
+
+.nav-link {
+  border-radius: 8px!important;
+  color: rgba(255, 255, 255, 1)
 }

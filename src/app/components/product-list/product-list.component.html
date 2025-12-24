@@ -1,18 +1,16 @@
-<h1 class="display-5 fw-bold mb-4 text-light">Каталог</h1>
-
-<div class="row">
+<div class="row products-box">
   <div class="col-12 px-0 mb-4 sticker">
-    <div class="card bg-dark text-white shadow rounded-4 overflow-hidden">
+    <div>
       <div class="p-3">
         <div #stickerContent class="stickerContent">
           <ul class="nav nav-pills flex-wrap justify-content-start mb-3 align-items-center">
             @for (cat of (categories$ | async); track cat) {
-              <li class="nav-item me-2 mb-2">
-                <a class="nav-link px-4 py-2 fw-semibold rounded-pill d-flex justify-content-between align-items-center"
+              <li class="me-2 mb-2">
+                <a class="btn-pink px-4 py-2 fw-semibold d-flex justify-content-between align-items-center"
                   [class.active]="(activeCategory | async) === cat.id"
                   (click)="setActiveCategory(cat.id)">
                   {{ cat.abbreviation }}
-                  <span class="badge bg-secondary ms-2">{{ cat.total_games }}</span>
+                  <span class="ms-2">{{ cat.total_games }}</span>
                 </a>
               </li>
             }
@@ -55,15 +53,15 @@
   <!-- Продукты -->
   @for (product of products$ | async; track product.id) {
     <!-- Desktop / tablet: карточки -->
-    <div class="col-xl-2 col-lg-3 col-md-4 d-none d-md-block p-3">
+    <div class="col-xl-3 col-lg-4 col-md-4 col-sm-6 p-3">
       <div
         class="card game-card h-100 border-0 shadow-sm hover-shadow"
         [routerLink]="[product.id.toString(), {platform: activeCategory.value}]"
         style="cursor: pointer;"
         >
         <div
-          class="card-img-top bg-dark-subtle d-flex align-items-center justify-content-center"
-          style="height: 180px; overflow: hidden;"
+          class="d-flex align-items-center justify-content-center"
+          style="height: 214px; overflow: hidden;"
           >
           @if (product.image_url) {
             <img
@@ -84,11 +82,11 @@
             </div>
           }
         </div>
-        <div class="card-body d-flex flex-column justify-content-between">
-          <div>
-            <h6 class="card-title fw-bold">{{ product.name }}</h6>
-            <div class="card-subtitle text-lite-muted small">
-              впервые выпущена:
+        <div class="d-flex flex-column justify-content-between">
+          <div class="game-content">
+            <div class="title">{{ product.name }}</div>
+            <div class="game-first-release text-lite-muted small">
+              c
               @if (product.first_release_date) {
                 {{ product.first_release_date | date: 'dd.MM.yy' : 'UTC' }}
               } @else {
@@ -96,48 +94,6 @@
               }
             </div>
           </div>
-        </div>
-      </div>
-    </div>
-    <!-- Mobile: горизонтальная карточка -->
-    <div class="col-12 d-md-none mb-3">
-      <div
-        class="card bg-dark text-white shadow-sm rounded-3 d-flex flex-row overflow-hidden"
-        [routerLink]="[product.id.toString(), {platform: activeCategory.value}]"
-        style="cursor: pointer;"
-        >
-        <div
-          class="flex-shrink-0 d-flex align-items-center justify-content-center bg-secondary-subtle"
-          style="width: 120px; height: 100px; overflow: hidden;"
-          >
-          @if (product.image_url) {
-            <img
-              [src]="product.image_url"
-              [alt]="product.name"
-              class="img-fluid h-100 w-100"
-              style="object-fit: cover;"
-              (error)="product.image_url = null"
-              />
-          } @else {
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
-              class="bi bi-image text-muted" viewBox="0 0 16 16">
-              <path d="M14.002 3a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2.002a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h12zM2.002 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H2.002z"/>
-              <path d="M10.648 8.646a.5.5 0 0 1 .704 0l2.25 2.25V12H2.398v-.316l3.85-3.85a.5.5 0 0 1 .704 0l2.15 2.15 1.546-1.548z"/>
-            </svg>
-          }
-        </div>
-        <div class="p-3 d-flex flex-column justify-content-center">
-          <h6 class="mb-1 fw-bold" style="max-width: 200px">
-            {{ product.name }}
-          </h6>
-          <small class="text-white-50">
-            впервые выпущена:
-            @if (product.first_release_date) {
-              {{ product.first_release_date | date: 'dd.MM.yy' : 'UTC' }}
-            } @else {
-              никогда
-            }
-          </small>
         </div>
       </div>
     </div>

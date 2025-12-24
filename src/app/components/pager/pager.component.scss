@@ -4,15 +4,25 @@ a {
 
 .page-link {
   transition: background-color 0.2s ease;
+  background-color: rgba(7, 16, 25, 1)!important;
+  border: none;
+  padding: 8px 16px 10px 16px;
+  color: #fff;
 }
 
 .page-item.active .page-link {
-  background-color: #6c757d; // secondary
-  color: #fff;
+  background-color: rgba(189, 167, 234, 1)!important;
   border-color: #6c757d;
+  color: rgba(6, 18, 31, 1)!important;
 }
 
 .page-item.disabled .page-link {
   pointer-events: none;
   opacity: 0.5;
+  color: #fff!important;
+}
+
+.page-item a {
+  margin-left: 6px !important;
+  margin-right: 6px !important;
 }

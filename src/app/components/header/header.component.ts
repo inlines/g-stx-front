@@ -1,6 +1,6 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, } from '@angular/core';
-import { NavigationEnd, Router, RouterLink } from '@angular/router';
+import { NavigationEnd, Router, RouterLink, RouterModule } from '@angular/router';
 import { AuthActions } from '@app/states/auth/states/auth-actions';
 import { AuthState } from '@app/states/auth/states/auth.state';
 import { ChatActions } from '@app/states/chat/states/chat-actions';
@@ -10,7 +10,7 @@ import { distinctUntilChanged, filter, map, Observable } from 'rxjs';
 import { Location } from '@angular/common';
 @Component({
   selector: 'app-header',
-  imports: [RouterLink, AsyncPipe],
+  imports: [RouterLink, AsyncPipe, RouterModule],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
   standalone: true

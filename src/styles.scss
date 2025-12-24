@@ -9,8 +9,97 @@ a {
   text-decoration: none !important;
 }
 
+// body {
+//   background: linear-gradient(
+//     180deg, 
+//     rgba(6, 19, 24, 1) 0%, 
+//     rgba(14, 37, 63, 1) 100%
+//   );
+
+//   //filter: blur(100px);
+// }
+
+// body {
+//   position: relative;
+//   min-height: 100vh;
+//   overflow-x: hidden;
+// }
+
+// body::before {
+//   content: '';
+//   position: fixed;
+//   top: 0;
+//   left: 0;
+//   width: 100%;
+//   height: 100%;
+//   background: linear-gradient(
+//     180deg, 
+//     rgba(6, 19, 24, 1) 0%, 
+//     rgba(14, 37, 63, 1) 100%
+//   );
+//   filter: blur(100px);
+//   z-index: -1; /* Отправляем фон на задний план */
+// }
+
+@font-face {
+  font-family: 'AvertaRegular';
+  src: url('./assets/fonts/AvertaRegular.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'AvertaExtraBold';
+  src: url('./assets/fonts/AvertaExtraBold.otf') format('opentype');
+}
+
+/* Использование */
 body {
-  background-color: #1a1a1a!important;
+  font-family: 'AvertaRegular', sans-serif !important;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  background: #061318;
+}
+
+body {
+  position: relative;
+  min-height: 100vh;
+  background: linear-gradient(
+    90deg, 
+    rgba(6, 19, 24, 1) 0%, 
+    rgba(14, 37, 63, 1) 100%
+  );
+}
+
+body::before {
+  content: '';
+  position: fixed; /* Фиксированный слой */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  
+  /* Градиент и размытие */
+  background: linear-gradient(
+    to right,
+    rgba(6, 19, 24, 0.95) 0%,
+    rgba(14, 37, 63, 0.95) 100%
+  );
+  
+  backdrop-filter: blur(100px);
+  -webkit-backdrop-filter: blur(100px);
+  
+  /* Ниже header */
+  z-index: -1;
+}
+
+main {
+  min-height: 100vh;
 }
 
 .modal-content {
@@ -30,3 +119,26 @@ body {
   background-color: rgba(0, 0, 0, 0.75); // опционально — затемнение
 }
 
+.btn-blue {
+  cursor: pointer;
+  padding: 8px 14px 10px 14px;
+  border-radius: 8px;
+  height: 38px;
+  background-color: rgba(104, 169, 239, 1);
+  &:hover{
+    background-color: rgba(152, 202, 255, 1);
+  }
+  color:rgba(6, 18, 31, 1);
+}
+
+.btn-pink {
+  cursor: pointer;
+  padding: 8px 14px 10px 14px;
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 1);
+  background-color: rgba(7, 16, 25, 1);
+  &.active {
+    background-color: rgba(189, 167, 234, 1);
+    color: rgba(6, 18, 31, 1);
+  }
+}
