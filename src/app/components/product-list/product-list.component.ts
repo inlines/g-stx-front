@@ -12,6 +12,7 @@ import { IProductListRequest } from '@app/states/products/interfaces/product-lis
 import { PagerComponent } from '@app/components/pager/pager.component';
 import { IPlatformItem } from '@app/states/platforms/interfaces/platform-item.interface';
 import { PlatformState } from '@app/states/platforms/states/platforms.state';
+import { AuthState } from '@app/states/auth/states/auth.state';
 
 const LIMIT = 18;
 
@@ -41,6 +42,7 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
   public limit = LIMIT;
   public categories$!: Observable<IPlatformItem[]>;
   public skipDigitalFilter: boolean = false;
+  public isAuthorised$!: Observable<boolean>;
 
 
   public ngOnInit(): void {
@@ -65,6 +67,7 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
     });
     this.activeCategory = new BehaviorSubject<number>(params?.cat || 6);
     this.offset$ = this.productParams$.pipe(map(p => p?.offset || 0));
+    this.isAuthorised$ = this.store.select(AuthState.isAuthorised);
     this.skipDigitalFilter = !!params.ignore_digital;
 
     let lastCategory = this.activeCategory.value;

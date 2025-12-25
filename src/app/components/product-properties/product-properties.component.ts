@@ -13,6 +13,7 @@ import { CollectionState } from '@app/states/collection/states/collection.state'
 import { ActivatedRoute } from '@angular/router';
 import { ChatActions } from '@app/states/chat/states/chat-actions';
 import { CopyToClipboardDirective } from '@app/directives/copy-to-clipboard.directive';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-product-properties',
@@ -29,6 +30,7 @@ export class ProductPropertiesComponent implements OnInit {
     private readonly store: Store,
     private readonly modalService: NgbModal,
     private readonly params: ActivatedRoute,
+    private location: Location
   ){
     this.productProperties$ = this.store.select(ProductsState.productProperties);
     this.isAuthorised$ = this.store.select(AuthState.isAuthorised);
@@ -146,5 +148,9 @@ export class ProductPropertiesComponent implements OnInit {
     setTimeout(() => {
       this.showAllSerials = null;
     }, 1500)
+  }
+
+  public goBack() {
+    this.location.back();
   }
 }

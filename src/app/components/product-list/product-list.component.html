@@ -1,7 +1,7 @@
 <div class="row products-box">
-  <div class="col-12 px-0 mb-4 sticker">
+  <div class="col-12 px-0 mb-4 sticker" [class.authorised]="(isAuthorised$ | async)">
     <div>
-      <div class="p-3">
+      <div class="px-3">
         <div #stickerContent class="stickerContent">
           <ul class="nav nav-pills flex-wrap justify-content-start mb-3 align-items-center">
             @for (cat of (categories$ | async); track cat) {
@@ -51,11 +51,12 @@
     </div>
   </div>
   <!-- Продукты -->
+  
   @for (product of products$ | async; track product.id) {
     <!-- Desktop / tablet: карточки -->
     <div class="col-xl-3 col-lg-4 col-md-4 col-sm-6 p-3">
       <div
-        class="card game-card h-100 border-0 shadow-sm hover-shadow"
+        class="card game-card border-0 d-flex flex-column justify-content-between"
         [routerLink]="[product.id.toString(), {platform: activeCategory.value}]"
         style="cursor: pointer;"
         >
@@ -86,11 +87,10 @@
           <div class="game-content">
             <div class="title">{{ product.name }}</div>
             <div class="game-first-release text-lite-muted small">
-              c
               @if (product.first_release_date) {
-                {{ product.first_release_date | date: 'dd.MM.yy' : 'UTC' }}
+                c {{ product.first_release_date | date: 'dd.MM.yy' : 'UTC' }}
               } @else {
-                никогда
+                никогда не была выпущена
               }
             </div>
           </div>
@@ -98,9 +98,10 @@
       </div>
     </div>
   }
+  
 
 
-  <div class="col-12 mt-4 py-0">
+  <div class="col-12 py-0">
     <app-pager
       (pageChange)="pageChanged($event)"
       [limit]="limit"

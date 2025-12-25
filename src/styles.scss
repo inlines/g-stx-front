@@ -123,12 +123,15 @@ main {
   cursor: pointer;
   padding: 8px 14px 10px 14px;
   border-radius: 8px;
-  height: 38px;
   background-color: rgba(104, 169, 239, 1);
   &:hover{
     background-color: rgba(152, 202, 255, 1);
   }
   color:rgba(6, 18, 31, 1);
+  &.small {
+    height: 38px;
+  }
+  border: none;
 }
 
 .btn-pink {
@@ -137,8 +140,11 @@ main {
   border-radius: 8px;
   color: rgba(255, 255, 255, 1);
   background-color: rgba(7, 16, 25, 1);
+  height: 38px;
+  border: none;
   &.active {
     background-color: rgba(189, 167, 234, 1);
     color: rgba(6, 18, 31, 1);
   }
 }
+

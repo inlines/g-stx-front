@@ -1,4 +1,4 @@
-<div class="header-bg text-white">
+<div class="header-bg text-white" [class.authorised]="(isAuthorised$ | async)">
   <div class="container-fluid container-lg">
     <div class="py-4 d-flex align-items-center" style="height: 82px;">
       
@@ -35,11 +35,11 @@
             </svg>
             {{ currentUser$ | async }}
           </span>
-          <a class="btn-blue px-2" (click)="logout()">
+          <a class="btn-blue px-2 small" (click)="logout()">
             Выйти
           </a>
         } @else {
-          <a class="btn-blue px-2" routerLink="/login">
+          <a class="btn-blue px-2 small" routerLink="/login">
             Войти
           </a>
         }

@@ -4,8 +4,8 @@
 
 .sticker {
   position: sticky;
-  top: 142px;
-  z-index: 1000; /* убедись, что он выше других элементов */
+  top: 130px;
+  z-index: 1000;
   background: linear-gradient(
     90deg, 
     rgba(6, 19, 24, 1) 0%, 
@@ -14,9 +14,13 @@
   @media (max-width: 576px) {
     top: 30px;
   }
+  &.authorised {
+    top: 142px;
+  }
 }
 
 .game-card {
+  height: 304px;
   border-radius: 8px;
   background-color: rgba(7, 16, 25, 1);
   color: rgba(255, 255, 255, 1);
@@ -64,9 +68,9 @@
   opacity: 0;
 }
 
-.products-box {
-  padding-top: 48px;
-}
+// .products-box {
+//   padding-top: 48px;
+// }
 
 .nav-link {
   border-radius: 8px!important;

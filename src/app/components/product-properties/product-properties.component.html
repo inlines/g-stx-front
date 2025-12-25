@@ -1,13 +1,20 @@
 @if ((productProperties$ | async); as productProperties) {
   <div class="row g-4">
+    <div class="col-12">
+      <a (click)="goBack()">
+        <svg style="margin-top: -12px; cursor: pointer; margin-right: 12px" width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M10.6392 20.4471L19.2511 29.5535L17.3157 31.6L5.4 19L17.3157 6.40002L19.2511 8.44652L10.6392 17.5529H30.6V20.4471H10.6392Z" fill="#2D587E"/>
+        </svg>
+      </a>
+      <span class="game-title" appCopyToClipboard>{{ productProperties.product.name }}</span>
+    </div>
     <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12">
-      <div class="card bg-dark text-white border-0 shadow rounded-4 overflow-hidden">
+      <div class="text-white overflow-hidden rounded-3">
         @if (productProperties.product.image_url) {
           <img
-            class="w-100"
             [src]="productProperties.product.image_url"
             [alt]="productProperties.product.name"
-            style="object-fit: cover;"
+            style="object-fit: cover; height: 480px;"
             (error)="productProperties.product.image_url = null"
             />
         } @else {
@@ -34,83 +41,83 @@
             </div>
           </div>
         </ng-template>
-        <div class="p-4">
-          <h2 class="text-warning mb-3" appCopyToClipboard>{{ productProperties.product.name }}</h2>
+        <div class="pt-5 mt-2">
           <div *ngIf="productProperties?.product?.alternative_names?.length">
-            Также известна как:
+            <span class="game-header mb-1">Также известна как:</span>
             @if (productProperties?.product?.alternative_names?.length || 0 > 0) {
-              <div class="serial-badge text-center" style="width:100%; max-width: 100%;">
-                <span class="badge bg-dark mb-2">{{ (productProperties?.product?.alternative_names || []).join(' | ') }}</span>
+              <div class="mt-2 mb-1">
+                <span>{{ (productProperties?.product?.alternative_names || []).join(' | ') }}</span>
               </div>
             }
           </div>
-          <div *ngIf="(productProperties?.franschises?.length || 0) > 0">
-            Является частью франшиз:
+          <div class="mt-4 mb-1" *ngIf="(productProperties?.franschises?.length || 0) > 0">
+            <span class="game-header">Является частью франшиз:</span>
             @for (franschise of productProperties?.franschises; track franschise) {
-              <div class="serial-badge text-center" style="width:100%; max-width: 100%;">
-                <span class="badge bg-dark mb-2">{{ franschise.franschise_name }} ({{ franschise.total_games_count }} игры)</span>
+              <div style="width:100%; max-width: 100%;">
+                <span>{{ franschise.franschise_name }} ({{ franschise.total_games_count }} игры)</span>
               </div>
             }
             
           </div>
-          <div class="mt-2">
-            Разработчики:
+          <div class="mt-4 mb-1">
+            <span class="game-header">Разработчики:</span>
             @for (developer of (productDevelopers$ | async); track developer) {
-              <div class="serial-badge text-center" style="width:100%; max-width: 100%;">
-                <span class="badge bg-dark">
+              <div style="width:100%; max-width: 100%;">
+                <span>
                   {{ developer }}
                 </span>
               </div>
             }
           </div>
-          <div>
-            Издатели:
+          <div class="mt-4 mb-1">
+            <span class="game-header">Издатели:</span>
             @for (publisher of (productPublishers$ | async); track publisher) {
-              <div class="serial-badge text-center" style="width:100%; max-width: 100%;">
-                <span class="badge bg-dark">
+              <div style="width:100%; max-width: 100%;">
+                <span>
                   {{ publisher }}
                 </span>
               </div>
             }
           </div>
-          <p class="text-light small fst-italic">
-            впервые выпущена:
-            @if (productProperties.product.first_release_date) {
-              {{ productProperties.product.first_release_date | date:'dd.MM.yy':'UTC' }}
-            } @else {
-              никогда
-            }
-            <ng-template #never>никогда</ng-template>
-          </p>
+          <div class="mt-4">
+            <div class="game-header">впервые выпущена:</div>
+            <div>
+              @if (productProperties.product.first_release_date) {
+                {{ productProperties.product.first_release_date | date:'dd.MM.yy':'UTC' }}
+              } @else {
+                никогда
+              }
+              <ng-template #never>никогда</ng-template>
+            </div>
+          </div>
         </div>
       </div>
     </div>
     <div class="col-xl-8 col-lg-8 col-md-8 col-sm-12">
-      <div class="card bg-dark text-white shadow rounded-4 p-4 h-100">
-        <h3 class="text-info mb-3">Релизы игры:</h3>
+      <div class="text-whiteh-100">
+        <div class="release-header">Релизы</div>
         <ul class="list-group list-group-flush">
   @if ((sortedReleases$ | async); as sorted) {
     @for (release of sorted.highlighted; track release) {
-      <li class="list-group-item bg-dark text-white border-secondary position-relative release-card"
+      <li class="text-white release-item"
           [ngClass]="{ 
             'text-decoration-line-through': release.release_status === 5,
-            'highlighted-release': true,
             'owned-item': release.owned 
           }">
           
         <!-- Верхняя строка: Основная информация -->
         <div class="d-flex justify-content-between align-items-start mb-2">
-          <div>
-            <span class="badge bg-secondary me-2">{{ release.release_date | date:'dd.MM.yy':'UTC' }}</span>
-            <span class="badge platform-badge me-2">{{ release.platform_name }}</span>
-            <span class="badge region-badge" [ngClass]="getRegionClass(release.release_region)">
+          <div class="col-auto">
+            <span class="release-bullet">{{ release.release_date | date:'dd.MM.yy':'UTC' }}</span>
+            <span class="release-bullet">{{ release.platform_name }}</span>
+            <span class="release-bullet">
               {{ release.release_region }}
             </span>
           </div>
           
           @if (!release.digital_only && release?.serial?.length) {
-            <div class="serial-badge">
-              <span class="badge bg-dark ">{{ release.serial?.join(' | ') }}</span>
+            <div class="col px-4 text-end">
+              {{ release.serial?.join(' | ') }}
             </div>
           }
         </div>
@@ -118,7 +125,9 @@
         <!-- Нижняя строка: Действия -->
         <div class="d-flex justify-content-between align-items-center">
           @if (release.digital_only) {
-            <span class="small ">Цифровая версия</span>
+            <div class="col px-4">
+              <span class="small ">Цифровая версия</span>
+            </div>
           }
           
           <ng-container *ngTemplateOutlet="releaseActions; context: { $implicit: release }"></ng-container>
@@ -126,22 +135,19 @@
       </li>
     }
 
-    @if (sorted.highlighted.length && sorted.others.length) {
-      <hr class="border-secondary my-2" />
-    }
-
     @for (release of sorted.others; track release) {
-      <li class="list-group-item bg-dark text-white border-secondary release-card"
+      <li class="text-white release-item"
           [ngClass]="{
             'text-decoration-line-through': release.release_status === 5,
             'owned-item': release.owned
           }">
           
         <div class="d-flex justify-content-between align-items-start mb-2">
-          <div>
-            <span class="badge bg-secondary me-2">{{ release.release_date | date:'dd.MM.yy':'UTC' }}</span>
-            <span class="badge platform-badge me-2">{{ release.platform_name }}</span>
-            <span class="badge region-badge" [ngClass]="getRegionClass(release.release_region)">
+
+          <div class="col-auto">
+            <span class="release-bullet">{{ release.release_date | date:'dd.MM.yy':'UTC' }}</span>
+            <span class="release-bullet">{{ release.platform_name }}</span>
+            <span class="release-bullet">
               {{ release.release_region }}
             </span>
           </div>
@@ -150,7 +156,7 @@
             <!-- <div class="serial-badge">
               <span class="badge bg-dark ">{{ release.serial?.join(' | ') }}</span>
             </div> -->
-            <div class="serial-container">
+            <div class="col serial-container">
               <!-- Десктопный вариант -->
               <div class="d-none d-md-block">
                 @if (release.serial?.length) {
@@ -201,32 +207,32 @@
         <ng-template #releaseActions let-release>
             @if (isAuthorised$ | async) {
               <div class="col-auto d-flex flex-wrap gap-2 align-items-start" style="min-height: 40px;">
-                <button type="button" class="btn btn-outline-success btn-sm"
+                <button class="btn-blue small"
                   [disabled]="release.owned || release.digital_only || release.release_status === 5 || !release.release_date || (collectionChanging$ | async)"
                   [hidden]="release.owned"
                   (click)="addToCollection(release.release_id)">
                   В коллекцию
                 </button>
-                <button type="button" class="btn btn-outline-success btn-sm"
+                <button type="button" class="btn-pink active"
                   [hidden]="!release.owned || release.bided"
                   [disabled]="release.release_status === 5 || !release.release_date || (collectionChanging$ | async)"
                   (click)="addBid(release.release_id)">
                   Хочу поменять
                 </button>
-                <button type="button" class="btn btn-outline-success btn-sm"
+                <button type="button" class="btn-blue small"
                   [hidden]="!release.bided"
                   [disabled]="(collectionChanging$ | async)"
                   (click)="removeBid(release.release_id)">
                   Больше не хочу меняться
                 </button>
-                <button type="button" class="btn btn-outline-primary btn-sm"
+                <button type="button" class="btn-blue small"
                   [disabled]="release.wished || release.release_status === 5 || !release.release_date || (collectionChanging$ | async)"
                   [hidden]="release.wished"
                   (click)="addWish(release.release_id)">
                   В вишлист
                 </button>
                 @if (release.bid_user_logins.length) {
-                  <button type="button" class="btn btn-outline-primary btn-sm"
+                  <button type="button" class="btn-blue small"
                     (click)="openBidsModal(release)">
                     Есть предложения
                   </button>
@@ -237,17 +243,17 @@
       </div>
     </div>
     <div class="col-12">
-      <div class="card bg-dark text-white shadow rounded-4 p-4">
-        <p class="text-light">{{ productProperties.product.summary || 'У нас нет описания этой игры' }}</p>
+      <div class="text-white">
+        <p>{{ productProperties.product.summary || 'У нас нет описания этой игры' }}</p>
       </div>
     </div>
     @if (productProperties.screenshots.length) {
       <div class="col-12">
-        <div class="card bg-dark border-0 shadow rounded-4 p-3">
+        <div>
           <ngb-carousel [interval]="3000" [pauseOnHover]="true" [wrap]="true">
             @for (screen of productProperties.screenshots; track screen) {
               <ng-template ngbSlide>
-                <img class="d-block w-100 rounded-3" [src]="screen" style="object-fit: cover; max-height: 500px;" />
+                <img class="d-block w-100" [src]="screen" style="object-fit: cover; max-height: 500px;" />
               </ng-template>
             }
           </ngb-carousel>
