@@ -3,7 +3,10 @@
     <app-header></app-header>
   </header>
 
-  <main class="flex-grow-1">
+  <main class="flex-grow-1 position-relative">
+    <div class="ellipse ellipse-1 d-none d-md-block"></div>
+    <div class="ellipse ellipse-2 d-none d-md-block"></div>
+    <div class="ellipse ellipse-3 d-none d-md-block"></div>
     <article [class.authenticated]="(isAuthorized$ | async)">
       <section class="container-fluid container-lg pt-5 pt-md-7">
         <router-outlet></router-outlet>

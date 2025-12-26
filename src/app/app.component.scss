@@ -47,3 +47,33 @@ app-toast-container {
     transform: translateX(0); /* Show the chat on mobile */
   }
 }
+
+.ellipse {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px); /* Для эффекта размытости как пятна */
+  z-index: -0;
+  mix-blend-mode: screen; /* или overlay, multiply - зависит от эффекта */
+  background-color: rgba(123, 0, 255, 0.1);
+}
+
+.ellipse-1 {
+  width: 545px;
+  height: 545px;
+  top: 5%;
+  right: -7%;
+}
+
+.ellipse-2 {
+  width: 222px;
+  height: 222px;
+  top: 556px;
+  left: 159px;
+}
+
+.ellipse-3 {
+  width: 495px;
+  height: 495px;
+  bottom: -1%;
+  left: 60%;
+}

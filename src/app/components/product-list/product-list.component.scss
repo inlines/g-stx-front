@@ -76,3 +76,23 @@
   border-radius: 8px!important;
   color: rgba(255, 255, 255, 1)
 }
+
+
+#onlyDigitalSwitch {
+  background-image: url("/ellipse.svg");
+  width: 44px;
+  height: 28px;
+  background-color: rgba(7, 16, 25, 1);
+  background-size: initial;
+  background-position: 7px;
+  border: none !important;
+  border-radius: 14px;
+  cursor: pointer;
+  &:checked {
+    background-image: url("/ellipse-pink.svg") !important;
+    background-position: 20px;
+  }
+  &:focus {
+    box-shadow: none!important;
+  }
+}
