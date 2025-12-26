@@ -38,7 +38,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
   public subs: Subscription[] = [];
   
   ngAfterViewInit(): void {
-    this.subs.push(this.messages$.pipe(debounceTime(500)).subscribe(() => {
+    this.subs.push(this.messages$.pipe(debounceTime(50)).subscribe(() => {
       if(this.scrollbox) {
         this.scrollbox.nativeElement.scrollTop = this.scrollbox.nativeElement.scrollHeight;
       }

@@ -1,69 +1,92 @@
-<div class="chat-container position-fixed top-0 end-0 h-100 bg-dark text-light border-start shadow-lg"
+<div class="chat-container position-fixed top-0 end-0 h-100 text-light"
   style="width: 100%; max-width: 400px; z-index: 1050;">
 
   <!-- Header -->
-  <div class="chat-header d-flex justify-content-between align-items-center p-3 border-bottom bg-dark">
-    <h5 class="mb-0 text-warning" style="font-family: 'Press Start 2P', cursive;">Чаты</h5>
-    <button class="btn-close btn-close-white" (click)="closeChat()" aria-label="Close"></button>
+  <div class="chat-header d-flex justify-content-between align-items-center py-3">
+    @if ((recepient$ | async)) {
+      <a role="button" (click)="setActiveDialog(null)" style="cursor: pointer;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M5.69097 13.2404L13.0726 21.0459L11.4137 22.8L1.2002 12L11.4137 1.2L13.0726 2.95414L5.69097 10.7596H22.8002V13.2404H5.69097Z" fill="#2D587E"/>
+        </svg>
+      </a>
+      <span>{{ recepient$ | async}}</span>
+    }
+    @if (!(recepient$ | async)) {
+      <span>Чаты</span>
+    }
+    <a (click)="closeChat()" aria-label="Close" style="cursor: pointer;">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 12L5 5M12 12L19 19M12 12L19 5M12 12L5 19" stroke="#2D587E" stroke-width="2" stroke-linecap="square" stroke-linejoin="round"/>
+      </svg>
+    </a>
   </div>
 
-
-  <div class="chat-content d-flex flex-column h-100" trapScroll trapKeyScroll>
-    <div class="messages-container d-flex flex-column flex-grow-1 overflow-auto p-3">
-      @if ((recepient$ | async)) {
-        <div class="mb-3">
-          <a class="text-decoration-underline text-light" role="button" (click)="setActiveDialog(null)">Назад к списку диалогов</a>
+  <!-- Основной контент -->
+  <div class="chat-main-content d-flex flex-column h-100">
+    @if ((recepient$ | async)) {
+      <!-- Режим чата с конкретным пользователем -->
+      <div class="d-flex flex-column flex-grow-1 overflow-hidden">
+        <!-- Контейнер для сообщений с прокруткой -->
+        <div class="messages-wrapper flex-grow-1 overflow-auto px-3" trapScroll trapKeyScroll #scrollbox>
+          <div [class.justify-content-end]="(recepient$ | async)" class="messages d-flex flex-column gap-2">
+            @for (message of (messages$ | async); track message) {
+              <div
+                class="p-2 message-item rounded text-light col-auto col-11"
+                [ngClass]="{
+                'yours': message.sender === 'Вы',
+                'others': message.sender !== 'Вы'
+                }"
+                >
+                <p class="mb-0">
+                  <strong>{{ message.sender }}:</strong> {{ message.body }}
+                </p>
+                <p class="small mt-2 mb-0" style="text-align: right; color: rgba(138, 172, 201, 1);">{{message.created_at | date:'dd.MM.yy':'UTC'}}</p>
+              </div>
+            }
+          </div>
         </div>
-        <div class="mb-3 text-warning">Чат с <strong>{{ recepient$ | async}}</strong></div>
-        <div class="messages d-flex flex-column gap-2" #scrollbox>
-          @for (message of (messages$ | async); track message) {
-            <div
-              class="p-2 message-item rounded bg-secondary bg-opacity-10 text-light col-auto"
-              [ngClass]="{
-              'yours': message.sender === 'Вы',
-              'others': message.sender !== 'Вы'
-              }"
-              >
-              <p class="mb-0">
-                <strong>{{ message.sender }}:</strong> {{ message.body }}
-              </p>
-              <p class="small mt-2 mb-0">{{message.created_at | date:'dd.MM.yy':'UTC'}}</p>
-            </div>
-          }
-        </div>
-        <div class="chat-input border-top p-3 bg-dark mt-auto">
-          <div class="input-group">
+        
+        <!-- Поле ввода (фиксировано снизу) -->
+        <div class="chat-input mt-auto">
+          <div class="input-group px-3 pb-3">
             <input [(ngModel)]="message"
-              class="form-control bg-dark text-light border-secondary"
+              class="form-control"
               (keydown.enter)="sendMessage()"
               (focus)="onFocus()"
               placeholder="Введите сообщение" />
-            <button class="btn btn-warning" (click)="sendMessage()" [disabled]="(isConnected$ | async) === false">Отправить</button>
+            <a (click)="sendMessage()" style="margin-left:12px;" [class.disabled]="(isConnected$ | async) === false">
+              <svg width="44" height="38" viewBox="0 0 44 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="44" height="38" rx="8" fill="#68A9EF"/>
+                <path d="M20.7498 20.25L29.4998 11.5M20.8561 20.5234L23.0462 26.1551C23.2391 26.6512 23.3356 26.8993 23.4746 26.9717C23.5951 27.0345 23.7386 27.0345 23.8592 26.9719C23.9983 26.8997 24.095 26.6517 24.2886 26.1558L29.7805 12.0827C29.9552 11.635 30.0426 11.4112 29.9948 11.2682C29.9533 11.144 29.8558 11.0465 29.7316 11.005C29.5886 10.9572 29.3647 11.0446 28.9171 11.2193L14.844 16.7112C14.3481 16.9047 14.1001 17.0015 14.0279 17.1406C13.9652 17.2612 13.9653 17.4047 14.0281 17.5252C14.1005 17.6642 14.3486 17.7607 14.8447 17.9536L20.4764 20.1437C20.5771 20.1829 20.6274 20.2024 20.6698 20.2327C20.7074 20.2595 20.7403 20.2924 20.7671 20.3299C20.7973 20.3723 20.8169 20.4227 20.8561 20.5234Z" stroke="#071019" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </a>
           </div>
           @if ((isConnected$ | async) === false) {
-            <p class="small text-warning">
+            <p class="small text-warning px-3 pb-3">
               <br/>
               Соединение разорвано, если оно долго не восстанавливается, попробуйте обновить страницу
             </p>
           }
         </div>
-      } @else {
-        <div class="messages d-flex flex-column overflow-auto mb-3 p-2" trapScroll trapKeyScroll>
+      </div>
+    } @else {
+      <!-- Режим списка диалогов -->
+      <div class="dialogs-wrapper flex-grow-1 overflow-auto p-3">
+        <div class="messages d-flex flex-column">
           @for (dialog of (dialogs$ | async); track dialog) {
             <div (click)="setActiveDialog(dialog)"
-              class="dialog-item d-flex flex-column p-3 mb-3 bg-dark text-light rounded-3 shadow-sm">
+              class="dialog-item d-flex flex-column py-2 mb-2 text-light">
               <div class="dialog-header d-flex justify-content-between align-items-center">
-                <span class="dialog-companion text-warning">{{ dialog.companion }}</span>
-                <span class="dialog-time small">{{ dialog.last_message_time | date:'dd.MM HH:mm' }}</span>
+                <span class="dialog-companion">{{ dialog.companion }}</span>
               </div>
-              <div class="dialog-message small">
-                {{ dialog.last_message }}
+              <div class="dialog-message small d-flex justify-content-between">
+                <span>{{ dialog.last_message }}</span>
+                <span class="dialog-time small d-flex flex-column justify-content-end">{{ dialog.last_message_time | date:'dd.MM.yy' }}</span>
               </div>
             </div>
           }
         </div>
-      }
-
-    </div>
+      </div>
+    }
   </div>
 </div>
