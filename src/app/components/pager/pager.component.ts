@@ -1,5 +1,5 @@
 import { NgClass } from '@angular/common';
-import { Component, Input, Output, EventEmitter, OnChanges, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, OnInit, HostListener } from '@angular/core';
 
 type PageItem = number | '...';
 
@@ -34,6 +34,30 @@ export class PagerComponent implements OnChanges, OnInit {
     this.pages = this.buildPages();
   }
 
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent): void {
+    console.warn(event);
+    // Проверяем, не находится ли фокус в поле ввода
+    const activeElement = document.activeElement as HTMLElement;
+    const isInputFocused = activeElement.tagName === 'INPUT' || 
+                          activeElement.tagName === 'TEXTAREA' ||
+                          activeElement.isContentEditable;
+    
+    // Если фокус в поле ввода - не обрабатываем клавиши
+    if (isInputFocused) {
+      return;
+    }
+
+    switch (event.key) {
+      case 'ArrowLeft':
+        this.goToPreviousPage();
+        break;
+      case 'ArrowRight':
+        this.goToNextPage();
+        break;
+    }
+  }
+
   buildPages(): PageItem[] {
     const pages: PageItem[] = [];
 
@@ -57,5 +81,20 @@ export class PagerComponent implements OnChanges, OnInit {
     this.currentPage = page;
     this.pages = this.buildPages();
     this.pageChange.emit(page);
+  }
+
+  goToPreviousPage(): void {
+    if (this.currentPage > 1) {
+      const previousPage = this.currentPage - 1;
+      this.selectPage(previousPage);
+    }
+  }
+
+  // Метод для перехода на следующую страницу
+  goToNextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      const nextPage = this.currentPage + 1;
+      this.selectPage(nextPage);
+    }
   }
 }
