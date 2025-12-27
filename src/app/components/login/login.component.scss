@@ -1,8 +1,8 @@
 input {
-  background-color: rgba(5, 11, 18, 1);
+  background-color: rgba(5, 11, 18, 1)!important;
   border-radius: 6px;
   height: 38px;
-  color: rgba(138, 172, 201, 1);
+  color: rgba(138, 172, 201, 1) !important;
   &:focus {
     box-shadow: none!important;
     border: none!important;
@@ -18,5 +18,14 @@ input {
 }
 
 input::placeholder {
+  color: rgba(138, 172, 201, 1);
+}
+
+.text-redirect {
+  font-weight: 400;
+  font-style: Regular;
+  font-size: 18px;
+  line-height: 20px;
+  letter-spacing: 0%;
   color: rgba(138, 172, 201, 1);
 }
