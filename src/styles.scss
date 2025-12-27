@@ -142,9 +142,13 @@ main {
   background-color: rgba(7, 16, 25, 1);
   height: 38px;
   border: none;
-  &.active {
+  &.filled {
     background-color: rgba(189, 167, 234, 1);
     color: rgba(6, 18, 31, 1);
+  }
+  &.active {
+    border: 1px rgba(189, 167, 234, 1) solid;
+    color: rgba(189, 167, 234, 1);
   }
 }
 

@@ -1,16 +1,16 @@
 <div class="row justify-content-center">
-  <div class="col-xl-6 col-lg-7 col-md-8 col-sm-12">
-    <div class="card bg-dark text-white shadow rounded-4 p-4">
+  <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12">
+    <div class="text-white p-4">
       <h2 class="mb-4">Авторизация</h2>
 
       <form [formGroup]="form" (ngSubmit)="submit()">
         <!-- Логин -->
         <div class="mb-3">
-          <label for="user_login" class="form-label">Логин</label>
           <input
             id="user_login"
             type="text"
-            class="form-control bg-secondary text-white border-0"
+            class="border-0 w-100 px-3"
+            placeholder="Логин"
             [ngClass]="{
               'is-invalid': form.get('user_login')?.invalid && form.get('user_login')?.touched,
               'is-valid': form.get('user_login')?.valid && form.get('user_login')?.touched
@@ -23,12 +23,12 @@
         </div>
 
         <!-- Пароль -->
-        <div class="mb-4">
-          <label for="password" class="form-label">Пароль</label>
+        <div class="mb-3 py-1">
           <input
             id="password"
             type="password"
-            class="form-control bg-secondary text-white border-0"
+            class="border-0 w-100 px-3"
+            placeholder="Пароль"
             [ngClass]="{
               'is-invalid': form.get('password')?.invalid && form.get('password')?.touched,
               'is-valid': form.get('password')?.valid && form.get('password')?.touched
@@ -42,13 +42,13 @@
 
         <button
           type="submit"
-          class="btn btn-primary w-100 fw-semibold rounded-pill shadow-sm"
+          class="btn-blue w-100 fw-semibold"
           [disabled]="form.invalid"
         >
           Войти
         </button>
 
-        <div class="text-center mt-3">
+        <div class="text-center mt-3 py-2">
           <a [routerLink]="'/registration'" class="text-decoration-none text-info">
             Нет аккаунта? Зарегистрироваться
           </a>

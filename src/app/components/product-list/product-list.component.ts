@@ -14,7 +14,7 @@ import { IPlatformItem } from '@app/states/platforms/interfaces/platform-item.in
 import { PlatformState } from '@app/states/platforms/states/platforms.state';
 import { AuthState } from '@app/states/auth/states/auth.state';
 
-const LIMIT = 18;
+const LIMIT = 15;
 
 @Component({
   selector: 'app-product-list',
@@ -54,7 +54,8 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
         offset: 0,
         query: undefined,
         cat: 6,
-        ignore_digital: false
+        ignore_digital: false,
+        sort: 'name'
       }));
     }
 
@@ -63,7 +64,11 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
     this.productParams$ = this.store.select(ProductsState.productsParams);
     this.categories$ = this.store.select(PlatformState.loadedPlatforms);
     this.queryForm = new FormGroup({
-      query: new FormControl(params?.query || '')
+      query: new FormControl(params?.query || ''),
+      sort: new FormControl(params?.sort || 'name'),
+      franschise: new FormControl(params?.franschise || null),
+      developer: new FormControl(params?.developer || null),
+      publisher: new FormControl(params?.publisher || null),
     });
     this.activeCategory = new BehaviorSubject<number>(params?.cat || 6);
     this.offset$ = this.productParams$.pipe(map(p => p?.offset || 0));

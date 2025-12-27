@@ -2,7 +2,7 @@
   <div class="container-fluid container-lg">
     <div class="py-4 d-flex align-items-center" style="height: 82px;">
       
-      <svg width="176" height="33" viewBox="0 0 176 33" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg width="176" height="33" viewBox="0 0 176 33" fill="none" xmlns="http://www.w3.org/2000/svg" routerLink="/products" style="cursor: pointer">
         <path d="M57.0417 24.625V8.50004H62.4167V3.12504H83.9167V8.50004H67.7917V24.625H73.1667V13.875H83.9167V30H62.4167V24.625H57.0417Z" fill="white"/>
         <path d="M89.2917 30V24.625H105.417V19.25H89.2917V8.50004H94.6667V3.12504H116.167V8.50004H100.042V13.875H116.167V24.625H110.792V30H89.2917Z" fill="white"/>
         <path d="M121.542 8.50004V3.12504H143.042V8.50004H137.667V30H126.917V8.50004H121.542Z" fill="white"/>
@@ -51,15 +51,6 @@
   @if (isAuthorised$ | async;) {
     <div class="container-fluid container-lg">
       <div class="row align-items-center" style="height: 60px;">
-        <!-- Кнопка "Назад" (только там где нужна) -->
-        <!-- @if (showBackButton$ | async) {
-          <div class="col-auto">
-            <a class="nav-link text-white p-1 rounded-3 d-flex align-items-center" (click)="goBack()">
-              ↩️ <span class="d-none d-sm-inline ms-1">Назад</span>
-            </a>
-          </div>
-        } -->
-
         <!-- Лого и кнопки -->
         <div class="col d-flex align-items-center gap-5 flex-wrap">
           <!-- Кнопка "Каталог" -->

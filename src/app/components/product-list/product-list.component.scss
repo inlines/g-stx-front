@@ -1,10 +1,31 @@
+@media (min-width: 1200px) {
+  .col-xl-3 {
+    width: 20%!important;
+  }
+}
+
+@media (min-width: 992px) {
+    .col-lg-4 {
+      width: 25%;
+    }
+}
+
+
+@media (min-width: 576px) {
+    .col-sm-6 {
+        flex: 0 0 auto;
+        width: 33.3%;
+    }
+}
+
+
 .card, a {
   cursor: pointer;
 }
 
 .sticker {
   position: sticky;
-  top: 130px;
+  top: 82px;
   z-index: 1000;
   background: linear-gradient(
     90deg, 
@@ -95,4 +116,46 @@
   &:focus {
     box-shadow: none!important;
   }
+}
+
+select {
+  background-color: rgba(7, 16, 25, 1);
+  border-radius: 8px;
+  height: 38px;
+  padding-top: 8px;
+  padding-left: 14px;
+  font-weight: 400;
+  font-style: Regular;
+  font-size: 16px;
+  line-height: 100%;
+  letter-spacing: 0%;
+  color: rgba(138, 172, 201, 1);
+  &:focus {
+    box-shadow: none!important;
+    background-color: rgba(7, 16, 25, 1);
+  }
+}
+
+input {
+  background-color: rgba(7, 16, 25, 1);
+  border-radius: 60px;
+  height: 38px;
+  padding-top: 8px;
+  color: rgba(138, 172, 201, 1);
+  &:focus {
+    box-shadow: none!important;
+    border: none!important;
+  }
+  &:focus-visible {
+    outline: none!important;
+  }
+  font-weight: 400;
+  font-style: Regular;
+  font-size: 16px;
+  line-height: 20px;
+  letter-spacing: 0%;
+}
+
+input::placeholder {
+  color: rgba(138, 172, 201, 1);
 }
