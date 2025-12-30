@@ -1,12 +1,12 @@
 import { AsyncPipe, DatePipe } from '@angular/common';
 import { Component, OnDestroy, OnInit, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
-import { takeUntil, throttleTime } from 'rxjs/operators';
+import { startWith, switchMap, takeUntil, throttleTime } from 'rxjs/operators';
 import { RouterModule } from '@angular/router';
 import { IProductListItem } from '@app/states/products/interfaces/product-list-item.interface';
 import { ProductsActions } from '@app/states/products/states/products.actions';
 import { ProductsState } from '@app/states/products/states/products.state';
 import { Store } from '@ngxs/store';
-import { BehaviorSubject, debounceTime, distinctUntilChanged, map, Observable, Subscription, fromEvent } from 'rxjs';
+import { BehaviorSubject, debounceTime, distinctUntilChanged, map, Observable, Subscription, fromEvent, combineLatest } from 'rxjs';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { IProductListRequest } from '@app/states/products/interfaces/product-list-request.interface';
 import { PagerComponent } from '@app/components/pager/pager.component';
@@ -46,8 +46,7 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
 
 
   public ngOnInit(): void {
-    const params = this.store.selectSnapshot(ProductsState.productsParams);
-
+    let params = this.store.selectSnapshot(ProductsState.productsParams);
     if (!params) {
       this.store.dispatch(new ProductsActions.SetRequestParams({
         limit: LIMIT,
@@ -69,17 +68,28 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
       franschise: new FormControl(params?.franschise || null),
       developer: new FormControl(params?.developer || null),
       publisher: new FormControl(params?.publisher || null),
+      skipDigitalFilter: new FormControl(params.ignore_digital),
     });
     this.activeCategory = new BehaviorSubject<number>(params?.cat || 6);
     this.offset$ = this.productParams$.pipe(map(p => p?.offset || 0));
     this.isAuthorised$ = this.store.select(AuthState.isAuthorised);
-    this.skipDigitalFilter = !!params.ignore_digital;
 
     let lastCategory = this.activeCategory.value;
 
     const query$ = this.queryForm.controls['query'].valueChanges.pipe(
       map(q => q?.trim() || null),
       debounceTime(500),
+      startWith(this.queryForm.controls['query'].value),
+      distinctUntilChanged()
+    );
+
+    const sort$ = this.queryForm.controls['sort'].valueChanges.pipe(
+      startWith(this.queryForm.controls['sort'].value),
+      distinctUntilChanged()
+    );
+
+    const ignore_digital$ = this.queryForm.controls['skipDigitalFilter'].valueChanges.pipe(
+      startWith(this.queryForm.controls['skipDigitalFilter'].value),
       distinctUntilChanged()
     );
 
@@ -87,26 +97,38 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
       distinctUntilChanged()
     );
 
-    const subQuery = query$.subscribe(query => {
-      this.store.dispatch(new ProductsActions.SetRequestParams({
-        query: query || undefined,
-        offset: 0,
-        limit: LIMIT,
-        cat: lastCategory,
-        ignore_digital: this.skipDigitalFilter
-      }));
-    });
+    let firstTime = true;
+    const subQuery = combineLatest([query$, sort$, ignore_digital$]).pipe(
+      distinctUntilChanged((prev, curr) =>
+        prev[0] === curr[0] &&
+        prev[1] === curr[1] &&
+        prev[2] === curr[2]
+      ))
+      .subscribe(([query, sort, ignore_digital]) => {
+        this.store.dispatch(new ProductsActions.SetRequestParams({
+          query: query || undefined,
+          offset: firstTime ? this.store.selectSnapshot(ProductsState.productsParams)?.offset || 0 : 0,
+          limit: LIMIT,
+          cat: lastCategory,
+          ignore_digital: ignore_digital,
+          sort,
+        }));
+
+        firstTime = false;
+      });
 
     const subCat = category$.subscribe(category => {
       lastCategory = category;
+      console.warn(this.store.selectSnapshot(ProductsState.productsParams)?.cat)
       if (this.store.selectSnapshot(ProductsState.productsParams)?.cat !== category) {
         this.queryForm.controls['query'].setValue('');
+        this.queryForm.controls['sort'].setValue('name');
         this.store.dispatch(new ProductsActions.SetRequestParams({
           query: undefined,
           offset: 0,
           limit: LIMIT,
           cat: category,
-          ignore_digital: this.skipDigitalFilter
+          sort: 'name'
         }));
       }
     });
@@ -116,7 +138,10 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
         prev.limit === curr.limit &&
         prev.offset === curr.offset &&
         prev.query === curr.query &&
-        prev.cat === curr.cat && prev.ignore_digital === curr.ignore_digital
+        prev.cat === curr.cat &&
+        prev.ignore_digital === curr.ignore_digital &&
+        prev.sort === curr.sort &&
+        prev.ignore_digital === curr.ignore_digital
       )
     ).subscribe(() => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -145,6 +170,9 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   public setActiveCategory(cat: number): void {
+    this.store.dispatch(new ProductsActions.SetRequestParams({
+      offset: 0,
+    }));
     this.activeCategory.next(cat);
     this.query.nativeElement.focus();
   }

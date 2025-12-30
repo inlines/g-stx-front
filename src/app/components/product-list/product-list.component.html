@@ -3,6 +3,7 @@
     <div>
       <div class="px-3">
         <div #stickerContent class="stickerContent">
+          <form [formGroup]="queryForm" class="position-relative">
           <ul class="nav nav-pills flex-wrap justify-content-start mb-3 align-items-center">
             @for (cat of (categories$ | async); track cat) {
               <li class="me-2 mb-2">
@@ -18,13 +19,14 @@
             <li class="nav-item mb-2 px-3">
               <div class="form-check form-switch d-flex align-items-center text-light">
                 <input class="form-check-input" type="checkbox" id="onlyDigitalSwitch"
-                  [(ngModel)]="skipDigitalFilter"
-                  (change)="onDigitalFilterChange()" />
+                  formControlName="skipDigitalFilter"
+                />
                 <label class="form-check-label ms-2 small" for="onlyDigitalSwitch">
                   Пропустить цифровые
                 </label>
               </div>
             </li>
+
             <li [formGroup]="queryForm" class="nav-item mb-2 pl-3" style="margin-left: auto;">
               <select 
                   class="form-select form-select-lg border-0 rounded-3"
@@ -35,7 +37,7 @@
               </select>
             </li>
           </ul>
-          <form [formGroup]="queryForm" class="position-relative">
+          
             <div class="row">
               <div class="col">
                 <input id="query"
