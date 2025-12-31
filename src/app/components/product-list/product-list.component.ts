@@ -119,7 +119,6 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
 
     const subCat = category$.subscribe(category => {
       lastCategory = category;
-      console.warn(this.store.selectSnapshot(ProductsState.productsParams)?.cat)
       if (this.store.selectSnapshot(ProductsState.productsParams)?.cat !== category) {
         this.queryForm.controls['query'].setValue('');
         this.queryForm.controls['sort'].setValue('name');

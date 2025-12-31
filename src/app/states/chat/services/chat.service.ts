@@ -33,7 +33,6 @@ export class ChatService {
   // Метод для подключения к WebSocket
   connect(login: string): void {
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-      console.log('WebSocket уже подключен');
       this.connected$.next(true);
       return;
     }
@@ -72,7 +71,6 @@ export class ChatService {
 
 
     this.socket.onclose = () => {
-      console.log('WebSocket closed');
       this.connected$.next(false);
       this.isConnected = false;
     };
@@ -103,12 +101,10 @@ export class ChatService {
       return;
     }
 
-    console.log('Отправка сообщения через WebSocket...');
     const message = {
       ...payload,
       created_at: new Date().toISOString(),
     };
-    console.warn(message);
 
     this.socket.send(JSON.stringify(message));
   }

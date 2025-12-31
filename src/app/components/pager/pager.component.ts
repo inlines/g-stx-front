@@ -36,7 +36,6 @@ export class PagerComponent implements OnChanges, OnInit {
 
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent): void {
-    console.warn(event);
     // Проверяем, не находится ли фокус в поле ввода
     const activeElement = document.activeElement as HTMLElement;
     const isInputFocused = activeElement.tagName === 'INPUT' || 
