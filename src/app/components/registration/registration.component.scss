@@ -1,0 +1,32 @@
+.reg-header {
+  text-align: center;
+  font-weight: 700;
+  font-style: Bold;
+  font-size: 26px;
+  line-height: 100%;
+  letter-spacing: 0%;
+  color: rgba(211, 225, 236, 1);
+}
+
+input {
+  background-color: rgba(5, 11, 18, 1)!important;
+  border-radius: 6px;
+  height: 38px;
+  color: rgba(138, 172, 201, 1) !important;
+  &:focus {
+    box-shadow: none!important;
+    border: none!important;
+  }
+  &:focus-visible {
+    outline: none!important;
+  }
+  font-weight: 400;
+  font-style: Regular;
+  font-size: 18px;
+  line-height: 20px;
+  letter-spacing: 0%;
+}
+
+input::placeholder {
+  color: rgba(138, 172, 201, 1);
+}

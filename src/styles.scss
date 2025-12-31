@@ -132,6 +132,11 @@ main {
     height: 38px;
   }
   border: none;
+  &:disabled {
+    color: rgba(7, 16, 25, 1);
+    background-color: rgba(104, 169, 239, 1);
+    opacity: 30%;
+  }
 }
 
 .btn-pink {

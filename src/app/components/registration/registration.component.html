@@ -1,51 +1,51 @@
 <div class="row justify-content-center">
-  <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
-    <div class="card bg-dark text-white shadow rounded-4 p-4">
-      <h2 class="mb-4">Регистрации</h2>
-      <form [formGroup]="form">
+  <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12">
+    <div class="p-4">
+      <h2 class="reg-header mb-4">Регистрации</h2>
+      <form class="position-relative" style="z-index: 100000000000" [formGroup]="form">
         <!-- Логин -->
         <div class="mb-3">
-          <label for="user_login" class="form-label">Логин</label>
           <input
             id="user_login"
             type="text"
-            class="form-control"
+            class="border-0 w-100 px-3"
+            placeholder="Логин"
             [ngClass]="{
               'is-invalid': form.get('user_login')?.invalid && form.get('user_login')?.touched,
               'is-valid': form.get('user_login')?.valid && form.get('user_login')?.touched
             }"
             formControlName="user_login"
             />
-          <div class="invalid-feedback">
+          <div class="invalid-feedback px-3">
             Поле обязательно для заполнения. Только латинские символы и цифры
           </div>
         </div>
 
         <!-- Пароль -->
         <div class="mb-4">
-          <label for="password" class="form-label">Пароль</label>
           <input
             id="password"
             type="password"
-            class="form-control"
+            class="border-0 w-100 px-3"
+            placeholder="Пароль"
             [ngClass]="{
               'is-invalid': form.get('password')?.invalid && form.get('password')?.touched,
               'is-valid': form.get('password')?.valid && form.get('password')?.touched
             }"
             formControlName="password"
             />
-          <div class="invalid-feedback">
+          <div class="invalid-feedback px-3">
             Введите пароль.
           </div>
         </div>
 
         <!-- Повтор пароля -->
         <div class="mb-4">
-          <label for="passwordAgain" class="form-label">Повторите пароль</label>
           <input
             id="passwordAgain"
             type="password"
-            class="form-control"
+            class="border-0 w-100 px-3"
+            placeholder="Пароль еще раз"
             [ngClass]="{
               'is-invalid': (form.get('passwordAgain')?.invalid && form.get('passwordAgain')?.touched) || form.errors?.['passwordMismatch'],
               'is-valid': form.get('passwordAgain')?.valid && !form.errors?.['passwordMismatch'] && form.get('passwordAgain')?.touched
@@ -53,17 +53,17 @@
             formControlName="passwordAgain"
             />
           @if (form.errors?.['passwordMismatch'] && form.get('passwordAgain')?.touched) {
-            <div class="invalid-feedback">
+            <div class="invalid-feedback px-3">
               Пароли не совпадают.
             </div>
           }
           @if (form.get('passwordAgain')?.hasError('required') && form.get('passwordAgain')?.touched) {
-            <div class="invalid-feedback">
+            <div class="invalid-feedback px-3">
               Повторите пароль.
             </div>
           }
         </div>
-        <button type="submit" class="btn btn-primary w-100 fw-semibold rounded-pill shadow-sm" [disabled]="form.invalid" (click)="submit()">регистрация</button>
+        <button type="submit" class="btn-blue w-100 fw-semibold" [disabled]="form.invalid" (click)="submit()">Зарегистрироваться</button>
       </form>
     </div>
   </div>

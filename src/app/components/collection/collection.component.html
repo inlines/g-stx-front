@@ -208,8 +208,8 @@
     }
     <div class="text-white">На эту платформу вы потратили {{activeCategoryTotalSpent | currency:'₽':'symbol':'1.0-2' }}</div>
   } @else {
-    <div class="card bg-dark text-white shadow rounded-4 p-4 text-center my-4">
-      <h5 class="text-warning mb-3">Ваша коллекция пока пуста</h5>
+    <div class="text-white my-4">
+      <div class="empty-collection-header mb-3">Ваша коллекция пока пуста</div>
       <p class="text-light mb-2">
         Начните собирать свою игровую библиотеку прямо сейчас! Зайдите в
         <a [routerLink]="'/products'" class="text-info text-decoration-none fw-semibold">
