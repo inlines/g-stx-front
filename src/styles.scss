@@ -9,38 +9,6 @@ a {
   text-decoration: none !important;
 }
 
-// body {
-//   background: linear-gradient(
-//     180deg, 
-//     rgba(6, 19, 24, 1) 0%, 
-//     rgba(14, 37, 63, 1) 100%
-//   );
-
-//   //filter: blur(100px);
-// }
-
-// body {
-//   position: relative;
-//   min-height: 100vh;
-//   overflow-x: hidden;
-// }
-
-// body::before {
-//   content: '';
-//   position: fixed;
-//   top: 0;
-//   left: 0;
-//   width: 100%;
-//   height: 100%;
-//   background: linear-gradient(
-//     180deg, 
-//     rgba(6, 19, 24, 1) 0%, 
-//     rgba(14, 37, 63, 1) 100%
-//   );
-//   filter: blur(100px);
-//   z-index: -1; /* Отправляем фон на задний план */
-// }
-
 @font-face {
   font-family: 'AvertaRegular';
   src: url('./assets/fonts/AvertaRegular.otf') format('opentype');
@@ -51,7 +19,6 @@ a {
   src: url('./assets/fonts/AvertaExtraBold.otf') format('opentype');
 }
 
-/* Использование */
 body {
   font-family: 'AvertaRegular', sans-serif !important;
 }
@@ -78,13 +45,12 @@ body {
 
 body::before {
   content: '';
-  position: fixed; /* Фиксированный слой */
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   
-  /* Градиент и размытие */
   background: linear-gradient(
     to right,
     rgba(6, 19, 24, 0.95) 0%,
@@ -94,12 +60,64 @@ body::before {
   backdrop-filter: blur(100px);
   -webkit-backdrop-filter: blur(100px);
   
-  /* Ниже header */
+  background-image: 
+    radial-gradient(2px 2px at 20px 30px, #eee, rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 40px 70px, #fff, rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 50px 160px, #ddd, rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 90px 40px, #fff, rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 130px 80px, #fff, rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 160px 120px, #ddd, rgba(0,0,0,0));
+  
+  background-repeat: repeat;
+  background-size: 200px 200px;
+  
+  backdrop-filter: blur(100px);
+  -webkit-backdrop-filter: blur(100px);
+  
   z-index: -1;
+  
+  /* Анимация падающих снежинок */
+  animation: snow 20s linear infinite;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  
+  background-image: 
+    radial-gradient(1.5px 1.5px at 60px 50px, #fff, rgba(0,0,0,0)),
+    radial-gradient(1.5px 1.5px at 100px 150px, #eee, rgba(0,0,0,0)),
+    radial-gradient(1.5px 1.5px at 150px 60px, #fff, rgba(0,0,0,0)),
+    radial-gradient(1.5px 1.5px at 180px 100px, #ddd, rgba(0,0,0,0)),
+    radial-gradient(1.5px 1.5px at 30px 180px, #fff, rgba(0,0,0,0));
+  
+  background-repeat: repeat;
+  background-size: 200px 200px;
+  
+  z-index: 0;
+  
+  /* Анимация с другой скоростью для эффекта глубины */
+  animation: snow 25s linear infinite;
+  animation-delay: -10s;
+}
+
+/* Анимация снегопада */
+@keyframes snow {
+  0% {
+    background-position: 0px 0px, 0px 0px, 0px 0px;
+  }
+  100% {
+    background-position: 200px 200px, 100px 200px, -100px 200px;
+  }
 }
 
 main {
   min-height: 100vh;
+  z-index: 1;
 }
 
 .modal-content {
