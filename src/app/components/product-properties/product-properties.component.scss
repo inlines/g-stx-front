@@ -20,35 +20,6 @@ li:hover .bg-secondary {
   box-shadow: 0 0 10px rgba(255, 193, 7, 0.2);
 }
 
-.badge {
-  font-weight: 500;
-  padding: 0.35em 0.65em;
-  
-  &.platform-badge {
-    background-color: #212529; /* Bootstrap's dark color */
-    border: 1px solid #6c757d; /* Bootstrap's secondary color */
-  }
-  
-  &.region-badge {
-    &.ntsc-j { background-color: #bc002d; } /* Япония */
-    &.ntsc-u { background-color: #3c78d8; } /* США */
-    &.pal { background-color: #009e60; }    /* Европа */
-  }
-}
-
-.serial-badge {
-  max-width: 50%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.serial-badge .badge {
-  word-wrap: break-word; /* или overflow-wrap: break-word; */
-  white-space: normal;   /* разрешает перенос строк */
-  width: 100%;
-  text-align: left;
-}
 
 .serial-container {
   position: relative;
@@ -62,35 +33,6 @@ li:hover .bg-secondary {
   
   &:hover {
     background: rgba(255, 255, 255, 0.1);
-  }
-}
-
-.more-serials-badge {
-  background: rgba(255, 193, 7, 0.2);
-  border-radius: 10px;
-  padding: 0 0.4rem;
-  font-size: 0.8em;
-  margin-left: 0.3rem;
-}
-
-.serials-dropdown {
-  position: absolute;
-  z-index: 10;
-  left: -54px;
-  background: #2c3034;
-  border: 1px solid #444;
-  border-radius: 4px;
-  padding: 0.5rem;
-  margin-top: 0.3rem;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-  
-  .dropdown-item {
-    padding: 0.3rem 0.5rem;
-    cursor: pointer;
-    
-    &:hover {
-      background: rgba(255, 255, 255, 0.05);
-    }
   }
 }
 
