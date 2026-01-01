@@ -71,28 +71,16 @@
   @if (!!(collection$ | async)?.length) {
     @for (product of collectionWithLetters$ | async; track product.item.release_id) {
       <!-- Desktop / tablet: карточки -->
-      <div class="col-12 d-none d-md-block p-3">
+      <div class="col-12 p-3" style="color: rgba(211, 225, 236, 1);">
         <div
-          class="game-card h-100 border-0 shadow-sm hover-shadow position-relative row"
+          class="game-card position-relative row"
           [routerLink]="['/products/' + product.item.product_id.toString(), {platform: activeCategory}]"
           style="cursor: pointer;"
           (click)="null"
           >
-          <h5 class="col-auto d-flex flex-column justify-content-center">
-            @if (sortBy$.value === 'name' ) {
-              <ng-container>
-                {{ product.letter || '&nbsp;&nbsp;' }}
-              </ng-container>
-            }
-            @if (sortBy$.value === 'date' ) {
-              <ng-container>
-                {{ product.release_year || '&nbsp;&nbsp;' }}
-              </ng-container>
-            }
-          </h5>
           <div
-            class="col-auto"
-            style="height: 40px; overflow: hidden;"
+            class="col-auto px-0"
+            style="height: 92px; overflow: hidden;"
             >
             @if (product.item.image_url) {
               <img
@@ -104,7 +92,7 @@
                 />
             } @else {
               <div class="text-muted d-flex flex-column align-items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor"
+                <svg xmlns="http://www.w3.org/2000/svg" width="92" height="92" fill="currentColor"
                   class="bi bi-image" viewBox="0 0 16 16">
                   <path d="M14.002 3a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2.002a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h12zM2.002 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H2.002z"/>
                   <path d="M10.648 8.646a.5.5 0 0 1 .704 0l2.25 2.25V12H2.398v-.316l3.85-3.85a.5.5 0 0 1 .704 0l2.15 2.15 1.546-1.548z"/>
@@ -113,44 +101,55 @@
               </div>
             }
           </div>
-          <div class="col">
-            <h6 class="card-title text-truncate fw-bold">{{ product.item.product_name }} ({{ product.item.release_date || 0 * 1000 | date:'dd.MM.yy':'UTC' }})</h6>
-            <div class="card-subtitle small mb-2">
-              {{ product.item.platform_name }} [{{ product.item.region_name }}] ({{ product.item.serial?.join('|') }})
+          <div class="col-7 d-flex flex-column justify-content-between" style="padding-top:20px; padding-left: 20px; padding-right: 20px; padding-bottom: 16px;">
+            <h6 class="card-title text-truncate">{{ product.item.product_name }}</h6>
+            <div class="card-subtitle">
+              <span class="release-bullet">
+                {{ product.item.release_date || 0 * 1000 | date:'dd.MM.yy':'UTC' }}
+              </span>
+              <span class="release-bullet">
+                {{ product.item.platform_name }}
+              </span>
+              <span class="release-bullet">
+                {{ product.item.region_name }}
+              </span>
+              <span class="release-bullet">
+                {{ product.item.serial?.join('|') }}
+              </span>
             </div>
           </div>
-          <h6 class="col-auto d-flex flex-column justify-content-center">
-            {{$index + 1}} / {{(collectionWithLetters$ | async)?.length || ''}}
-          </h6>
-          <div class="col-auto py-2">
+
+          <div class="col-2 text-end d-flex flex-column justify-content-center">
             @if (product.item.price) {
               {{ product.item.price | currency:'₽':'symbol':'1.0-2' }}
             } @else {
               ₽?
             }
           </div>
-          <div class="col-auto py-2">
+          <div class="col-auto d-flex flex-column justify-content-center">
               <button
                 type="button"
-                class="btn btn-danger btn-sm w-100"
+                class="btn-blue"
                 (click)="setPrice(product.item.release_id, product.item.product_name, $event); $event.stopPropagation()"
               >
               задать цену
             </button>
           </div>
-          <div class="col-auto py-2">
-            <button
+          <div class="col-auto d-flex flex-column justify-content-center">
+            <a
               type="button"
-              class="btn btn-danger btn-sm w-100"
               (click)="remove(product.item.release_id, $event); $event.stopPropagation();"
               >
-              удалить
-            </button>
+              <svg width="44" height="38" viewBox="0 0 44 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="0.5" y="0.5" width="43" height="37" rx="7.5" stroke="#2D587E"/>
+                <path d="M19.0833 14.4286V12.4286C19.0833 12.0497 19.237 11.6863 19.5105 11.4184C19.784 11.1505 20.1549 11 20.5417 11H23.4583C23.8451 11 24.216 11.1505 24.4895 11.4184C24.763 11.6863 24.9167 12.0497 24.9167 12.4286V14.4286M15 14.4286H29M27.8333 14.4286V25.4286C27.8333 25.8453 27.6643 26.245 27.3635 26.5397C27.0626 26.8344 26.6546 27 26.2292 27H17.7708C17.3454 27 16.9374 26.8344 16.6365 26.5397C16.3357 26.245 16.1667 25.8453 16.1667 25.4286V14.4286H27.8333Z" stroke="#8AACC9" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </a>
           </div>
         </div>
       </div>
       <!-- Mobile: горизонтальная карточка -->
-       <div class="col-12 d-block d-md-none mb-3 overflow-hidden">
+       <!-- <div class="col-12 d-block d-md-none mb-3 overflow-hidden">
         <div
           class="game-card h-100 border-0 shadow-sm hover-shadow position-relative row"
           [routerLink]="['/products/' + product.item.product_id.toString(), {platform: activeCategory}]"
@@ -204,7 +203,7 @@
             </button>
           </div>
         </div>
-      </div>
+      </div> -->
     }
     <div class="text-white">На эту платформу вы потратили {{activeCategoryTotalSpent | currency:'₽':'symbol':'1.0-2' }}</div>
   } @else {

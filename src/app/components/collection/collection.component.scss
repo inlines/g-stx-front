@@ -10,26 +10,8 @@
 }
 
 .game-card {
-  background-color: #1e1e2f;
-  color: #f1f1f1;
-  border-radius: 0.75rem;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-
-  &:hover {
-    transform: scale(1.03);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-  }
-
-  .card-img-top {
-    background: linear-gradient(135deg, #2a2a3f, #1a1a2f);
-    border-top-left-radius: 0.75rem;
-    border-top-right-radius: 0.75rem;
-  }
-
-  .btn-danger {
-    font-size: 0.75rem;
-    padding: 0.4rem 0.6rem;
-  }
+  background-color: rgba(7, 16, 25, 1);
+  border-radius: 12px;
 }
 
 
@@ -101,4 +83,41 @@ ngb-dropdown-menu {
   line-height: 100%;
   letter-spacing: 0%;
   text-align: center;
+}
+
+.release-bullet:nth-of-type(n+2) {
+  position: relative;
+  padding-left: 24px;
+  margin-top: 8px;
+}
+
+.release-bullet:nth-of-type(n+2)::before {
+  content: "";
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  background-color: #333;
+  border-radius: 50%;
+}
+
+.release-bullet:first-of-type,
+.release-bullet:nth-of-type(1) {
+  padding-left: 0;
+}
+
+.card-title {
+  font-weight: 700;
+  font-style: Bold;
+  font-size: 18px;
+  line-height: 20px;
+}
+
+.card-subtitle {
+  font-weight: 400;
+  font-style: Regular;
+  font-size: 16px;
+  line-height: 20px;
 }
