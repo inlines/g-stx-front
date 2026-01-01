@@ -13,10 +13,9 @@
         <app-toast-container></app-toast-container>
       </section>
     </article>
+  </main>
     @if ((isAuthorized$ | async)) {
       <app-chat [class.invisible]="!(isChatVisible$ | async)" class="chat-sidebar open"></app-chat>
     }
-  </main>
-
   <app-footer></app-footer>
 </div>

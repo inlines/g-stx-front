@@ -1,20 +1,12 @@
-<h1 class="display-5 fw-bold mb-4 text-light">👥 Другие коллекционеры</h1>
+<h1 class="collectors-header mb-4">Другие коллекционеры</h1>
 
 <div class="row collector-row"> <!-- Добавлен класс collector-row -->
   @for (collector of collectors$ | async; track collector.user_login) {
-    <div class="col-12 mb-3">
+    <div class="col-md-3 col-lg-3 col-sm-4 mb-3" [routerLink]="[collector.user_login]">
       <div
         class="collector-card h-100 border-0 shadow-sm hover-shadow position-relative row align-items-center mx-0"
         style="cursor: pointer;"
-      >
-        <!-- Аватар/Иконка слева -->
-        <div class="col-2 col-md-1 d-flex justify-content-center ps-2 pe-1 ps-md-3 pe-md-2">
-          <div class="collector-avatar rounded-circle d-flex align-items-center justify-content-center">
-            {{ collector.user_login.charAt(0).toUpperCase() }}
-          </div>
-        </div>
-        
-        <!-- Информация о коллекционере -->
+      > 
         <div class="col-7 col-md-8 px-2 px-md-3 text-truncate-fix">
           <h6 class="collector-name text-truncate fw-bold mb-1">{{ collector.user_login }}</h6>
           <div class="collector-stats small text-light-muted">
@@ -23,19 +15,6 @@
               {{ collector.release_count || 0 }} игр
             </span>
           </div>
-        </div>
-        
-        <!-- Кнопка действия справа -->
-        <div class="col-3 col-md-3 text-end pe-2 pe-md-3 ps-1 ps-md-2">
-          <button
-            type="button"
-            class="btn btn-outline-primary btn-sm"
-            [routerLink]="[collector.user_login]"
-          >
-            <i class="bi bi-person-plus me-1 d-none d-md-inline"></i>
-            <span class="d-none d-md-inline">Посмотреть</span>
-            <span class="d-inline d-md-none">→</span>
-          </button>
         </div>
       </div>
     </div>

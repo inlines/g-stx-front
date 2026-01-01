@@ -1,88 +1,28 @@
-.card, a {
-  cursor: pointer;
+/* Темный дропдаун */
+.collector-header {
+  color: rgba(211, 225, 236, 1);
+  font-weight: 700;
+  font-style: Bold;
+  font-size: 34px;
+  line-height: 100%;
+  z-index: 1;
 }
 
 .game-card {
-  background-color: #1e1e2f;
-  color: #f1f1f1;
-  border-radius: 0.75rem;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-
-  &:hover {
-    transform: scale(1.03);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-  }
-
-  .card-img-top {
-    background: linear-gradient(135deg, #2a2a3f, #1a1a2f);
-    border-top-left-radius: 0.75rem;
-    border-top-right-radius: 0.75rem;
-  }
-
-  .btn-danger {
-    font-size: 0.75rem;
-    padding: 0.4rem 0.6rem;
-  }
+  background-color: rgba(7, 16, 25, 1);
+  border-radius: 12px;
 }
 
-
-.card-img-top {
-  background: linear-gradient(135deg, #2a2a3f, #1a1a2f);
-  border-top-left-radius: 0.75rem;
-  border-top-right-radius: 0.75rem;
+.card-title {
+  font-weight: 700;
+  font-style: Bold;
+  font-size: 18px;
+  line-height: 20px;
 }
 
-.text-light-muted {
-  color: #b0b0b0;
-}
-
-.stickerContent {
-  //overflow: hidden;
-  transition: height 0.3s ease, opacity 0.3s ease;
-  height: auto;
-  opacity: 1;
-}
-
-.stickerContent.hidden {
-  height: 0 !important;
-  opacity: 0;
-}
-
-.sticker {
-  position: sticky;
-  overflow: visible !important;
-  top: 52px;
-  z-index: 1000; /* убедись, что он выше других элементов */
-  @media (max-width: 576px) {
-    top: 64px;
-  }
-}
-
-/* Темный дропдаун */
-.dropdown-menu-dark {
-  background-color: #343a40;
-  border: 1px solid #495057;
-}
-.dropdown-item {
-  color: #f8f9fa;
-}
-.dropdown-item:hover {
-  background-color: #495057;
-}
-
-ngb-dropdown-menu {
-  position: absolute;
-  right: 0; /* Раскрывать вправо */
-  min-width: 200px; /* Фиксированная ширина */
-}
-
-.dropdown-menu { 
-  z-index: 1050; /* Чтобы меню было поверх других элементов */
-}
-
-.sort-button {
-  @media (min-width: 576px) {
-    top: 50%;
-    right: 0;
-  }
+.card-subtitle {
+  font-weight: 400;
+  font-style: Regular;
+  font-size: 16px;
+  line-height: 20px;
 }

@@ -1,40 +1,45 @@
-<h1 class="display-5 fw-bold mb-4 text-light">Коллекция пользователя {{collectionPropertiesLogin$ | async}}</h1>
-<button type="button" (click)="startChatWith()" class="mb-4 btn btn-outline-warning btn-sm">
-  Написать игроку
-</button>
+<div class="row mb-4 position-relative">
+  <div class="col">
+    <span class="collector-header" style="cursor: pointer;" [routerLink]="'/collectors'">
+      <svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M10.6393 20.4471L19.2511 29.5535L17.3158 31.6L5.40002 19L17.3158 6.39999L19.2511 8.44649L10.6393 17.5529H30.6V20.4471H10.6393Z" fill="#2D587E"/>
+      </svg>
+      Коллекция {{collectionPropertiesLogin$ | async}}
+    </span>
+  </div>
+  <div class="col-auto ml-auto">
+    <button type="button" (click)="startChatWith()" class="ml-auto btn-blue">
+      <svg width="14" height="13" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12.75 6.0119C12.75 8.91809 10.062 11.2738 6.75002 11.2738C5.78584 11.2799 4.8314 11.0785 3.95003 10.6829L3.43003 10.9095L0.750049 12.0833L1.67004 8.84524C1.06828 8.02652 0.745429 7.03224 0.750049 6.0119C0.750049 3.10571 3.43803 0.75 6.75002 0.75C9.654 0.75 12.078 2.56333 12.63 4.96762C12.7107 5.30968 12.751 5.66023 12.75 6.0119Z" stroke="#071019" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Написать
+    </button>
+  </div>
+</div>
 <div class="row text-white">
   @if (!!(loadedCollection$ | async)?.length) {
     @for (item of loadedCollection$ | async; track item.release_id) {
-      <!-- Desktop / tablet: карточки -->
-      
-      <!-- Mobile: горизонтальная карточка -->
        <div class="col-12 d-block mb-3 overflow-hidden">
         <div
-          class="game-card h-100 border-0 shadow-sm hover-shadow position-relative row"
+          class="game-card row"
           [routerLink]="['/products/' + item.product_id.toString()]"
           style="cursor: pointer;"
           (click)="null"
           >
-          <!-- <h5 class="col-2 d-flex flex-column justify-content-center">
-            {{ product.letter || '&nbsp;&nbsp;' }}
-          </h5>
-          <h6 class="col-10 d-flex flex-column justify-content-center text-end">
-            {{$index + 1}} / {{activeCategorCount}}
-          </h6> -->
           <div
             class="col-auto"
-            style="height: 40px; overflow: hidden;"
             >
             @if (item.image_url) {
               <img
                 [src]="item.image_url"
                 [alt]="item.product_name"
                 class="img-fluid"
-                style="max-height: 100%; object-fit: cover;"
+                style="object-fit: cover;"
                 (error)="item.image_url = null"
+                style="height: 92px;"
                 />
             } @else {
-              <div class="text-muted d-flex flex-column align-items-center">
+              <div class="d-flex flex-column align-items-center">
                 <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor"
                   class="bi bi-image" viewBox="0 0 16 16">
                   <path d="M14.002 3a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2.002a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h12zM2.002 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H2.002z"/>
@@ -44,13 +49,22 @@
               </div>
             }
           </div>
-          <div class="col-8">
-            <h6 class="card-title text-truncate fw-bold">{{ item.product_name }}({{ item.release_date || 0 * 1000 | date:'dd.MM.yy':'UTC' }})</h6>
-            <div class="card-subtitle small mb-2">
-              {{ item.platform_name }} [{{ item.region_name }}] ({{ item.serial?.join('|') }})
+          <div class="col-8 d-flex flex-column justify-content-between" style="padding-top:20px; padding-left: 20px; padding-right: 20px; padding-bottom: 16px;">
+            <div class="card-title text-truncate">{{ item.product_name }}</div>
+            <div class="card-subtitle">
+              <span class="release-bullet">
+                {{ item.release_date || 0 * 1000 | date:'dd.MM.yy':'UTC' }}
+              </span>
+              <span class="release-bullet">
+                {{ item.platform_name }}
+              </span>
+              <span class="release-bullet">
+                {{ item.region_name }}
+              </span>
             </div>
           </div>
-          <div class="col-4 py-2">
+          <div class="col d-flex flex-column justify-content-end text-end" style="padding-top:20px; padding-left: 20px; padding-right: 20px; padding-bottom: 16px;">
+            {{ item.serial?.join('|') }}
           </div>
         </div>
       </div>
