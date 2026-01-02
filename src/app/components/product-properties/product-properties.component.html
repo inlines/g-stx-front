@@ -157,39 +157,7 @@
               <span class="badge bg-dark ">{{ release.serial?.join(' | ') }}</span>
             </div> -->
             <div class="col serial-container">
-              <!-- Десктопный вариант -->
-              <div class="d-none d-md-block">
-                @if (release.serial?.length) {
-                  @for (serial of release.serial; let i = $index; track i; let last = $last) {
-                    <span class="serial-item">
-                      {{ serial || '' }}<span *ngIf="!last"> | </span>
-                    </span>
-                  }
-                } @else {
-                  <span class="">N/A</span>
-                }
-              </div>
-
-              <!-- Мобильный вариант -->
-              <div class="d-block d-md-none">
-                @if (release.serial?.length) {
-                  <span class="serial-item" (click)="toggleSerials(release.release_id)">
-                    серийники
-                  </span>
-
-                  @if (showAllSerials === release.release_id) {
-                    <div class="serials-dropdown">
-                      @for (serial of release.serial?.slice(1) || ''; let i = $index; track i;) {
-                        <div class="dropdown-item">
-                          {{ serial || '' }}
-                        </div>
-                      }
-                    </div>
-                  }
-                } @else {
-                  <span class="">N/A</span>
-                }
-              </div>
+              {{ release.serial?.join(' | ') }}
             </div>
           }
         </div>
