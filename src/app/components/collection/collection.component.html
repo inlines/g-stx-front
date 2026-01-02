@@ -1,68 +1,59 @@
-<h1 class="display-5 fw-bold mb-4 text-light">Ваша коллекция</h1>
-
 <div class="row">
-  <div class="col-12 px-0 mb-4 sticker">
+  <div class="col-12 px-0 mb-4 sticker authorised">
     @if (!!(collection$ | async)?.length) {
-      <div class="bg-dark text-white shadow">
-        <div class="p-3">
+      <div>
+        <div>
           <div #stickerContent class="stickerContent">
-            <ul class="nav nav-pills flex-wrap justify-content-start mb-0">
+            <form [formGroup]="queryForm" class="position-relative">
+            <ul class="nav nav-pills flex-wrap justify-content-start mb-3">
               @for (cat of (displayCategories$ | async); track cat) {
-                <li class="nav-item me-2 mb-2"
+                <li class="me-2 mb-2"
                   >
-                  <a class="nav-link d-flex justify-content-between align-items-center"
+                  <a class="btn-pink px-4 py-2 fw-semibold d-flex justify-content-between align-items-center"
                     [class.active]="activeCategory === cat.id"
                     (click)="setActiveCategory(cat.id, cat.user_games, cat.total_spent)">
                     <span>
                       {{ cat.abbreviation }}
-                      @if (cat.user_games === cat.total_games) {
-                        <span class="ms-1 text-success">🏆</span>
-                      }
                     </span>
-                    <span class="badge bg-light text-dark">
+                    <span>
                       {{ cat.user_games }}/{{ cat.total_games }}
                     </span>
                   </a>
                 </li>
+                <li [formGroup]="queryForm" class="nav-item mb-2 pl-3" style="margin-left: auto;">
+                  <div ngbDropdown class="d-inline-block">
+                    <button
+                      class="btn-pink active dropdown-toggle"
+                      ngbDropdownToggle
+                      type="button">
+                      {{ sortBy$.value === 'name' ? 'По имени' : sortBy$.value === 'date' ? 'По дате' : 'По цене' }}
+                    </button>
+                    <div ngbDropdownMenu class="dropdown-menu dropdown-menu-dark">
+                      <button ngbDropdownItem (click)="setSort('name')">По имени (A-Z)</button>
+                      <button ngbDropdownItem (click)="setSort('date')">По дате релиза</button>
+                      <button ngbDropdownItem (click)="setSort('price')">По цене</button>
+                    </div>
+                  </div>
+                </li>
               }
             </ul>
-          </div>
-
-          <form [formGroup]="queryForm" class="position-relative">
-            <input id="query"
-              #query
-              class="form-control form-control-lg bg-secondary text-white border-0 rounded-3 pe-5"
-              type="text"
-              placeholder="🔍 Поиск по названию"
-              formControlName="query" />
-
-            @if (queryForm.get('query')?.value) {
-              <button
-                type="button"
-                class="btn position-absolute top-50 end-0 translate-middle-y me-3 p-0 text-white"
-                style="font-size: 1.2rem; background: none; border: none;"
-                (click)="queryForm.get('query')?.reset()">
-                &times;
-              </button>
-            }
-
-            <!-- Переключатель сортировки (справа от поиска) -->
-            <div class="sort-button mt-3">
-              <div ngbDropdown class="d-inline-block">
-                <button
-                  class="btn btn-sm btn-outline-light dropdown-toggle"
-                  ngbDropdownToggle
-                  type="button">
-                  Сортировка: {{ sortBy$.value === 'name' ? 'По имени' : sortBy$.value === 'date' ? 'По дате' : 'По цене' }}
-                </button>
-                <div ngbDropdownMenu class="dropdown-menu dropdown-menu-dark">
-                  <button ngbDropdownItem (click)="setSort('name')">По имени (A-Z)</button>
-                  <button ngbDropdownItem (click)="setSort('date')">По дате релиза</button>
-                  <button ngbDropdownItem (click)="setSort('price')">По цене</button>
-                </div>
+            <div class="row">
+              <div class="col">
+                <input id="query"
+                  #query
+                  class="form-control form-control-lg border-0 rounded-3 pe-5"
+                  type="text"
+                  placeholder="Название"
+                  formControlName="query"
+                  autocomplete="off"/>
               </div>
             </div>
-          </form>
+            </form>
+          </div>
+
+          
+            
+          
         </div>
 
       </div>

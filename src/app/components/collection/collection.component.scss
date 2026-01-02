@@ -1,8 +1,18 @@
 .sticker {
   position: sticky;
-  top: 56px;
-  z-index: 1000; /* убедись, что он выше других элементов */
-  background: white; /* или цвет фона страницы */
+   top: 82px;
+  z-index: 1000;
+  background: linear-gradient(
+    90deg, 
+    rgba(6, 19, 24, 1) 0%, 
+    rgba(14, 37, 63, 1) 100%
+  );
+  @media (max-width: 576px) {
+    top: 30px;
+  }
+  &.authorised {
+    top: 142px;
+  }
 }
 
 .card, a {
@@ -11,7 +21,11 @@
 
 .game-card {
   background-color: rgba(7, 16, 25, 1);
-  border-radius: 12px;
+  border-radius: 8px;
+  &:hover {
+    transform: scale(1.03);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+  }
 }
 
 
@@ -120,4 +134,30 @@ ngb-dropdown-menu {
   font-style: Regular;
   font-size: 16px;
   line-height: 20px;
+}
+
+input {
+  background-color: rgba(7, 16, 25, 1);
+  border-radius: 60px;
+  height: 38px;
+  padding-top: 8px;
+  color: rgba(138, 172, 201, 1);
+  &:focus {
+    box-shadow: none!important;
+    border: none!important;
+    background-color: rgba(7, 16, 25, 1)!important;
+    color: rgba(138, 172, 201, 1)!important;
+  }
+  &:focus-visible {
+    outline: none!important;
+  }
+  font-weight: 400;
+  font-style: Regular;
+  font-size: 16px;
+  line-height: 20px;
+  letter-spacing: 0%;
+}
+
+input::placeholder {
+  color: rgba(138, 172, 201, 1);
 }
