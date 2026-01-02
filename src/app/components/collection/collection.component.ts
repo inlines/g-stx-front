@@ -7,7 +7,7 @@ import { CollectionState } from '@app/states/collection/states/collection.state'
 import { OwnershipState } from '@app/states/ownership/states/ownership.state';
 import { IProductListRequest } from '@app/states/products/interfaces/product-list-request.interface';
 import { Store } from '@ngxs/store';
-import { BehaviorSubject, combineLatest, debounceTime, filter, map, Observable, of, startWith, Subject, Subscription, switchMap, take, takeUntil, tap } from 'rxjs';
+import { BehaviorSubject, combineLatest, filter, map, Observable, startWith, Subject, Subscription, switchMap, take, tap } from 'rxjs';
 import { PagerComponent } from '../pager/pager.component';
 import { IPlatformItem } from '@app/states/platforms/interfaces/platform-item.interface';
 import { PlatformState } from '@app/states/platforms/states/platforms.state';
@@ -94,6 +94,13 @@ export class CollectionComponent implements OnInit, OnDestroy {
     });
 
   public ngOnInit(): void {
+    let params = this.store.selectSnapshot(CollectionState.collectionParams);
+    if(params.cat) {
+      this.activeCategory$.next(params.cat);
+      this.activeCategory = params.cat;
+    }
+
+
     const sub =  this.activeCategory$.subscribe(x => this.store.dispatch(new CollectionActions.SetCollectionParams({cat: x, limit: LIMIT, offset: 0,})));
 
     const paramsSub = this.collectionParams$.pipe(filter(x => !!x.cat && !!x.limit)).subscribe(params => this.store.dispatch(new CollectionActions.GetCollectionRequest()));
@@ -148,17 +155,11 @@ export class CollectionComponent implements OnInit, OnDestroy {
                 lastLetter = currentLetter;
               }
             } else if (sortBy === 'date') {
-              // ФУНКЦИЯ ДЛЯ ПОЛУЧЕНИЯ ГОДА
               const getYearFromTimestamp = (timestamp: number | undefined): string => {
                 if (!timestamp) return 'Unknown';
-                
-                // Попробуем понять, в чем timestamp: секундах или миллисекундах
-                // Если timestamp меньше 10^10 (31 марта 2286), вероятно это секунды
                 if (timestamp < 10000000000) {
-                  // Скорее всего секунды - умножаем на 1000
                   return new Date(timestamp * 1000).getFullYear().toString();
                 } else {
-                  // Скорее всего уже миллисекунды
                   return new Date(timestamp).getFullYear().toString();
                 }
               };
@@ -185,10 +186,12 @@ export class CollectionComponent implements OnInit, OnDestroy {
     const subPlat = this.activePlatforms$.pipe(
       filter(platforms => platforms.length > 0),
     ).subscribe(platforms => {
-      this.activeCategory$.next(platforms[0].platform);
-      this.activeCategory = platforms[0].platform;
-      this.activeCategorCount = platforms[0].have_games;
-      this.activeCategoryTotalSpent = platforms[0].total_spent
+      if(!this.activeCategory) {
+        this.activeCategory$.next(platforms[0].platform);
+        this.activeCategory = platforms[0].platform;
+        this.activeCategorCount = platforms[0].have_games;
+        this.activeCategoryTotalSpent = platforms[0].total_spent
+      }
     });
 
     this.subscriptions.push(sub, paramsSub, subPlat);
@@ -239,12 +242,6 @@ export class CollectionComponent implements OnInit, OnDestroy {
         }
       })
     ).subscribe();
-  }
-
-  public pageChanged(page: number): void {
-    this.store.dispatch(new CollectionActions.SetCollectionParams({
-      offset: (page - 1 ) * LIMIT
-    }));
   }
 
   public setPriceProductName: string | null = null;

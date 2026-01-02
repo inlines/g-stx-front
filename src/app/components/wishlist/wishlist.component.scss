@@ -1,8 +1,18 @@
 .sticker {
   position: sticky;
-  top: 56px;
-  z-index: 1000; /* убедись, что он выше других элементов */
-  background: white; /* или цвет фона страницы */
+  top: 82px;
+  z-index: 1000;
+  background: linear-gradient(
+    90deg, 
+    rgba(6, 19, 24, 1) 0%, 
+    rgba(14, 37, 63, 1) 100%
+  );
+  @media (max-width: 576px) {
+    top: 30px;
+  }
+  &.authorised {
+    top: 142px;
+  }
 }
 
 .card, a {
@@ -10,29 +20,12 @@
 }
 
 .game-card {
-  background-color: #1e1e2f;
-  color: #f8f9fa;
-  border-radius: 0.75rem;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-
+  background-color: rgba(7, 16, 25, 1);
+  border-radius: 8px;
   &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-  }
-
-  .card-img-top {
-    background: linear-gradient(135deg, #2a2a3f, #1a1a2f);
-    border-top-left-radius: 0.75rem;
-    border-top-right-radius: 0.75rem;
-  }
-
-  .btn-danger {
-    font-size: 0.75rem;
-    padding: 0.35rem 0.75rem;
+    transform: scale(1.03);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
   }
 }
 
-.text-light-muted {
-  color: #b0b0b0;
-}
 

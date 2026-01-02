@@ -213,11 +213,13 @@
       </div>
 
       @if (productProperties.screenshots.length) {
-        <div style="margin-top: 60px; padding: 0px 20px 46px 20px;">
+        <div style="margin-top: 60px;">
           <ngb-carousel [interval]="3000" [pauseOnHover]="true" [wrap]="true">
             @for (screen of productProperties.screenshots; track screen) {
               <ng-template ngbSlide>
-                <img class="d-block w-100" [src]="screen" style="object-fit: cover; max-height: 500px;" />
+                <div class="d-flex justify-content-center">
+                  <img class="d-block" [src]="screen" style="object-fit: cover; max-height: 500px;" />
+                </div>
               </ng-template>
             }
           </ngb-carousel>
