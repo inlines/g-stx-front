@@ -8,7 +8,7 @@
     <div class="ellipse ellipse-2 d-none d-md-block"></div>
     <div class="ellipse ellipse-3 d-none d-md-block"></div>
     <article [class.authenticated]="(isAuthorized$ | async)">
-      <section class="container-fluid container-lg pt-5 pt-md-7">
+      <section class="container-fluid container-lg pt-md-5 pt-md-7" style="padding-top: 32px;">
         <router-outlet></router-outlet>
         <app-toast-container></app-toast-container>
       </section>

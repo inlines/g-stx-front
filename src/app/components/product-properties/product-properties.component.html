@@ -106,8 +106,8 @@
           }">
           
         <!-- Верхняя строка: Основная информация -->
-        <div class="d-flex justify-content-between align-items-start mb-2">
-          <div class="col-auto">
+        <div class="row justify-content-between align-items-start mb-2">
+          <div class="col-12 col-md">
             <span class="release-bullet">{{ release.release_date | date:'dd.MM.yy':'UTC' }}</span>
             <span class="release-bullet">{{ release.platform_name }}</span>
             <span class="release-bullet">
@@ -116,7 +116,7 @@
           </div>
           
           @if (!release.digital_only && release?.serial?.length) {
-            <div class="col px-4 text-end">
+            <div class="col-12 col-md px-2 px-md-4 text-md-end">
               {{ release.serial?.join(' | ') }}
             </div>
           }
