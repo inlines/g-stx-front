@@ -177,7 +177,7 @@
                 <button class="btn-blue small"
                   [disabled]="release.owned || release.digital_only || release.release_status === 5 || !release.release_date || (collectionChanging$ | async)"
                   [hidden]="release.owned"
-                  (click)="addToCollection(release.release_id)">
+                  (click)="addToCollection(release.release_id, productProperties.product.id)">
                   В коллекцию
                 </button>
                 <button type="button" class="btn-pink active"

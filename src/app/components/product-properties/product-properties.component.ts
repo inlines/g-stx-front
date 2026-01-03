@@ -103,8 +103,8 @@ export class ProductPropertiesComponent implements OnInit {
 
   public releases$: Observable<IReleaseItem[]>;
 
-  public addToCollection(release_id: number): void {
-    this.store.dispatch(new CollectionActions.AddToCollectionRequest({release_id}))
+  public addToCollection(release_id: number, product_id: number): void {
+    this.store.dispatch(new CollectionActions.AddToCollectionRequest({release_id, product_id}))
   }
 
   public addWish(release_id: number): void {
