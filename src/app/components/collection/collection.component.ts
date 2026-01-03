@@ -8,7 +8,6 @@ import { OwnershipState } from '@app/states/ownership/states/ownership.state';
 import { IProductListRequest } from '@app/states/products/interfaces/product-list-request.interface';
 import { Store } from '@ngxs/store';
 import { BehaviorSubject, combineLatest, filter, map, Observable, startWith, Subject, Subscription, switchMap, take, tap } from 'rxjs';
-import { PagerComponent } from '../pager/pager.component';
 import { IPlatformItem } from '@app/states/platforms/interfaces/platform-item.interface';
 import { PlatformState } from '@app/states/platforms/states/platforms.state';
 import { ICollectionItemWithLetter } from '@app/states/collection/interfaces/collection-item-with-letter.interface';
@@ -19,7 +18,7 @@ import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 const LIMIT = 1000;
 @Component({
   selector: 'app-collection',
-  imports: [AsyncPipe, RouterModule, PagerComponent, FormsModule, ReactiveFormsModule, DatePipe, NgbDropdownModule, CurrencyPipe],
+  imports: [AsyncPipe, RouterModule, FormsModule, ReactiveFormsModule, DatePipe, NgbDropdownModule, CurrencyPipe],
   templateUrl: './collection.component.html',
   styleUrl: './collection.component.scss',
   standalone: true,

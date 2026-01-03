@@ -52,7 +52,7 @@ export class OwnershipState {
 
   static activeCollectionPlatforms = createSelector(
     [OwnershipState.ownership],
-    (ownership: IOwnershipItem[]) => ownership.filter(item => item.have_count > 0).map(o => ({platform: o.platform, have_games: o.have_games, total_spent: o.total_spent}))
+    (ownership: IOwnershipItem[]) => ownership.filter(item => item.have_count > 0).map(o => ({platform: o.platform, have_games: (o.have_prod_ids || []).length, total_spent: o.total_spent}))
   );
 
   static activeWishlistPlatforms = createSelector(
@@ -63,6 +63,11 @@ export class OwnershipState {
   static hasRelease = (releaseId: number) =>
     createSelector([OwnershipState.ownership], (ownership: IOwnershipItem[]): boolean => {
       return ownership.some(item => item.have_ids.includes(releaseId));
+  });
+
+  static hasGame = (prodId: number) =>
+    createSelector([OwnershipState.ownership], (ownership: IOwnershipItem[]): boolean => {
+      return ownership.some(item => item.have_prod_ids.includes(prodId));
   });
 
   static hasWish = (releaseId: number) =>

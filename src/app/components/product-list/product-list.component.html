@@ -87,10 +87,18 @@
     <!-- Desktop / tablet: карточки -->
     <div class="col-xl-3 col-lg-4 col-md-4 col-sm-6 p-3">
       <div
-        class="card game-card border-0 d-flex flex-column justify-content-between"
+        class="card game-card border-0 d-flex flex-column justify-content-between position-relative"
         [routerLink]="[product.id.toString(), {platform: activeCategory.value}]"
         style="cursor: pointer;"
         >
+        @if (product.owned) {
+          <a class="position-absolute" style="top: 8px; left: 8px;">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="28" height="28" rx="4" fill="#BDA7EA"/>
+            <path d="M21.1564 8.07556C21.0572 7.9724 20.9391 7.89052 20.8091 7.83464C20.679 7.77877 20.5395 7.75 20.3986 7.75C20.2577 7.75 20.1182 7.77877 19.9881 7.83464C19.8581 7.89052 19.74 7.9724 19.6408 8.07556L11.6892 16.2861L8.34852 12.8302C8.2455 12.7276 8.12389 12.6469 7.99063 12.5927C7.85737 12.5386 7.71507 12.512 7.57185 12.5146C7.42864 12.5171 7.28732 12.5487 7.15595 12.6076C7.02459 12.6665 6.90575 12.7515 6.80624 12.8577C6.70672 12.9639 6.62847 13.0894 6.57596 13.2268C6.52344 13.3642 6.49769 13.5109 6.50016 13.6586C6.50264 13.8063 6.5333 13.952 6.5904 14.0875C6.64749 14.2229 6.7299 14.3455 6.83292 14.4481L10.9314 18.6744C11.0307 18.7776 11.1487 18.8595 11.2788 18.9154C11.4088 18.9712 11.5483 19 11.6892 19C11.8301 19 11.9696 18.9712 12.0997 18.9154C12.2298 18.8595 12.3478 18.7776 12.447 18.6744L21.1564 9.69346C21.2647 9.59039 21.3512 9.46531 21.4103 9.32608C21.4695 9.18685 21.5 9.0365 21.5 8.88451C21.5 8.73251 21.4695 8.58216 21.4103 8.44294C21.3512 8.30371 21.2647 8.17862 21.1564 8.07556Z" fill="#5B399D"/>
+            </svg>
+          </a>
+        }
         <div
           class="d-flex align-items-center justify-content-center"
           style="height: 214px; overflow: hidden;"

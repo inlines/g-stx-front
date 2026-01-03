@@ -8,12 +8,11 @@ import { OwnershipState } from '@app/states/ownership/states/ownership.state';
 import { IProductListRequest } from '@app/states/products/interfaces/product-list-request.interface';
 import { Store } from '@ngxs/store';
 import { combineLatest, filter, Observable, Subject, Subscription, switchMap, take, tap } from 'rxjs';
-import { PagerComponent } from '@app/components/pager/pager.component';
 
 const LIMIT = 1000;
 @Component({
   selector: 'app-wishlist',
-  imports: [AsyncPipe, RouterModule, PagerComponent],
+  imports: [AsyncPipe, RouterModule],
   templateUrl: './wishlist.component.html',
   styleUrl: './wishlist.component.scss',
   standalone: true,

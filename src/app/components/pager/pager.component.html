@@ -4,7 +4,7 @@
       class="pagination justify-content-center mb-0 flex-nowrap overflow-auto"
       style="white-space: nowrap;"
       >
-      @for (page of pages; track page) {
+      @for (page of pages; track $index) {
         <li
           class="page-item"
           [class.active]="page === currentPage"

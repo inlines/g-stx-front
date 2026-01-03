@@ -1,6 +1,6 @@
 import { AsyncPipe, DatePipe } from '@angular/common';
 import { Component, OnDestroy, OnInit, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
-import { startWith, switchMap, takeUntil, throttleTime } from 'rxjs/operators';
+import { max, startWith, switchMap, takeUntil, throttleTime } from 'rxjs/operators';
 import { RouterModule } from '@angular/router';
 import { IProductListItem } from '@app/states/products/interfaces/product-list-item.interface';
 import { ProductsActions } from '@app/states/products/states/products.actions';
@@ -13,6 +13,7 @@ import { PagerComponent } from '@app/components/pager/pager.component';
 import { IPlatformItem } from '@app/states/platforms/interfaces/platform-item.interface';
 import { PlatformState } from '@app/states/platforms/states/platforms.state';
 import { AuthState } from '@app/states/auth/states/auth.state';
+import { OwnershipState } from '@app/states/ownership/states/ownership.state';
 
 const LIMIT = 15;
 
@@ -32,7 +33,7 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
 
   constructor(private readonly store: Store) {}
 
-  public products$!: Observable<IProductListItem[]>;
+  public products$!: Observable<any[]>;
   public offset$!: Observable<number>;
   public productsTotalCount$!: Observable<number>;
   public productParams$!: Observable<IProductListRequest>;
@@ -58,7 +59,10 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
       }));
     }
 
-    this.products$ = this.store.select(ProductsState.loadedProducts);
+    this.products$ = this.store.select(ProductsState.loadedProducts).pipe(
+      map(products => products.map(x => ({...x, owned: this.store.selectSnapshot(OwnershipState.hasGame(x.id))})))
+    );
+
     this.productsTotalCount$ = this.store.select(ProductsState.totalCountProducts);
     this.productParams$ = this.store.select(ProductsState.productsParams);
     this.categories$ = this.store.select(PlatformState.loadedPlatforms);
