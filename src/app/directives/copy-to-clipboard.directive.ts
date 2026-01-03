@@ -41,7 +41,7 @@ export class CopyToClipboardDirective implements OnInit {
         </g>
       </svg>`;
     const button= this.renderer.createElement('span');
-    button.style = 'height:20px;line-height:20px;width:20px;cursor:pointer;'
+    button.style = 'height:20px;line-height:20px;width:20px;cursor:pointer; z-index: 1000;'
     button.innerHTML = totalString;
     this.renderer.appendChild(this.nativeElement, button);
     this.renderer.nextSibling(this.nativeElement)
