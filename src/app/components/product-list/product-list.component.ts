@@ -54,7 +54,7 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
         offset: 0,
         query: undefined,
         cat: 6,
-        ignore_digital: false,
+        ignore_digital: true,
         sort: 'name'
       }));
     }
