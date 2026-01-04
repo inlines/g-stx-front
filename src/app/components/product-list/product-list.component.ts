@@ -55,7 +55,7 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
         query: undefined,
         cat: 6,
         ignore_digital: true,
-        sort: 'name'
+        sort: 'date'
       }));
     }
 
@@ -68,7 +68,7 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
     this.categories$ = this.store.select(PlatformState.loadedPlatforms);
     this.queryForm = new FormGroup({
       query: new FormControl(params?.query || ''),
-      sort: new FormControl(params?.sort || 'name'),
+      sort: new FormControl(params?.sort || 'date'),
       franschise: new FormControl(params?.franschise || null),
       developer: new FormControl(params?.developer || null),
       publisher: new FormControl(params?.publisher || null),
