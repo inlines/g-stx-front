@@ -125,13 +125,13 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
       lastCategory = category;
       if (this.store.selectSnapshot(ProductsState.productsParams)?.cat !== category) {
         this.queryForm.controls['query'].setValue('');
-        this.queryForm.controls['sort'].setValue('name');
+        this.queryForm.controls['sort'].setValue('date');
         this.store.dispatch(new ProductsActions.SetRequestParams({
           query: undefined,
           offset: 0,
           limit: LIMIT,
           cat: category,
-          sort: 'name'
+          sort: 'date'
         }));
       }
     });
