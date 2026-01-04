@@ -97,6 +97,13 @@ export class CollectionComponent implements OnInit, OnDestroy {
     if(params.cat) {
       this.activeCategory$.next(params.cat);
       this.activeCategory = params.cat;
+    } else {
+      this.displayCategories$.pipe(take(1)).subscribe(x => {
+        if(x[0]) {
+          this.activeCategory$.next(x[0].id);
+          this.activeCategory = x[0].id;
+        }
+      });
     }
 
 
@@ -190,6 +197,8 @@ export class CollectionComponent implements OnInit, OnDestroy {
         this.activeCategory = platforms[0].platform;
         this.activeCategorCount = platforms[0].have_games;
         this.activeCategoryTotalSpent = platforms[0].total_spent
+      } else {
+        this.activeCategoryTotalSpent = platforms.find(x => x.platform === this.activeCategory)?.total_spent;
       }
     });
 
