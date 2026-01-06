@@ -385,6 +385,11 @@ export class CollectionState {
     });
   }
 
+  @Action(CollectionActions.Reset)
+  public reset(ctx: StateContext<ICollectionState>) {
+    ctx.setState(COLLECTION_STATE_DEFAULTS);
+  }
+
   @Action(CollectionActions.SetWishlistParams)
   public setWishlistParams(ctx: StateContext<ICollectionState>, action: CollectionActions.SetWishlistParams) {
     const currentParams = ctx.getState().wishlistParams;

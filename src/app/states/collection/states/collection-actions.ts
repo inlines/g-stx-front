@@ -143,5 +143,9 @@ export namespace CollectionActions {
     constructor(public payload: IProductListRequest){
     }
   }
+
+  export class Reset {
+    public static readonly type = CollectionActionList.RESET;
+  }
   
 }

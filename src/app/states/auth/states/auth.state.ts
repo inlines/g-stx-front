@@ -11,6 +11,8 @@ import { OwnershipActions } from "@app/states/ownership/states/ownership-actions
 import { ProductsActions } from "@app/states/products/states/products.actions";
 import { ToastService } from "@app/services/toast.service";
 import { ChatActions } from "@app/states/chat/states/chat-actions";
+import { CollectionState } from "@app/states/collection/states/collection.state";
+import { CollectionActions } from "@app/states/collection/states/collection-actions";
 
 
 @State<IAuthState>({
@@ -83,6 +85,7 @@ export class AuthState {
 
     ctx.dispatch(new OwnershipActions.ResetOwnership());
     ctx.dispatch(new ProductsActions.ProductsReset());
+    ctx.dispatch(new CollectionActions.Reset());
     ctx.dispatch(new ChatActions.Reset());
 
     this.router.navigate(['/login']);

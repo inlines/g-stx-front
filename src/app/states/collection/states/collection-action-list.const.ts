@@ -38,4 +38,6 @@ export enum CollectionActionList {
   GET_WISHLIST_SUCCESS = '[Collection] get wishlist request success',
 
   SET_WISHLIST_PARAMS = '[Collection] set wishlist params',
+
+  RESET = '[Collection] reset',
 }
