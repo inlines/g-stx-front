@@ -93,6 +93,11 @@ export class CollectionComponent implements OnInit, OnDestroy {
     });
 
   public ngOnInit(): void {
+    
+    const sub =  this.activeCategory$.subscribe(x => this.store.dispatch(new CollectionActions.SetCollectionParams({cat: x, limit: LIMIT, offset: 0,})));
+
+    const paramsSub = this.collectionParams$.pipe(filter(x => !!x.cat && !!x.limit)).subscribe(params => this.store.dispatch(new CollectionActions.GetCollectionRequest()));
+
     let params = this.store.selectSnapshot(CollectionState.collectionParams);
     if(params.cat) {
       this.activeCategory$.next(params.cat);
@@ -105,11 +110,6 @@ export class CollectionComponent implements OnInit, OnDestroy {
         }
       });
     }
-
-
-    const sub =  this.activeCategory$.subscribe(x => this.store.dispatch(new CollectionActions.SetCollectionParams({cat: x, limit: LIMIT, offset: 0,})));
-
-    const paramsSub = this.collectionParams$.pipe(filter(x => !!x.cat && !!x.limit)).subscribe(params => this.store.dispatch(new CollectionActions.GetCollectionRequest()));
 
     this.collectionWithLetters$ = 
       combineLatest([
