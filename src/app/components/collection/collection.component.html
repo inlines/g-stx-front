@@ -56,7 +56,6 @@
   </div>
   @if (!!(collection$ | async)?.length) {
     @for (product of collectionWithLetters$ | async; track product.item.release_id) {
-      <!-- Desktop / tablet: карточки -->
       <div class="col-12 p-3" style="color: rgba(211, 225, 236, 1);">
         <div
           class="game-card position-relative row"
@@ -99,7 +98,7 @@
               <span class="release-bullet">
                 {{ product.item.region_name }}
               </span>
-              <span class="release-bullet">
+              <span class="release-bullet d-none d-md-inline">
                 {{ product.item.serial?.join(' | ') }}
               </span>
             </div>
