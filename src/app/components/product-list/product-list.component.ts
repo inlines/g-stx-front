@@ -28,9 +28,6 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('stickerContent') stickerContent!: ElementRef;
   @ViewChild('query') query!: ElementRef;
 
-  private lastScrollTop = 0;
-  private isHidden = false;
-
   constructor(private readonly store: Store) {}
 
   public products$!: Observable<any[]>;
@@ -155,16 +152,6 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   public ngAfterViewInit(): void {
-    if (window.innerWidth <= 576) {
-      this.subscriptions.push(
-      fromEvent(window, 'scroll')
-        .pipe(
-          throttleTime(100)
-        )
-        .subscribe(() => this.handleScroll())
-      );
-    }
-
     this.query.nativeElement.focus();
   }
 
@@ -192,24 +179,5 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
         offset: 0,
         ignore_digital: this.skipDigitalFilter
     }));
-  }
-
-  private handleScroll() {
-    const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
-    const goingDown = currentScroll > this.lastScrollTop;
-    const stickerTop = this.stickerContent.nativeElement.getBoundingClientRect().top;
-    const threshold = 81;
-
-    if (goingDown && stickerTop <= threshold && !this.isHidden) {
-      this.stickerContent.nativeElement.classList.add('hidden');
-      this.isHidden = true;
-    }
-
-    if (!goingDown && this.isHidden && stickerTop > threshold + 5) {
-      this.stickerContent.nativeElement.classList.remove('hidden');
-      this.isHidden = false;
-    }
-
-    this.lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
   }
 }
