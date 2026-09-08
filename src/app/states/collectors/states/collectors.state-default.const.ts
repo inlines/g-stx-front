@@ -1,5 +1,5 @@
-import { RequestStatus } from "@app/constants/request-status.const";
-import { IcollectorsState } from "./collectors.state.interface";
+import { RequestStatus } from '@app/constants/request-status.const';
+import { IcollectorsState } from './collectors.state.interface';
 
 export const COLLECTORS_STATE_DEFAULTS: IcollectorsState = {
   collectorsList: [],
@@ -9,4 +9,4 @@ export const COLLECTORS_STATE_DEFAULTS: IcollectorsState = {
   collectionTotalCount: 0,
   loadedCollection: [],
   collectionPropertiesLogin: null,
-}
+};

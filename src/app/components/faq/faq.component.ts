@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
 
@@ -7,7 +7,8 @@ import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
   imports: [NgbAccordionModule, RouterLink],
   templateUrl: './faq.component.html',
   styleUrl: './faq.component.scss',
-  standalone: true
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: true,
 })
 export class FaqComponent {
   isFirstOpen = true;

@@ -1,5 +1,5 @@
-import { IPlatformItem } from "../interfaces/platform-item.interface";
-import { PlatformsActionList } from "./platforms-action-list.const";
+import { IPlatformItem } from '../interfaces/platform-item.interface';
+import { PlatformsActionList } from './platforms-action-list.const';
 
 export namespace PlatformsActions {
   export class LoadPlaformsRequest {
@@ -13,8 +13,6 @@ export namespace PlatformsActions {
   export class LoadPlaformsRequestSuccess {
     public static readonly type = PlatformsActionList.LOAD_PLATFORMS_SUCCESS;
 
-    constructor(
-      public payload: IPlatformItem[]
-    ){}
+    constructor(public payload: IPlatformItem[]) {}
   }
 }

@@ -1,5 +1,5 @@
-import { RequestStatus } from "@app/constants/request-status.const";
-import { IChatState } from "./chat.state.interface";
+import { RequestStatus } from '@app/constants/request-status.const';
+import { IChatState } from './chat.state.interface';
 
 export const CHAT_STATE_DEFAULTS: IChatState = {
   messages: [],
@@ -11,4 +11,4 @@ export const CHAT_STATE_DEFAULTS: IChatState = {
   messagesReqeustStatus: RequestStatus.NotInvoked,
   dialogs: [],
   showWarning: false,
-}
+};

@@ -1,62 +1,60 @@
 import { Routes } from '@angular/router';
-import { RegistrationComponent } from '@app/components/registration/registration.component';
-import { ProductListComponent } from '@app/components/product-list/product-list.component';
-import { NotFoundComponent } from '@app/components/not-found/not-found.component';
-import { ProductPropertiesComponent } from '@app/components/product-properties/product-properties.component';
-import { ProductPropertiesResolver } from '@app/resolvers/product-properties.resolver';
-import { LoginComponent } from '@app/components/login/login.component';
-import { CollectionComponent } from '@app/components/collection/collection.component';
-import { WishlistComponent } from '@app/components/wishlist/wishlist.component';
-import { AboutComponent } from '@app/components/about/about.component';
 import { authGuard } from '@app/guards/auth.guard';
-import { FaqComponent } from '@app/components/faq/faq.component';
-import { CollectorsComponent } from './components/collectors/collectors.component';
+import { ProductPropertiesResolver } from '@app/resolvers/product-properties.resolver';
 import { CollectorPropertiesResolver } from './resolvers/collector-properties.resolver';
-import { CollectorPropertiesComponent } from './components/collector-properties/collector-properties.component';
 
 export const routes: Routes = [
   {
     path: '',
     redirectTo: 'products',
-    pathMatch: 'full'
+    pathMatch: 'full',
   },
   {
     path: 'products',
-    loadComponent: () => ProductListComponent
+    loadComponent: () =>
+      import('@app/components/product-list/product-list.component').then((m) => m.ProductListComponent),
   },
   {
     path: 'products/:id',
-    loadComponent: () => ProductPropertiesComponent,
+    loadComponent: () =>
+      import('@app/components/product-properties/product-properties.component').then(
+        (m) => m.ProductPropertiesComponent,
+      ),
     resolve: {
-      message: ProductPropertiesResolver
-    }
+      message: ProductPropertiesResolver,
+    },
   },
   {
     path: 'collectors',
-    loadComponent: () => CollectorsComponent,
+    loadComponent: () =>
+      import('./components/collectors/collectors.component').then((m) => m.CollectorsComponent),
   },
   {
     path: 'collectors/:id',
-    loadComponent: () => CollectorPropertiesComponent,
+    loadComponent: () =>
+      import('./components/collector-properties/collector-properties.component').then(
+        (m) => m.CollectorPropertiesComponent,
+      ),
     resolve: {
-      message: CollectorPropertiesResolver
-    }
+      message: CollectorPropertiesResolver,
+    },
   },
   {
     path: 'registration',
-    loadComponent: () => RegistrationComponent,
+    loadComponent: () =>
+      import('@app/components/registration/registration.component').then((m) => m.RegistrationComponent),
   },
   {
     path: 'login',
-    loadComponent: () => LoginComponent,
+    loadComponent: () => import('@app/components/login/login.component').then((m) => m.LoginComponent),
   },
   {
     path: 'about',
-    loadComponent: () => AboutComponent,
+    loadComponent: () => import('@app/components/about/about.component').then((m) => m.AboutComponent),
   },
   {
     path: 'faq',
-    loadComponent: () => FaqComponent,
+    loadComponent: () => import('@app/components/faq/faq.component').then((m) => m.FaqComponent),
   },
   {
     path: '',
@@ -64,16 +62,23 @@ export const routes: Routes = [
     children: [
       {
         path: 'collection',
-        loadComponent: () => CollectionComponent,
+        loadComponent: () =>
+          import('@app/components/collection/collection.component').then((m) => m.CollectionComponent),
       },
       {
         path: 'wishlist',
-        loadComponent: () => WishlistComponent,
+        loadComponent: () =>
+          import('@app/components/wishlist/wishlist.component').then((m) => m.WishlistComponent),
       },
-    ]
+      {
+        path: 'wts',
+        loadComponent: () => import('./components/wts/wts.component').then((m) => m.WtsComponent),
+      },
+    ],
   },
   {
     path: '**',
-    loadComponent: () => NotFoundComponent
+    loadComponent: () =>
+      import('@app/components/not-found/not-found.component').then((m) => m.NotFoundComponent),
   },
 ];

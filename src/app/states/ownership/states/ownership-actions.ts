@@ -1,4 +1,5 @@
-import { OwnershipActionList } from "./ownership-action-list.const";
+import { IOwnershipItem } from '../interfaces/ownership-item.interface';
+import { OwnershipActionList } from './ownership-action-list.const';
 
 export namespace OwnershipActions {
   export class RequestOwnership {
@@ -7,8 +8,7 @@ export namespace OwnershipActions {
 
   export class RequestOwnershipSuccess {
     public static readonly type = OwnershipActionList.LOAD_OWNERSHIP_SUCCESS;
-    constructor(public payload: any) {
-    }
+    constructor(public payload: IOwnershipItem[]) {}
   }
 
   export class RequestOwnershipFail {

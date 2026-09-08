@@ -1,66 +1,14 @@
 <div class="row">
   <div class="col-12 px-0 mb-4 sticker authorised">
-    @if (!!(activePlatforms$ | async)?.length) {
+    @if (!!(platforms$ | async)?.length) {
       <div>
-        <div class="p-3" class="stickerContent">
+        <div class="p-3 stickerContent">
           <ul class="nav nav-pills flex-wrap justify-content-start mb-0">
-            @if ((activePlatforms$ | async)?.includes(6)) {
-              <li class="me-2 mb-2"
-                >
+            @for (cat of platforms$ | async; track cat.id) {
+              <li class="me-2 mb-2">
                 <a class="btn-pink px-4 py-2 fw-semibold d-flex justify-content-between align-items-center"
-                  [class.active]="activeCategory === 6"
-                  (click)="setActiveCategory(6)">
-                  PC
-                </a>
-              </li>
-            }
-            @if ((activePlatforms$ | async)?.includes(38)) {
-              <li class="me-2 mb-2"
-                >
-                <a class="btn-pink px-4 py-2 fw-semibold d-flex justify-content-between align-items-center"
-                  [class.active]="activeCategory === 38"
-                  (click)="setActiveCategory(38)">
-                  PSP
-                </a>
-              </li>
-            }
-            @if ((activePlatforms$ | async)?.includes(8)) {
-              <li class="me-2 mb-2"
-                >
-                <a class="btn-pink px-4 py-2 fw-semibold d-flex justify-content-between align-items-center"
-                  [class.active]="activeCategory === 8"
-                  (click)="setActiveCategory(8)">
-                  PS2
-                </a>
-              </li>
-            }
-            @if ((activePlatforms$ | async)?.includes(9)) {
-              <li class="me-2 mb-2"
-                >
-                <a class="btn-pink px-4 py-2 fw-semibold d-flex justify-content-between align-items-center"
-                  [class.active]="activeCategory === 9"
-                  (click)="setActiveCategory(9)">
-                  PS3
-                </a>
-              </li>
-            }
-            @if ((activePlatforms$ | async)?.includes(48)) {
-              <li class="me-2 mb-2"
-                >
-                <a class="btn-pink px-4 py-2 fw-semibold d-flex justify-content-between align-items-center"
-                  [class.active]="activeCategory === 48"
-                  (click)="setActiveCategory(48)">
-                  PS4
-                </a>
-              </li>
-            }
-            @if ((activePlatforms$ | async)?.includes(167)) {
-              <li class="me-2 mb-2"
-                >
-                <a class="btn-pink px-4 py-2 fw-semibold d-flex justify-content-between align-items-center"
-                  [class.active]="activeCategory === 167"
-                  (click)="setActiveCategory(167)">
-                  PS5
+                  [class.active]="activeCategory === cat.id" (click)="setActiveCategory(cat.id)">
+                  {{ cat.abbreviation || cat.name }}
                 </a>
               </li>
             }

@@ -1,5 +1,5 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Router, RouterLink, RouterModule } from '@angular/router';
 import { AuthActions } from '@app/states/auth/states/auth-actions';
 import { AuthState } from '@app/states/auth/states/auth.state';
@@ -13,7 +13,8 @@ import { Observable } from 'rxjs';
   imports: [RouterLink, AsyncPipe, RouterModule],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
-  standalone: true
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: true,
 })
 export class HeaderComponent {
   constructor(

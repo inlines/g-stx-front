@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TEST_PROVIDERS } from '@app/testing/test-providers';
 
 import { CollectorPropertiesComponent } from './collector-properties.component';
 
@@ -8,9 +9,9 @@ describe('CollectorPropertiesComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CollectorPropertiesComponent]
-    })
-    .compileComponents();
+      providers: TEST_PROVIDERS,
+      imports: [CollectorPropertiesComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(CollectorPropertiesComponent);
     component = fixture.componentInstance;

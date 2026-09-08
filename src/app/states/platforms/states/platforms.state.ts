@@ -1,13 +1,13 @@
-import { Action, Selector, State, StateContext } from "@ngxs/store";
-import { Injectable } from "@angular/core";
-import { IplatformState } from "./platforms.state.interface";
-import { PLATFORM_STATE_DEFAULTS } from "./platforms.state-default.const";
-import { PlatformService } from "../services/platform.service";
-import { PlatformsActions } from "./platforms-actions";
-import { RequestStatus } from "@app/constants/request-status.const";
-import { catchError, tap } from "rxjs";
-import { ToastService } from "@app/services/toast.service";
-import { IPlatformItem } from "../interfaces/platform-item.interface";
+import { Injectable } from '@angular/core';
+import { RequestStatus } from '@app/constants/request-status.const';
+import { ToastService } from '@app/services/toast.service';
+import { Action, Selector, State, StateContext } from '@ngxs/store';
+import { catchError, tap } from 'rxjs';
+import { IPlatformItem } from '../interfaces/platform-item.interface';
+import { PlatformService } from '../services/platform.service';
+import { PlatformsActions } from './platforms-actions';
+import { PLATFORM_STATE_DEFAULTS } from './platforms.state-default.const';
+import { IplatformState } from './platforms.state.interface';
 
 @State<IplatformState>({
   name: 'Platforms',
@@ -18,34 +18,37 @@ export class PlatformState {
   constructor(
     private service: PlatformService,
     private toastService: ToastService,
-  ){}
+  ) {}
 
   @Action(PlatformsActions.LoadPlaformsRequest)
   public loadPlatforms(ctx: StateContext<IplatformState>) {
     ctx.patchState({
-      loadPlatformsStatus: RequestStatus.Pending
+      loadPlatformsStatus: RequestStatus.Pending,
     });
 
     return this.service.getPlatforms().pipe(
       tap((response) => {
-        ctx.dispatch(new PlatformsActions.LoadPlaformsRequestSuccess(response))
+        ctx.dispatch(new PlatformsActions.LoadPlaformsRequestSuccess(response));
       }),
-      catchError((err, caught) => ctx.dispatch(new PlatformsActions.LoadPlaformsRequestFail()))
-    )
+      catchError(() => ctx.dispatch(new PlatformsActions.LoadPlaformsRequestFail())),
+    );
   }
 
   @Action(PlatformsActions.LoadPlaformsRequestSuccess)
-  public loadListSuccess(ctx: StateContext<IplatformState>, action: PlatformsActions.LoadPlaformsRequestSuccess) {
+  public loadListSuccess(
+    ctx: StateContext<IplatformState>,
+    action: PlatformsActions.LoadPlaformsRequestSuccess,
+  ) {
     ctx.patchState({
       loadPlatformsStatus: RequestStatus.Load,
-      platforms: action.payload
+      platforms: action.payload,
     });
   }
 
   @Action(PlatformsActions.LoadPlaformsRequestFail)
   public loadListFail(ctx: StateContext<IplatformState>) {
     ctx.patchState({
-      loadPlatformsStatus: RequestStatus.Error
+      loadPlatformsStatus: RequestStatus.Error,
     });
     this.toastService.clear();
     this.toastService.show({
