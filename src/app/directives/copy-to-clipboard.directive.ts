@@ -7,13 +7,12 @@ import { Clipboard } from '@angular/cdk/clipboard';
   standalone: true,
 })
 export class CopyToClipboardDirective implements OnInit {
-
   constructor(
-    private renderer:Renderer2,
-    private element:ElementRef,
+    private renderer: Renderer2,
+    private element: ElementRef,
     private clipboard: Clipboard,
     private toastService: ToastService,
-  ) { }
+  ) {}
 
   @HostListener('click') onClick() {
     this.clipboard.copy(this.nativeElement.textContent?.trim() || '');
@@ -25,12 +24,11 @@ export class CopyToClipboardDirective implements OnInit {
     });
   }
 
-  private nativeElement! : Node;
+  private nativeElement!: Node;
 
   public ngOnInit(): void {
     this.nativeElement = this.element.nativeElement;
-    const totalString =
-      `<svg fill="currentColor" focusable="false" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24">
+    const totalString = `<svg fill="currentColor" focusable="false" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24">
         <g>
         <rect fill="none" height="24" width="24">
         </rect>
@@ -40,11 +38,11 @@ export class CopyToClipboardDirective implements OnInit {
         </path>
         </g>
       </svg>`;
-    const button= this.renderer.createElement('span');
-    button.style = 'height:20px;line-height:20px;width:20px;cursor:pointer; position: relative; z-index: 1000;'
+    const button = this.renderer.createElement('span');
+    button.style =
+      'height:20px;line-height:20px;width:20px;cursor:pointer; position: relative; z-index: 1000;';
     button.innerHTML = totalString;
     this.renderer.appendChild(this.nativeElement, button);
-    this.renderer.nextSibling(this.nativeElement)
+    this.renderer.nextSibling(this.nativeElement);
   }
-
 }

@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TEST_PROVIDERS } from '@app/testing/test-providers';
 
 import { FooterComponent } from './footer.component';
 
@@ -8,9 +9,9 @@ describe('FooterComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [FooterComponent]
-    })
-    .compileComponents();
+      providers: TEST_PROVIDERS,
+      imports: [FooterComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(FooterComponent);
     component = fixture.componentInstance;

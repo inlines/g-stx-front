@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TEST_PROVIDERS } from '@app/testing/test-providers';
 
 import { NotFoundComponent } from './not-found.component';
 
@@ -8,9 +9,9 @@ describe('NotFoundComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [NotFoundComponent]
-    })
-    .compileComponents();
+      providers: TEST_PROVIDERS,
+      imports: [NotFoundComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(NotFoundComponent);
     component = fixture.componentInstance;

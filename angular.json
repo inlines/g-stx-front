@@ -33,8 +33,9 @@
               }
             ],
             "styles": [
-              "src/styles.scss",
-              "node_modules/bootstrap/dist/css/bootstrap.css"              
+              "node_modules/bootstrap/dist/css/bootstrap.css",
+              "node_modules/animate.css/animate.min.css",
+              "src/styles.scss"
             ],
             "scripts": []
           },
@@ -64,6 +65,19 @@
                   "with": "src/app/environments/environment.dev.ts"
                 }
               ]
+            },
+            "testing": {
+              "aot": false,
+              "optimization": false,
+              "extractLicenses": false,
+              "styles": [
+                "src/styles.scss"
+              ],
+              "polyfills": [
+                "zone.js",
+                "zone.js/testing",
+                "@angular/localize/init"
+              ]
             }
           },
           "defaultConfiguration": "production"
@@ -84,25 +98,11 @@
           "builder": "@angular/build:extract-i18n"
         },
         "test": {
-          "builder": "@angular/build:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing",
-              "@angular/localize/init"
-            ],
             "tsConfig": "tsconfig.spec.json",
-            "inlineStyleLanguage": "scss",
-            "assets": [
-              {
-                "glob": "**/*",
-                "input": "public"
-              }
-            ],
-            "styles": [
-              "src/styles.scss"
-            ],
-            "scripts": []
+            "buildTarget": ":build:testing",
+            "runner": "vitest"
           }
         }
       }
@@ -132,6 +132,11 @@
     },
     "@schematics/angular:resolver": {
       "typeSeparator": "."
+    }
+  },
+  "cli": {
+    "cache": {
+      "enabled": false
     }
   }
 }

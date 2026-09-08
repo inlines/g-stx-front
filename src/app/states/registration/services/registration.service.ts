@@ -1,8 +1,9 @@
-import { HttpClient } from "@angular/common/http";
-import { Inject, Injectable } from "@angular/core";
-import { IEnvironment } from "@app/environments/environment.interface";
-import { Observable } from "rxjs";
-import { IRegistrationPayload } from "../interfaces/registration-payload.interface";
+import { HttpClient } from '@angular/common/http';
+import { Inject, Injectable } from '@angular/core';
+import { IEnvironment } from '@app/environments/environment.interface';
+import { ENVIRONMENT } from '@app/environments/environment.token';
+import { Observable } from 'rxjs';
+import { IRegistrationPayload } from '../interfaces/registration-payload.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -12,13 +13,12 @@ export class RegistrationService {
 
   constructor(
     private http: HttpClient,
-    @Inject('environment') private environment: IEnvironment,
+    @Inject(ENVIRONMENT) private environment: IEnvironment,
   ) {
-    this.registerPath = `${this.environment.apiUrl}/register`
+    this.registerPath = `${this.environment.apiUrl}/register`;
   }
 
-  public registerRequest(payload: IRegistrationPayload): Observable<any> {
-    return this.http.post<any>(this.registerPath, payload);
+  public registerRequest(payload: IRegistrationPayload): Observable<void> {
+    return this.http.post<void>(this.registerPath, payload);
   }
-
 }

@@ -5,5 +5,5 @@ export interface IPlatformItem {
   generation: number | null;
   total_games: number;
   user_games?: number;
-  total_spent? :number;
+  total_spent?: number;
 }

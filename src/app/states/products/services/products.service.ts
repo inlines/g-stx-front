@@ -1,11 +1,12 @@
-import { HttpClient } from "@angular/common/http";
-import { Inject, Injectable } from "@angular/core";
-import { IEnvironment } from "@app/environments/environment.interface";
-import { Observable } from "rxjs";
-import { IProductListItem } from "@app/states/products/interfaces/product-list-item.interface";
-import { IProductListRequest } from "@app/states/products/interfaces/product-list-request.interface";
-import { IProductPropertiesResponse } from "@app/states/products/interfaces/product-properties-response.interface";
-import { IproductListResponse } from "../interfaces/product-list-response.interface";
+import { HttpClient } from '@angular/common/http';
+import { Inject, Injectable } from '@angular/core';
+import { IEnvironment } from '@app/environments/environment.interface';
+import { ENVIRONMENT } from '@app/environments/environment.token';
+import { listHttpParams } from '@app/shared/list-params';
+import { IProductListRequest } from '@app/states/products/interfaces/product-list-request.interface';
+import { IProductPropertiesResponse } from '@app/states/products/interfaces/product-properties-response.interface';
+import { Observable } from 'rxjs';
+import { IproductListResponse } from '../interfaces/product-list-response.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -15,13 +16,13 @@ export class ProductsService {
 
   constructor(
     private http: HttpClient,
-    @Inject('environment') private environment: IEnvironment,
+    @Inject(ENVIRONMENT) private environment: IEnvironment,
   ) {
-    this.productsPath = `${this.environment.apiUrl}/products`    
+    this.productsPath = `${this.environment.apiUrl}/products`;
   }
 
   public productsRequest(params: IProductListRequest): Observable<IproductListResponse> {
-    return this.http.get<IproductListResponse>(this.productsPath, {params: {...params}});
+    return this.http.get<IproductListResponse>(this.productsPath, { params: listHttpParams(params) });
   }
 
   public productPropertiesRequest(id: string | number): Observable<IProductPropertiesResponse> {

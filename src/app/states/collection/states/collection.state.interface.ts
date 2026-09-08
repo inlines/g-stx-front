@@ -1,6 +1,6 @@
-import { RequestStatus } from "@app/constants/request-status.const";
-import { ICollectionItem } from "../interfaces/collection-item.interface";
-import { IProductListRequest } from "@app/states/products/interfaces/product-list-request.interface";
+import { RequestStatus } from '@app/constants/request-status.const';
+import { IProductListRequest } from '@app/states/products/interfaces/product-list-request.interface';
+import { ICollectionItem } from '../interfaces/collection-item.interface';
 
 export interface ICollectionState {
   changeCollectionRequestStatus: RequestStatus;
@@ -13,4 +13,9 @@ export interface ICollectionState {
   loadedWishlist: ICollectionItem[];
   wishlistTotalCount: number;
   wishlistParams: IProductListRequest;
+
+  loadWtsStatus: RequestStatus;
+  loadedWtslist: ICollectionItem[];
+  wtsTotalCount: number;
+  wtsParams: IProductListRequest;
 }

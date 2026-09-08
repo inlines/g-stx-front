@@ -1,59 +1,69 @@
-# GameStockx
+# Game StockX — frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.13.
+Angular 22.1, NGXS 22, TypeScript 6. Backend: отдельный Rust API.
 
-## Development server
+## Локальный запуск
 
-To start a local development server, run:
-
-```bash
-ng serve
-```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+Нужен Node.js 24.19.0 (зафиксирован в `.nvmrc`). Старые Node.js 20 и 22.12 не поддерживаются Angular 22.
 
 ```bash
-ng generate component component-name
+nvm install
+nvm use
+npm ci
+npm start
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Приложение: http://localhost:4200. В development API ожидается на
+`http://127.0.0.1:9090/api`, WebSocket — `ws://localhost:9090/ws/`.
+Адреса находятся в `src/app/environments/environment.dev.ts`.
+Production использует относительные `/api` и `/ws/`, которые должен проксировать сервер.
+
+После обновления Angular ранее запущенный dev-server нужно остановить и запустить заново.
+
+## Проверки
 
 ```bash
-ng generate --help
+npm run typecheck
+npm test
+npm run build
 ```
 
-## Building
+Тесты работают через официальный Angular Vitest runner в jsdom, без установленного Chrome.
+`npm run test:watch` запускает их в режиме наблюдения. HTTP-тесты проверяют контракт запросов
+с подменой транспорта; они не заменяют проверку работающего Rust API.
+Результат production-сборки: `dist/game-stockx/browser`.
 
-To build the project run:
+Дисковый кэш Angular временно отключён в `angular.json`: нативный LMDB 3.5.6 на локальной
+macOS аварийно завершал процесс. Это влияет на скорость повторной сборки, а не на приложение.
+После исправления совместимости LMDB кэш можно включить снова.
+Лимит предупреждения размера initial bundle сохранён: 500 kB, максимальный — 2 MB.
 
-```bash
-ng build
-```
+## Организация кода
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+- `components` — страницы и элементы интерфейса; страницы загружаются через `loadComponent`.
+- `states` — NGXS-состояния, actions, типизированные HTTP-сервисы и модели API.
+- `shared/list-params.ts` — нормализация и сравнение параметров списков; только поля,
+  поддерживаемые API: `cat`, `limit`, `offset`, `query`, `sort`, `ignore_digital`.
+- `shared/personal-list.controller.ts` — общий жизненный цикл коллекции, wishlist и WTS:
+  выбор платформы, загрузка и обновление после успешной операции.
+- `shared/collection-filter.ts` — чистая локальная фильтрация и сортировка коллекции.
+- `environments/environment.token.ts` — типизированная конфигурация API/WebSocket.
+- `testing` — общие test providers и проверки контракта API.
 
-## Running unit tests
+Поиск каталога отправляется после паузы 300 мс. Изменение фильтра сбрасывает страницу,
+выбор платформы обновляет параметры одной операцией, предыдущий запрос отменяется.
+Сохранённая страница восстанавливается при возврате. Неиспользуемые фильтры разработчика,
+издателя и франшизы удалены: backend их не обрабатывает. Сортировки каталога — имя и дата;
+коллекция дополнительно сортируется по цене локально. Нулевая цена сохраняется как 0.
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+Публичные маршруты, HTTP payload, имена NGXS state и существующие actions сохранены.
+WTS остаётся незавершённой функцией исходной ветки: текущая страница-заглушка сохранена,
+рефакторинг не реализует недостающий backend или новый пользовательский сценарий.
 
-```bash
-ng test
-```
+## Ручная проверка
 
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+1. Открыть каталог, набрать поиск, быстро переключить платформу; проверить страницу и результаты.
+2. Перейти на вторую страницу, открыть игру и вернуться; проверить восстановление списка.
+3. Войти, открыть коллекцию и wishlist, переключить платформы и сортировку коллекции.
+4. На тестовой игре проверить добавление/удаление и сохранение цены, включая 0.
+5. Проверить карточки коллекционеров, выход и повторный вход; при наличии второго аккаунта — чат.

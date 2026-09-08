@@ -1,5 +1,5 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { ICollectorItem } from '@app/states/collectors/interfaces/collector-item.interface';
 import { CollectorsActions } from '@app/states/collectors/states/collectors-actions';
@@ -11,12 +11,11 @@ import { Observable } from 'rxjs';
   selector: 'app-collectors',
   imports: [AsyncPipe, RouterModule],
   templateUrl: './collectors.component.html',
-  styleUrl: './collectors.component.scss'
+  changeDetection: ChangeDetectionStrategy.Eager,
+  styleUrl: './collectors.component.scss',
 })
 export class CollectorsComponent implements OnInit {
-  constructor(
-    private readonly store: Store
-  ){
+  constructor(private readonly store: Store) {
     this.collectors$ = this.store.select(CollectorsState.collectors);
   }
 

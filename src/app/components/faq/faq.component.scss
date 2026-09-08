@@ -1,7 +1,8 @@
+@use 'sass:color';
 /* Аккордеон в тёмной теме */
 .accordion-button {
   &:not(.collapsed) {
-    background-color: darken(#1a1a1a, 5%);
+    background-color: color.adjust(#1a1a1a, $lightness: -5%);
     color: white;
     &::after {
       filter: brightness(0.5); // Иконка стрелки (светлее)

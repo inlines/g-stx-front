@@ -1,21 +1,29 @@
-import { Component, OnInit } from '@angular/core';
+import { AsyncPipe } from '@angular/common';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { Store } from '@ngxs/store';
+import { Observable } from 'rxjs';
+import { ChatComponent } from './components/chat/chat.component';
+import { FooterComponent } from './components/footer/footer.component';
 import { HeaderComponent } from './components/header/header.component';
 import { ToastContainerComponent } from './components/toast-container/toast-container.component';
-import { FooterComponent } from './components/footer/footer.component';
-import { Store } from '@ngxs/store';
-import { PlatformsActions } from './states/platforms/states/platforms-actions';
-import { Observable } from 'rxjs';
 import { AuthState } from './states/auth/states/auth.state';
-import { ChatComponent } from './components/chat/chat.component';
-import { AsyncPipe } from '@angular/common';
 import { ChatState } from './states/chat/states/chat.state';
+import { PlatformsActions } from './states/platforms/states/platforms-actions';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, HeaderComponent, ToastContainerComponent, FooterComponent, ChatComponent, AsyncPipe],
+  imports: [
+    RouterOutlet,
+    HeaderComponent,
+    ToastContainerComponent,
+    FooterComponent,
+    ChatComponent,
+    AsyncPipe,
+  ],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  changeDetection: ChangeDetectionStrategy.Eager,
+  styleUrl: './app.component.scss',
 })
 export class AppComponent implements OnInit {
   title = 'game-stockx';
@@ -23,8 +31,7 @@ export class AppComponent implements OnInit {
   public isChatVisible$!: Observable<boolean>;
   public isAuthorized$!: Observable<boolean>;
 
-  constructor(private store: Store) {
-  }
+  constructor(private store: Store) {}
 
   public ngOnInit(): void {
     this.store.dispatch(new PlatformsActions.LoadPlaformsRequest());

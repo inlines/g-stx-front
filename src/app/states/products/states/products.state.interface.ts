@@ -6,8 +6,8 @@ import { IProductPropertiesResponse } from '@app/states/products/interfaces/prod
 export interface IproductState {
   productList: IProductListItem[];
   productsTotalCount: number;
-  productListRequestStatus: RequestStatus,
-  productListRequestParams: IProductListRequest,
-  productProperties: IProductPropertiesResponse | null,
-  productPropertiesRequestStatus: RequestStatus,
+  productListRequestStatus: RequestStatus;
+  productListRequestParams: IProductListRequest;
+  productProperties: IProductPropertiesResponse | null;
+  productPropertiesRequestStatus: RequestStatus;
 }

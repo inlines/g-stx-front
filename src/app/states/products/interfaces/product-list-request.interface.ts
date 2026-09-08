@@ -1,11 +1,11 @@
+export type ProductSort = 'name' | 'date';
+
+/** Query fields supported by the existing Rust Pagination contract. */
 export interface IProductListRequest {
   limit?: number;
   offset?: number;
   query?: string;
-  franschise?: string;
-  developer?: string;
-  publisher?: string;
-  sort?: string;
+  sort?: ProductSort;
   cat?: number;
   ignore_digital?: boolean;
 }

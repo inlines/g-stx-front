@@ -1,6 +1,6 @@
-import { IDialog } from "../interfaces/dialog.interface";
-import { IMessage } from "../interfaces/message.interface";
-import { ChatActionList } from "./chat-action-list.const";
+import { IDialog } from '../interfaces/dialog.interface';
+import { IMessage } from '../interfaces/message.interface';
+import { ChatActionList } from './chat-action-list.const';
 
 export namespace ChatActions {
   export class Connect {
@@ -12,22 +12,19 @@ export namespace ChatActions {
   export class SendMessage {
     public static readonly type = ChatActionList.SEND_MESSAGE;
 
-    constructor(public payload: IMessage){
-    }
+    constructor(public payload: IMessage) {}
   }
 
   export class SetMessages {
     public static readonly type = ChatActionList.SET_MESSAGES;
 
-    constructor(public payload: IMessage[]){
-    }
+    constructor(public payload: IMessage[]) {}
   }
 
   export class SetRecepient {
     public static readonly type = ChatActionList.SET_RECIPIENT;
 
-    constructor(public payload: string | null){
-    }
+    constructor(public payload: string | null) {}
   }
 
   export class ToggleChatVisibility {
@@ -40,8 +37,7 @@ export namespace ChatActions {
 
   export class RequestDialogsSuccess {
     public static readonly type = ChatActionList.REQUEST_DIALOGS_SUCCESS;
-    constructor(public payload: IDialog[]){
-    }
+    constructor(public payload: IDialog[]) {}
   }
 
   export class RequestDialogsFail {
@@ -50,13 +46,12 @@ export namespace ChatActions {
 
   export class RequestMessages {
     public static readonly type = ChatActionList.REQUEST_MESSAGES;
-    constructor(public recipient: string){}
+    constructor(public recipient: string) {}
   }
 
   export class RequestMessagesSuccess {
     public static readonly type = ChatActionList.REQUEST_MESSAGES_SUCCESS;
-    constructor(public payload: IMessage[]){
-    }
+    constructor(public payload: IMessage[]) {}
   }
 
   export class RequestMessagesFail {

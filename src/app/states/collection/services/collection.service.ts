@@ -1,10 +1,12 @@
-import { HttpClient } from "@angular/common/http";
-import { Inject, Injectable } from "@angular/core";
-import { IEnvironment } from "@app/environments/environment.interface";
-import { Observable } from "rxjs";
-import { IEditCollectionPayload } from "../interfaces/edit-collection-payload.interface";
-import { IProductListRequest } from "@app/states/products/interfaces/product-list-request.interface";
-import { IcollectionResponse } from "../interfaces/collection-response.interface";
+import { HttpClient } from '@angular/common/http';
+import { Inject, Injectable } from '@angular/core';
+import { IEnvironment } from '@app/environments/environment.interface';
+import { ENVIRONMENT } from '@app/environments/environment.token';
+import { listHttpParams } from '@app/shared/list-params';
+import { IProductListRequest } from '@app/states/products/interfaces/product-list-request.interface';
+import { Observable } from 'rxjs';
+import { IcollectionResponse } from '../interfaces/collection-response.interface';
+import { IEditCollectionPayload } from '../interfaces/edit-collection-payload.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -19,13 +21,17 @@ export class CollectionService {
 
   private readonly getCollectionPath: string;
   private readonly getWishlistPath: string;
+  private readonly getWtsPath: string;
 
   private readonly addBidPath: string;
   private readonly removeBidPath: string;
 
+  private readonly addWtsPath: string;
+  private readonly removewtsPath: string;
+
   constructor(
     private http: HttpClient,
-    @Inject('environment') private environment: IEnvironment,
+    @Inject(ENVIRONMENT) private environment: IEnvironment,
   ) {
     this.addToCollectionPath = `${this.environment.apiUrl}/add_release`;
     this.setReleasePricePath = `${this.environment.apiUrl}/set_release_price`;
@@ -36,44 +42,59 @@ export class CollectionService {
     this.removeWishPath = `${this.environment.apiUrl}/remove_wish`;
     this.getWishlistPath = `${this.environment.apiUrl}/wishlist`;
 
+    this.addWtsPath = `${this.environment.apiUrl}/add_wts`;
+    this.getWtsPath = `${this.environment.apiUrl}/wts`;
+    this.removewtsPath = `${this.environment.apiUrl}/remove_wts`;
+
     this.addBidPath = `${this.environment.apiUrl}/add_bid`;
     this.removeBidPath = `${this.environment.apiUrl}/remove_bid`;
   }
 
-  public addToCollection(payload: IEditCollectionPayload): Observable<any> {
-    return this.http.post<any>(this.addToCollectionPath, payload);
+  public addToCollection(payload: IEditCollectionPayload): Observable<void> {
+    return this.http.post<void>(this.addToCollectionPath, payload);
   }
 
-  public setReleasePrice(payload: IEditCollectionPayload): Observable<any> {
-    return this.http.post<any>(this.setReleasePricePath, payload);
+  public setReleasePrice(payload: IEditCollectionPayload): Observable<void> {
+    return this.http.post<void>(this.setReleasePricePath, payload);
   }
 
-  public removeFromCollection(payload: IEditCollectionPayload): Observable<any> {
-    return this.http.post<any>(this.removeFromCollectionPath, payload);
+  public removeFromCollection(payload: IEditCollectionPayload): Observable<void> {
+    return this.http.post<void>(this.removeFromCollectionPath, payload);
   }
 
-  public addWish(payload: IEditCollectionPayload): Observable<any> {
-    return this.http.post<any>(this.addWishPath, payload);
+  public addWish(payload: IEditCollectionPayload): Observable<void> {
+    return this.http.post<void>(this.addWishPath, payload);
   }
 
-  public addBid(payload: IEditCollectionPayload): Observable<any> {
-    return this.http.post<any>(this.addBidPath, payload);
+  public addWts(payload: IEditCollectionPayload): Observable<void> {
+    return this.http.post<void>(this.addWtsPath, payload);
   }
 
-  public removeWish(payload: IEditCollectionPayload): Observable<any> {
-    return this.http.post<any>(this.removeWishPath, payload);
+  public addBid(payload: IEditCollectionPayload): Observable<void> {
+    return this.http.post<void>(this.addBidPath, payload);
   }
 
-  public removeBid(payload: IEditCollectionPayload): Observable<any> {
-    return this.http.post<any>(this.removeBidPath, payload);
+  public removeWish(payload: IEditCollectionPayload): Observable<void> {
+    return this.http.post<void>(this.removeWishPath, payload);
+  }
+
+  public removeBid(payload: IEditCollectionPayload): Observable<void> {
+    return this.http.post<void>(this.removeBidPath, payload);
+  }
+
+  public removeWts(payload: IEditCollectionPayload): Observable<void> {
+    return this.http.post<void>(this.removewtsPath, payload);
   }
 
   public getCollection(params: IProductListRequest): Observable<IcollectionResponse> {
-    return this.http.get<IcollectionResponse>(this.getCollectionPath, {params: {...params}});
+    return this.http.get<IcollectionResponse>(this.getCollectionPath, { params: listHttpParams(params) });
   }
 
   public getWishlist(params: IProductListRequest): Observable<IcollectionResponse> {
-    return this.http.get<IcollectionResponse>(this.getWishlistPath, {params: {...params}});
+    return this.http.get<IcollectionResponse>(this.getWishlistPath, { params: listHttpParams(params) });
   }
 
+  public getWts(params: IProductListRequest): Observable<IcollectionResponse> {
+    return this.http.get<IcollectionResponse>(this.getWtsPath, { params: listHttpParams(params) });
+  }
 }

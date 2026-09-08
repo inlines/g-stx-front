@@ -1,14 +1,24 @@
 import { NgClass } from '@angular/common';
-import { Component, Input, Output, EventEmitter, OnChanges, OnInit, HostListener } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  HostListener,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+} from '@angular/core';
 
-type PageItem = number | '...';
+import { buildPages, PageItem } from './pagination';
 
 @Component({
   selector: 'app-pager',
   standalone: true,
   templateUrl: './pager.component.html',
   styleUrls: ['./pager.component.scss'],
-  imports: [NgClass]
+  changeDetection: ChangeDetectionStrategy.Eager,
+  imports: [NgClass],
 })
 export class PagerComponent implements OnChanges, OnInit {
   @Input() totalCount: number = 0;
@@ -24,13 +34,15 @@ export class PagerComponent implements OnChanges, OnInit {
 
   public ngOnInit(): void {
     if (window.innerWidth < 576) {
-      this.range = 1; // например, для мобильных
+      this.range = 1;
     }
+    this.ngOnChanges();
   }
 
   ngOnChanges(): void {
+    this.limit = Math.max(1, this.limit);
     this.currentPage = Math.floor(this.offset / this.limit) + 1;
-    this.totalPages = Math.ceil(this.totalCount / this.limit);
+    this.totalPages = Math.max(0, Math.ceil(this.totalCount / this.limit));
     this.pages = this.buildPages();
   }
 
@@ -38,10 +50,12 @@ export class PagerComponent implements OnChanges, OnInit {
   handleKeyboardEvent(event: KeyboardEvent): void {
     // Проверяем, не находится ли фокус в поле ввода
     const activeElement = document.activeElement as HTMLElement;
-    const isInputFocused = activeElement.tagName === 'INPUT' || 
-                          activeElement.tagName === 'TEXTAREA' ||
-                          activeElement.isContentEditable;
-    
+    const isInputFocused =
+      activeElement?.tagName === 'SELECT' ||
+      activeElement?.tagName === 'INPUT' ||
+      activeElement?.tagName === 'TEXTAREA' ||
+      activeElement?.isContentEditable;
+
     // Если фокус в поле ввода - не обрабатываем клавиши
     if (isInputFocused) {
       return;
@@ -58,25 +72,11 @@ export class PagerComponent implements OnChanges, OnInit {
   }
 
   buildPages(): PageItem[] {
-    const pages: PageItem[] = [];
-
-    for (let i = 1; i <= this.totalPages; i++) {
-      if (
-        i === 1 || // первая страница
-        i === this.totalPages || // последняя
-        (i >= this.currentPage - this.range && i <= this.currentPage + this.range)
-      ) {
-        pages.push(i);
-      } else if (pages[pages.length - 1] !== '...') {
-        pages.push('...');
-      }
-    }
-
-    return pages;
+    return buildPages(this.totalPages, this.currentPage, this.range);
   }
 
   selectPage(page: PageItem): void {
-    if (typeof page !== 'number' || page < 1 || page > this.totalPages) return;
+    if (typeof page !== 'number' || page < 1 || page > this.totalPages || page === this.currentPage) return;
     this.currentPage = page;
     this.pages = this.buildPages();
     this.pageChange.emit(page);

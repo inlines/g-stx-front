@@ -1,6 +1,13 @@
 import { NgClass } from '@angular/common';
-import { Component } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthActions } from '@app/states/auth/states/auth-actions';
 import { Store } from '@ngxs/store';
@@ -10,25 +17,24 @@ import { Store } from '@ngxs/store';
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
   standalone: true,
-  imports: [FormsModule, ReactiveFormsModule, NgClass, RouterLink]
+  changeDetection: ChangeDetectionStrategy.Eager,
+  imports: [FormsModule, ReactiveFormsModule, NgClass, RouterLink],
 })
 export class LoginComponent {
   constructor(
     private readonly fb: FormBuilder,
     private readonly store: Store,
   ) {
-    this.form  = this.fb.group({
-      user_login: new FormControl("", [
-        Validators.required,
-      ]),
-      password: new FormControl("", Validators.required),
+    this.form = this.fb.group({
+      user_login: new FormControl('', [Validators.required]),
+      password: new FormControl('', Validators.required),
     });
   }
 
   public form!: FormGroup;
 
-  public submit() : void {
-    if(!this.form.invalid) {
+  public submit(): void {
+    if (!this.form.invalid) {
       this.store.dispatch(new AuthActions.LoginRequest(this.form.value));
     }
   }

@@ -1,91 +1,82 @@
-import { AsyncPipe, DatePipe, NgClass, NgIf, NgTemplateOutlet } from '@angular/common';
-import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { AuthState } from '@app/states/auth/states/auth.state';
-import { IProductPropertiesResponse } from '@app/states/products/interfaces/product-properties-response.interface';
-import { ProductsState } from '@app/states/products/states/products.state';
-import { Store } from '@ngxs/store';
-import { combineLatest, map, Observable, of, switchMap } from 'rxjs';
-import { NgbCarouselModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { CollectionActions } from '@app/states/collection/states/collection-actions';
-import { IReleaseItem } from '@app/states/products/interfaces/release-item.interface';
-import { OwnershipState } from '@app/states/ownership/states/ownership.state';
-import { CollectionState } from '@app/states/collection/states/collection.state';
+import { AsyncPipe, DatePipe, Location, NgClass, NgTemplateOutlet } from '@angular/common';
+import { ChangeDetectionStrategy, Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ChatActions } from '@app/states/chat/states/chat-actions';
 import { CopyToClipboardDirective } from '@app/directives/copy-to-clipboard.directive';
-import { Location } from '@angular/common';
+import { AuthState } from '@app/states/auth/states/auth.state';
+import { ChatActions } from '@app/states/chat/states/chat-actions';
+import { CollectionActions } from '@app/states/collection/states/collection-actions';
+import { CollectionState } from '@app/states/collection/states/collection.state';
+import { OwnershipState } from '@app/states/ownership/states/ownership.state';
+import { IProductPropertiesResponse } from '@app/states/products/interfaces/product-properties-response.interface';
+import { IReleaseItem } from '@app/states/products/interfaces/release-item.interface';
+import { ProductsState } from '@app/states/products/states/products.state';
+import { NgbCarouselModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Store } from '@ngxs/store';
+import { combineLatest, map, Observable } from 'rxjs';
 
 @Component({
   selector: 'app-product-properties',
-  imports: [AsyncPipe, DatePipe, NgbCarouselModule, NgClass, NgTemplateOutlet, CopyToClipboardDirective, NgIf],
+  imports: [AsyncPipe, DatePipe, NgbCarouselModule, NgClass, NgTemplateOutlet, CopyToClipboardDirective],
   templateUrl: './product-properties.component.html',
   styleUrl: './product-properties.component.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
 })
 export class ProductPropertiesComponent implements OnInit {
-
-  @ViewChild('bidsModal', { static: true }) bidsModalRef!: TemplateRef<any>;
+  @ViewChild('bidsModal', { static: true }) bidsModalRef!: TemplateRef<unknown>;
 
   constructor(
     private readonly store: Store,
     private readonly modalService: NgbModal,
     private readonly params: ActivatedRoute,
-    private location: Location
-  ){
+    private location: Location,
+  ) {
     this.productProperties$ = this.store.select(ProductsState.productProperties);
     this.isAuthorised$ = this.store.select(AuthState.isAuthorised);
     this.collectionChanging$ = this.store.select(CollectionState.collectionChanging);
-    this.releases$ = this.productProperties$.pipe(
-    switchMap(properties => {
-      if (!properties) return of([]);
-        const releaseStreams = properties.releases.map(release =>
-          (
-            combineLatest([
-              this.store.select(OwnershipState.hasRelease(release.release_id)),
-              this.store.select(OwnershipState.hasWish(release.release_id)),
-              this.store.select(OwnershipState.hasBid(release.release_id)),
-            ])
-          ).pipe(
-            map(([owned, wished, bided]) => ({
-              ...release,
-              owned,
-              wished,
-              bided
-            }))
-          )
-        );
-
-        return releaseStreams.length > 0 ? combineLatest(releaseStreams) : of([]);
-      })
+    this.releases$ = combineLatest([
+      this.productProperties$,
+      this.store.select(OwnershipState.ownership),
+    ]).pipe(
+      map(([properties, ownership]) => {
+        const have = new Set(ownership.flatMap((item) => item.have_ids ?? []));
+        const wish = new Set(ownership.flatMap((item) => item.wish_ids ?? []));
+        const bid = new Set(ownership.flatMap((item) => item.bid_ids ?? []));
+        return (properties?.releases ?? []).map((release) => ({
+          ...release,
+          owned: have.has(release.release_id),
+          wished: wish.has(release.release_id),
+          bided: bid.has(release.release_id),
+        }));
+      }),
     );
-
   }
 
   public platformId$!: Observable<number>;
 
-  public sortedReleases$!: Observable<{highlighted:IReleaseItem[]; others:IReleaseItem[]}>;
+  public sortedReleases$!: Observable<{ highlighted: IReleaseItem[]; others: IReleaseItem[] }>;
 
   public ngOnInit(): void {
-    this.platformId$ = of(parseInt(this.params.snapshot.paramMap.get('platform') || '0'));
+    this.platformId$ = this.params.paramMap.pipe(map((params) => Number(params.get('platform') ?? 0)));
     this.sortedReleases$ = combineLatest([this.releases$, this.platformId$]).pipe(
       map(([releases, platformId]) => {
         if (!platformId || platformId === 0) {
           return { highlighted: [], others: releases };
         }
 
-        const highlighted = releases.filter(r => r.platform_id === platformId);
-        const others = releases.filter(r => r.platform_id !== platformId);
+        const highlighted = releases.filter((r) => r.platform_id === platformId);
+        const others = releases.filter((r) => r.platform_id !== platformId);
 
         return { highlighted, others };
-      })
+      }),
     );
 
     this.productDevelopers$ = this.productProperties$.pipe(
-      map(properties => (properties?.companies || []).filter(c => c.developer).map(c => c.name)),
+      map((properties) => (properties?.companies || []).filter((c) => c.developer).map((c) => c.name)),
     );
 
     this.productPublishers$ = this.productProperties$.pipe(
-      map(properties => (properties?.companies || []).filter(c => c.publisher).map(c => c.name)),
+      map((properties) => (properties?.companies || []).filter((c) => c.publisher).map((c) => c.name)),
     );
   }
 
@@ -104,19 +95,19 @@ export class ProductPropertiesComponent implements OnInit {
   public releases$: Observable<IReleaseItem[]>;
 
   public addToCollection(release_id: number, product_id: number): void {
-    this.store.dispatch(new CollectionActions.AddToCollectionRequest({release_id, product_id}))
+    this.store.dispatch(new CollectionActions.AddToCollectionRequest({ release_id, product_id }));
   }
 
   public addWish(release_id: number): void {
-    this.store.dispatch(new CollectionActions.AddWishRequest({release_id}))
+    this.store.dispatch(new CollectionActions.AddWishRequest({ release_id }));
   }
 
   public addBid(release_id: number): void {
-    this.store.dispatch(new CollectionActions.AddBidRequest({release_id}))
+    this.store.dispatch(new CollectionActions.AddBidRequest({ release_id }));
   }
 
   public removeBid(release_id: number): void {
-    this.store.dispatch(new CollectionActions.RemoveBidRequest({release_id}))
+    this.store.dispatch(new CollectionActions.RemoveBidRequest({ release_id }));
   }
 
   public openBidsModal(release: IReleaseItem) {
@@ -132,22 +123,21 @@ export class ProductPropertiesComponent implements OnInit {
   }
 
   public getRegionClass(region: string): string {
-    const regionMap: {[key: string]: string} = {
-      'japan': 'ntsc-j',
-      'north_america': 'ntsc-u',
-      'europe': 'pal'
+    const regionMap: { [key: string]: string } = {
+      japan: 'ntsc-j',
+      north_america: 'ntsc-u',
+      europe: 'pal',
     };
     return regionMap[region] || 'bg-secondary';
   }
 
-  
   showAllSerials: number | null = null;
 
   toggleSerials(releseId: number) {
     this.showAllSerials = releseId;
     setTimeout(() => {
       this.showAllSerials = null;
-    }, 1500)
+    }, 1500);
   }
 
   public goBack() {

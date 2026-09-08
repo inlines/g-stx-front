@@ -1,19 +1,17 @@
-import { Injectable } from "@angular/core";
-import { AUTH_STATE_DEFAULTS } from "./auth.state-default.const";
-import { IAuthState } from "./auth.state.interface";
-import { Action, Selector, State, StateContext } from "@ngxs/store";
-import { AuthService } from "../services/auth.service";
-import { AuthActions } from "./auth-actions";
-import { RequestStatus } from "@app/constants/request-status.const";
-import { catchError, tap } from "rxjs";
-import { Router } from "@angular/router";
-import { OwnershipActions } from "@app/states/ownership/states/ownership-actions";
-import { ProductsActions } from "@app/states/products/states/products.actions";
-import { ToastService } from "@app/services/toast.service";
-import { ChatActions } from "@app/states/chat/states/chat-actions";
-import { CollectionState } from "@app/states/collection/states/collection.state";
-import { CollectionActions } from "@app/states/collection/states/collection-actions";
-
+import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
+import { RequestStatus } from '@app/constants/request-status.const';
+import { ToastService } from '@app/services/toast.service';
+import { ChatActions } from '@app/states/chat/states/chat-actions';
+import { CollectionActions } from '@app/states/collection/states/collection-actions';
+import { OwnershipActions } from '@app/states/ownership/states/ownership-actions';
+import { ProductsActions } from '@app/states/products/states/products.actions';
+import { Action, Selector, State, StateContext } from '@ngxs/store';
+import { catchError, tap } from 'rxjs';
+import { AuthService } from '../services/auth.service';
+import { AuthActions } from './auth-actions';
+import { AUTH_STATE_DEFAULTS } from './auth.state-default.const';
+import { IAuthState } from './auth.state.interface';
 
 @State<IAuthState>({
   name: 'Auth',
@@ -22,24 +20,24 @@ import { CollectionActions } from "@app/states/collection/states/collection-acti
 @Injectable()
 export class AuthState {
   constructor(
-      private service: AuthService,
-      private toastService: ToastService,
-      private router: Router
-  ){}
+    private service: AuthService,
+    private toastService: ToastService,
+    private router: Router,
+  ) {}
 
   @Action(AuthActions.LoginRequest)
   public loginRequest(ctx: StateContext<IAuthState>, action: AuthActions.LoginRequest) {
     ctx.patchState({
       authRequestStatus: RequestStatus.Pending,
       login: action.payload.user_login,
-      token: null
+      token: null,
     });
 
     return this.service.authRequest(action.payload).pipe(
       tap((response) => {
-        ctx.dispatch(new AuthActions.LoginRequestSuccess(response))
+        ctx.dispatch(new AuthActions.LoginRequestSuccess(response));
       }),
-      catchError((err, caught) => ctx.dispatch(new AuthActions.LoginRequestFail()))
+      catchError(() => ctx.dispatch(new AuthActions.LoginRequestFail())),
     );
   }
 
@@ -52,11 +50,6 @@ export class AuthState {
 
     ctx.dispatch(new OwnershipActions.RequestOwnership());
 
-    // const state = ctx.getState();
-    // if(state.login) {
-    //   ctx.dispatch(new ChatActions.Connect(state.login));
-    // }
-
     this.router.navigate(['/collection']);
   }
 
@@ -65,7 +58,7 @@ export class AuthState {
     ctx.patchState({
       authRequestStatus: RequestStatus.Error,
       login: null,
-      token: null
+      token: null,
     });
 
     this.toastService.show({
@@ -80,7 +73,7 @@ export class AuthState {
     ctx.patchState({
       authRequestStatus: RequestStatus.NotInvoked,
       login: null,
-      token: null
+      token: null,
     });
 
     ctx.dispatch(new OwnershipActions.ResetOwnership());

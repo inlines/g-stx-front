@@ -1,7 +1,7 @@
-import { IcollectionResponse } from "@app/states/collection/interfaces/collection-response.interface";
-import { ICollectorItem } from "../interfaces/collector-item.interface";
-import { CollectorsActionList } from "./collectors-action-list.const";
-import { ICollectionItem } from "@app/states/collection/interfaces/collection-item.interface";
+import { IcollectionResponse } from '@app/states/collection/interfaces/collection-response.interface';
+import { ICollectorItem } from '../interfaces/collector-item.interface';
+import { CollectorsActionList } from './collectors-action-list.const';
+import { ICollectionItem } from '@app/states/collection/interfaces/collection-item.interface';
 
 export namespace CollectorsActions {
   export class GetCollectorsRequest {

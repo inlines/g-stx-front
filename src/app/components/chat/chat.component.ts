@@ -1,27 +1,38 @@
+import { DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { IMessage } from '@app/states/chat/interfaces/message.interface';
 // src/app/components/chat/chat.component.ts
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
-import { Store, Actions, ofActionCompleted } from '@ngxs/store';
-import { debounceTime, filter, map, Observable, Subscription, take, withLatestFrom } from 'rxjs';
-import { ChatState } from '@app/states/chat/states/chat.state';
-import { AuthState } from '@app/states/auth/states/auth.state';
-import { ChatActions } from '@app/states/chat/states/chat-actions';
-import { FormsModule } from '@angular/forms';
 import { AsyncPipe, DatePipe, NgClass } from '@angular/common';
-import { IDialog } from '@app/states/chat/interfaces/dialog.interface';
-import { ToastService } from '@app/services/toast.service';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { TrapScrollDirective } from '@app/directives/trap-scroll.directive';
-
+import { ToastService } from '@app/services/toast.service';
+import { AuthState } from '@app/states/auth/states/auth.state';
+import { IDialog } from '@app/states/chat/interfaces/dialog.interface';
+import { ChatActions } from '@app/states/chat/states/chat-actions';
+import { ChatState } from '@app/states/chat/states/chat.state';
+import { Actions, ofActionCompleted, Store } from '@ngxs/store';
+import { debounceTime, map, Observable, withLatestFrom } from 'rxjs';
 
 @Component({
   selector: 'app-chat',
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [FormsModule, AsyncPipe, DatePipe, TrapScrollDirective, NgClass, DatePipe],
 })
 export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('scrollbox') scrollbox!: ElementRef;
 
-  messages$!: Observable<any[]>;
+  messages$!: Observable<IMessage[]>;
   isConnected$!: Observable<boolean>;
   login$!: Observable<string | null>;
   recepient$!: Observable<string | null>;
@@ -33,16 +44,20 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
 
   public dialogs$!: Observable<IDialog[]>;
 
-  constructor(private store: Store, private actions$: Actions, private toastService: ToastService,) {}
+  constructor(
+    private store: Store,
+    private actions$: Actions,
+    private toastService: ToastService,
+  ) {}
 
-  public subs: Subscription[] = [];
-  
+  private readonly destroyRef = inject(DestroyRef);
+
   ngAfterViewInit(): void {
-    this.subs.push(this.messages$.pipe(debounceTime(50)).subscribe(() => {
-      if(this.scrollbox) {
+    this.messages$.pipe(debounceTime(50), takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+      if (this.scrollbox) {
         this.scrollbox.nativeElement.scrollTop = this.scrollbox.nativeElement.scrollHeight;
       }
-    }));
+    });
   }
 
   ngOnInit(): void {
@@ -52,44 +67,42 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
     this.dialogs$ = this.store.select(ChatState.dialogs);
     this.messages$ = this.store.select(ChatState.messages).pipe(
       withLatestFrom(this.login$),
-      map(([messages, login]) => messages.map(m => ({...m, sender: m.sender === login ? 'Вы' : m.sender})))
+      map(([messages, login]) =>
+        messages.map((m) => ({ ...m, sender: m.sender === login ? 'Вы' : m.sender })),
+      ),
     );
-    
+
     this.store.dispatch(new ChatActions.Connect(this.store.selectSnapshot(AuthState.login) || ''));
 
-    this.actions$.pipe(ofActionCompleted(ChatActions.SetMessages)).subscribe(
-      () => {
-        if(this.isOpen) {
-          if(this.scrollbox) {
+    this.actions$
+      .pipe(ofActionCompleted(ChatActions.SetMessages), takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (this.isOpen) {
+          if (this.scrollbox) {
             this.scrollbox.nativeElement.scrollTop = this.scrollbox.nativeElement.scrollHeight;
-            this.scrollbox.nativeElement.children[this.scrollbox.nativeElement.children.length - 1].classList.add('highlight');
-            setTimeout(() => {
-              this.scrollbox.nativeElement.children[this.scrollbox.nativeElement.children.length - 1].classList.remove('highlight');
-            }, 1000);
+            const message = this.scrollbox.nativeElement.querySelector('.message-item:last-child');
+            message?.classList.add('highlight');
+            setTimeout(() => message?.classList.remove('highlight'), 1000);
           }
         }
-      }
-    )
+      });
   }
 
   sendMessage(): void {
-    this.recepient$.pipe(
-      filter(r => !!r),
-      take(1)
-    ).subscribe(recepient => {
-        this.store.dispatch(new ChatActions.SendMessage({
-        sender: this.store.selectSnapshot(AuthState.login) || '',
-        recipient: recepient || '',
-        body: this.message
-      }));
-
-      this.message = ''; // Очистка поля ввода
-    })
+    const recipient = this.store.selectSnapshot(ChatState.recepient);
+    if (!recipient || !this.message.trim() || !this.store.selectSnapshot(ChatState.isConnected)) return;
+    this.store.dispatch(
+      new ChatActions.SendMessage({
+        sender: this.store.selectSnapshot(AuthState.login) ?? '',
+        recipient,
+        body: this.message,
+      }),
+    );
+    this.message = '';
   }
 
   ngOnDestroy(): void {
     // Закрытие соединения при уничтожении компонента
-    this.subs.forEach(sub => sub.unsubscribe());
     this.store.dispatch(new ChatActions.Reset());
   }
 
@@ -101,13 +114,13 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   public onFocus(): void {
-    if(this.scrollbox) {
+    if (this.scrollbox) {
       this.scrollbox.nativeElement.scrollTop = this.scrollbox.nativeElement.scrollHeight;
     }
   }
 
   public setActiveDialog(dialog: IDialog | null) {
-    if(dialog?.companion) {
+    if (dialog?.companion) {
       this.store.dispatch(new ChatActions.SetRecepient(dialog.companion));
       this.store.dispatch(new ChatActions.RequestMessages(dialog.companion));
     } else {

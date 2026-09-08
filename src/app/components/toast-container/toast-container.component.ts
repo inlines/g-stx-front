@@ -1,5 +1,4 @@
-
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ToastService } from '@app/services/toast.service';
 import { NgbToastModule } from '@ng-bootstrap/ng-bootstrap';
 
@@ -8,7 +7,8 @@ import { NgbToastModule } from '@ng-bootstrap/ng-bootstrap';
   imports: [NgbToastModule],
   templateUrl: './toast-container.component.html',
   styleUrl: './toast-container.component.scss',
-  standalone: true,
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: true,
 })
 export class ToastContainerComponent {
   constructor(public toastService: ToastService) {}

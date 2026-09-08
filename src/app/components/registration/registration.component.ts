@@ -1,6 +1,15 @@
 import { NgClass } from '@angular/common';
-import { Component } from '@angular/core';
-import { AbstractControl, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import {
+  AbstractControl,
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  ValidationErrors,
+  Validators,
+} from '@angular/forms';
 import { RegistrationActions } from '@app/states/registration/states/registration-actions';
 import { Store } from '@ngxs/store';
 
@@ -9,21 +18,22 @@ import { Store } from '@ngxs/store';
   templateUrl: './registration.component.html',
   styleUrl: './registration.component.scss',
   standalone: true,
-  imports: [FormsModule, ReactiveFormsModule, NgClass]
+  changeDetection: ChangeDetectionStrategy.Eager,
+  imports: [FormsModule, ReactiveFormsModule, NgClass],
 })
 export class RegistrationComponent {
   constructor(
     private readonly fb: FormBuilder,
     private readonly store: Store,
   ) {
-    this.form  = this.fb.group({
-      user_login: new FormControl("", [
-        Validators.required,
-        this.latinAndNumbersValidator.bind(this)
-      ]),
-      password: new FormControl("", Validators.required),
-      passwordAgain: new FormControl("", Validators.required),
-    }, { validators: this.passwordsMatchValidator });
+    this.form = this.fb.group(
+      {
+        user_login: new FormControl('', [Validators.required, this.latinAndNumbersValidator.bind(this)]),
+        password: new FormControl('', Validators.required),
+        passwordAgain: new FormControl('', Validators.required),
+      },
+      { validators: this.passwordsMatchValidator },
+    );
   }
 
   private passwordsMatchValidator(form: FormGroup) {
@@ -39,18 +49,18 @@ export class RegistrationComponent {
 
     // Разрешаем латинские буквы и цифры
     const latinWithNumbersRegex = /^[a-zA-Z0-9]+$/;
-    
+
     if (!latinWithNumbersRegex.test(control.value)) {
       return { latinAndNumbersOnly: true };
     }
-    
+
     return null;
   }
 
   public form!: FormGroup;
 
-  public submit() : void {
-    if(!this.form.invalid) {
+  public submit(): void {
+    if (!this.form.invalid) {
       this.store.dispatch(new RegistrationActions.RegisterRequest(this.form.value));
     }
   }

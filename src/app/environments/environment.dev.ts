@@ -1,6 +1,6 @@
-import { IEnvironment } from "./environment.interface";
+import { IEnvironment } from './environment.interface';
 
 export const environment: IEnvironment = {
   apiUrl: 'http://127.0.0.1:9090/api',
-  wsUrl:  'ws://localhost:9090/ws/'
-}
+  wsUrl: 'ws://localhost:9090/ws/',
+};

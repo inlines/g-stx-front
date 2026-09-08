@@ -5,10 +5,10 @@
         <div #stickerContent class="stickerContent">
           <form [formGroup]="queryForm" class="position-relative">
           <ul class="d-flex px-0 mb-3 align-items-center" style="overflow-x: scroll;">
-            @for (cat of (categories$ | async); track cat) {
+            @for (cat of (categories$ | async); track cat.id) {
               <li class="me-2 mb-2">
                 <a class="btn-pink px-4 py-2 fw-semibold d-flex justify-content-between align-items-center"
-                  [class.active]="(activeCategory | async) === cat.id"
+                  [class.active]="activeCategory === cat.id"
                   (click)="setActiveCategory(cat.id)">
                   {{ cat.abbreviation }}
                   <span class="ms-2">{{ cat.total_games }}</span>
@@ -33,7 +33,6 @@
                   formControlName="sort">
                   <option value="name">По названию</option>
                   <option value="date">По дате</option>
-                  <option value="popularity">По популярности</option>
               </select>
             </li>
           </ul>
@@ -48,47 +47,21 @@
                   autocomplete="off"
                   formControlName="query" />
               </div>
-              <div class="col-auto d-none d-md-block">
-                <select 
-                  class="form-select form-select-lg border-0 rounded-3"
-                  formControlName="franschise">
-                  <option value="null">Франшиза</option>
-                  <option value="1">metal gear solid</option>
-                  <option value="2">silent hill</option>
-                </select>
-              </div>
-              <div class="col-auto d-none d-md-block">
-                <select 
-                  class="form-select form-select-lg border-0 rounded-3"
-                  formControlName="developer">
-                  <option value="null">Разработчик</option>
-                  <option value="1">Konami</option>
-                  <option value="2">other</option>
-                </select>
-              </div>
-              <div class="col-auto d-none d-md-block">
-                <select 
-                  class="form-select form-select-lg border-0 rounded-3"
-                  formControlName="publisher">
-                  <option value="null">Издатель</option>
-                  <option value="1">Konami</option>
-                  <option value="2">other</option>
-                </select>
-              </div>
             </div>
           </form>
         </div>
       </div>
     </div>
   </div>
-  <!-- Продукты -->
+  @if (loading$ | async) { <p class="text-light" role="status">Загрузка...</p> }
+  @if (failed$ | async) { <p class="text-warning" role="alert">Не удалось загрузить каталог. Попробуйте изменить фильтры или обновить страницу.</p> }
   
   @for (product of products$ | async; track product.id) {
     <!-- Desktop / tablet: карточки -->
     <div class="col-xl-3 col-lg-4 col-md-4 col-sm-6 p-3">
       <div
         class="card game-card border-0 d-flex flex-column justify-content-between position-relative"
-        [routerLink]="[product.id.toString(), {platform: activeCategory.value}]"
+        [routerLink]="[product.id.toString(), {platform: activeCategory}]"
         style="cursor: pointer;"
         >
         @if (product.owned) {

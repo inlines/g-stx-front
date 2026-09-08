@@ -9,6 +9,6 @@ export interface IReleaseItem {
   wished?: boolean;
   bided?: boolean;
   bid_user_logins: string[];
-  digital_only: boolean,
+  digital_only: boolean;
   serial: string[] | null;
 }

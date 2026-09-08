@@ -1,4 +1,4 @@
-import { ICollectionItem } from "./collection-item.interface";
+import { ICollectionItem } from './collection-item.interface';
 
 export interface IcollectionResponse {
   items: ICollectionItem[];

@@ -1,12 +1,12 @@
-import { Action, createSelector, Selector, State, StateContext } from "@ngxs/store";
-import { IownershipState } from "./ownership.state.interface";
-import { OWNERSHIP_STATE_DEFAULTS } from "./ownership.state-default.const";
-import { Injectable } from "@angular/core";
-import { OwnershipService } from "../services/ownership.service";
-import { OwnershipActions } from "./ownership-actions";
-import { RequestStatus } from "@app/constants/request-status.const";
-import { catchError, tap } from "rxjs";
-import { IOwnershipItem } from "../interfaces/ownership-item.interface";
+import { Injectable } from '@angular/core';
+import { RequestStatus } from '@app/constants/request-status.const';
+import { Action, createSelector, Selector, State, StateContext } from '@ngxs/store';
+import { catchError, tap } from 'rxjs';
+import { IOwnershipItem } from '../interfaces/ownership-item.interface';
+import { OwnershipService } from '../services/ownership.service';
+import { OwnershipActions } from './ownership-actions';
+import { OWNERSHIP_STATE_DEFAULTS } from './ownership.state-default.const';
+import { IownershipState } from './ownership.state.interface';
 
 @State<IownershipState>({
   name: 'Ownership',
@@ -14,29 +14,35 @@ import { IOwnershipItem } from "../interfaces/ownership-item.interface";
 })
 @Injectable()
 export class OwnershipState {
-  constructor(
-    private service: OwnershipService
-  ){}
+  constructor(private service: OwnershipService) {}
+
+  @Action(OwnershipActions.RequestOwnershipFail)
+  loadOwnershipFail(ctx: StateContext<IownershipState>) {
+    ctx.patchState({ loadOwnershipStatus: RequestStatus.Error });
+  }
 
   @Action(OwnershipActions.RequestOwnership)
   public loadOwnership(ctx: StateContext<IownershipState>, action: OwnershipActions.RequestOwnership) {
     ctx.patchState({
-      loadOwnershipStatus: RequestStatus.Pending
+      loadOwnershipStatus: RequestStatus.Pending,
     });
 
     return this.service.getOwnershipInfo().pipe(
       tap((response) => {
-        ctx.dispatch(new OwnershipActions.RequestOwnershipSuccess(response))
+        ctx.dispatch(new OwnershipActions.RequestOwnershipSuccess(response));
       }),
-      catchError((err, caught) => ctx.dispatch(new OwnershipActions.RequestOwnershipFail()))
-    )
+      catchError(() => ctx.dispatch(new OwnershipActions.RequestOwnershipFail())),
+    );
   }
 
   @Action(OwnershipActions.RequestOwnershipSuccess)
-  public loadListSuccess(ctx: StateContext<IownershipState>, action: OwnershipActions.RequestOwnershipSuccess) {
+  public loadListSuccess(
+    ctx: StateContext<IownershipState>,
+    action: OwnershipActions.RequestOwnershipSuccess,
+  ) {
     ctx.patchState({
       loadOwnershipStatus: RequestStatus.Load,
-      ownership: action.payload
+      ownership: action.payload,
     });
   }
 
@@ -52,31 +58,41 @@ export class OwnershipState {
 
   static activeCollectionPlatforms = createSelector(
     [OwnershipState.ownership],
-    (ownership: IOwnershipItem[]) => ownership.filter(item => item.have_count > 0).map(o => ({platform: o.platform, have_games: (o.have_prod_ids || []).length, total_spent: o.total_spent}))
+    (ownership: IOwnershipItem[]) =>
+      ownership
+        .filter((item) => item.have_count > 0)
+        .map((o) => ({
+          platform: o.platform,
+          have_games: new Set(o.have_prod_ids ?? []).size,
+          total_spent: o.total_spent,
+        })),
   );
 
-  static activeWishlistPlatforms = createSelector(
-    [OwnershipState.ownership],
-    (ownership: IOwnershipItem[]) => ownership.filter(item => item.wish_count > 0).map(o => o.platform)
+  static activeWishlistPlatforms = createSelector([OwnershipState.ownership], (ownership: IOwnershipItem[]) =>
+    ownership.filter((item) => item.wish_count > 0).map((o) => o.platform),
+  );
+
+  static activeWtsPlatforms = createSelector([OwnershipState.ownership], (ownership: IOwnershipItem[]) =>
+    ownership.filter((item) => item.have_count > 0).map((o) => o.platform),
   );
 
   static hasRelease = (releaseId: number) =>
     createSelector([OwnershipState.ownership], (ownership: IOwnershipItem[]): boolean => {
-      return ownership.some(item => item.have_ids.includes(releaseId));
-  });
+      return ownership.some((item) => (item.have_ids ?? []).includes(releaseId));
+    });
 
   static hasGame = (prodId: number) =>
     createSelector([OwnershipState.ownership], (ownership: IOwnershipItem[]): boolean => {
-      return ownership.some(item => item.have_prod_ids.includes(prodId));
-  });
+      return ownership.some((item) => (item.have_prod_ids ?? []).includes(prodId));
+    });
 
   static hasWish = (releaseId: number) =>
     createSelector([OwnershipState.ownership], (ownership: IOwnershipItem[]): boolean => {
-      return ownership.some(item => item.wish_ids.includes(releaseId));
-  });
+      return ownership.some((item) => (item.wish_ids ?? []).includes(releaseId));
+    });
 
   static hasBid = (releaseId: number) =>
     createSelector([OwnershipState.ownership], (ownership: IOwnershipItem[]): boolean => {
-      return ownership.some(item => item.bid_ids.includes(releaseId));
-  });
+      return ownership.some((item) => (item.bid_ids ?? []).includes(releaseId));
+    });
 }

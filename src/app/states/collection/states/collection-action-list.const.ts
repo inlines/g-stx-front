@@ -15,6 +15,10 @@ export enum CollectionActionList {
   ADD_BID_REQUEST_FAIL = '[Collection] add bid request fail',
   ADD_BID_REQUEST_SUCCESS = '[Collection] add bid request success',
 
+  ADD_WTS_REQUEST = '[Collection] add wts request',
+  ADD_WTS_REQUEST_FAIL = '[Collection] add wts request fail',
+  ADD_WTS_REQUEST_SUCCESS = '[Collection] add wts request success',
+
   REMOVE_WISH_REQUEST = '[Collection] remove wish request',
   REMOVE_WISH_REQUEST_FAIL = '[Collection] remove wish request fail',
   REMOVE_WISH_REQUEST_SUCCESS = '[Collection] remove wish request success',
@@ -22,6 +26,10 @@ export enum CollectionActionList {
   REMOVE_BID_REQUEST = '[Collection] rmv bid request',
   REMOVE_BID_REQUEST_FAIL = '[Collection] rmv bid request fail',
   REMOVE_BID_REQUEST_SUCCESS = '[Collection] rmv bid request success',
+
+  REMOVE_WTS_REQUEST = '[Collection] rmv wts request',
+  REMOVE_WTS_REQUEST_FAIL = '[Collection] rmv wts request fail',
+  REMOVE_WTS_REQUEST_SUCCESS = '[Collection] rmv wts request success',
 
   REMOVE_REQUEST = '[Collection] rmv request',
   REMOVE_REQUEST_FAIL = '[Collection] rmv request fail',
@@ -37,7 +45,12 @@ export enum CollectionActionList {
   GET_WISHLIST_FAIL = '[Collection] get wishlist request fail',
   GET_WISHLIST_SUCCESS = '[Collection] get wishlist request success',
 
+  GET_WTS_REQUEST = '[Collection] get wts request',
+  GET_WTS_FAIL = '[Collection] get wts request fail',
+  GET_WTS_SUCCESS = '[Collection] get wts request success',
+
   SET_WISHLIST_PARAMS = '[Collection] set wishlist params',
+  SET_WTS_PARAMS = '[Collection] set wts params',
 
   RESET = '[Collection] reset',
 }

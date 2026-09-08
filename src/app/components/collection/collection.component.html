@@ -6,12 +6,12 @@
           <div #stickerContent class="stickerContent">
             <form [formGroup]="queryForm" class="position-relative">
             <ul class="nav nav-pills flex-wrap justify-content-start mb-3">
-              @for (cat of (displayCategories$ | async); track cat) {
+              @for (cat of (displayCategories$ | async); track cat.id) {
                 <li class="me-2 mb-2"
                   >
                   <a class="btn-pink px-4 py-2 fw-semibold d-flex justify-content-between align-items-center"
                     [class.active]="activeCategory === cat.id"
-                    (click)="setActiveCategory(cat.id, cat.user_games, cat.total_spent)">
+                    (click)="setActiveCategory(cat.id)">
                     <span>
                       {{ cat.abbreviation }}
                     </span>
@@ -55,25 +55,25 @@
     }
   </div>
   @if (!!(collection$ | async)?.length) {
-    @for (product of collectionWithLetters$ | async; track product.item.release_id) {
+    @for (product of filteredCollection$ | async; track product.release_id) {
       <div class="col-12 p-3" style="color: rgba(211, 225, 236, 1);">
         <div
           class="game-card position-relative row"
-          [routerLink]="['/products/' + product.item.product_id.toString(), {platform: activeCategory}]"
+          [routerLink]="['/products/' + product.product_id.toString(), {platform: activeCategory}]"
           style="cursor: pointer;"
-          (click)="null"
+
           >
           <div
             class="col-auto px-0"
             style="height: 92px; overflow: hidden;"
             >
-            @if (product.item.image_url) {
+            @if (product.image_url) {
               <img
-                [src]="product.item.image_url"
-                [alt]="product.item.product_name"
+                [src]="product.image_url"
+                [alt]="product.product_name"
                 class="img-fluid"
                 style="max-height: 100%; object-fit: cover;"
-                (error)="product.item.image_url = null"
+                (error)="product.image_url = null"
                 />
             } @else {
               <div class="text-muted d-flex flex-column align-items-center">
@@ -87,26 +87,26 @@
             }
           </div>
           <div class="col-7 d-flex flex-column justify-content-between" style="padding-top:20px; padding-left: 20px; padding-right: 20px; padding-bottom: 16px;">
-            <div class="card-title text-truncate">{{ product.item.product_name }}</div>
+            <div class="card-title text-truncate">{{ product.product_name }}</div>
             <div class="card-subtitle">
               <span class="release-bullet">
-                {{ product.item.release_date || 0 * 1000 | date:'dd.MM.yy':'UTC' }}
+                {{ product.release_date | date:'dd.MM.yy':'UTC' }}
               </span>
               <span class="release-bullet">
-                {{ product.item.platform_name }}
+                {{ product.platform_name }}
               </span>
               <span class="release-bullet">
-                {{ product.item.region_name }}
+                {{ product.region_name }}
               </span>
               <span class="release-bullet d-none d-md-inline">
-                {{ product.item.serial?.join(' | ') }}
+                {{ product.serial?.join(' | ') }}
               </span>
             </div>
           </div>
 
           <div class="col-2 text-end d-flex flex-column justify-content-center">
-            @if (product.item.price) {
-              {{ product.item.price | currency:'₽':'symbol':'1.0-2' }}
+            @if (product.price !== null) {
+              {{ product.price | currency:'₽':'symbol':'1.0-2' }}
             } @else {
               ₽?
             }
@@ -115,7 +115,7 @@
               <button
                 type="button"
                 class="btn-blue"
-                (click)="setPrice(product.item.release_id, product.item.product_name, $event); $event.stopPropagation()"
+                (click)="setPrice(product.release_id, product.product_name, $event); $event.stopPropagation()"
               >
               задать цену
             </button>
@@ -123,7 +123,7 @@
           <div class="col-auto d-flex flex-column justify-content-center">
             <a
               type="button"
-              (click)="remove(product.item.release_id, $event); $event.stopPropagation();"
+              (click)="remove(product.release_id, $event); $event.stopPropagation();"
               >
               <svg width="44" height="38" viewBox="0 0 44 38" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect x="0.5" y="0.5" width="43" height="37" rx="7.5" stroke="#2D587E"/>
@@ -184,7 +184,7 @@
                       <input type="text" [formControl]="priceControl">
                     </div>
                     <div>
-                      <button class="d-block" type="button" (click)="sendPrice()" class="mt-4 btn btn-outline-warning btn-sm">
+                      <button class="d-block" type="button" (click)="sendPrice()" [disabled]="priceControl.invalid" class="mt-4 btn btn-outline-warning btn-sm">
                         ок
                       </button>
                     </div>

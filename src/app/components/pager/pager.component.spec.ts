@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TEST_PROVIDERS } from '@app/testing/test-providers';
 
 import { PagerComponent } from './pager.component';
 
@@ -8,9 +9,9 @@ describe('PagerComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PagerComponent]
-    })
-    .compileComponents();
+      providers: TEST_PROVIDERS,
+      imports: [PagerComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(PagerComponent);
     component = fixture.componentInstance;
