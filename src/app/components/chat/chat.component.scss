@@ -188,3 +188,5 @@
   background: rgba(104, 169, 239, 0.8);
 }
 .online-label { display: block; color: #79d9ac; font-size: 12px; line-height: 18px; font-weight: 600; }
+
+.chat-person { display: flex; align-items: center; gap: 10px; min-width: 0; overflow-wrap: anywhere; }

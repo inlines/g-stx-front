@@ -1,0 +1,53 @@
+<section class="profile">
+  <header class="profile-heading"><app-user-avatar [login]="login$ | async"/><div><h1>Профиль</h1><p>{{login$ | async}}</p></div></header>
+  <nav class="tabs" aria-label="Настройки профиля">
+    <button type="button" [class.selected]="tab === 'password'" [attr.aria-pressed]="tab === 'password'" (click)="tab = 'password'">Сменить пароль</button>
+    <button type="button" [class.selected]="tab === 'avatar'" [attr.aria-pressed]="tab === 'avatar'" (click)="tab = 'avatar'">Аватар</button>
+  </nav>
+  @if(tab === 'password') {
+    <form class="password-panel panel" [formGroup]="password" (ngSubmit)="changePassword()">
+      <h2>Смена пароля</h2>
+      <label>Текущий пароль<input type="password" formControlName="old" autocomplete="current-password" required></label>
+      <label>Новый пароль<input type="password" formControlName="next" autocomplete="new-password" minlength="8" maxlength="128" required aria-describedby="password-help"></label>
+      <p id="password-help" class="hint">От 8 до 128 символов.</p>
+      <label>Повторите новый пароль<input type="password" formControlName="confirm" autocomplete="new-password" required></label>
+      @if(passwordError){<p role="alert" class="error">{{passwordError}}</p>}
+      @if(passwordSuccess){<p role="status" class="success">{{passwordSuccess}}</p>}
+      <button class="primary" type="submit" [disabled]="password.invalid || passwordBusy">{{passwordBusy ? 'Сохраняем…' : 'Изменить пароль'}}</button>
+    </form>
+  } @else {
+    <div class="panel">
+      <h2>Ваш пиксельный аватар</h2><p class="hint">Выберите фото, выделите квадрат и посмотрите результат. Исходное изображение не отправляется на сервер.</p>
+      <div class="dropzone" [class.dragging]="dragging" (dragover)="$event.preventDefault(); dragging = true" (dragleave)="dragging = false" (drop)="drop($event)">
+        <p>Перетащите сюда изображение или выберите из галереи</p>
+        <label class="file-button">Выбрать изображение<input type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" [disabled]="avatarBusy" (change)="fileSelected($event)"></label>
+        <small>До 10 МБ и 24 Мп. JPEG, PNG, WebP; HEIC/HEIF — при поддержке браузера.</small>
+      </div>
+      @if(loading){<p role="status">Подготавливаем изображение…</p>}
+      @if(image){
+        <div class="editor">
+          <div class="crop-panel"><h3>1. Выберите квадрат</h3><p class="hint">Перемещайте рамку пальцем или мышью. Ползунки доступны с клавиатуры.</p>
+            <div class="crop-stage" [style.max-width.px]="Math.min(480, 420 * image.naturalWidth / image.naturalHeight)">
+              <img [src]="sourceUrl" alt="Исходное изображение для выбора области" draggable="false">
+              <div class="crop-square" [style.left.%]="crop.left" [style.top.%]="crop.top" [style.width.%]="crop.width" [style.height.%]="crop.height"
+                (pointerdown)="startDrag($event)" (pointermove)="moveDrag($event)" (pointerup)="endDrag()" (pointercancel)="endDrag()" (lostpointercapture)="endDrag()"><span></span></div>
+            </div>
+            <fieldset [disabled]="avatarBusy || loading">
+              <label>Масштаб<input type="range" min="1" max="4" step="0.05" [(ngModel)]="zoom" (ngModelChange)="updatePreview()"></label>
+              <label>По горизонтали<input type="range" min="0" max="100" step="0.5" [(ngModel)]="x" (ngModelChange)="updatePreview()"></label>
+              <label>По вертикали<input type="range" min="0" max="100" step="0.5" [(ngModel)]="y" (ngModelChange)="updatePreview()"></label>
+            </fieldset>
+          </div>
+          <div class="preview-panel"><h3>2. Посмотрите результат</h3>
+            @if(previewUrl){<img class="pixel-preview" [src]="previewUrl" alt="Предпросмотр пиксельного аватара">}
+            <label>Размер пикселей<select [(ngModel)]="pixels" (ngModelChange)="updatePreview()" [disabled]="avatarBusy || loading"><option [ngValue]="16">Крупные · 16×16</option><option [ngValue]="32">Средние · 32×32</option><option [ngValue]="64">Мелкие · 64×64</option></select></label>
+            <p class="hint">PNG · 64×64 · {{blob ? (blob.size / 1024).toFixed(1) : '…'}} КБ</p>
+            <button class="primary" type="button" [disabled]="!blob || avatarBusy || loading" (click)="saveAvatar()">{{avatarBusy ? 'Сохраняем…' : 'Сохранить аватар'}}</button>
+          </div>
+        </div>
+      }
+      @if(avatarError){<p role="alert" class="error">{{avatarError}}</p>}
+      @if(avatarSuccess){<p role="status" class="success">{{avatarSuccess}}</p>}
+    </div>
+  }
+</section>

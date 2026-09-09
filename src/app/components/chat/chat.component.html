@@ -9,7 +9,7 @@
           <path fill-rule="evenodd" clip-rule="evenodd" d="M5.69097 13.2404L13.0726 21.0459L11.4137 22.8L1.2002 12L11.4137 1.2L13.0726 2.95414L5.69097 10.7596H22.8002V13.2404H5.69097Z" fill="#2D587E"/>
         </svg>
       </a>
-      <span>{{ recepient$ | async}}</span>
+      <span class="chat-person"><app-user-avatar [login]="recepient$ | async"/>{{ recepient$ | async}}</span>
     }
     @if (!(recepient$ | async)) {
       <span>Чаты</span>
@@ -85,7 +85,7 @@
             <div (click)="setActiveDialog(dialog)" role="button" tabindex="0" (keydown.enter)="setActiveDialog(dialog)" (keydown.space)="$event.preventDefault(); setActiveDialog(dialog)" [attr.data-companion]="dialog.companion" [class.unread]="(unread$ | async)?.[dialog.companion]"
               class="dialog-item d-flex flex-column py-2 mb-2 text-light">
               <div class="dialog-header d-flex justify-content-between align-items-center">
-                <div>@if ((online$ | async)?.has(dialog.companion)) { <span class="online-label">Онлайн</span> }<span class="dialog-companion">{{ dialog.companion }}</span></div>@if((unread$ | async)?.[dialog.companion]; as count){<span class="unread-count" aria-label="Новые сообщения">{{count}}</span>}
+                <div class="chat-person"><app-user-avatar [login]="dialog.companion"/><div>@if ((online$ | async)?.has(dialog.companion)) { <span class="online-label">Онлайн</span> }<span class="dialog-companion">{{ dialog.companion }}</span></div></div>@if((unread$ | async)?.[dialog.companion]; as count){<span class="unread-count" aria-label="Новые сообщения">{{count}}</span>}
               </div>
               <div class="dialog-message small d-flex justify-content-between">
                 <span>{{ dialog.last_message }}</span>
