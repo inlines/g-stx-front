@@ -257,3 +257,6 @@ input::placeholder {
   margin-top: 6px;
   color: #a3b8cb;
 }
+
+.list-info { flex-wrap: wrap; align-items: center; gap: 12px; }
+.csv-export { position: relative; z-index: 1; }

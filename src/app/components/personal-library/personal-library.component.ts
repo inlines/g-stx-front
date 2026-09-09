@@ -1,3 +1,4 @@
+import { libraryCsv, LibraryCsvDownload } from '@app/shared/library-csv';
 import { OwnershipState } from '@app/states/ownership/states/ownership.state';
 import { AsyncPipe, CurrencyPipe } from '@angular/common';
 import {
@@ -46,6 +47,7 @@ export class PersonalLibraryComponent implements OnInit, OnDestroy {
   readonly saleCib = new FormControl(false, { nonNullable: true });
   sellingItem: ICollectionItem | null = null;
   readonly list = inject(PersonalListController);
+  private readonly csvDownload = inject(LibraryCsvDownload);
   private readonly store = inject(Store);
   private readonly views = inject(LibraryViewService);
   private readonly modal = inject(NgbModal);
@@ -95,6 +97,7 @@ export class PersonalLibraryComponent implements OnInit, OnDestroy {
         if (status === RequestStatus.Load) this.view.page = Math.min(this.view.page, pages);
         const start = (this.view.page - 1) * this.view.size;
         return {
+          exportCount: items.length,
           forSale: new Set(ownership.flatMap((item) => item.wts_ids ?? [])),
           items: filtered.slice(start, start + this.view.size),
           total,
@@ -115,6 +118,25 @@ export class PersonalLibraryComponent implements OnInit, OnDestroy {
         }
       }),
       shareReplay({ bufferSize: 1, refCount: true }),
+    );
+  }
+  exportCsv(): void {
+    if (this.store.selectSnapshot(CollectionState.libraryStatuses)[this.kind] !== RequestStatus.Load) return;
+    const items = this.store.selectSnapshot(
+      this.kind === 'collection'
+        ? CollectionState.loadedCollection
+        : this.kind === 'wts'
+          ? CollectionState.loadedWts
+          : CollectionState.loadedWishlist,
+    );
+    if (!items.length) return;
+    const selling = new Set(
+      this.store.selectSnapshot(OwnershipState.ownership).flatMap((item) => item.wts_ids ?? []),
+    );
+    const ordered = this.kind === 'collection' ? filterCollection(items, '', this.view.sort) : items;
+    this.csvDownload.save(
+      libraryCsv(ordered, this.kind, selling),
+      `${this.kind}-${this.list.activeCategory ?? 'all'}-${new Date().toISOString().slice(0, 10)}.csv`,
     );
   }
   selectPlatform(cat: number): void {

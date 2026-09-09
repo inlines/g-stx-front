@@ -1,3 +1,4 @@
+import { LibraryCsvDownload } from '@app/shared/library-csv';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpTestingController } from '@angular/common/http/testing';
 import { OwnershipState } from '@app/states/ownership/states/ownership.state';
@@ -280,5 +281,21 @@ describe('Personal library pages', () => {
     req.flush(null);
     http.expectOne('/api/collection-stats').flush(ownership());
     http.expectOne((r) => r.url === '/api/collection').flush({ items, total_count: items.length });
+  });
+  it.each(['collection', 'wishlist', 'wts'] as const)('exports the entire %s through its button', (kind) => {
+    const save = vi.spyOn(TestBed.inject(LibraryCsvDownload), 'save').mockImplementation(() => {});
+    const component = mount(kind);
+    component.page(2);
+    if (kind === 'collection') component.query.setValue('Game 49');
+    fixture.detectChanges();
+    (fixture.nativeElement.querySelector('.csv-export') as HTMLButtonElement).click();
+    expect(save).toHaveBeenCalledOnce();
+    const [csv, filename] = save.mock.calls[0];
+    expect(csv).toContain('Game 01');
+    expect(csv).toContain('Game 49');
+    expect(filename).toMatch(new RegExp('^' + kind + '-48-.*\\.csv$'));
+    expect(csv).toContain(
+      kind === 'wts' ? 'Цена продажи' : kind === 'collection' ? 'Цена покупки' : 'Название',
+    );
   });
 });
