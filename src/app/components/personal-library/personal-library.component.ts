@@ -1,3 +1,4 @@
+import { priceValidator } from '@app/shared/price-validator';
 import { libraryCsv, LibraryCsvDownload } from '@app/shared/library-csv';
 import { OwnershipState } from '@app/states/ownership/states/ownership.state';
 import { AsyncPipe, CurrencyPipe } from '@angular/common';
@@ -42,7 +43,7 @@ export class PersonalLibraryComponent implements OnInit, OnDestroy {
   @ViewChild('priceModal', { static: true }) priceModal!: TemplateRef<unknown>;
   @ViewChild('saleModal', { static: true }) saleModal!: TemplateRef<unknown>;
   readonly salePrice = new FormControl<number | null>(null, {
-    validators: [Validators.min(0), Validators.max(2147483647), Validators.pattern(/^\d+$/)],
+    validators: [priceValidator],
   });
   readonly saleCib = new FormControl(false, { nonNullable: true });
   sellingItem: ICollectionItem | null = null;
@@ -58,12 +59,7 @@ export class PersonalLibraryComponent implements OnInit, OnDestroy {
   readonly query = new FormControl('', { nonNullable: true });
   readonly price = new FormControl(0, {
     nonNullable: true,
-    validators: [
-      Validators.required,
-      Validators.min(0),
-      Validators.max(2147483647),
-      Validators.pattern(/^\d+$/),
-    ],
+    validators: [Validators.required, priceValidator],
   });
   readonly busy$ = this.store.select(CollectionState.collectionChanging);
   editing: ICollectionItem | null = null;

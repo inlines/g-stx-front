@@ -57,7 +57,7 @@
               <span class="game-header">Является частью франшиз:</span>
               @for (franschise of productProperties?.franschises; track franschise) {
                 <div style="width:100%; max-width: 100%;">
-                  <a class="franchise-link" [routerLink]="['/franchises', franschise.franschise_id]">{{ franschise.franschise_name }} ({{ franschise.total_games_count }} игры)</a>
+                  <a class="catalog-link" [routerLink]="['/franchises', franschise.franschise_id]">{{ franschise.franschise_name }} ({{ franschise.total_games_count }} игры)</a>
                 </div>
               }
             </div>
@@ -66,7 +66,7 @@
             <span class="game-header">Разработчики:</span>
             @for (developer of (productDevelopers$ | async); track developer) {
               <div style="width:100%; max-width: 100%;">
-                <a class="franchise-link" [routerLink]="['/companies', developer.company]">{{ developer.name }}</a>
+                <a class="catalog-link" [routerLink]="['/companies', developer.company]">{{ developer.name }}</a>
               </div>
             }
           </div>
@@ -74,7 +74,7 @@
             <span class="game-header">Издатели:</span>
             @for (publisher of (productPublishers$ | async); track publisher) {
               <div style="width:100%; max-width: 100%;">
-                <a class="franchise-link" [routerLink]="['/companies', publisher.company]">{{ publisher.name }}</a>
+                <a class="catalog-link" [routerLink]="['/companies', publisher.company]">{{ publisher.name }}</a>
               </div>
             }
           </div>

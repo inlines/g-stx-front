@@ -1,7 +1,6 @@
-import { DestroyRef, inject } from '@angular/core';
+import { DestroyRef, inject, Injector, afterNextRender } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { IMessage } from '@app/states/chat/interfaces/message.interface';
-// src/app/components/chat/chat.component.ts
 import { AsyncPipe, DatePipe, NgClass } from '@angular/common';
 import {
   AfterViewInit,
@@ -14,12 +13,11 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TrapScrollDirective } from '@app/directives/trap-scroll.directive';
-import { ToastService } from '@app/services/toast.service';
 import { AuthState } from '@app/states/auth/states/auth.state';
 import { IDialog } from '@app/states/chat/interfaces/dialog.interface';
 import { ChatActions } from '@app/states/chat/states/chat-actions';
 import { ChatState } from '@app/states/chat/states/chat.state';
-import { Actions, ofActionCompleted, Store } from '@ngxs/store';
+import { Store } from '@ngxs/store';
 import { debounceTime, map, Observable, withLatestFrom } from 'rxjs';
 
 @Component({
@@ -27,7 +25,7 @@ import { debounceTime, map, Observable, withLatestFrom } from 'rxjs';
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.scss'],
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [FormsModule, AsyncPipe, DatePipe, TrapScrollDirective, NgClass, DatePipe],
+  imports: [FormsModule, AsyncPipe, DatePipe, TrapScrollDirective, NgClass],
 })
 export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('scrollbox') scrollbox!: ElementRef;
@@ -38,18 +36,16 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
   recepient$!: Observable<string | null>;
 
   message: string = '';
-  login: string = '';
-
-  public selectedDialog: IDialog | null = null;
 
   public dialogs$!: Observable<IDialog[]>;
 
-  constructor(
-    private store: Store,
-    private actions$: Actions,
-    private toastService: ToastService,
-  ) {}
+  private readonly store = inject(Store);
 
+  private readonly injector = inject(Injector);
+  private readonly host: ElementRef<HTMLElement> = inject(ElementRef);
+  private readonly timers = new Map<HTMLElement, ReturnType<typeof setTimeout>>();
+  readonly unread$ = this.store.select(ChatState.unread);
+  readonly unreadDialogs$ = this.store.select(ChatState.unreadDialogs);
   private readonly destroyRef = inject(DestroyRef);
 
   ngAfterViewInit(): void {
@@ -74,18 +70,52 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
 
     this.store.dispatch(new ChatActions.Connect(this.store.selectSnapshot(AuthState.login) || ''));
 
-    this.actions$
-      .pipe(ofActionCompleted(ChatActions.SetMessages), takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        if (this.isOpen) {
-          if (this.scrollbox) {
-            this.scrollbox.nativeElement.scrollTop = this.scrollbox.nativeElement.scrollHeight;
-            const message = this.scrollbox.nativeElement.querySelector('.message-item:last-child');
-            message?.classList.add('highlight');
-            setTimeout(() => message?.classList.remove('highlight'), 1000);
-          }
-        }
+    this.store
+      .select(ChatState.notification)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((notification) => {
+        if (!notification) return;
+        afterNextRender(
+          () => {
+            if (!this.store.selectSnapshot(ChatState.visible)) return;
+            const recipient = this.store.selectSnapshot(ChatState.recepient);
+            if (notification.active && recipient === notification.sender) {
+              const messages = this.store.selectSnapshot(ChatState.messages);
+              let index = -1;
+              messages.forEach((message, position) => {
+                if (
+                  message.sender === notification.message.sender &&
+                  message.body === notification.message.body &&
+                  message.created_at === notification.message.created_at
+                )
+                  index = position;
+              });
+              const element = this.scrollbox?.nativeElement.querySelector(`[data-message-index="${index}"]`);
+              if (element) {
+                this.scrollbox.nativeElement.scrollTop = this.scrollbox.nativeElement.scrollHeight;
+                this.highlight(element);
+              }
+            } else {
+              const elements = this.host.nativeElement.querySelectorAll<HTMLElement>('[data-companion]');
+              for (const element of elements)
+                if (element.dataset['companion'] === notification.sender) this.highlight(element);
+            }
+          },
+          { injector: this.injector },
+        );
       });
+  }
+
+  private highlight(element: HTMLElement): void {
+    clearTimeout(this.timers.get(element));
+    element.classList.remove('highlight');
+    void element.offsetWidth;
+    element.classList.add('highlight');
+    const timer = setTimeout(() => {
+      element.classList.remove('highlight');
+      this.timers.delete(element);
+    }, 1400);
+    this.timers.set(element, timer);
   }
 
   sendMessage(): void {
@@ -102,11 +132,10 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngOnDestroy(): void {
+    this.timers.forEach((timer) => clearTimeout(timer));
     // Закрытие соединения при уничтожении компонента
     this.store.dispatch(new ChatActions.Reset());
   }
-
-  public isOpen = true;
 
   public closeChat() {
     this.store.dispatch(new ChatActions.SetRecepient(null));

@@ -12,4 +12,6 @@ export interface IChatState {
   dialogRequestStatus: RequestStatus;
   messagesReqeustStatus: RequestStatus;
   showWarning: boolean;
+  unread: Record<string, number>;
+  notification: { sequence: number; sender: string; active: boolean; message: IMessage } | null;
 }

@@ -21,6 +21,13 @@
     </a>
   </div>
 
+  @if(recepient$ | async){
+    <nav class="incoming-dialogs" aria-label="Новые сообщения" aria-live="polite">
+      @for(dialog of unreadDialogs$ | async; track dialog.companion){
+        <button type="button" [attr.data-companion]="dialog.companion" (click)="setActiveDialog(dialog)">Новое от {{dialog.companion}} · {{(unread$ | async)?.[dialog.companion]}}<span>{{dialog.last_message}}</span></button>
+      }
+    </nav>
+  }
   <!-- Основной контент -->
   <div class="chat-main-content d-flex flex-column h-100">
     @if ((recepient$ | async)) {
@@ -29,8 +36,9 @@
         <!-- Контейнер для сообщений с прокруткой -->
         <div class="messages-wrapper flex-grow-1 overflow-auto px-3" trapScroll trapKeyScroll #scrollbox>
           <div [class.justify-content-end]="(recepient$ | async)" class="messages d-flex flex-column gap-2">
-            @for (message of (messages$ | async); track message) {
+            @for (message of (messages$ | async); track $index) {
               <div
+                [attr.data-message-index]="$index"
                 class="p-2 message-item rounded text-light col-auto col-11"
                 [ngClass]="{
                 'yours': message.sender === 'Вы',
@@ -73,11 +81,11 @@
       <!-- Режим списка диалогов -->
       <div class="dialogs-wrapper flex-grow-1 overflow-auto p-3">
         <div class="messages d-flex flex-column">
-          @for (dialog of (dialogs$ | async); track dialog) {
-            <div (click)="setActiveDialog(dialog)"
+          @for (dialog of (dialogs$ | async); track dialog.companion) {
+            <div (click)="setActiveDialog(dialog)" role="button" tabindex="0" (keydown.enter)="setActiveDialog(dialog)" (keydown.space)="$event.preventDefault(); setActiveDialog(dialog)" [attr.data-companion]="dialog.companion" [class.unread]="(unread$ | async)?.[dialog.companion]"
               class="dialog-item d-flex flex-column py-2 mb-2 text-light">
               <div class="dialog-header d-flex justify-content-between align-items-center">
-                <span class="dialog-companion">{{ dialog.companion }}</span>
+                <span class="dialog-companion">{{ dialog.companion }}</span>@if((unread$ | async)?.[dialog.companion]; as count){<span class="unread-count" aria-label="Новые сообщения">{{count}}</span>}
               </div>
               <div class="dialog-message small d-flex justify-content-between">
                 <span>{{ dialog.last_message }}</span>

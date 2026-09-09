@@ -149,23 +149,21 @@
   line-height: 20px;
 }
 
-/* Анимация */
-.highlight {
-  animation: message-pop 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+/* Highlight incoming content without hiding it or shifting the layout. */
+.highlight { animation: incoming-message 1.4s ease-out; }
+@keyframes incoming-message {
+  0%, 35% { box-shadow: inset 0 0 0 2px #c2a4ed; background-color: #49375f; }
+  100% { box-shadow: inset 0 0 0 2px transparent; }
 }
-
-@keyframes message-pop {
-  0% {
-    transform: scale(0.95);
-    opacity: 0;
-  }
-  50% {
-    transform: scale(1.03);
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
+.dialog-item.unread { border-left: 3px solid #c2a4ed; background: #1e293e; }
+.unread-count { border-radius: 16px; padding: 2px 8px; background: #c2a4ed; color: #102231; font-size: 13px; }
+.incoming-dialogs { flex-shrink: 0; max-height: 160px; overflow-y: auto; }
+.incoming-dialogs button { display: block; width: calc(100% - 24px); margin: 6px 12px; padding: 10px; text-align: left; border: 1px solid #c2a4ed; border-radius: 8px; color: #e4edf6; background: #24213a; }
+.incoming-dialogs span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
+.dialog-item:focus-visible, .incoming-dialogs button:focus-visible { outline: 2px solid #c2a4ed; outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) {
+  .highlight { animation: none; outline: 2px solid #c2a4ed; outline-offset: -2px; }
+  .dialog-item, .message-item { transition: none; }
 }
 
 /* Кастомный скроллбар для Webkit */

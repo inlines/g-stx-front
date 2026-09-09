@@ -1,4 +1,4 @@
-<section class="franchise">
+<section class="catalog-group">
   <a class="back" routerLink="/products">← Каталог игр</a>
   @if(vm$ | async; as vm){
     @if(vm.loading){<p role="status">{{isCompany ? 'Загружаем компанию…' : 'Загружаем франшизу…'}}</p>}

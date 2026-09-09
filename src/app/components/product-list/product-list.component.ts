@@ -72,7 +72,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     const saved = this.store.selectSnapshot(ProductsState.productsParams);
-    const sameFranchise =
+    const sameCatalogContext =
       saved.franchise_id === this.franchiseId &&
       saved.company_id === this.companyId &&
       saved.company_role === this.companyRole;
@@ -84,7 +84,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
       franchise_id: this.franchiseId,
       company_id: this.companyId,
       company_role: this.companyRole,
-      ...(sameFranchise ? {} : { offset: 0, query: '', sort: 'date', ignore_digital: true }),
+      ...(sameCatalogContext ? {} : { offset: 0, query: '', sort: 'date', ignore_digital: true }),
     });
     this.activeCategory = params.cat!;
     this.queryForm.setValue(
