@@ -2,3 +2,11 @@
 
 .library-tabs { display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;position:relative;z-index:1; }
 .library-tabs .selected { background:#342947;border-color:#c2a4ed;color:#dcc9f6; }
+
+.collector-identity { display: flex; align-items: center; gap: 20px; min-width: 0; }
+.collector-description { min-width: 0; }
+.collector-avatar { width: 128px; height: 128px; border-radius: 16px; font-size: 48px; }
+@media (max-width: 575px) {
+  .collector-identity { gap: 14px; width: 100%; }
+  .collector-avatar { width: 80px; height: 80px; border-radius: 12px; font-size: 32px; }
+}
