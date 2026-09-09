@@ -204,7 +204,7 @@ export class CollectionState {
       loadCollectionStatus: RequestStatus.Pending,
     });
 
-    return this.service.getCollection(ctx.getState().collectionParams).pipe(
+    return this.service.getCompleteCollection(ctx.getState().collectionParams).pipe(
       tap((payload) => {
         ctx.dispatch(new CollectionActions.GetCollectionSuccess(payload));
       }),
@@ -256,7 +256,7 @@ export class CollectionState {
       loadWishlistStatus: RequestStatus.Pending,
     });
 
-    return this.service.getWishlist(ctx.getState().wishlistParams).pipe(
+    return this.service.getCompleteWishlist(ctx.getState().wishlistParams).pipe(
       tap((payload) => {
         ctx.dispatch(new CollectionActions.GetWishlistSuccess(payload));
       }),
@@ -387,6 +387,11 @@ export class CollectionState {
   @Selector()
   public static wtsParams(state: ICollectionState): IProductListRequest {
     return state.wtsParams;
+  }
+
+  @Selector()
+  static libraryStatuses(state: ICollectionState) {
+    return { collection: state.loadCollectionStatus, wishlist: state.loadWishlistStatus };
   }
 
   @Selector()

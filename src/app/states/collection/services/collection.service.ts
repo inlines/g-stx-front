@@ -4,7 +4,7 @@ import { IEnvironment } from '@app/environments/environment.interface';
 import { ENVIRONMENT } from '@app/environments/environment.token';
 import { listHttpParams } from '@app/shared/list-params';
 import { IProductListRequest } from '@app/states/products/interfaces/product-list-request.interface';
-import { Observable } from 'rxjs';
+import { EMPTY, expand, last, map, Observable, throwError } from 'rxjs';
 import { IcollectionResponse } from '../interfaces/collection-response.interface';
 import { IEditCollectionPayload } from '../interfaces/edit-collection-payload.interface';
 
@@ -92,6 +92,36 @@ export class CollectionService {
 
   public getWishlist(params: IProductListRequest): Observable<IcollectionResponse> {
     return this.http.get<IcollectionResponse>(this.getWishlistPath, { params: listHttpParams(params) });
+  }
+
+  /** Keep client-side search and price sorting global, including collections over 1000 releases. */
+  private completeList(
+    request: (params: IProductListRequest) => Observable<IcollectionResponse>,
+    params: IProductListRequest,
+  ): Observable<IcollectionResponse> {
+    const first = { ...params, offset: 0, limit: 1000 };
+    return request(first).pipe(
+      expand((result) => {
+        if (result.items.length >= result.total_count) return EMPTY;
+        if (!result.items.length) return throwError(() => new Error('Incomplete personal list'));
+        return request({ ...first, offset: result.items.length }).pipe(
+          map((next) => {
+            if (!next.items.length && result.items.length < next.total_count)
+              throw new Error('Incomplete personal list');
+            return { items: [...result.items, ...next.items], total_count: next.total_count };
+          }),
+        );
+      }),
+      last(),
+    );
+  }
+
+  public getCompleteCollection(params: IProductListRequest): Observable<IcollectionResponse> {
+    return this.completeList((p) => this.getCollection(p), params);
+  }
+
+  public getCompleteWishlist(params: IProductListRequest): Observable<IcollectionResponse> {
+    return this.completeList((p) => this.getWishlist(p), params);
   }
 
   public getWts(params: IProductListRequest): Observable<IcollectionResponse> {

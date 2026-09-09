@@ -1,4 +1,3 @@
-import { NgClass } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -18,7 +17,6 @@ import { buildPages, PageItem } from './pagination';
   templateUrl: './pager.component.html',
   styleUrls: ['./pager.component.scss'],
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [NgClass],
 })
 export class PagerComponent implements OnChanges, OnInit {
   @Input() totalCount: number = 0;

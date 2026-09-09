@@ -1,3 +1,4 @@
+import { unixMilliseconds } from '@app/shared/collection-filter';
 import { Injectable } from '@angular/core';
 import { RequestStatus } from '@app/constants/request-status.const';
 import { ICollectionItem } from '@app/states/collection/interfaces/collection-item.interface';
@@ -42,7 +43,7 @@ export class CollectorsState {
     });
   }
 
-  @Action(CollectorsActions.GetCollectorsPropertiesRequest)
+  @Action(CollectorsActions.GetCollectorsPropertiesRequest, { cancelUncompleted: true })
   public loadProperties(
     ctx: StateContext<IcollectorsState>,
     action: CollectorsActions.GetCollectorsPropertiesRequest,
@@ -68,9 +69,10 @@ export class CollectorsState {
   ) {
     ctx.patchState({
       collectorPropertiesRequestStatus: RequestStatus.Load,
+      collectionTotalCount: action.payload.length,
       loadedCollection: action.payload.map((item) => ({
         ...item,
-        release_date: (item.release_date || 0) * 1000,
+        release_date: unixMilliseconds(item.release_date),
       })),
     });
   }
@@ -86,6 +88,11 @@ export class CollectorsState {
       collectionPropertiesLogin: null,
       collectorsListRequestStatus: RequestStatus.Error,
     });
+  }
+
+  @Selector()
+  static propertiesStatus(state: IcollectorsState): RequestStatus {
+    return state.collectorPropertiesRequestStatus;
   }
 
   @Selector()

@@ -1,28 +1,43 @@
-a {
+:host {
+  display: block;
+  position: relative;
+  z-index: 1;
+}
+.pager {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  margin-top: 24px;
+}
+button {
+  position: relative;
+  z-index: 1;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 8px;
+  font: inherit;
+  color: #e4edf6;
+  background: #102231;
+  border: 1px solid #385069;
+  border-radius: 8px;
   cursor: pointer;
 }
-
-.page-link {
-  transition: background-color 0.2s ease;
-  background-color: rgba(7, 16, 25, 1)!important;
-  border: none;
-  padding: 8px 16px 10px 16px;
-  color: #fff;
+button:hover:not(:disabled),
+button.selected {
+  background: #342947;
+  border-color: #c2a4ed;
+  color: #dcc9f6;
 }
-
-.page-item.active .page-link {
-  background-color: rgba(189, 167, 234, 1)!important;
-  border-color: #6c757d;
-  color: rgba(6, 18, 31, 1)!important;
+button:disabled {
+  opacity: 0.45;
+  cursor: default;
 }
-
-.page-item.disabled .page-link {
-  pointer-events: none;
-  opacity: 0.5;
-  color: #fff!important;
+button:focus-visible {
+  outline: 2px solid #c2a4ed;
+  outline-offset: 3px;
 }
-
-.page-item a {
-  margin-left: 6px !important;
-  margin-right: 6px !important;
+.gap {
+  color: #a3b8cb;
 }

@@ -1,84 +1,15 @@
-<div class="row mb-4 position-relative">
-  <div class="col">
-    <span class="collector-header" style="cursor: pointer;" [routerLink]="'/collectors'">
-      <svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path fill-rule="evenodd" clip-rule="evenodd" d="M10.6393 20.4471L19.2511 29.5535L17.3158 31.6L5.40002 19L17.3158 6.39999L19.2511 8.44649L10.6393 17.5529H30.6V20.4471H10.6393Z" fill="#2D587E"/>
-      </svg>
-      Коллекция {{collectionPropertiesLogin$ | async}}
-    </span>
-  </div>
-  <div class="col-auto ml-auto">
-    <button type="button" (click)="startChatWith()" class="ml-auto btn-blue">
-      <svg width="14" height="13" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12.75 6.0119C12.75 8.91809 10.062 11.2738 6.75002 11.2738C5.78584 11.2799 4.8314 11.0785 3.95003 10.6829L3.43003 10.9095L0.750049 12.0833L1.67004 8.84524C1.06828 8.02652 0.745429 7.03224 0.750049 6.0119C0.750049 3.10571 3.43803 0.75 6.75002 0.75C9.654 0.75 12.078 2.56333 12.63 4.96762C12.7107 5.30968 12.751 5.66023 12.75 6.0119Z" stroke="#071019" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-      Написать
-    </button>
-  </div>
-</div>
-<div class="row text-white">
-  @if (!!(loadedCollection$ | async)?.length) {
-    @for (item of loadedCollection$ | async; track item.release_id) {
-       <div class="col-12 d-block mb-3 overflow-hidden">
-        <div
-          class="game-card row"
-          [routerLink]="['/products/' + item.product_id.toString()]"
-          style="cursor: pointer;"
-          (click)="null"
-          >
-          <div
-            class="col-auto px-0"
-            >
-            @if (item.image_url) {
-              <img
-                [src]="item.image_url"
-                [alt]="item.product_name"
-                class="img-fluid"
-                style="object-fit: cover;"
-                (error)="item.image_url = null"
-                style="height: 92px;"
-                />
-            } @else {
-              <div class="d-flex flex-column align-items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor"
-                  class="bi bi-image" viewBox="0 0 16 16">
-                  <path d="M14.002 3a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2.002a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h12zM2.002 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H2.002z"/>
-                  <path d="M10.648 8.646a.5.5 0 0 1 .704 0l2.25 2.25V12H2.398v-.316l3.85-3.85a.5.5 0 0 1 .704 0l2.15 2.15 1.546-1.548z"/>
-                </svg>
-                <small class="mt-1">Нет изображения</small>
-              </div>
-            }
-          </div>
-          <div class="col-8 d-flex flex-column justify-content-between" style="padding-top:20px; padding-left: 20px; padding-right: 20px; padding-bottom: 16px;">
-            <div class="card-title text-truncate">{{ item.product_name }}</div>
-            <div class="card-subtitle">
-              <span class="release-bullet">
-                {{ item.release_date || 0 * 1000 | date:'dd.MM.yy':'UTC' }}
-              </span>
-              <span class="release-bullet">
-                {{ item.platform_name }}
-              </span>
-              <span class="release-bullet">
-                {{ item.region_name }}
-              </span>
-            </div>
-          </div>
-          <div class="col-2 d-flex flex-column justify-content-end text-end" style="padding-top:20px; padding-left: 20px; padding-right: 20px; padding-bottom: 16px;">
-            {{ item.serial?.join('|') }}
-          </div>
-        </div>
-      </div>
-    }
+@if(vm$ | async;as vm){
+<section class="collector-library" aria-labelledby="collector-heading">
+  <a class="back" routerLink="/collectors">← Все коллекционеры</a>
+  <header><div><h1 id="collector-heading">Коллекция {{vm.login}}</h1><p>Игровая библиотека коллекционера</p></div><button type="button" (click)="startChatWith()" [disabled]="!vm.login">Написать</button></header>
+  @if(vm.loading){<p class="status" role="status">Загружаем коллекцию…</p>}
+  @else if(vm.failed){<div class="status" role="alert">Не удалось загрузить коллекцию. <button type="button" (click)="retry()">Повторить</button></div>}
+  @else if(vm.total){
+    <div class="list-info" aria-live="polite"><span>Релизов: {{vm.total}}</span><span>{{vm.offset+1}}–{{vm.offset+vm.items.length}} из {{vm.total}}</span></div>
+    <div class="release-grid">@for(item of vm.items;track item.release_id){<app-release-card [item]="item" [readOnly]="true"/>}</div>
+    <footer><label>На странице<select [value]="vm.size" (change)="pageSize($any($event.target).value)"><option value="24">24</option><option value="48">48</option><option value="96">96</option></select></label><app-pager [totalCount]="vm.total" [limit]="vm.size" [offset]="vm.offset" (pageChange)="page($event)"/></footer>
   } @else {
-    <div class="card bg-dark text-white shadow rounded-4 p-4 text-center my-4">
-      <h5 class="text-warning mb-3">Коллекция этого пользователя пуста</h5>
-      <p class="text-light mb-4">
-        GSTX — это не только коллекции, но и <strong>сообщество</strong>: вы можете находить игроков с похожими интересами, предлагать обмены и делать свою игровую библиотеку живой. Пусть каждая игра найдет нового владельца — начните с первой!
-      </p>
-      <div>
-        <a [routerLink]="'/products'" class="btn btn-outline-info btn-lg fw-semibold">
-          Перейти в каталог
-        </a>
-      </div>
-    </div>
+    <div class="empty"><h2>Коллекция этого пользователя пуста</h2><p>GSTX — это не только коллекции, но и сообщество: вы можете находить игроков с похожими интересами, предлагать обмены и делать свою игровую библиотеку живой. Пусть каждая игра найдёт нового владельца — начните с первой!</p><a routerLink="/products">Перейти в каталог →</a></div>
   }
+</section>
+}
