@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpTestingController } from '@angular/common/http/testing';
 import { Store } from '@ngxs/store';
 import { TEST_PROVIDERS } from '@app/testing/test-providers';
 import { RequestStatus } from '@app/constants/request-status.const';
@@ -30,6 +31,7 @@ describe('Collector library', () => {
   });
   afterEach(() => {
     fixture.destroy();
+    TestBed.inject(HttpTestingController).verify({ ignoreCancelled: true });
     vi.restoreAllMocks();
   });
   function seed(login: string) {
@@ -76,5 +78,58 @@ describe('Collector library', () => {
   it('preserves a missing release date instead of converting it to 1970', () => {
     store.dispatch(new CollectorsActions.GetCollectorsPropertiesSuccess(items));
     expect(store.selectSnapshot(CollectorsState.loadedCollection)[0].release_date).toBeNull();
+  });
+  it('loads sale cards from the selected collector and keeps them read-only', () => {
+    const http = TestBed.inject(HttpTestingController);
+    fixture.componentInstance.page(2);
+    (fixture.nativeElement.querySelectorAll('.library-tabs button')[1] as HTMLButtonElement).click();
+    fixture.detectChanges();
+    http
+      .expectOne((r) => r.url === '/api/collectors/alice/wts')
+      .flush(items.map((i) => ({ ...i, price: 1500, cib: true })));
+    fixture.detectChanges();
+    const host = fixture.nativeElement as HTMLElement;
+    expect(host.querySelectorAll('app-release-card').length).toBe(24);
+    expect(host.textContent).toContain('Цена продажи');
+    expect(host.textContent).toContain('CIB · Полный комплект');
+    expect(host.querySelector('.release-card button')).toBeNull();
+    expect(host.querySelector('details')).toBeNull();
+    fixture.componentInstance.page(3);
+    fixture.detectChanges();
+    expect(host.querySelectorAll('app-release-card').length).toBe(1);
+    fixture.componentInstance.selectTab('collection');
+    fixture.detectChanges();
+    expect(host.querySelector('.release-title')!.textContent).toBe('Release 25');
+  });
+  it('cancels a pending sale request when navigating to another collector', () => {
+    const http = TestBed.inject(HttpTestingController);
+    fixture.componentInstance.selectTab('wts');
+    fixture.detectChanges();
+    const old = http.expectOne((r) => r.url === '/api/collectors/alice/wts');
+    seed('bob');
+    fixture.detectChanges();
+    expect(old.cancelled).toBe(true);
+    http.expectOne((r) => r.url === '/api/collectors/bob/wts').flush([]);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('Пока нет игр для продажи');
+  });
+  it('supports retry and fetches sale lists beyond 1000 releases', () => {
+    const http = TestBed.inject(HttpTestingController);
+    fixture.componentInstance.selectTab('wts');
+    fixture.detectChanges();
+    http
+      .expectOne((r) => r.url === '/api/collectors/alice/wts')
+      .flush('error', { status: 500, statusText: 'error' });
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('[role=alert]')).not.toBeNull();
+    fixture.componentInstance.retry();
+    const first = http.expectOne((r) => r.url === '/api/collectors/alice/wts');
+    expect(first.request.params.get('offset')).toBe('0');
+    first.flush(Array.from({ length: 1000 }, (_, i) => ({ ...items[0], release_id: i + 1 })));
+    const next = http.expectOne((r) => r.url === '/api/collectors/alice/wts');
+    expect(next.request.params.get('offset')).toBe('1000');
+    next.flush([{ ...items[0], release_id: 1001 }]);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('Релизов: 1001');
   });
 });

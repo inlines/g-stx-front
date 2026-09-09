@@ -26,9 +26,17 @@ export class CollectorsService {
   }
 
   public getCollectorProperties(id: string): Observable<ICollectionItem[]> {
+    return this.completeList(`${this.getCollectorsPropertiesPath}/${encodeURIComponent(id)}`);
+  }
+
+  public getCollectorWts(login: string): Observable<ICollectionItem[]> {
+    return this.completeList(`${this.getCollectorsPath}/${encodeURIComponent(login)}/wts`);
+  }
+
+  private completeList(path: string): Observable<ICollectionItem[]> {
     const limit = 1000;
     const request = (offset: number) =>
-      this.http.get<ICollectionItem[]>(`${this.getCollectorsPropertiesPath}/${encodeURIComponent(id)}`, {
+      this.http.get<ICollectionItem[]>(path, {
         params: { cat: 0, limit, offset },
       });
     return request(0).pipe(
