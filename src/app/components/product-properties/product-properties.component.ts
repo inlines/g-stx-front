@@ -1,5 +1,5 @@
 import { ICompanyItem } from '@app/states/products/interfaces/company-item.interface';
-import { AsyncPipe, DatePipe, Location, NgClass, NgTemplateOutlet } from '@angular/common';
+import { AsyncPipe, DatePipe, Location, NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CopyToClipboardDirective } from '@app/directives/copy-to-clipboard.directive';
@@ -11,7 +11,7 @@ import { OwnershipState } from '@app/states/ownership/states/ownership.state';
 import { IProductPropertiesResponse } from '@app/states/products/interfaces/product-properties-response.interface';
 import { IReleaseItem } from '@app/states/products/interfaces/release-item.interface';
 import { ProductsState } from '@app/states/products/states/products.state';
-import { NgbCarouselModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbCarouselModule, NgbModal, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngxs/store';
 import { combineLatest, map, Observable } from 'rxjs';
 
@@ -22,7 +22,7 @@ import { combineLatest, map, Observable } from 'rxjs';
     AsyncPipe,
     DatePipe,
     NgbCarouselModule,
-    NgClass,
+    NgbTooltipModule,
     NgTemplateOutlet,
     CopyToClipboardDirective,
   ],
@@ -134,22 +134,8 @@ export class ProductPropertiesComponent implements OnInit {
     this.store.dispatch(new ChatActions.ToggleChatVisibility());
   }
 
-  public getRegionClass(region: string): string {
-    const regionMap: { [key: string]: string } = {
-      japan: 'ntsc-j',
-      north_america: 'ntsc-u',
-      europe: 'pal',
-    };
-    return regionMap[region] || 'bg-secondary';
-  }
-
-  showAllSerials: number | null = null;
-
-  toggleSerials(releseId: number) {
-    this.showAllSerials = releseId;
-    setTimeout(() => {
-      this.showAllSerials = null;
-    }, 1500);
+  serialPreview(release: IReleaseItem): string {
+    return (release.serial ?? []).slice(0, 3).join(' · ') + ((release.serial?.length ?? 0) > 3 ? ' · …' : '');
   }
 
   public goBack() {

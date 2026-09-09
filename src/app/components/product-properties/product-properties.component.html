@@ -1,24 +1,24 @@
 @if ((productProperties$ | async); as productProperties) {
-  <div class="row g-4">
-    <div class="col-12">
-      <a (click)="goBack()">
-        <svg style="margin-top: -12px; cursor: pointer; margin-right: 12px" width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <div class="row g-4 product-page">
+    <div class="col-12 product-heading">
+      <button type="button" class="back-button" aria-label="Назад" (click)="goBack()">
+        <svg aria-hidden="true" width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path fill-rule="evenodd" clip-rule="evenodd" d="M10.6392 20.4471L19.2511 29.5535L17.3157 31.6L5.4 19L17.3157 6.40002L19.2511 8.44652L10.6392 17.5529H30.6V20.4471H10.6392Z" fill="#2D587E"/>
         </svg>
-      </a>
-      <span class="game-title" appCopyToClipboard>{{ productProperties.product.name }}</span>
+      </button>
+      <h1 class="game-title" appCopyToClipboard>{{ productProperties.product.name }}</h1>
     </div>
-    <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12">
-      <div class="text-white overflow-hidden rounded-3">
+    <div class="col-12 col-lg-4 product-sidebar">
+      <div class="text-white product-info">
         @if (productProperties.product.image_url) {
           <img
             [src]="productProperties.product.image_url"
             [alt]="productProperties.product.name"
-            style="object-fit: cover; height: 480px;"
+            class="product-cover"
             (error)="productProperties.product.image_url = null"
             />
         } @else {
-          <div class="d-flex justify-content-center align-items-center bg-secondary-subtle" style="height: 300px;">
+          <div class="no-cover">
             <div class=" text-center">
               <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor"
                 class="bi bi-image mb-2" viewBox="0 0 16 16">
@@ -29,19 +29,7 @@
             </div>
           </div>
         }
-        <ng-template #noImage>
-          <div class="d-flex justify-content-center align-items-center bg-secondary-subtle" style="height: 300px;">
-            <div class=" text-center">
-              <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor"
-                class="bi bi-image mb-2" viewBox="0 0 16 16">
-                <path d="M14.002 3a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2.002a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h12zM2.002 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H2.002z"/>
-                <path d="M10.648 8.646a.5.5 0 0 1 .704 0l2.25 2.25V12H2.398v-.316l3.85-3.85a.5.5 0 0 1 .704 0l2.15 2.15 1.546-1.548z"/>
-              </svg>
-              <div>Нет изображения</div>
-            </div>
-          </div>
-        </ng-template>
-        <div class="pt-5 mt-2">
+        <div class="product-metadata">
           @if (productProperties?.product?.alternative_names?.length) {
             <div>
               <span class="game-header mb-1">Также известна как:</span>
@@ -86,94 +74,52 @@
               } @else {
                 никогда
               }
-              <ng-template #never>никогда</ng-template>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <div class="col-xl-8 col-lg-8 col-md-8 col-sm-12">
-      <div class="text-whiteh-100">
-        <div class="release-header">Релизы</div>
+    <div class="col-12 col-lg-8 product-content">
+      <div class="releases-section">
+        <h2 class="release-header">Релизы</h2>
         <ul class="list-group list-group-flush">
           @if ((sortedReleases$ | async); as sorted) {
-            @for (release of sorted.highlighted; track release) {
-              <li class="text-white release-item"
-          [ngClass]="{ 
-            'text-decoration-line-through': release.release_status === 5,
-            'owned-item': release.owned 
-          }">
-
-                <!-- Верхняя строка: Основная информация -->
-                <div class="row justify-content-between align-items-start mb-2">
-                  <div class="col-12 col-md">
-                    <span class="release-bullet">{{ release.release_date | date:'dd.MM.yy':'UTC' }}</span>
-                    <span class="release-bullet">{{ release.platform_name }}</span>
-                    <span class="release-bullet">
-                      {{ release.release_region }}
-                    </span>
-                  </div>
-
-                  @if (!release.digital_only && release?.serial?.length) {
-                    <div class="col-12 col-md px-2 px-md-4 text-md-end">
-                      {{ release.serial?.join(' | ') }}
-                    </div>
-                  }
-                </div>
-
-                <!-- Нижняя строка: Действия -->
-                <div class="d-flex justify-content-between align-items-center">
-                  @if (release.digital_only) {
-                    <div class="col px-4">
-                      <span class="small ">Цифровая версия</span>
-                    </div>
-                  }
-
-                  <ng-container *ngTemplateOutlet="releaseActions; context: { $implicit: release }"></ng-container>
-                </div>
-              </li>
+            @for (release of sorted.highlighted; track release.release_id) {
+              <ng-container *ngTemplateOutlet="releaseRow; context: { $implicit: release, actions: true }" />
             }
-
-            @for (release of sorted.others; track release) {
-              <li class="text-white release-item"
-          [ngClass]="{
-            'text-decoration-line-through': release.release_status === 5,
-            'owned-item': release.owned
-          }">
-
-                <div class="d-flex justify-content-between align-items-start mb-2">
-
-                  <div class="col-auto">
-                    <span class="release-bullet">{{ release.release_date | date:'dd.MM.yy':'UTC' }}</span>
-                    <span class="release-bullet">{{ release.platform_name }}</span>
-                    <span class="release-bullet">
-                      {{ release.release_region }}
-                    </span>
-                  </div>
-
-                  @if (!release.digital_only && release?.serial?.length) {
-                    <!-- <div class="serial-badge">
-                    <span class="badge bg-dark ">{{ release.serial?.join(' | ') }}</span>
-                  </div> -->
-                  <div class="col serial-container">
-                    {{ release.serial?.join(' | ') }}
-                  </div>
-                }
-              </div>
-
-              <div class="d-flex justify-content-between align-items-center">
-                @if (release.digital_only) {
-                  <span class="small ">Цифровая версия</span>
-                }
-              </div>
-            </li>
+            @for (release of sorted.others; track release.release_id) {
+              <ng-container *ngTemplateOutlet="releaseRow; context: { $implicit: release, actions: false }" />
+            }
+            @if (!sorted.highlighted.length && !sorted.others.length) {
+              <li class="release-empty">Информация о релизах пока отсутствует.</li>
+            }
           }
-        }
-      </ul>
+        </ul>
+        <ng-template #releaseRow let-release let-actions="actions">
+          <li class="release-item" [class.owned-item]="release.owned" [class.highlighted-release]="actions">
+            <div class="release-meta" [class.text-decoration-line-through]="release.release_status === 5">
+              <span class="release-platform">{{ release.platform_name }}</span>
+              <span>{{ release.release_region }}</span>
+              <span>{{ release.release_date ? (release.release_date | date:'dd.MM.yy':'UTC') : 'Дата не указана' }}</span>
+            </div>
+            @if (!release.digital_only && release.serial?.length) {
+              <details class="serials">
+                <summary [ngbTooltip]="serialPreview(release)" triggers="mouseenter:mouseleave" container="body">Серийники · {{ release.serial.length }}</summary>
+                <ul aria-label="Все серийники">
+                  @for (serial of release.serial; track $index) { <li>{{ serial }}</li> }
+                </ul>
+              </details>
+            }
+            @if (release.digital_only) { <div class="digital-label">Цифровая версия</div> }
+            @if (actions) {
+              <ng-container *ngTemplateOutlet="releaseActions; context: { $implicit: release }" />
+            }
+          </li>
+        </ng-template>
       <ng-template #releaseActions let-release>
         @if (isAuthorised$ | async) {
-          <div class="col-auto d-flex flex-wrap gap-2 align-items-start" style="min-height: 40px;">
-            <button class="btn-blue small"
+          <div class="release-actions">
+            <button type="button" class="btn-blue small"
               [disabled]="release.owned || release.digital_only || release.release_status === 5 || !release.release_date || (collectionChanging$ | async)"
               [hidden]="release.owned"
               (click)="addToCollection(release.release_id, productProperties.product.id)">
@@ -207,17 +153,17 @@
         }
       </ng-template>
     </div>
-    <div class="text-white mt-6" style="padding-left: 40px; border-left: 1px solid rgba(138, 172, 201, 0.2);">
+    <div class="product-summary">
       <p>{{ productProperties.product.summary || 'У нас нет описания этой игры' }}</p>
     </div>
 
     @if (productProperties.screenshots.length) {
-      <div style="margin-top: 60px;">
+      <div class="product-screenshots">
         <ngb-carousel [interval]="3000" [pauseOnHover]="true" [wrap]="true">
           @for (screen of productProperties.screenshots; track screen) {
             <ng-template ngbSlide>
               <div class="d-flex justify-content-center">
-                <img class="d-block" [src]="screen" style="object-fit: cover; max-height: 500px;" />
+                <img class="screenshot" [src]="screen" [alt]="productProperties.product.name + ' — скриншот ' + ($index + 1)" loading="lazy" />
               </div>
             </ng-template>
           }
@@ -241,15 +187,6 @@
   </div>
 }
 
-<ng-template #loading>
-  <div class="row">
-    <div class="col text-center py-5">
-      <div class="spinner-border text-primary" role="status"></div>
-      <h4 class="mt-3">Загрузка...</h4>
-    </div>
-  </div>
-</ng-template>
-
 <ng-template #bidsModal let-modal>
   <div class="modal-dialog modal-lg modal-dialog-centered animate__animated animate__fadeIn">
     <div class="modal-content p-0 border-0 bg-transparent">
@@ -257,7 +194,7 @@
 
         <div class="modal-header border-secondary">
           <h4 class="modal-title text-warning">Игроки, готовые на обмен</h4>
-          <button type="button" class="btn-close btn-close-white" (click)="modal.dismiss()" aria-label="Close"></button>
+          <button type="button" class="btn-close btn-close-white" (click)="modal.dismiss()" aria-label="Закрыть"></button>
         </div>
 
         <div class="modal-body">
@@ -277,9 +214,9 @@
                     </svg>
                   </div>
                   <!-- Имя пользователя и кнопка -->
-                  <div class="flex-grow-1 d-flex justify-content-between align-items-center">
+                  <div class="bid-player">
                     <span class="fw-semibold fs-6">{{ user }}</span>
-                    <button type="button" (click)="startChatWith(user)" class="ms-4 btn btn-outline-warning btn-sm">
+                    <button type="button" (click)="startChatWith(user)" class="btn btn-outline-warning btn-sm">
                       Написать игроку
                     </button>
                   </div>

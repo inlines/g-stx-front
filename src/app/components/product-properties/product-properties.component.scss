@@ -1,110 +1,255 @@
-ul {
-  list-style-type: none;
-}
-
-li:hover .bg-secondary {
-  background-color: rgba(255, 255, 255, 0.1) !important;
-}
-
-.release-card {
-  padding: 0.75rem 1.25rem;
-  transition: all 0.2s;
-  
-  &:hover {
-    background-color: rgba(255, 255, 255, 0.05) !important;
-  }
-}
-
-.highlighted-release {
-  border-left: 3px solid #ffc107; /* Bootstrap's warning color */
-  box-shadow: 0 0 10px rgba(255, 193, 7, 0.2);
-}
-
-
-.serial-container {
+:host {
+  display: block;
   position: relative;
-  text-align: end;
+  z-index: 1;
+  color: #d3e1ec;
 }
-
-.serial-item {
-  cursor: pointer;
-  transition: all 0.2s;
-  padding: 0.1rem 0.3rem;
-  border-radius: 3px;
-  
-  &:hover {
-    background: rgba(255, 255, 255, 0.1);
-  }
+.product-page > *,
+.product-info,
+.product-content {
+  min-width: 0;
 }
-
+.product-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.back-button {
+  flex: 0 0 44px;
+  min-height: 44px;
+  padding: 3px;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+}
+.back-button svg path {
+  fill: #8aacc9;
+}
 .game-title {
-  font-weight: bolder;
   font-size: 32px;
-  line-height: 100%;
-  color: rgba(211, 225, 236, 1);
+  line-height: 1.25;
+  font-weight: 700;
+  margin: 0;
+  overflow-wrap: anywhere;
 }
-
+.product-cover {
+  display: block;
+  width: 100%;
+  max-height: 480px;
+  object-fit: contain;
+  border-radius: 12px;
+  background: #08141f;
+}
+.no-cover {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  border-radius: 12px;
+  background: #102231;
+}
+.product-metadata {
+  margin-top: 24px;
+  overflow-wrap: anywhere;
+}
 .game-header {
-  font-weight: bold;
+  font-weight: 700;
   font-size: 16px;
-  line-height: 20px;
-  color: rgba(138, 172, 201, 1);
+  line-height: 1.4;
+  color: #8aacc9;
 }
-
-.release-header {
-  font-weight: bolder;
-  font-size: 16px;
-  line-height: 100%;
-  color: rgba(211, 225, 236, 1);
-  background-color: rgba(0, 0, 0, 0.2);
-  display: inline-block;
-  padding: 16px 20px 16px 20px;
-}
-
-.release-item:nth-child(odd) {
-  background-color: rgba(0, 0, 0, 0.4);
-}
-
-.release-item:nth-child(even) {
-  background-color: rgba(0, 0, 0, 0.2);
-}
-
-.release-item {
-  padding: 16px 20px 20px 20px;
-}
-
-.release-bullet:nth-of-type(n+2) {
+.catalog-link {
+  color: #c2a4ed;
   position: relative;
-  padding-left: 24px;
+  z-index: 1;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.release-header {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 16px;
+}
+.releases-section > ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border: 1px solid #294053;
+  border-radius: 12px;
+}
+.release-item {
+  padding: 16px 20px;
+  min-width: 0;
+  list-style: none;
+  background: #102231;
+  border-bottom: 1px solid #294053;
+}
+.release-item:first-child {
+  border-radius: 11px 11px 0 0;
+}
+.release-item:last-child {
+  border-bottom: 0;
+  border-radius: 0 0 11px 11px;
+}
+.release-item:only-child {
+  border-radius: 11px;
+}
+.release-item:nth-child(even) {
+  background: #0c1c29;
+}
+.highlighted-release {
+  border-left: 3px solid #8aacc9;
+}
+.release-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.release-meta > * {
+  min-width: 0;
+}
+.release-platform {
+  font-weight: 700;
+}
+.digital-label {
+  margin-top: 8px;
+  color: #a3b8cb;
+  font-size: 14px;
+}
+.release-actions {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+.release-actions button {
+  min-height: 44px;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.serials {
+  position: relative;
+  z-index: 1;
   margin-top: 8px;
 }
-
-.release-bullet:nth-of-type(n+2)::before {
-  content: "";
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 6px;
-  height: 6px;
-  background-color: #333;
-  border-radius: 50%;
+.serials summary {
+  width: fit-content;
+  max-width: 100%;
+  min-height: 44px;
+  box-sizing: border-box;
+  padding: 12px 0;
+  color: #c2a4ed;
+  cursor: pointer;
+  font-size: 14px;
 }
-
-.release-bullet:first-of-type,
-.release-bullet:nth-of-type(1) {
-  padding-left: 0;
+.serials ul {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 8px;
 }
-
-.mt-6 {
-  margin-top: 60px;
+.serials li {
+  background: #08141f;
+  border-radius: 4px;
+  padding: 8px;
+  font:
+    13px/1.6 ui-monospace,
+    monospace;
+  overflow-wrap: anywhere;
+  -webkit-user-select: all;
+  user-select: all;
 }
-
-.product-error { position:relative;z-index:1;margin:32px 0;padding:32px 24px;border:1px solid #294053;border-radius:14px;background:#102231;color:#e4edf6;text-align:center; }
-.product-error h1 { font-size:26px; }
-.product-error p { color:#a3b8cb; }
-.product-error a { display:inline-block;padding:12px;color:#c2a4ed; }
-.product-error a:focus-visible { outline:2px solid #c2a4ed;outline-offset:3px; }
-
-.catalog-link { color:#c2a4ed;position:relative;z-index:1;text-decoration:underline;text-underline-offset:3px; }
-.catalog-link:focus-visible { outline:2px solid #c2a4ed;outline-offset:3px; }
+.product-summary {
+  margin-top: 32px;
+  padding: 20px;
+  border-left: 2px solid #294053;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+.product-summary p {
+  margin: 0;
+}
+.product-screenshots {
+  margin-top: 32px;
+  min-width: 0;
+}
+.screenshot {
+  display: block;
+  max-width: 100%;
+  width: 100%;
+  max-height: 500px;
+  object-fit: contain;
+}
+.bid-player {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  overflow-wrap: anywhere;
+}
+.product-error {
+  position: relative;
+  z-index: 1;
+  margin: 32px 0;
+  padding: 32px 24px;
+  border: 1px solid #294053;
+  border-radius: 14px;
+  background: #102231;
+  text-align: center;
+}
+.product-error h1 {
+  font-size: 26px;
+}
+.product-error p,
+.release-empty {
+  color: #a3b8cb;
+}
+.release-empty {
+  padding: 20px;
+}
+.product-error a {
+  display: inline-block;
+  padding: 12px;
+  color: #c2a4ed;
+}
+a:focus-visible,
+button:focus-visible,
+summary:focus-visible {
+  outline: 2px solid #c2a4ed;
+  outline-offset: 3px;
+}
+@media (max-width: 991px) {
+  .product-cover,
+  .no-cover {
+    max-width: 360px;
+    margin: 0 auto;
+  }
+}
+@media (max-width: 575px) {
+  .game-title {
+    font-size: 26px;
+  }
+  .release-item {
+    padding: 14px;
+  }
+  .serials ul {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .product-summary {
+    padding: 14px;
+  }
+  .release-actions button {
+    flex: 1 1 140px;
+  }
+}

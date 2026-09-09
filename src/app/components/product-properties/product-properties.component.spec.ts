@@ -78,4 +78,88 @@ describe('ProductPropertiesComponent', () => {
     expect(links[0].textContent).toContain('Studio');
     expect(fixture.nativeElement.querySelector('a[href="/companies/999"]')).toBeNull();
   });
+  it('keeps every serial, release and metadata field while serial lists start collapsed', () => {
+    const serials = Array.from({ length: 60 }, (_, index) => `CUSA-${index}`);
+    TestBed.inject(Store).dispatch(new ProductsActions.LoadProperties(1));
+    TestBed.inject(HttpTestingController)
+      .expectOne('/api/products/1')
+      .flush({
+        product: {
+          id: 1,
+          name: 'Game',
+          image_url: null,
+          first_release_date: null,
+          alternative_names: ['Alias one', 'Alias two'],
+          summary: 'Full description',
+        },
+        releases: [
+          {
+            release_id: 1,
+            platform_id: 48,
+            platform_name: 'PS4',
+            release_region: 'Europe',
+            release_date: 1000,
+            release_status: 0,
+            digital_only: false,
+            serial: serials,
+            bid_user_logins: [],
+          },
+          {
+            release_id: 2,
+            platform_id: 49,
+            platform_name: 'Xbox',
+            release_region: 'Japan',
+            release_date: null,
+            release_status: 5,
+            digital_only: false,
+            serial: ['ABC', 'ABC'],
+            bid_user_logins: [],
+          },
+          {
+            release_id: 3,
+            platform_id: 6,
+            platform_name: 'PC',
+            release_region: 'World',
+            release_date: null,
+            release_status: 0,
+            digital_only: true,
+            serial: null,
+            bid_user_logins: [],
+          },
+        ],
+        screenshots: ['https://example.test/screen.jpg'],
+        companies: [],
+        franschises: [{ franschise_id: 2, franschise_name: 'Series', total_games_count: 5 }],
+      });
+    fixture.detectChanges();
+    const root: HTMLElement = fixture.nativeElement;
+    expect(root.querySelectorAll('.release-item')).toHaveLength(3);
+    const lists = root.querySelectorAll<HTMLDetailsElement>('details.serials');
+    expect(lists).toHaveLength(2);
+    expect(lists[0].open).toBe(false);
+    expect(lists[0].querySelector('summary')?.textContent).toContain('60');
+    lists[0].querySelector('summary')!.click();
+    expect(lists[0].open).toBe(true);
+    expect(Array.from(lists[0].querySelectorAll('li'), (li) => li.textContent)).toEqual(serials);
+    expect(lists[1].querySelectorAll('li')).toHaveLength(2);
+    for (const text of [
+      'PS4',
+      'Europe',
+      'Xbox',
+      'Japan',
+      'PC',
+      'World',
+      'Цифровая версия',
+      'Дата не указана',
+      'Alias one',
+      'Alias two',
+      'Full description',
+      'Series',
+    ]) {
+      expect(root.textContent).toContain(text);
+    }
+    expect(root.querySelectorAll('.text-decoration-line-through')).toHaveLength(1);
+    expect(root.querySelector('img.screenshot')?.getAttribute('alt')).toBe('Game — скриншот 1');
+    expect(root.querySelector('button[aria-label="Назад"]')).not.toBeNull();
+  });
 });
