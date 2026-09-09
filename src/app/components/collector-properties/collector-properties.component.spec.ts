@@ -132,4 +132,15 @@ describe('Collector library', () => {
     fixture.detectChanges();
     expect(fixture.nativeElement.textContent).toContain('Релизов: 1001');
   });
+  it('passes the clicked release platform to product links once platforms are loaded', () => {
+    const state = store.snapshot();
+    store.reset({ ...state, Platforms: { ...state.Platforms, platforms: [{ id: 48, name: 'PS4' }] } });
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.release-title').getAttribute('href')).toBe(
+      '/products/1;platform=48',
+    );
+    expect(fixture.nativeElement.querySelector('.cover').getAttribute('href')).toBe(
+      '/products/1;platform=48',
+    );
+  });
 });

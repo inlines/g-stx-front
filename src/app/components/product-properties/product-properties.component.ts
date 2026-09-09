@@ -1,3 +1,8 @@
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { priceValidator } from '@app/shared/price-validator';
+import { RequestStatus } from '@app/constants/request-status.const';
+import { DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ICompanyItem } from '@app/states/products/interfaces/company-item.interface';
 import { AsyncPipe, DatePipe, Location, NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
@@ -18,6 +23,7 @@ import { combineLatest, map, Observable } from 'rxjs';
 @Component({
   selector: 'app-product-properties',
   imports: [
+    ReactiveFormsModule,
     RouterLink,
     AsyncPipe,
     DatePipe,
@@ -32,7 +38,7 @@ import { combineLatest, map, Observable } from 'rxjs';
   standalone: true,
 })
 export class ProductPropertiesComponent implements OnInit {
-  @ViewChild('bidsModal', { static: true }) bidsModalRef!: TemplateRef<unknown>;
+  @ViewChild('sellersModal', { static: true }) sellersModalRef!: TemplateRef<unknown>;
 
   constructor(
     private readonly store: Store,
@@ -51,12 +57,12 @@ export class ProductPropertiesComponent implements OnInit {
       map(([properties, ownership]) => {
         const have = new Set(ownership.flatMap((item) => item.have_ids ?? []));
         const wish = new Set(ownership.flatMap((item) => item.wish_ids ?? []));
-        const bid = new Set(ownership.flatMap((item) => item.bid_ids ?? []));
+        const sales = new Set(ownership.flatMap((item) => item.wts_ids ?? []));
         return (properties?.releases ?? []).map((release) => ({
           ...release,
           owned: have.has(release.release_id),
           wished: wish.has(release.release_id),
-          bided: bid.has(release.release_id),
+          forSale: sales.has(release.release_id),
         }));
       }),
     );
@@ -114,17 +120,51 @@ export class ProductPropertiesComponent implements OnInit {
     this.store.dispatch(new CollectionActions.AddWishRequest({ release_id }));
   }
 
-  public addBid(release_id: number): void {
-    this.store.dispatch(new CollectionActions.AddBidRequest({ release_id }));
+  private readonly destroyRef = inject(DestroyRef);
+  @ViewChild('saleModal', { static: true }) saleModal!: TemplateRef<unknown>;
+  readonly salePrice = new FormControl<number | null>(null, { validators: [priceValidator] });
+  readonly saleCib = new FormControl(false, { nonNullable: true });
+  sellingRelease: IReleaseItem | null = null;
+
+  toggleSale(release: IReleaseItem): void {
+    if (this.store.selectSnapshot(CollectionState.collectionChanging)) return;
+    const ownership = this.store.selectSnapshot(OwnershipState.ownership);
+    if (!ownership.some((item) => item.have_ids.includes(release.release_id))) return;
+    if (ownership.some((item) => (item.wts_ids ?? []).includes(release.release_id))) {
+      this.store.dispatch(new CollectionActions.RemoveWtsRequest({ release_id: release.release_id }));
+      return;
+    }
+    this.sellingRelease = release;
+    this.salePrice.reset(null);
+    this.saleCib.reset(false);
+    this.modalService.open(this.saleModal, { centered: true, ariaLabelledBy: 'product-sale-title' });
   }
 
-  public removeBid(release_id: number): void {
-    this.store.dispatch(new CollectionActions.RemoveBidRequest({ release_id }));
+  saveSale(): void {
+    if (
+      !this.sellingRelease ||
+      this.salePrice.invalid ||
+      this.store.selectSnapshot(CollectionState.collectionChanging)
+    )
+      return;
+    this.store
+      .dispatch(
+        new CollectionActions.AddWtsRequest({
+          release_id: this.sellingRelease.release_id,
+          price: this.salePrice.value,
+          cib: this.saleCib.value,
+        }),
+      )
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (this.store.selectSnapshot(CollectionState.changeStatus) === RequestStatus.Load)
+          this.modalService.dismissAll();
+      });
   }
 
-  public openBidsModal(release: IReleaseItem) {
+  public openSellersModal(release: IReleaseItem) {
     this.selectedRelease = release;
-    this.modalService.open(this.bidsModalRef, { centered: true });
+    this.modalService.open(this.sellersModalRef, { centered: true });
   }
 
   public startChatWith(user: string) {

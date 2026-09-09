@@ -1,3 +1,4 @@
+import { PlatformState } from '@app/states/platforms/states/platforms.state';
 import { CollectorsService } from '@app/states/collectors/services/collectors.service';
 import { unixMilliseconds } from '@app/shared/collection-filter';
 import { ICollectionItem } from '@app/states/collection/interfaces/collection-item.interface';
@@ -58,8 +59,12 @@ export class CollectorPropertiesComponent {
       );
     }),
   );
-  readonly vm$ = combineLatest([this.data$, this.changes]).pipe(
-    map(([{ items, login, status, tab }]) => {
+  readonly vm$ = combineLatest([
+    this.data$,
+    this.changes,
+    this.store.select(PlatformState.loadedPlatforms),
+  ]).pipe(
+    map(([{ items, login, status, tab }, , platforms]) => {
       const view = this.views.get(tab === 'wts' ? `collector-wts:${login}` : `collector:${login}`);
       const pages = Math.max(1, Math.ceil(items.length / view.size));
       if (status === RequestStatus.Load) view.page = Math.min(view.page, pages);
@@ -71,7 +76,10 @@ export class CollectorPropertiesComponent {
         offset,
         page: view.page,
         size: view.size,
-        items: items.slice(offset, offset + view.size).map((item) => ({ ...item })),
+        items: items.slice(offset, offset + view.size).map((item) => ({
+          ...item,
+          platformId: platforms.find((platform) => platform.name === item.platform_name)?.id ?? null,
+        })),
         loading: status === RequestStatus.Pending,
         failed: status === RequestStatus.Error,
       };

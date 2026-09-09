@@ -68,8 +68,6 @@ describe('Existing Rust API contract', () => {
       ['setReleasePrice', 'set_release_price'],
       ['addWish', 'add_wish'],
       ['removeWish', 'remove_wish'],
-      ['addBid', 'add_bid'],
-      ['removeBid', 'remove_bid'],
       ['addWts', 'add_wts'],
       ['removeWts', 'remove_wts'],
     ] as const;
@@ -123,7 +121,6 @@ describe('Existing Rust API contract', () => {
     http.expectOne('/api/remove_wts').flush({}, { status: 500, statusText: 'Error' });
     await done;
     expect(store.selectSnapshot(CollectionState.changeStatus)).toBe(RequestStatus.Error);
-    expect(CollectionActions.AddBidFail.type as string).not.toBe(CollectionActions.AddWishFail.type);
   });
 
   it('keeps zero prices and sends ownership refresh only after a successful mutation', async () => {

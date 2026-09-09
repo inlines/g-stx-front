@@ -7,7 +7,7 @@
   @else if(vm.failed){<div class="status" role="alert">Не удалось загрузить список. <button type="button" (click)="retry()">Повторить</button></div>}
   @else if(vm.total){
     <div class="list-info" aria-live="polite"><span>Релизов: {{vm.total}}</span><span>{{vm.offset+1}}–{{vm.offset+vm.items.length}} из {{vm.total}}</span></div>
-    <div class="release-grid">@for(item of vm.items;track item.release_id){<app-release-card [item]="item" [readOnly]="true" [saleMode]="vm.tab === 'wts'"/>}</div>
+    <div class="release-grid">@for(item of vm.items;track item.release_id){<app-release-card [item]="item" [platform]="item.platformId" [readOnly]="true" [saleMode]="vm.tab === 'wts'"/>}</div>
     <footer><label>На странице<select [value]="vm.size" (change)="pageSize($any($event.target).value)"><option value="24">24</option><option value="48">48</option><option value="96">96</option></select></label><app-pager [totalCount]="vm.total" [limit]="vm.size" [offset]="vm.offset" (pageChange)="page($event)"/></footer>
   } @else {
     @if(vm.tab === 'wts'){<div class="empty"><h2>Пока нет игр для продажи</h2><p>Пользователь ещё не отметил игры, которые хочет продать.</p></div>}@else{

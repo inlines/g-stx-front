@@ -8,8 +8,6 @@ export interface IOwnershipItem {
   wish_count: number;
   wish_ids: number[];
 
-  bid_count: number;
-  bid_ids: number[];
 
   wts_count?: number;
   wts_ids?: number[];

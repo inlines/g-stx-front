@@ -136,8 +136,6 @@ describe('Personal library pages', () => {
         have_prod_ids: items.map((i) => i.product_id),
         wish_count: 0,
         wish_ids: [],
-        bid_count: 0,
-        bid_ids: [],
         wts_count: selling.length,
         wts_ids: selling,
         total_spent: 100,

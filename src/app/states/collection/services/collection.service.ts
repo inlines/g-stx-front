@@ -23,9 +23,6 @@ export class CollectionService {
   private readonly getWishlistPath: string;
   private readonly getWtsPath: string;
 
-  private readonly addBidPath: string;
-  private readonly removeBidPath: string;
-
   private readonly addWtsPath: string;
   private readonly removewtsPath: string;
 
@@ -45,9 +42,6 @@ export class CollectionService {
     this.addWtsPath = `${this.environment.apiUrl}/add_wts`;
     this.getWtsPath = `${this.environment.apiUrl}/wts`;
     this.removewtsPath = `${this.environment.apiUrl}/remove_wts`;
-
-    this.addBidPath = `${this.environment.apiUrl}/add_bid`;
-    this.removeBidPath = `${this.environment.apiUrl}/remove_bid`;
   }
 
   public addToCollection(payload: IEditCollectionPayload): Observable<void> {
@@ -70,16 +64,8 @@ export class CollectionService {
     return this.http.post<void>(this.addWtsPath, payload);
   }
 
-  public addBid(payload: IEditCollectionPayload): Observable<void> {
-    return this.http.post<void>(this.addBidPath, payload);
-  }
-
   public removeWish(payload: IEditCollectionPayload): Observable<void> {
     return this.http.post<void>(this.removeWishPath, payload);
-  }
-
-  public removeBid(payload: IEditCollectionPayload): Observable<void> {
-    return this.http.post<void>(this.removeBidPath, payload);
   }
 
   public removeWts(payload: IEditCollectionPayload): Observable<void> {

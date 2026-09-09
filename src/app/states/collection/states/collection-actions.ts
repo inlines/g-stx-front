@@ -46,20 +46,6 @@ export namespace CollectionActions {
     public static readonly type = CollectionActionList.ADD_WISH_REQUEST_FAIL;
   }
 
-  export class AddBidRequest {
-    public static readonly type = CollectionActionList.ADD_BID_REQUEST;
-
-    constructor(public payload: IEditCollectionPayload) {}
-  }
-
-  export class AddBidSuccess {
-    public static readonly type = CollectionActionList.ADD_BID_REQUEST_SUCCESS;
-  }
-
-  export class AddBidFail {
-    public static readonly type = CollectionActionList.ADD_BID_REQUEST_FAIL;
-  }
-
   export class AddWtsRequest {
     public static readonly type = CollectionActionList.ADD_WTS_REQUEST;
 
@@ -100,20 +86,6 @@ export namespace CollectionActions {
 
   export class RemoveWishFail {
     public static readonly type = CollectionActionList.REMOVE_WISH_REQUEST_FAIL;
-  }
-
-  export class RemoveBidRequest {
-    public static readonly type = CollectionActionList.REMOVE_BID_REQUEST;
-
-    constructor(public payload: IEditCollectionPayload) {}
-  }
-
-  export class RemoveBidSuccess {
-    public static readonly type = CollectionActionList.REMOVE_BID_REQUEST_SUCCESS;
-  }
-
-  export class RemoveBidFail {
-    public static readonly type = CollectionActionList.REMOVE_BID_REQUEST_FAIL;
   }
 
   export class RemoveWtsRequest {

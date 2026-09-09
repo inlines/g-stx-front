@@ -85,18 +85,18 @@
         <ul class="list-group list-group-flush">
           @if ((sortedReleases$ | async); as sorted) {
             @for (release of sorted.highlighted; track release.release_id) {
-              <ng-container *ngTemplateOutlet="releaseRow; context: { $implicit: release, actions: true }" />
+              <ng-container *ngTemplateOutlet="releaseRow; context: { $implicit: release, highlighted: true }" />
             }
             @for (release of sorted.others; track release.release_id) {
-              <ng-container *ngTemplateOutlet="releaseRow; context: { $implicit: release, actions: false }" />
+              <ng-container *ngTemplateOutlet="releaseRow; context: { $implicit: release, highlighted: false }" />
             }
             @if (!sorted.highlighted.length && !sorted.others.length) {
               <li class="release-empty">Информация о релизах пока отсутствует.</li>
             }
           }
         </ul>
-        <ng-template #releaseRow let-release let-actions="actions">
-          <li class="release-item" [class.owned-item]="release.owned" [class.highlighted-release]="actions">
+        <ng-template #releaseRow let-release let-highlighted="highlighted">
+          <li class="release-item" [class.owned-item]="release.owned" [class.highlighted-release]="highlighted">
             <div class="release-meta" [class.text-decoration-line-through]="release.release_status === 5">
               <span class="release-platform">{{ release.platform_name }}</span>
               <span>{{ release.release_region }}</span>
@@ -111,9 +111,7 @@
               </details>
             }
             @if (release.digital_only) { <div class="digital-label">Цифровая версия</div> }
-            @if (actions) {
-              <ng-container *ngTemplateOutlet="releaseActions; context: { $implicit: release }" />
-            }
+            <ng-container *ngTemplateOutlet="releaseActions; context: { $implicit: release }" />
           </li>
         </ng-template>
       <ng-template #releaseActions let-release>
@@ -125,28 +123,22 @@
               (click)="addToCollection(release.release_id, productProperties.product.id)">
               В коллекцию
             </button>
-            <button type="button" class="btn-pink active"
-              [hidden]="!release.owned || release.bided"
-              [disabled]="release.release_status === 5 || !release.release_date || (collectionChanging$ | async)"
-              (click)="addBid(release.release_id)">
-              Хочу поменять
-            </button>
-            <button type="button" class="btn-blue small"
-              [hidden]="!release.bided"
-              [disabled]="(collectionChanging$ | async)"
-              (click)="removeBid(release.release_id)">
-              Больше не хочу меняться
-            </button>
+            @if (release.owned) {
+              <button type="button" class="btn-pink active" [disabled]="(collectionChanging$ | async)"
+                [attr.aria-pressed]="release.forSale" (click)="toggleSale(release)">
+                {{ release.forSale ? 'Снять с продажи' : 'Хочу продать' }}
+              </button>
+            }
             <button type="button" class="btn-blue small"
               [disabled]="release.wished || release.release_status === 5 || !release.release_date || (collectionChanging$ | async)"
               [hidden]="release.wished"
               (click)="addWish(release.release_id)">
               В вишлист
             </button>
-            @if (release.bid_user_logins.length) {
+            @if (release.seller_logins?.length) {
               <button type="button" class="btn-blue small"
-                (click)="openBidsModal(release)">
-                Есть предложения
+                (click)="openSellersModal(release)">
+                Кто продаёт
               </button>
             }
           </div>
@@ -187,19 +179,19 @@
   </div>
 }
 
-<ng-template #bidsModal let-modal>
+<ng-template #sellersModal let-modal>
   <div class="modal-dialog modal-lg modal-dialog-centered animate__animated animate__fadeIn">
     <div class="modal-content p-0 border-0 bg-transparent">
       <div class="bg-dark text-white rounded-4 shadow-lg overflow-hidden w-100">
 
         <div class="modal-header border-secondary">
-          <h4 class="modal-title text-warning">Игроки, готовые на обмен</h4>
+          <h4 class="modal-title text-warning">Игроки, которые хотят продать</h4>
           <button type="button" class="btn-close btn-close-white" (click)="modal.dismiss()" aria-label="Закрыть"></button>
         </div>
 
         <div class="modal-body">
           <ul class="list-unstyled m-0">
-            @for (user of selectedRelease.bid_user_logins || []; track user) {
+            @for (user of selectedRelease.seller_logins || []; track user) {
               <li class="mb-3">
                 <div class="d-flex align-items-center bg-secondary bg-opacity-10 p-3 rounded-3 border border-secondary">
                   <!-- SVG аватар-заглушка -->
@@ -214,7 +206,7 @@
                     </svg>
                   </div>
                   <!-- Имя пользователя и кнопка -->
-                  <div class="bid-player">
+                  <div class="seller-player">
                     <span class="fw-semibold fs-6">{{ user }}</span>
                     <button type="button" (click)="startChatWith(user)" class="btn btn-outline-warning btn-sm">
                       Написать игроку
@@ -234,3 +226,15 @@
   </div>
 </ng-template>
 
+
+<ng-template #saleModal let-modal>
+  <form class="sale-dialog" (submit)="$event.preventDefault(); saveSale()">
+    <header><h2 id="product-sale-title">Хочу продать</h2><button type="button" aria-label="Закрыть" (click)="modal.dismiss()">×</button></header>
+    <p>{{ (productProperties$ | async)?.product?.name }} · {{sellingRelease?.platform_name}} · {{sellingRelease?.release_region}}</p>
+    <label>Цена продажи, ₽<input type="number" min="0" max="2147483647" step="1" [formControl]="salePrice" placeholder="Не указана"></label>
+    <p class="sale-hint">Можно оставить цену пустой.</p>
+    @if(salePrice.invalid){<p role="alert">Введите целую сумму от 0 до 2 147 483 647 ₽.</p>}
+    <label class="cib-label"><input type="checkbox" [formControl]="saleCib"> CIB · Полный комплект (Complete in box)</label>
+    <footer><button type="button" (click)="modal.dismiss()">Отмена</button><button type="submit" [disabled]="salePrice.invalid || (collectionChanging$ | async)">Сохранить</button></footer>
+  </form>
+</ng-template>

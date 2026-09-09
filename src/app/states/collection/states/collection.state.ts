@@ -77,16 +77,6 @@ export class CollectionState {
     );
   }
 
-  @Action(CollectionActions.AddBidRequest)
-  addBid(ctx: StateContext<ICollectionState>, action: CollectionActions.AddBidRequest) {
-    return this.mutation(
-      ctx,
-      this.service.addBid(action.payload),
-      new CollectionActions.AddBidSuccess(),
-      new CollectionActions.AddBidFail(),
-    );
-  }
-
   @Action(CollectionActions.RemoveFromCollectionRequest)
   removeFromCollection(
     ctx: StateContext<ICollectionState>,
@@ -120,26 +110,14 @@ export class CollectionState {
     );
   }
 
-  @Action(CollectionActions.RemoveBidRequest)
-  removeBid(ctx: StateContext<ICollectionState>, action: CollectionActions.RemoveBidRequest) {
-    return this.mutation(
-      ctx,
-      this.service.removeBid(action.payload),
-      new CollectionActions.RemoveBidSuccess(),
-      new CollectionActions.RemoveBidFail(),
-    );
-  }
-
   @Action([
     CollectionActions.AddToCollectionSuccess,
     CollectionActions.SetPriceSuccess,
     CollectionActions.AddWishSuccess,
     CollectionActions.AddWtsSuccess,
-    CollectionActions.AddBidSuccess,
     CollectionActions.RemoveFromCollectionSuccess,
     CollectionActions.RemoveWishSuccess,
     CollectionActions.RemoveWtsSuccess,
-    CollectionActions.RemoveBidSuccess,
   ])
   mutationSuccess(ctx: StateContext<ICollectionState>, action: object) {
     ctx.patchState({ changeCollectionRequestStatus: RequestStatus.Load });
@@ -148,11 +126,9 @@ export class CollectionState {
       [CollectionActions.SetPriceSuccess.type]: 'Цена сохранена',
       [CollectionActions.AddWishSuccess.type]: 'Успешное добавление в вишлист',
       [CollectionActions.AddWtsSuccess.type]: 'Успешное добавление в лист продаж',
-      [CollectionActions.AddBidSuccess.type]: 'Успешное добавление бида',
       [CollectionActions.RemoveFromCollectionSuccess.type]: 'Успешное удаление из коллекции',
       [CollectionActions.RemoveWishSuccess.type]: 'Успешное удаление из вишлиста',
       [CollectionActions.RemoveWtsSuccess.type]: 'Успешное удаление из листа продаж',
-      [CollectionActions.RemoveBidSuccess.type]: 'Успешное удаление бида',
     };
     this.toastService.clear();
     this.toastService.show({
@@ -168,11 +144,9 @@ export class CollectionState {
     CollectionActions.SetPriceFail,
     CollectionActions.AddWishFail,
     CollectionActions.AddWtsFail,
-    CollectionActions.AddBidFail,
     CollectionActions.RemoveFromCollectionFail,
     CollectionActions.RemoveWishFail,
     CollectionActions.RemoveWtsFail,
-    CollectionActions.RemoveBidFail,
   ])
   mutationFail(ctx: StateContext<ICollectionState>, action: object) {
     ctx.patchState({ changeCollectionRequestStatus: RequestStatus.Error });
@@ -181,11 +155,9 @@ export class CollectionState {
       [CollectionActions.SetPriceFail.type]: 'Ошибка при сохранении цены',
       [CollectionActions.AddWishFail.type]: 'Ошибка при добавлении в вишлист',
       [CollectionActions.AddWtsFail.type]: 'Ошибка при добавлении в лист продаж',
-      [CollectionActions.AddBidFail.type]: 'Ошибка при добавлении бида',
       [CollectionActions.RemoveFromCollectionFail.type]: 'Ошибка при удалении из коллекции',
       [CollectionActions.RemoveWishFail.type]: 'Ошибка при удалении из вишлиста',
       [CollectionActions.RemoveWtsFail.type]: 'Ошибка при удалении из листа продаж',
-      [CollectionActions.RemoveBidFail.type]: 'Ошибка при удалении бида',
     };
     this.toastService.clear();
     this.toastService.show({

@@ -7,8 +7,8 @@ export interface IReleaseItem {
   platform_id: number;
   owned?: boolean;
   wished?: boolean;
-  bided?: boolean;
-  bid_user_logins: string[];
+  forSale?: boolean;
+  seller_logins: string[];
   digital_only: boolean;
   serial: string[] | null;
 }
