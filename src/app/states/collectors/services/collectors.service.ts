@@ -3,7 +3,7 @@ import { Inject, Injectable } from '@angular/core';
 import { IEnvironment } from '@app/environments/environment.interface';
 import { ENVIRONMENT } from '@app/environments/environment.token';
 import { ICollectionItem } from '@app/states/collection/interfaces/collection-item.interface';
-import { Observable } from 'rxjs';
+import { EMPTY, expand, last, map, Observable } from 'rxjs';
 import { ICollectorItem } from '../interfaces/collector-item.interface';
 
 @Injectable({
@@ -26,8 +26,20 @@ export class CollectorsService {
   }
 
   public getCollectorProperties(id: string): Observable<ICollectionItem[]> {
-    return this.http.get<ICollectionItem[]>(`${this.getCollectorsPropertiesPath}/${id}`, {
-      params: { cat: 0 },
-    });
+    const limit = 1000;
+    const request = (offset: number) =>
+      this.http.get<ICollectionItem[]>(`${this.getCollectorsPropertiesPath}/${encodeURIComponent(id)}`, {
+        params: { cat: 0, limit, offset },
+      });
+    return request(0).pipe(
+      map((batch) => ({ batch, items: batch })),
+      expand(({ batch, items }) =>
+        batch.length < limit
+          ? EMPTY
+          : request(items.length).pipe(map((next) => ({ batch: next, items: [...items, ...next] }))),
+      ),
+      last(),
+      map((result) => result.items),
+    );
   }
 }

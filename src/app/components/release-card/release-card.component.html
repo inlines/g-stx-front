@@ -1,0 +1,33 @@
+<article class="release-card">
+  <div class="release-main">
+    <a class="cover" [routerLink]="productLink" [attr.aria-label]="item.product_name">
+      @if (item.image_url) {
+        <img [src]="item.image_url" [alt]="item.product_name" loading="lazy" decoding="async" (error)="item.image_url = null">
+      } @else { <span class="no-cover">Нет<br>обложки</span> }
+    </a>
+    <div class="release-copy">
+      <a class="release-title" [routerLink]="productLink">{{item.product_name}}</a>
+      <div class="metadata"><span>{{item.platform_name}}</span>@if (item.region_name) { <span class="region">{{item.region_name}}</span> }</div>
+      @if (collection || readOnly) {
+        <div class="release-date">{{item.release_date === null ? 'Дата релиза не указана' : (item.release_date | date:'dd.MM.yyyy':'UTC')}}</div>
+      }
+    </div>
+  </div>
+  @if ((collection || readOnly) && item.serial?.length) {
+    <details class="serials">
+      <summary [ngbTooltip]="serialPreview" triggers="mouseenter:mouseleave" container="body">Серийники · {{item.serial.length}}</summary>
+      <ul aria-label="Все серийники">@for (serial of item.serial; track $index) { <li>{{serial}}</li> }</ul>
+    </details>
+  }
+  @if (!readOnly) {
+  <footer>
+    @if (collection) {
+      <div class="price"><small>Цена покупки</small>@if (item.price !== null) { {{item.price | currency:'RUB':'symbol-narrow':'1.0-2'}} } @else { <span class="muted">Не указана</span> }</div>
+    } @else { <span class="muted">В списке желаемого</span> }
+    <div class="actions">
+      @if (collection) { <button type="button" [disabled]="busy" (click)="editPrice.emit(item)">{{item.price === null ? 'Задать цену' : 'Изменить цену'}}</button> }
+      <button type="button" class="remove" [disabled]="busy" (click)="removeRelease.emit(item.release_id)" [attr.aria-label]="'Удалить ' + item.product_name + (collection ? ' из коллекции' : ' из вишлиста')" ngbTooltip="Удалить" container="body"><span aria-hidden="true">×</span></button>
+    </div>
+  </footer>
+  }
+</article>

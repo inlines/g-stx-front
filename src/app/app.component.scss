@@ -7,6 +7,8 @@ header {
 }
 
 main article {
+  position: relative;
+  z-index: 1;
   margin-top: 82px;
   &.authenticated {
     margin-top: 142px;
@@ -52,7 +54,8 @@ app-toast-container {
   position: absolute;
   border-radius: 50%;
   filter: blur(60px); /* Для эффекта размытости как пятна */
-  z-index: -0;
+  z-index: 0;
+  pointer-events: none;
   mix-blend-mode: screen; /* или overlay, multiply - зависит от эффекта */
   background-color: rgba(123, 0, 255, 0.1);
 }
