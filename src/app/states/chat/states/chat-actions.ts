@@ -6,7 +6,10 @@ export namespace ChatActions {
   export class Connect {
     public static readonly type = ChatActionList.CONNECT;
 
-    constructor(public login: string) {}
+    constructor(
+      public login: string,
+      public token: string,
+    ) {}
   }
 
   export class SendMessage {

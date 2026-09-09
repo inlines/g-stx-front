@@ -12,20 +12,21 @@ class Socket {
   static instances: Socket[] = [];
   readyState = 0;
   onopen?: () => void;
-  onclose?: () => void;
+  onclose?: (event: { code: number }) => void;
   onerror?: () => void;
   onmessage?: (event: { data: string }) => void;
   send = vi.fn();
   constructor(readonly url: URL) {
     Socket.instances.push(this);
   }
-  close() {
+  close(code = 1000) {
     this.readyState = 3;
-    this.onclose?.();
+    this.onclose?.({ code });
   }
   open() {
     this.readyState = 1;
     this.onopen?.();
+    this.onmessage?.({ data: JSON.stringify({ type: 'authenticated', login: 'alice' }) });
   }
 }
 
@@ -50,16 +51,16 @@ describe('Chat socket lifecycle and existing wire format', () => {
     vi.useRealTimers();
   });
   it('does not open duplicate connections while connecting or connected', () => {
-    service.connect('alice');
-    service.connect('alice');
+    service.connect('alice', 'valid-token');
+    service.connect('alice', 'valid-token');
     expect(Socket.instances).toHaveLength(1);
     Socket.instances[0].open();
-    service.connect('alice');
+    service.connect('alice', 'valid-token');
     expect(Socket.instances).toHaveLength(1);
-    expect(Socket.instances[0].url.pathname).toBe('/ws/alice');
+    expect(Socket.instances[0].url.pathname).toBe('/ws/');
   });
   it('reconnects once after a disconnect and cancels reconnect on logout', () => {
-    service.connect('alice');
+    service.connect('alice', 'valid-token');
     Socket.instances[0].open();
     Socket.instances[0].close();
     vi.advanceTimersByTime(1000);
@@ -72,7 +73,7 @@ describe('Chat socket lifecycle and existing wire format', () => {
   it('ignores malformed frames and keeps the socket usable', () => {
     const received = vi.fn();
     service.messages$.subscribe(received);
-    service.connect('alice');
+    service.connect('alice', 'valid-token');
     const socket = Socket.instances[0];
     socket.open();
     socket.onmessage?.({ data: 'invalid json' });
@@ -84,19 +85,19 @@ describe('Chat socket lifecycle and existing wire format', () => {
   it('preserves the API payload and refuses optimistic send while disconnected', () => {
     const payload = { sender: 'alice', recipient: 'bob', body: 'Hello' };
     expect(service.sendMessage(payload)).toBeNull();
-    service.connect('alice');
+    service.connect('alice', 'valid-token');
     const socket = Socket.instances[0];
     socket.open();
     const message = service.sendMessage(payload);
     expect(message).toEqual({ ...payload, created_at: expect.any(String) });
-    expect(JSON.parse(socket.send.mock.calls[0][0])).toEqual(message);
+    expect(JSON.parse(socket.send.mock.calls.at(-1)![0])).toEqual({ recipient: 'bob', body: 'Hello' });
   });
   it('updates presence independently from messages and clears it on disconnect', () => {
     const online = vi.fn();
     const messages = vi.fn();
     service.online$.subscribe(online);
     service.messages$.subscribe(messages);
-    service.connect('alice');
+    service.connect('alice', 'valid-token');
     const socket = Socket.instances[0];
     socket.open();
     socket.onmessage?.({ data: JSON.stringify({ type: 'presence', online: ['alice', 'bob'] }) });
@@ -108,5 +109,27 @@ describe('Chat socket lifecycle and existing wire format', () => {
     expect(online).toHaveBeenLastCalledWith(new Set(['alice']));
     socket.close();
     expect(online).toHaveBeenLastCalledWith(new Set());
+  });
+  it('authenticates before announcing connection or allowing messages, without URL credentials', () => {
+    const connected = vi.fn();
+    service.connected$.subscribe(connected);
+    service.connect('alice', 'secret-token');
+    const socket = Socket.instances[0];
+    socket.readyState = 1;
+    socket.onopen?.();
+    expect(socket.url.pathname).toBe('/ws/');
+    expect(socket.url.search).toBe('');
+    expect(JSON.parse(socket.send.mock.calls[0][0])).toEqual({ type: 'authenticate', token: 'secret-token' });
+    expect(connected).toHaveBeenLastCalledWith(false);
+    expect(service.sendMessage({ sender: 'alice', recipient: 'bob', body: 'Wait' })).toBeNull();
+    socket.onmessage?.({ data: JSON.stringify({ type: 'authenticated', login: 'alice' }) });
+    expect(connected).toHaveBeenLastCalledWith(true);
+    socket.close(1008);
+    vi.advanceTimersByTime(10000);
+    expect(Socket.instances).toHaveLength(1);
+  });
+  it('does not open an anonymous connection', () => {
+    service.connect('alice', '');
+    expect(Socket.instances).toHaveLength(0);
   });
 });

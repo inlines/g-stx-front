@@ -38,7 +38,7 @@ export class ChatState implements NgxsAfterBootstrap, OnDestroy {
 
   @Action(ChatActions.Connect)
   connectToChat(ctx: StateContext<IChatState>, action: ChatActions.Connect): void {
-    this.chatService.connect(action.login);
+    this.chatService.connect(action.login, action.token);
     ctx.patchState({
       login: action.login,
     });

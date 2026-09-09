@@ -71,7 +71,12 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
       ),
     );
 
-    this.store.dispatch(new ChatActions.Connect(this.store.selectSnapshot(AuthState.login) || ''));
+    this.store.dispatch(
+      new ChatActions.Connect(
+        this.store.selectSnapshot(AuthState.login) || '',
+        this.store.selectSnapshot(AuthState.token) || '',
+      ),
+    );
 
     this.store
       .select(ChatState.notification)
