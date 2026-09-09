@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpTestingController } from '@angular/common/http/testing';
+import { OwnershipState } from '@app/states/ownership/states/ownership.state';
 import { Store } from '@ngxs/store';
 import { TEST_PROVIDERS } from '@app/testing/test-providers';
 import { CollectionActions } from '@app/states/collection/states/collection-actions';
@@ -29,7 +30,12 @@ describe('Personal library pages', () => {
     const state = store.snapshot();
     store.reset({
       ...state,
-      Collection: { ...state.Collection, collectionParams: { cat: 48 }, wishlistParams: { cat: 48 } },
+      Collection: {
+        ...state.Collection,
+        collectionParams: { cat: 48 },
+        wishlistParams: { cat: 48 },
+        wtsParams: { cat: 48 },
+      },
     });
   });
   afterEach(() => {
@@ -37,7 +43,7 @@ describe('Personal library pages', () => {
     http.verify({ ignoreCancelled: true });
     vi.restoreAllMocks();
   });
-  function mount(kind: 'collection' | 'wishlist' = 'collection') {
+  function mount(kind: 'collection' | 'wishlist' | 'wts' = 'collection') {
     fixture = TestBed.createComponent(PersonalLibraryComponent);
     fixture.componentRef.setInput('kind', kind);
     fixture.detectChanges();
@@ -119,5 +125,160 @@ describe('Personal library pages', () => {
     expect(component.price.invalid).toBe(true);
     component.price.setValue(0);
     expect(component.price.valid).toBe(true);
+  });
+  function ownership(selling: number[] = []) {
+    return [
+      {
+        platform: 48,
+        have_count: 49,
+        have_ids: items.map((i) => i.release_id),
+        have_prod_ids: items.map((i) => i.product_id),
+        wish_count: 0,
+        wish_ids: [],
+        bid_count: 0,
+        bid_ids: [],
+        wts_count: selling.length,
+        wts_ids: selling,
+        total_spent: 100,
+      },
+    ];
+  }
+  function seedOwnership(selling: number[] = []) {
+    const state = store.snapshot();
+    store.reset({ ...state, Ownership: { ...state.Ownership, ownership: ownership(selling) } });
+  }
+  it('paginates WTS like wishlist and hides purchase controls', () => {
+    const component = mount('wts');
+    expect(cards().length).toBe(24);
+    expect(cards()[0].textContent).toContain('Цена продажи');
+    expect(cards()[0].textContent).not.toContain('Цена покупки');
+    component.page(3);
+    fixture.detectChanges();
+    expect(cards().length).toBe(1);
+  });
+  it('offers an owned release for sale and refreshes its marker', () => {
+    seedOwnership();
+    const component = mount();
+    const button = fixture.nativeElement.querySelector('.sale-action button') as HTMLButtonElement;
+    button.click();
+    fixture.detectChanges();
+    http.expectNone('/api/add_wts');
+    expect(component.salePrice.value).toBeNull();
+    component.salePrice.setValue(1500);
+    component.saleCib.setValue(true);
+    fixture.detectChanges();
+    (document.querySelector('ngb-modal-window button[type="submit"]') as HTMLButtonElement).click();
+    fixture.detectChanges();
+    const req = http.expectOne('/api/add_wts');
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({ release_id: 1, price: 1500, cib: true });
+    expect(button.disabled).toBe(true);
+    req.flush(null);
+    http.expectOne('/api/collection-stats').flush(ownership([1]));
+    http.expectOne((r) => r.url === '/api/collection').flush({ items, total_count: items.length });
+    fixture.detectChanges();
+    expect(button.textContent).toContain('Снять с продажи');
+    expect(button.getAttribute('aria-pressed')).toBe('true');
+  });
+  it('keeps the original sale status after a failed request', () => {
+    seedOwnership();
+    const component = mount();
+    component.toggleSale(items[0]);
+    component.saveSale();
+    http.expectOne('/api/add_wts').flush('Failed', { status: 500, statusText: 'Server error' });
+    fixture.detectChanges();
+    const button = fixture.nativeElement.querySelector('.sale-action button') as HTMLButtonElement;
+    expect(button.disabled).toBe(false);
+    expect(button.getAttribute('aria-pressed')).toBe('false');
+    expect(button.textContent).toContain('Выставить на продажу');
+  });
+  it('removes only the sale flag from WTS and shows the collection link when empty', () => {
+    seedOwnership([1]);
+    mount('wts');
+    (fixture.nativeElement.querySelector('.sale-remove') as HTMLButtonElement).click();
+    const req = http.expectOne('/api/remove_wts');
+    expect(req.request.body).toEqual({ release_id: 1 });
+    req.flush(null);
+    http.expectOne('/api/collection-stats').flush(ownership());
+    http.expectOne((r) => r.url === '/api/wts').flush({ items: [], total_count: 0 });
+    fixture.detectChanges();
+    expect(cards().length).toBe(0);
+    expect(fixture.nativeElement.querySelector('.empty a').getAttribute('href')).toBe('/collection');
+    expect(store.selectSnapshot(OwnershipState.hasRelease(1))).toBe(true);
+    http.expectNone('/api/remove_release');
+  });
+  it('can withdraw a sale directly from the collection', () => {
+    seedOwnership([1]);
+    const component = mount();
+    component.toggleSale(items[0]);
+    http.expectOne('/api/remove_wts').flush(null);
+    http.expectOne('/api/collection-stats').flush(ownership());
+    http.expectOne((r) => r.url === '/api/collection').flush({ items, total_count: items.length });
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.sale-action button').getAttribute('aria-pressed')).toBe(
+      'false',
+    );
+  });
+  it('does not offer unowned releases and excludes platforms without WTS flags', () => {
+    seedOwnership();
+    const component = mount();
+    component.toggleSale({ ...items[0], release_id: 999 });
+    http.expectNone('/api/add_wts');
+    expect(store.selectSnapshot(OwnershipState.activeWtsPlatforms)).toEqual([]);
+    seedOwnership([1]);
+    expect(store.selectSnapshot(OwnershipState.activeWtsPlatforms)).toEqual([48]);
+  });
+  it('prepopulates sale details and saves a zero price and cleared CIB flag', () => {
+    const component = mount('wts');
+    component.editSale({ ...items[0], price: 850, cib: true });
+    expect(component.salePrice.value).toBe(850);
+    expect(component.saleCib.value).toBe(true);
+    component.salePrice.setValue(0);
+    component.saleCib.setValue(false);
+    component.saveSale();
+    const req = http.expectOne('/api/add_wts');
+    expect(req.request.body).toEqual({ release_id: 1, price: 0, cib: false });
+    req.flush(null);
+    http.expectOne('/api/collection-stats').flush(ownership([1]));
+    http
+      .expectOne((r) => r.url === '/api/wts')
+      .flush({ items: [{ ...items[0], price: 0, cib: false }], total_count: 1 });
+    fixture.detectChanges();
+    expect(cards()[0].querySelector('.price').textContent).toContain('0');
+    expect(cards()[0].textContent).toContain('Полный комплект не отмечен');
+  });
+  it('validates sale price and allows leaving it unspecified', () => {
+    const component = mount('wts');
+    component.editSale(items[0]);
+    for (const value of [-1, 1.5, 2147483648]) {
+      component.salePrice.setValue(value);
+      expect(component.salePrice.invalid).toBe(true);
+      component.saveSale();
+    }
+    http.expectNone('/api/add_wts');
+    component.salePrice.setValue(null);
+    component.saveSale();
+    const req = http.expectOne('/api/add_wts');
+    expect(req.request.body).toEqual({ release_id: 1, price: null, cib: false });
+    req.flush(null);
+    http.expectOne('/api/collection-stats').flush(ownership([1]));
+    http
+      .expectOne((r) => r.url === '/api/wts')
+      .flush({ items: [{ ...items[0], price: null, cib: true }], total_count: 1 });
+    fixture.detectChanges();
+    expect(cards()[0].textContent).toContain('CIB · Полный комплект');
+    expect(cards()[0].textContent).toContain('Не указана');
+  });
+  it('submits the purchase price by clicking the modal save button', () => {
+    const component = mount();
+    component.edit(items[0]);
+    component.price.setValue(500);
+    fixture.detectChanges();
+    (document.querySelector('ngb-modal-window button[type="submit"]') as HTMLButtonElement).click();
+    const req = http.expectOne('/api/set_release_price');
+    expect(req.request.body).toEqual({ release_id: 1, price: 500 });
+    req.flush(null);
+    http.expectOne('/api/collection-stats').flush(ownership());
+    http.expectOne((r) => r.url === '/api/collection').flush({ items, total_count: items.length });
   });
 });

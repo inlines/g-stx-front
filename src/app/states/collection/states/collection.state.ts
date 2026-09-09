@@ -292,7 +292,7 @@ export class CollectionState {
       loadWtsStatus: RequestStatus.Pending,
     });
 
-    return this.service.getWts(ctx.getState().wtsParams).pipe(
+    return this.service.getCompleteWts(ctx.getState().wtsParams).pipe(
       tap((payload) => {
         ctx.dispatch(new CollectionActions.GetWtsSuccess(payload));
       }),
@@ -391,7 +391,11 @@ export class CollectionState {
 
   @Selector()
   static libraryStatuses(state: ICollectionState) {
-    return { collection: state.loadCollectionStatus, wishlist: state.loadWishlistStatus };
+    return {
+      collection: state.loadCollectionStatus,
+      wishlist: state.loadWishlistStatus,
+      wts: state.loadWtsStatus,
+    };
   }
 
   @Selector()

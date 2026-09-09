@@ -8,4 +8,5 @@ export interface ICollectionItem {
   product_id: number;
   serial: string[];
   price: number | null;
+  cib?: boolean;
 }

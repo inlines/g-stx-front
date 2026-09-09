@@ -56,13 +56,9 @@ export class PersonalListController {
         platforms.flatMap((platform) => {
           const item = ownership.find((entry) => entry.platform === platform.id);
           if (!item) return [];
-          // Older API responses have no WTS statistics. Preserve the existing fallback.
+          // WTS platforms come from actual sale flags, not the whole owned collection.
           const count =
-            kind === 'wishlist'
-              ? item.wish_count
-              : kind === 'wts'
-                ? (item.wts_count ?? item.have_count)
-                : item.have_count;
+            kind === 'wishlist' ? item.wish_count : kind === 'wts' ? (item.wts_count ?? 0) : item.have_count;
           return count > 0
             ? [
                 {

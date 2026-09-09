@@ -73,7 +73,7 @@ export class OwnershipState {
   );
 
   static activeWtsPlatforms = createSelector([OwnershipState.ownership], (ownership: IOwnershipItem[]) =>
-    ownership.filter((item) => item.have_count > 0).map((o) => o.platform),
+    ownership.filter((item) => (item.wts_count ?? 0) > 0).map((o) => o.platform),
   );
 
   static hasRelease = (releaseId: number) =>

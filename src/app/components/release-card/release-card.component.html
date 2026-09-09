@@ -8,6 +8,7 @@
     <div class="release-copy">
       <a class="release-title" [routerLink]="productLink">{{item.product_name}}</a>
       <div class="metadata"><span>{{item.platform_name}}</span>@if (item.region_name) { <span class="region">{{item.region_name}}</span> }</div>
+      @if(collection && forSale){<span class="sale-status">Готова к продаже</span>}
       @if (collection || readOnly) {
         <div class="release-date">{{item.release_date === null ? 'Дата релиза не указана' : (item.release_date | date:'dd.MM.yyyy':'UTC')}}</div>
       }
@@ -23,10 +24,14 @@
   <footer>
     @if (collection) {
       <div class="price"><small>Цена покупки</small>@if (item.price !== null) { {{item.price | currency:'RUB':'symbol-narrow':'1.0-2'}} } @else { <span class="muted">Не указана</span> }</div>
-    } @else { <span class="muted">В списке желаемого</span> }
-    <div class="actions">
+    } @else if (saleMode) {
+      <div class="price"><small>Цена продажи</small>@if(item.price !== null){ {{item.price | currency:'RUB':'symbol-narrow':'1.0-2'}} }@else{<span class="muted">Не указана</span>}<small>{{item.cib ? 'CIB · Полный комплект' : 'Полный комплект не отмечен'}}</small></div>
+    } @else { <span class="muted">{{saleMode ? 'Готова к продаже' : 'В списке желаемого'}}</span> }
+    <div class="actions" [class.collection-actions]="collection">
+      @if(saleMode){<button type="button" [disabled]="busy" (click)="editSale.emit(item)">Изменить</button>}
       @if (collection) { <button type="button" [disabled]="busy" (click)="editPrice.emit(item)">{{item.price === null ? 'Задать цену' : 'Изменить цену'}}</button> }
-      <button type="button" class="remove" [disabled]="busy" (click)="removeRelease.emit(item.release_id)" [attr.aria-label]="'Удалить ' + item.product_name + (collection ? ' из коллекции' : ' из вишлиста')" ngbTooltip="Удалить" container="body"><span aria-hidden="true">×</span></button>
+      @if(collection) { <span class="sale-action"><button type="button" [disabled]="busy" [class.selling]="forSale" [attr.aria-pressed]="forSale" (click)="toggleSale.emit(item)">{{forSale ? 'Снять с продажи' : 'Выставить на продажу'}}</button></span> }
+      <button type="button" class="remove" [class.sale-remove]="saleMode" [disabled]="busy" (click)="removeRelease.emit(item.release_id)" [attr.aria-label]="saleMode ? 'Снять с продажи ' + item.product_name : 'Удалить ' + item.product_name + (collection ? ' из коллекции' : ' из вишлиста')" [ngbTooltip]="saleMode ? 'Снять с продажи' : 'Удалить'" container="body">@if(saleMode){Снять с продажи}@else{<span aria-hidden="true">×</span>}</button>
     </div>
   </footer>
   }

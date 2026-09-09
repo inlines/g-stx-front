@@ -1,3 +1,4 @@
+import { OwnershipState } from '@app/states/ownership/states/ownership.state';
 import { AsyncPipe, CurrencyPipe } from '@angular/common';
 import {
   afterNextRender,
@@ -38,6 +39,12 @@ import { buildPages } from '../pager/pagination';
 export class PersonalLibraryComponent implements OnInit, OnDestroy {
   @Input({ required: true }) kind!: LibraryKind;
   @ViewChild('priceModal', { static: true }) priceModal!: TemplateRef<unknown>;
+  @ViewChild('saleModal', { static: true }) saleModal!: TemplateRef<unknown>;
+  readonly salePrice = new FormControl<number | null>(null, {
+    validators: [Validators.min(0), Validators.max(2147483647), Validators.pattern(/^\d+$/)],
+  });
+  readonly saleCib = new FormControl(false, { nonNullable: true });
+  sellingItem: ICollectionItem | null = null;
   readonly list = inject(PersonalListController);
   private readonly store = inject(Store);
   private readonly views = inject(LibraryViewService);
@@ -75,9 +82,10 @@ export class PersonalLibraryComponent implements OnInit, OnDestroy {
     return combineLatest([
       this.list.items$,
       this.store.select(CollectionState.libraryStatuses),
+      this.store.select(OwnershipState.ownership),
       this.changes,
     ]).pipe(
-      map(([items, statuses]) => {
+      map(([items, statuses, ownership]) => {
         const status = statuses[this.kind];
         const filtered =
           this.kind === 'collection' ? filterCollection(items, this.view.query, this.view.sort) : items;
@@ -87,6 +95,7 @@ export class PersonalLibraryComponent implements OnInit, OnDestroy {
         if (status === RequestStatus.Load) this.view.page = Math.min(this.view.page, pages);
         const start = (this.view.page - 1) * this.view.size;
         return {
+          forSale: new Set(ownership.flatMap((item) => item.wts_ids ?? [])),
           items: filtered.slice(start, start + this.view.size),
           total,
           start,
@@ -135,16 +144,54 @@ export class PersonalLibraryComponent implements OnInit, OnDestroy {
     this.store.dispatch(
       this.kind === 'collection'
         ? new CollectionActions.GetCollectionRequest()
-        : new CollectionActions.GetWishlistRequest(),
+        : this.kind === 'wts'
+          ? new CollectionActions.GetWtsRequest()
+          : new CollectionActions.GetWishlistRequest(),
     );
   }
   remove(id: number): void {
     this.list.mutate(
       this.kind === 'collection'
         ? new CollectionActions.RemoveFromCollectionRequest({ release_id: id })
-        : new CollectionActions.RemoveWishRequest({ release_id: id }),
+        : this.kind === 'wts'
+          ? new CollectionActions.RemoveWtsRequest({ release_id: id })
+          : new CollectionActions.RemoveWishRequest({ release_id: id }),
     );
   }
+  toggleSale(item: ICollectionItem): void {
+    if (this.kind !== 'collection' || this.store.selectSnapshot(CollectionState.collectionChanging)) return;
+    const owned = this.store.selectSnapshot(OwnershipState.ownership);
+    if (!owned.some((platform) => platform.have_ids.includes(item.release_id))) return;
+    const selling = owned.some((platform) => (platform.wts_ids ?? []).includes(item.release_id));
+    if (selling) {
+      this.list.mutate(new CollectionActions.RemoveWtsRequest({ release_id: item.release_id }));
+    } else {
+      this.editSale(item);
+    }
+  }
+  editSale(item: ICollectionItem): void {
+    this.sellingItem = item;
+    this.salePrice.reset(this.kind === 'wts' ? item.price : null);
+    this.saleCib.reset(this.kind === 'wts' ? (item.cib ?? false) : false);
+    this.modal.open(this.saleModal, { centered: true, ariaLabelledBy: 'library-sale-title' });
+  }
+  saveSale(): void {
+    if (
+      !this.sellingItem ||
+      this.salePrice.invalid ||
+      this.store.selectSnapshot(CollectionState.collectionChanging)
+    )
+      return;
+    this.list.mutate(
+      new CollectionActions.AddWtsRequest({
+        release_id: this.sellingItem.release_id,
+        price: this.salePrice.value,
+        cib: this.saleCib.value,
+      }),
+      () => this.modal.dismissAll(),
+    );
+  }
+
   edit(item: ICollectionItem): void {
     this.editing = item;
     this.price.setValue(item.price ?? 0);

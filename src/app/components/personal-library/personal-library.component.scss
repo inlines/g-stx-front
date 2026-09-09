@@ -234,3 +234,26 @@ input::placeholder {
   position: relative;
   z-index: 1;
 }
+
+.price-dialog .sale-hint {
+  font-size: 13px;
+  color: #a3b8cb;
+}
+.price-dialog .cib-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.price-dialog .cib-option input {
+  width: 22px;
+  height: 22px;
+  min-height: 22px;
+  margin: 2px 0 0;
+  flex-shrink: 0;
+  accent-color: #c2a4ed;
+}
+.cib-option small {
+  display: block;
+  margin-top: 6px;
+  color: #a3b8cb;
+}

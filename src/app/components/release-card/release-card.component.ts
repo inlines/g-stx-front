@@ -15,6 +15,10 @@ export class ReleaseCardComponent {
   @Input() platform: number | null = null;
   @Input() collection = false;
   @Input() readOnly = false;
+  @Input() saleMode = false;
+  @Input() forSale = false;
+  @Output() editSale = new EventEmitter<ICollectionItem>();
+  @Output() toggleSale = new EventEmitter<ICollectionItem>();
   get productLink() {
     return this.platform === null
       ? ['/products', this.item.product_id]

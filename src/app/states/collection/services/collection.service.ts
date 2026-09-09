@@ -124,6 +124,10 @@ export class CollectionService {
     return this.completeList((p) => this.getWishlist(p), params);
   }
 
+  public getCompleteWts(params: IProductListRequest): Observable<IcollectionResponse> {
+    return this.completeList((p) => this.getWts(p), params);
+  }
+
   public getWts(params: IProductListRequest): Observable<IcollectionResponse> {
     return this.http.get<IcollectionResponse>(this.getWtsPath, { params: listHttpParams(params) });
   }

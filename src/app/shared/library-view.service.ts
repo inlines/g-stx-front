@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { CollectionSort } from './collection-filter';
-export type LibraryKind = 'collection' | 'wishlist';
+export type LibraryKind = 'collection' | 'wishlist' | 'wts';
 export interface LibraryView {
   query: string;
   sort: CollectionSort;
