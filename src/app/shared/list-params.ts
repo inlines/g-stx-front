@@ -11,6 +11,9 @@ export function normalizeListParams(params: IProductListRequest): IProductListRe
   if (Number.isFinite(params.offset)) result.offset = Math.max(0, Math.trunc(params.offset!));
   if (Number.isInteger(params.franchise_id) && params.franchise_id! > 0)
     result.franchise_id = params.franchise_id;
+  if (Number.isInteger(params.company_id) && params.company_id! > 0) result.company_id = params.company_id;
+  if (params.company_role === 'developer' || params.company_role === 'publisher')
+    result.company_role = params.company_role;
   const query = params.query?.trim();
   if (query) result.query = query;
   if (params.sort) result.sort = params.sort === 'date' ? 'date' : 'name';
@@ -33,6 +36,8 @@ export function sameListParams(a: IProductListRequest, b: IProductListRequest): 
   return (
     a.cat === b.cat &&
     a.franchise_id === b.franchise_id &&
+    a.company_id === b.company_id &&
+    a.company_role === b.company_role &&
     a.limit === b.limit &&
     a.offset === b.offset &&
     a.query === b.query &&

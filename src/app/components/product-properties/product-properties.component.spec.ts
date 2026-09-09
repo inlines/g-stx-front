@@ -41,15 +41,13 @@ describe('ProductPropertiesComponent', () => {
     store.dispatch(new ProductsActions.LoadProperties(1));
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('.product-error')).toBeNull();
-    http
-      .expectOne('/api/products/1')
-      .flush({
-        product: { id: 1, name: 'Existing game', image_url: null, first_release_date: null },
-        releases: [],
-        screenshots: [],
-        companies: [],
-        franschises: [],
-      });
+    http.expectOne('/api/products/1').flush({
+      product: { id: 1, name: 'Existing game', image_url: null, first_release_date: null },
+      releases: [],
+      screenshots: [],
+      companies: [],
+      franschises: [],
+    });
     fixture.detectChanges();
     expect(fixture.nativeElement.textContent).toContain('Existing game');
   });
@@ -62,5 +60,22 @@ describe('ProductPropertiesComponent', () => {
     fixture.detectChanges();
     expect(fixture.nativeElement.textContent).toContain('Не удалось загрузить игру');
     expect(fixture.nativeElement.textContent).not.toContain('Игра не найдена');
+  });
+  it('links developers and publishers by company ID, not involvement ID', () => {
+    TestBed.inject(Store).dispatch(new ProductsActions.LoadProperties(1));
+    TestBed.inject(HttpTestingController)
+      .expectOne('/api/products/1')
+      .flush({
+        product: { id: 1, name: 'Game', image_url: null, first_release_date: null },
+        releases: [],
+        screenshots: [],
+        franschises: [],
+        companies: [{ id: 999, company: 42, name: 'Studio', developer: true, publisher: true }],
+      });
+    fixture.detectChanges();
+    const links = fixture.nativeElement.querySelectorAll('a[href="/companies/42"]');
+    expect(links.length).toBe(2);
+    expect(links[0].textContent).toContain('Studio');
+    expect(fixture.nativeElement.querySelector('a[href="/companies/999"]')).toBeNull();
   });
 });

@@ -8,5 +8,7 @@ export interface IProductListRequest {
   sort?: ProductSort;
   cat?: number;
   franchise_id?: number;
+  company_id?: number;
+  company_role?: 'developer' | 'publisher';
   ignore_digital?: boolean;
 }

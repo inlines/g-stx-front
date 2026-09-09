@@ -1,5 +1,6 @@
 export interface ICompanyItem {
   id: number;
+  company: number;
   developer: boolean;
   porting: boolean;
   publisher: boolean;

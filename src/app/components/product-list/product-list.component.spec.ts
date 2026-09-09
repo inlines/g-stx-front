@@ -134,4 +134,24 @@ describe('Catalog filters', () => {
     expect(req.request.params.has('franchise_id')).toBe(false);
     req.flush({ items: [], total_count: 100 });
   });
+  it('retains company role on pagination and removes it on returning to the catalogue', () => {
+    fixture = TestBed.createComponent(ProductListComponent);
+    fixture.componentRef.setInput('companyId', 42);
+    fixture.componentRef.setInput('companyRole', 'publisher');
+    fixture.componentRef.setInput('platformIds', [48]);
+    fixture.detectChanges();
+    nextRequest().flush({ items: [], total_count: 50 });
+    fixture.componentInstance.pageChanged(2);
+    let req = nextRequest();
+    expect(req.request.params.get('company_role')).toBe('publisher');
+    expect(req.request.params.get('company_id')).toBe('42');
+    expect(req.request.params.get('offset')).toBe('15');
+    req.flush({ items: [], total_count: 50 });
+    fixture.destroy();
+    mount();
+    req = nextRequest();
+    expect(req.request.params.has('company_id')).toBe(false);
+    expect(req.request.params.has('company_role')).toBe(false);
+    req.flush({ items: [], total_count: 50 });
+  });
 });

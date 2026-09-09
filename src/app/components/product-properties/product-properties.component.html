@@ -66,9 +66,7 @@
             <span class="game-header">Разработчики:</span>
             @for (developer of (productDevelopers$ | async); track developer) {
               <div style="width:100%; max-width: 100%;">
-                <span>
-                  {{ developer }}
-                </span>
+                <a class="franchise-link" [routerLink]="['/companies', developer.company]">{{ developer.name }}</a>
               </div>
             }
           </div>
@@ -76,9 +74,7 @@
             <span class="game-header">Издатели:</span>
             @for (publisher of (productPublishers$ | async); track publisher) {
               <div style="width:100%; max-width: 100%;">
-                <span>
-                  {{ publisher }}
-                </span>
+                <a class="franchise-link" [routerLink]="['/companies', publisher.company]">{{ publisher.name }}</a>
               </div>
             }
           </div>

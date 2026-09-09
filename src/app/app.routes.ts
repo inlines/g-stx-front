@@ -15,8 +15,15 @@ export const routes: Routes = [
       import('@app/components/product-list/product-list.component').then((m) => m.ProductListComponent),
   },
   {
+    path: 'companies/:id',
+    data: { catalogKind: 'company' },
+    loadComponent: () =>
+      import('./components/catalog-group/catalog-group.component').then((m) => m.CatalogGroupComponent),
+  },
+  {
     path: 'franchises/:id',
-    loadComponent: () => import('./components/franchise/franchise.component').then(m => m.FranchiseComponent),
+    loadComponent: () =>
+      import('./components/catalog-group/catalog-group.component').then((m) => m.CatalogGroupComponent),
   },
   {
     path: 'products/:id',

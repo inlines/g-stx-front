@@ -33,6 +33,8 @@ import { combineLatest, debounceTime, distinctUntilChanged, map } from 'rxjs';
 })
 export class ProductListComponent implements OnInit, AfterViewInit {
   @Input() franchiseId?: number;
+  @Input() companyId?: number;
+  @Input() companyRole?: 'developer' | 'publisher';
   @Input() platformIds: number[] | null = null;
   private readonly store = inject(Store);
   private readonly destroyRef = inject(DestroyRef);
@@ -70,13 +72,18 @@ export class ProductListComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     const saved = this.store.selectSnapshot(ProductsState.productsParams);
-    const sameFranchise = saved.franchise_id === this.franchiseId;
+    const sameFranchise =
+      saved.franchise_id === this.franchiseId &&
+      saved.company_id === this.companyId &&
+      saved.company_role === this.companyRole;
     const cat =
       this.platformIds && !this.platformIds.includes(saved.cat ?? 6) ? this.platformIds[0] : saved.cat;
     const params = catalogParams({
       ...saved,
       cat,
       franchise_id: this.franchiseId,
+      company_id: this.companyId,
+      company_role: this.companyRole,
       ...(sameFranchise ? {} : { offset: 0, query: '', sort: 'date', ignore_digital: true }),
     });
     this.activeCategory = params.cat!;
@@ -88,6 +95,8 @@ export class ProductListComponent implements OnInit, AfterViewInit {
       new ProductsActions.SetRequestParams({
         ...params,
         franchise_id: this.franchiseId,
+        company_id: this.companyId,
+        company_role: this.companyRole,
         query: params.query,
       }),
     );

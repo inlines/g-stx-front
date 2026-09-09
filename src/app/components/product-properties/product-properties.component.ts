@@ -1,3 +1,4 @@
+import { ICompanyItem } from '@app/states/products/interfaces/company-item.interface';
 import { AsyncPipe, DatePipe, Location, NgClass, NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -83,11 +84,11 @@ export class ProductPropertiesComponent implements OnInit {
     );
 
     this.productDevelopers$ = this.productProperties$.pipe(
-      map((properties) => (properties?.companies || []).filter((c) => c.developer).map((c) => c.name)),
+      map((properties) => (properties?.companies || []).filter((c) => c.developer)),
     );
 
     this.productPublishers$ = this.productProperties$.pipe(
-      map((properties) => (properties?.companies || []).filter((c) => c.publisher).map((c) => c.name)),
+      map((properties) => (properties?.companies || []).filter((c) => c.publisher)),
     );
   }
 
@@ -95,9 +96,9 @@ export class ProductPropertiesComponent implements OnInit {
 
   public productProperties$: Observable<IProductPropertiesResponse | null>;
 
-  public productDevelopers$!: Observable<string[] | null>;
+  public productDevelopers$!: Observable<ICompanyItem[] | null>;
 
-  public productPublishers$!: Observable<string[] | null>;
+  public productPublishers$!: Observable<ICompanyItem[] | null>;
 
   public collectionChanging$: Observable<boolean>;
 

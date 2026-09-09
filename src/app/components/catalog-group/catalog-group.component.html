@@ -1,0 +1,19 @@
+<section class="franchise">
+  <a class="back" routerLink="/products">← Каталог игр</a>
+  @if(vm$ | async; as vm){
+    @if(vm.loading){<p role="status">{{isCompany ? 'Загружаем компанию…' : 'Загружаем франшизу…'}}</p>}
+    @else if(vm.group; as group){
+      <header><p class="eyebrow">{{isCompany ? 'Компания' : 'Франшиза'}}</p><h1>{{group.name}}</h1><p>{{isCompany ? 'Разработанные и изданные игры — в отдельных списках.' : 'Игры серии — выберите платформу, чтобы посмотреть каталог.'}}</p></header>
+      @if(isCompany){<nav class="role-tabs" aria-label="Участие компании"><button type="button" [class.selected]="role === 'developer'" [attr.aria-pressed]="role === 'developer'" (click)="role = 'developer'">Разработанные игры</button><button type="button" [class.selected]="role === 'publisher'" [attr.aria-pressed]="role === 'publisher'" (click)="role = 'publisher'">Изданные игры</button></nav>}
+      @if(platforms(group).length){
+        @if(!isCompany){<app-product-list [franchiseId]="group.id" [platformIds]="platforms(group)"/>}
+        @else if(role === 'developer'){<app-product-list [companyId]="group.id" companyRole="developer" [platformIds]="platforms(group)"/>}
+        @else{<app-product-list [companyId]="group.id" companyRole="publisher" [platformIds]="platforms(group)"/>}
+      }@else{<div class="empty"><h2>{{isCompany ? (role === 'developer' ? 'Нет разработанных игр на доступных платформах' : 'Нет изданных игр на доступных платформах') : 'Пока нет игр на доступных платформах'}}</h2><a routerLink="/products">Перейти в каталог →</a></div>}
+    }@else{
+      <div class="empty" role="alert"><h1>{{vm.status === 404 ? (isCompany ? 'Компания не найдена' : 'Франшиза не найдена') : (isCompany ? 'Не удалось загрузить компанию' : 'Не удалось загрузить франшизу')}}</h1>
+      @if(vm.status !== 404){<button type="button" (click)="retry()">Повторить</button>}
+      <a routerLink="/products">Перейти в каталог →</a></div>
+    }
+  }
+</section>
