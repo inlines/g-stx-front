@@ -14,29 +14,17 @@ export function libraryCsv(
   kind: LibraryKind,
   selling: ReadonlySet<number>,
 ): string {
-  const headers = [
-    'ID релиза',
-    'ID игры',
-    'Название',
-    'Платформа',
-    'Регион',
-    'Дата релиза',
-    'Серийники',
-    'Обложка',
-  ];
+  const headers = ['Название', 'Платформа', 'Регион', 'Дата релиза', 'Серийники'];
   if (kind === 'collection') headers.push('Цена покупки, ₽', 'Готова к продаже');
   if (kind === 'wts') headers.push('Цена продажи, ₽', 'CIB — полный комплект');
   const rows = items.map((item) => {
     const date = item.release_date == null ? null : new Date(item.release_date);
     const values: (string | number | null | undefined)[] = [
-      item.release_id,
-      item.product_id,
       item.product_name,
       item.platform_name,
       item.region_name,
       date && !Number.isNaN(date.getTime()) ? date.toISOString().slice(0, 10) : '',
       (item.serial ?? []).join('\n'),
-      item.image_url,
     ];
     if (kind === 'collection') values.push(item.price, selling.has(item.release_id) ? 'Да' : 'Нет');
     if (kind === 'wts') values.push(item.price, item.cib ? 'Да' : 'Нет');
