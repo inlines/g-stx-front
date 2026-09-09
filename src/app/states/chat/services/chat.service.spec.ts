@@ -91,4 +91,22 @@ describe('Chat socket lifecycle and existing wire format', () => {
     expect(message).toEqual({ ...payload, created_at: expect.any(String) });
     expect(JSON.parse(socket.send.mock.calls[0][0])).toEqual(message);
   });
+  it('updates presence independently from messages and clears it on disconnect', () => {
+    const online = vi.fn();
+    const messages = vi.fn();
+    service.online$.subscribe(online);
+    service.messages$.subscribe(messages);
+    service.connect('alice');
+    const socket = Socket.instances[0];
+    socket.open();
+    socket.onmessage?.({ data: JSON.stringify({ type: 'presence', online: ['alice', 'bob'] }) });
+    expect(online).toHaveBeenLastCalledWith(new Set(['alice', 'bob']));
+    expect(messages).not.toHaveBeenCalled();
+    socket.onmessage?.({ data: JSON.stringify({ type: 'presence', online: [12] }) });
+    expect(online).toHaveBeenLastCalledWith(new Set(['alice', 'bob']));
+    socket.onmessage?.({ data: JSON.stringify({ type: 'presence', online: ['alice'] }) });
+    expect(online).toHaveBeenLastCalledWith(new Set(['alice']));
+    socket.close();
+    expect(online).toHaveBeenLastCalledWith(new Set());
+  });
 });

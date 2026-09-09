@@ -15,6 +15,8 @@ export class ChatService implements OnDestroy {
   private retryDelay = 1000;
   private readonly connection = new BehaviorSubject(false);
   private readonly incoming = new Subject<IMessage>();
+  private readonly online = new BehaviorSubject<ReadonlySet<string>>(new Set());
+  readonly online$ = this.online.asObservable();
   readonly connected$ = this.connection.asObservable();
   readonly messages$ = this.incoming.asObservable();
 
@@ -42,7 +44,15 @@ export class ChatService implements OnDestroy {
       if (this.socket !== socket) return;
       try {
         const message: unknown = JSON.parse(event.data);
-        if (isMessage(message)) this.incoming.next(message);
+        if (message && typeof message === 'object' && 'type' in message && message.type === 'presence') {
+          if (
+            'online' in message &&
+            Array.isArray(message.online) &&
+            message.online.every((login) => typeof login === 'string')
+          ) {
+            this.online.next(new Set(message.online));
+          }
+        } else if (isMessage(message)) this.incoming.next(message);
       } catch {
         /* Ignore malformed frames; retain the connection for valid messages. */
       }
@@ -50,6 +60,7 @@ export class ChatService implements OnDestroy {
     socket.onclose = () => {
       if (this.socket !== socket) return;
       this.socket = null;
+      this.online.next(new Set());
       this.connection.next(false);
       if (this.login) {
         this.reconnectTimer = setTimeout(() => this.openSocket(), this.retryDelay);
@@ -57,7 +68,10 @@ export class ChatService implements OnDestroy {
       }
     };
     socket.onerror = () => {
-      if (this.socket === socket) this.connection.next(false);
+      if (this.socket === socket) {
+        this.online.next(new Set());
+        this.connection.next(false);
+      }
     };
   }
 
@@ -74,6 +88,7 @@ export class ChatService implements OnDestroy {
 
   closeConnection(): void {
     this.login = null;
+    this.online.next(new Set());
     clearTimeout(this.reconnectTimer);
     const socket = this.socket;
     this.socket = null;

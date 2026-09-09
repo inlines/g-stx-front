@@ -188,6 +188,11 @@ export class ChatState implements NgxsAfterBootstrap, OnDestroy {
   }
 
   @Selector()
+  public static unreadCount(state: IChatState): number {
+    return Object.values(state.unread).reduce((total, count) => total + count, 0);
+  }
+
+  @Selector()
   public static unread(state: IChatState) {
     return state.unread;
   }

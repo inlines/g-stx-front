@@ -1,3 +1,4 @@
+import { ChatService } from '@app/states/chat/services/chat.service';
 import { DestroyRef, inject, Injector, afterNextRender } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { IMessage } from '@app/states/chat/interfaces/message.interface';
@@ -44,6 +45,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
   private readonly injector = inject(Injector);
   private readonly host: ElementRef<HTMLElement> = inject(ElementRef);
   private readonly timers = new Map<HTMLElement, ReturnType<typeof setTimeout>>();
+  readonly online$ = inject(ChatService).online$;
   readonly unread$ = this.store.select(ChatState.unread);
   readonly unreadDialogs$ = this.store.select(ChatState.unreadDialogs);
   private readonly destroyRef = inject(DestroyRef);

@@ -1,5 +1,6 @@
+import { ChatService } from '@app/states/chat/services/chat.service';
 import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { ICollectorItem } from '@app/states/collectors/interfaces/collector-item.interface';
 import { CollectorsActions } from '@app/states/collectors/states/collectors-actions';
@@ -15,6 +16,8 @@ import { Observable } from 'rxjs';
   styleUrl: './collectors.component.scss',
 })
 export class CollectorsComponent implements OnInit {
+  readonly online$ = inject(ChatService).online$;
+
   constructor(private readonly store: Store) {
     this.collectors$ = this.store.select(CollectorsState.collectors);
   }

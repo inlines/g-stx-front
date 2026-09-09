@@ -8,6 +8,7 @@
         style="cursor: pointer;"
       > 
         <div class="col-7 col-md-8 px-2 px-md-3 text-truncate-fix">
+          @if ((online$ | async)?.has(collector.user_login)) { <span class="online-label">Онлайн</span> }
           <h6 class="collector-name text-truncate fw-bold mb-1">{{ collector.user_login }}</h6>
           <div class="collector-stats small text-light-muted">
             <span class="me-3">

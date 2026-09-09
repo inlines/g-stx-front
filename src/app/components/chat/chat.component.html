@@ -85,7 +85,7 @@
             <div (click)="setActiveDialog(dialog)" role="button" tabindex="0" (keydown.enter)="setActiveDialog(dialog)" (keydown.space)="$event.preventDefault(); setActiveDialog(dialog)" [attr.data-companion]="dialog.companion" [class.unread]="(unread$ | async)?.[dialog.companion]"
               class="dialog-item d-flex flex-column py-2 mb-2 text-light">
               <div class="dialog-header d-flex justify-content-between align-items-center">
-                <span class="dialog-companion">{{ dialog.companion }}</span>@if((unread$ | async)?.[dialog.companion]; as count){<span class="unread-count" aria-label="Новые сообщения">{{count}}</span>}
+                <div>@if ((online$ | async)?.has(dialog.companion)) { <span class="online-label">Онлайн</span> }<span class="dialog-companion">{{ dialog.companion }}</span></div>@if((unread$ | async)?.[dialog.companion]; as count){<span class="unread-count" aria-label="Новые сообщения">{{count}}</span>}
               </div>
               <div class="dialog-message small d-flex justify-content-between">
                 <span>{{ dialog.last_message }}</span>

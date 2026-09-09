@@ -23,13 +23,13 @@ export class HeaderComponent {
   ) {
     this.currentUser$ = this.store.select(AuthState.login);
     this.isAuthorised$ = this.store.select(AuthState.isAuthorised);
-    this.showChatWarning$ = this.store.select(ChatState.showWarning);
+    this.unreadCount$ = this.store.select(ChatState.unreadCount);
     this.isConnected$ = this.store.select(ChatState.isConnected);
   }
 
   public readonly currentUser$: Observable<string | null>;
   public readonly isAuthorised$: Observable<boolean>;
-  public readonly showChatWarning$!: Observable<boolean>;
+  public readonly unreadCount$: Observable<number>;
 
   public readonly isConnected$: Observable<boolean>;
 

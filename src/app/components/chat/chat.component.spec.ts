@@ -91,4 +91,18 @@ describe('Chat incoming notifications', () => {
     expect(store.selectSnapshot(ChatState.messages)).toEqual([incoming]);
     expect(play).not.toHaveBeenCalled();
   });
+  it('sums unread messages across dialogs and clears only the opened dialog', () => {
+    store.dispatch(
+      new ChatActions.SetMessages([
+        { sender: 'alice', recipient: 'me', body: 'One' },
+        { sender: 'alice', recipient: 'me', body: 'Two' },
+        { sender: 'bob', recipient: 'me', body: 'Three' },
+      ]),
+    );
+    expect(store.selectSnapshot(ChatState.unreadCount)).toBe(3);
+    store.dispatch(new ChatActions.SetRecepient('alice'));
+    expect(store.selectSnapshot(ChatState.unreadCount)).toBe(1);
+    store.dispatch(new ChatActions.SetRecepient('bob'));
+    expect(store.selectSnapshot(ChatState.unreadCount)).toBe(0);
+  });
 });
