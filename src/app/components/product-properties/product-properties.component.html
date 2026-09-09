@@ -230,6 +230,12 @@
     }
   </div>
 </div>
+} @else if ((failure$ | async)?.failed) {
+  <section class="product-error" role="alert">
+    <h1>{{(failure$ | async)?.notFound ? 'Игра не найдена' : 'Не удалось загрузить игру'}}</h1>
+    <p>{{(failure$ | async)?.notFound ? 'Возможно, игра была удалена или в ссылке указан неверный адрес. Попробуйте найти её в каталоге.' : 'Попробуйте обновить страницу или перейти в каталог.'}}</p>
+    <a routerLink="/products">Перейти в каталог →</a>
+  </section>
 } @else {
   <div class="row">
     <div class="col text-center py-5">

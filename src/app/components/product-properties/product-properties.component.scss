@@ -99,3 +99,9 @@ li:hover .bg-secondary {
 .mt-6 {
   margin-top: 60px;
 }
+
+.product-error { position:relative;z-index:1;margin:32px 0;padding:32px 24px;border:1px solid #294053;border-radius:14px;background:#102231;color:#e4edf6;text-align:center; }
+.product-error h1 { font-size:26px; }
+.product-error p { color:#a3b8cb; }
+.product-error a { display:inline-block;padding:12px;color:#c2a4ed; }
+.product-error a:focus-visible { outline:2px solid #c2a4ed;outline-offset:3px; }

@@ -61,13 +61,14 @@ export class ProductsState {
   public loadProperties(ctx: StateContext<IproductState>, action: ProductsActions.LoadProperties) {
     ctx.patchState({
       productPropertiesRequestStatus: RequestStatus.Pending,
+      productPropertiesErrorStatus: null,
       productProperties: null,
     });
     return this.service.productPropertiesRequest(action.id).pipe(
       tap((response) => {
         ctx.dispatch(new ProductsActions.LoadPropertiesSuccess(response));
       }),
-      catchError(() => ctx.dispatch(new ProductsActions.LoadPropertiesFail())),
+      catchError((error) => ctx.dispatch(new ProductsActions.LoadPropertiesFail(error.status ?? null))),
     );
   }
 
@@ -78,6 +79,7 @@ export class ProductsState {
   ) {
     ctx.patchState({
       productPropertiesRequestStatus: RequestStatus.Load,
+      productPropertiesErrorStatus: null,
       productProperties: {
         ...action.payload,
         product: {
@@ -107,8 +109,20 @@ export class ProductsState {
   }
 
   @Action(ProductsActions.LoadPropertiesFail)
-  loadPropertiesFail(ctx: StateContext<IproductState>) {
-    ctx.patchState({ productPropertiesRequestStatus: RequestStatus.Error });
+  loadPropertiesFail(ctx: StateContext<IproductState>, action: ProductsActions.LoadPropertiesFail) {
+    ctx.patchState({
+      productPropertiesRequestStatus: RequestStatus.Error,
+      productProperties: null,
+      productPropertiesErrorStatus: action.status,
+    });
+  }
+
+  @Selector()
+  static propertiesFailure(state: IproductState) {
+    return {
+      failed: state.productPropertiesRequestStatus === RequestStatus.Error,
+      notFound: state.productPropertiesErrorStatus === 404,
+    };
   }
 
   @Selector()

@@ -7,5 +7,6 @@ export const PRODUCTS_STATE_DEFAULTS: IproductState = {
   productListRequestStatus: RequestStatus.NotInvoked,
   productListRequestParams: { limit: 15, offset: 0, ignore_digital: true, sort: 'date' },
   productProperties: null,
+  productPropertiesErrorStatus: null,
   productPropertiesRequestStatus: RequestStatus.NotInvoked,
 };

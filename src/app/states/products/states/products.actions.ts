@@ -39,6 +39,7 @@ export namespace ProductsActions {
 
   export class LoadPropertiesFail {
     public static readonly type = ProductsActionList.LOAD_PROPERTIES_FAIL;
+    constructor(public status: number | null = null) {}
   }
 
   export class ProductsReset {

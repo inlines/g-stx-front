@@ -1,6 +1,6 @@
 import { AsyncPipe, DatePipe, Location, NgClass, NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CopyToClipboardDirective } from '@app/directives/copy-to-clipboard.directive';
 import { AuthState } from '@app/states/auth/states/auth.state';
 import { ChatActions } from '@app/states/chat/states/chat-actions';
@@ -16,7 +16,15 @@ import { combineLatest, map, Observable } from 'rxjs';
 
 @Component({
   selector: 'app-product-properties',
-  imports: [AsyncPipe, DatePipe, NgbCarouselModule, NgClass, NgTemplateOutlet, CopyToClipboardDirective],
+  imports: [
+    RouterLink,
+    AsyncPipe,
+    DatePipe,
+    NgbCarouselModule,
+    NgClass,
+    NgTemplateOutlet,
+    CopyToClipboardDirective,
+  ],
   templateUrl: './product-properties.component.html',
   styleUrl: './product-properties.component.scss',
   changeDetection: ChangeDetectionStrategy.Eager,
@@ -31,6 +39,7 @@ export class ProductPropertiesComponent implements OnInit {
     private readonly params: ActivatedRoute,
     private location: Location,
   ) {
+    this.failure$ = this.store.select(ProductsState.propertiesFailure);
     this.productProperties$ = this.store.select(ProductsState.productProperties);
     this.isAuthorised$ = this.store.select(AuthState.isAuthorised);
     this.collectionChanging$ = this.store.select(CollectionState.collectionChanging);
@@ -51,6 +60,8 @@ export class ProductPropertiesComponent implements OnInit {
       }),
     );
   }
+
+  readonly failure$: Observable<{ failed: boolean; notFound: boolean }>;
 
   public platformId$!: Observable<number>;
 

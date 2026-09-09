@@ -9,5 +9,6 @@ export interface IproductState {
   productListRequestStatus: RequestStatus;
   productListRequestParams: IProductListRequest;
   productProperties: IProductPropertiesResponse | null;
+  productPropertiesErrorStatus: number | null;
   productPropertiesRequestStatus: RequestStatus;
 }
