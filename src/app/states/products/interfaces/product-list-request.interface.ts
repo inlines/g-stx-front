@@ -7,5 +7,6 @@ export interface IProductListRequest {
   query?: string;
   sort?: ProductSort;
   cat?: number;
+  franchise_id?: number;
   ignore_digital?: boolean;
 }

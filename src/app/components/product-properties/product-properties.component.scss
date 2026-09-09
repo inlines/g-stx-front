@@ -105,3 +105,6 @@ li:hover .bg-secondary {
 .product-error p { color:#a3b8cb; }
 .product-error a { display:inline-block;padding:12px;color:#c2a4ed; }
 .product-error a:focus-visible { outline:2px solid #c2a4ed;outline-offset:3px; }
+
+.franchise-link { color:#c2a4ed;position:relative;z-index:1;text-decoration:underline;text-underline-offset:3px; }
+.franchise-link:focus-visible { outline:2px solid #c2a4ed;outline-offset:3px; }

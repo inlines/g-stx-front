@@ -57,7 +57,7 @@
               <span class="game-header">Является частью франшиз:</span>
               @for (franschise of productProperties?.franschises; track franschise) {
                 <div style="width:100%; max-width: 100%;">
-                  <span>{{ franschise.franschise_name }} ({{ franschise.total_games_count }} игры)</span>
+                  <a class="franchise-link" [routerLink]="['/franchises', franschise.franschise_id]">{{ franschise.franschise_name }} ({{ franschise.total_games_count }} игры)</a>
                 </div>
               }
             </div>

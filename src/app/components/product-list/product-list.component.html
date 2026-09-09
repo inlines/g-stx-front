@@ -11,7 +11,7 @@
                   [class.active]="activeCategory === cat.id"
                   (click)="setActiveCategory(cat.id)">
                   {{ cat.abbreviation }}
-                  <span class="ms-2">{{ cat.total_games }}</span>
+                  @if(!franchiseId){<span class="ms-2">{{ cat.total_games }}</span>}
                 </a>
               </li>
             }
@@ -56,12 +56,13 @@
   @if (loading$ | async) { <p class="text-light" role="status">Загрузка...</p> }
   @if (failed$ | async) { <p class="text-warning" role="alert">Не удалось загрузить каталог. Попробуйте изменить фильтры или обновить страницу.</p> }
   
+  @if(franchiseId && !(loading$ | async) && !(failed$ | async) && (productsTotalCount$ | async) === 0){<p class="text-light" role="status">По выбранным фильтрам игр не найдено. Попробуйте другую платформу или измените поиск.</p>}
   @for (product of products$ | async; track product.id) {
     <!-- Desktop / tablet: карточки -->
     <div class="col-xl-3 col-lg-4 col-md-4 col-sm-6 p-3">
       <div
         class="card game-card border-0 d-flex flex-column justify-content-between position-relative"
-        [routerLink]="[product.id.toString(), {platform: activeCategory}]"
+        [routerLink]="['/products', product.id, {platform: activeCategory}]"
         style="cursor: pointer;"
         >
         @if (product.owned) {

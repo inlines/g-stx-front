@@ -7,6 +7,7 @@ import {
   ElementRef,
   inject,
   OnInit,
+  Input,
   ViewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -31,6 +32,8 @@ import { combineLatest, debounceTime, distinctUntilChanged, map } from 'rxjs';
   styleUrl: './product-list.component.scss',
 })
 export class ProductListComponent implements OnInit, AfterViewInit {
+  @Input() franchiseId?: number;
+  @Input() platformIds: number[] | null = null;
   private readonly store = inject(Store);
   private readonly destroyRef = inject(DestroyRef);
   @ViewChild('query') query?: ElementRef<HTMLInputElement>;
@@ -38,7 +41,13 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   readonly limit = CATALOG_PAGE_SIZE;
   readonly productParams$ = this.store.select(ProductsState.productsParams);
   readonly offset$ = this.productParams$.pipe(map((params) => params.offset ?? 0));
-  readonly categories$ = this.store.select(PlatformState.loadedPlatforms);
+  readonly categories$ = this.store
+    .select(PlatformState.loadedPlatforms)
+    .pipe(
+      map((platforms) =>
+        this.platformIds === null ? platforms : platforms.filter((p) => this.platformIds!.includes(p.id)),
+      ),
+    );
   readonly productsTotalCount$ = this.store.select(ProductsState.totalCountProducts);
   readonly isAuthorised$ = this.store.select(AuthState.isAuthorised);
   readonly loading$ = this.store.select(ProductsState.listLoading);
@@ -60,13 +69,28 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   activeCategory = 6;
 
   ngOnInit(): void {
-    const params = catalogParams(this.store.selectSnapshot(ProductsState.productsParams));
+    const saved = this.store.selectSnapshot(ProductsState.productsParams);
+    const sameFranchise = saved.franchise_id === this.franchiseId;
+    const cat =
+      this.platformIds && !this.platformIds.includes(saved.cat ?? 6) ? this.platformIds[0] : saved.cat;
+    const params = catalogParams({
+      ...saved,
+      cat,
+      franchise_id: this.franchiseId,
+      ...(sameFranchise ? {} : { offset: 0, query: '', sort: 'date', ignore_digital: true }),
+    });
     this.activeCategory = params.cat!;
     this.queryForm.setValue(
       { query: params.query ?? '', sort: params.sort!, skipDigitalFilter: params.ignore_digital! },
       { emitEvent: false },
     );
-    this.store.dispatch(new ProductsActions.SetRequestParams(params));
+    this.store.dispatch(
+      new ProductsActions.SetRequestParams({
+        ...params,
+        franchise_id: this.franchiseId,
+        query: params.query,
+      }),
+    );
 
     this.queryForm.valueChanges
       .pipe(debounceTime(300), takeUntilDestroyed(this.destroyRef))
