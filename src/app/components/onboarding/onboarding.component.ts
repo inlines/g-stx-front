@@ -22,6 +22,7 @@ import { ICollectionItem } from '@app/states/collection/interfaces/collection-it
 })
 export class OnboardingComponent implements OnInit, OnDestroy {
   readonly modal = inject(NgbActiveModal);
+  playNavigationSound: () => void = () => {};
   @ViewChild('content') private content?: ElementRef<HTMLElement>;
   readonly index = signal(0);
   readonly phase = signal(0);
@@ -108,6 +109,7 @@ export class OnboardingComponent implements OnInit, OnDestroy {
   }
   select(index: number) {
     if (index < 0 || index >= this.steps.length) return;
+    if (index !== this.index()) this.playNavigationSound();
     this.index.set(index);
     if (this.content) this.content.nativeElement.scrollTop = 0;
     this.replay();

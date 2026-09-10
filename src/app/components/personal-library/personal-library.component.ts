@@ -20,7 +20,7 @@ import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { Store } from '@ngxs/store';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { BehaviorSubject, combineLatest, map, shareReplay, tap } from 'rxjs';
+import { BehaviorSubject, combineLatest, firstValueFrom, map, shareReplay, tap } from 'rxjs';
 import { RequestStatus } from '@app/constants/request-status.const';
 import { filterCollection, CollectionSort } from '@app/shared/collection-filter';
 import { LibraryKind, LibraryView, LibraryViewService } from '@app/shared/library-view.service';
@@ -65,6 +65,8 @@ export class PersonalLibraryComponent implements OnInit, OnDestroy {
   editing: ICollectionItem | null = null;
   vm$!: ReturnType<PersonalLibraryComponent['createView']>;
   private restoring = true;
+  private snowOpening = false;
+  private snowDialog?: ReturnType<NgbModal['open']>;
   ngOnInit(): void {
     this.view = this.views.get(this.kind);
     this.query.setValue(this.view.query, { emitEvent: false });
@@ -115,6 +117,32 @@ export class PersonalLibraryComponent implements OnInit, OnDestroy {
       }),
       shareReplay({ bufferSize: 1, refCount: true }),
     );
+  }
+  async openSnow(): Promise<void> {
+    if (this.kind !== 'collection' || this.snowOpening || this.snowDialog) return;
+    this.snowOpening = true;
+    try {
+      const vm = await firstValueFrom(this.vm$);
+      if (!vm.ready) return;
+      const items = vm.items.map((item) => ({ ...item }));
+      const { CollectionSnowComponent } = await import('../collection-snow/collection-snow.component');
+      if (this.destroyRef.destroyed) return;
+      const dialog = this.modal.open(CollectionSnowComponent, {
+        fullscreen: true,
+        windowClass: 'collection-snow-window',
+        ariaLabelledBy: 'collection-snow-title',
+      });
+      this.snowDialog = dialog;
+      dialog.componentInstance.items = items;
+      const clear = () => {
+        if (this.snowDialog === dialog) this.snowDialog = undefined;
+      };
+      dialog.result.then(clear, clear);
+    } catch {
+      /* An optional animation chunk must not interrupt the collection page. */
+    } finally {
+      this.snowOpening = false;
+    }
   }
   exportCsv(): void {
     if (this.store.selectSnapshot(CollectionState.libraryStatuses)[this.kind] !== RequestStatus.Load) return;
@@ -227,6 +255,7 @@ export class PersonalLibraryComponent implements OnInit, OnDestroy {
     );
   }
   ngOnDestroy(): void {
+    this.snowDialog?.close();
     if (this.view) this.view.scroll = window.scrollY;
     this.modal.dismissAll();
   }

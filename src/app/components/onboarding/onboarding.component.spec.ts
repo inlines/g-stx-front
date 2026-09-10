@@ -67,6 +67,22 @@ describe('Safe interactive tutorial', () => {
     component.select(-1);
     expect(component.index()).toBe(2);
   });
+  it('plays navigation feedback only when changing the slide', () => {
+    const fixture = TestBed.createComponent(OnboardingComponent);
+    const component = fixture.componentInstance;
+    component.playNavigationSound = vi.fn();
+    fixture.detectChanges();
+    component.select(0);
+    component.replay();
+    component.select(-1);
+    expect(component.playNavigationSound).not.toHaveBeenCalled();
+    component.next();
+    component.select(0);
+    component.select(7);
+    expect(component.playNavigationSound).toHaveBeenCalledTimes(3);
+    component.next();
+    expect(component.playNavigationSound).toHaveBeenCalledTimes(3);
+  });
   it('honours reduced motion without hiding the action result', () => {
     vi.stubGlobal('matchMedia', () => ({ matches: true }));
     const fixture = TestBed.createComponent(OnboardingComponent);

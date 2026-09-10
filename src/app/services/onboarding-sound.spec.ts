@@ -40,6 +40,12 @@ describe('Lightweight tutorial startup audio', () => {
     sound.play();
     expect(starts).toHaveLength(7);
     expect(Math.max(...stops)).toBeLessThan(3);
+    starts.length = 0;
+    stops.length = 0;
+    sound.navigate();
+    sound.navigate();
+    expect(starts).toHaveLength(2); // Rapid clicks do not stack sounds.
+    expect(Math.max(...stops)).toBeLessThan(0.2);
     sound.stop();
     sound.stop();
     expect(close).toHaveBeenCalledOnce();
@@ -50,6 +56,7 @@ describe('Lightweight tutorial startup audio', () => {
     expect(() => {
       sound.prepare();
       sound.play();
+      sound.navigate();
       sound.stop();
     }).not.toThrow();
   });

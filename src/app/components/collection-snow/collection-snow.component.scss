@@ -1,0 +1,219 @@
+:host {
+  display: block;
+  height: 100%;
+}
+.snow {
+  position: relative;
+  isolation: isolate;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  color: #e4edf6;
+  background: radial-gradient(ellipse at 45% 30%, #293b65, transparent 65%), #071523;
+}
+.sky {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  perspective: 900px;
+}
+header,
+footer {
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px max(24px, env(safe-area-inset-right)) 24px max(24px, env(safe-area-inset-left));
+}
+header {
+  top: 0;
+  padding-top: max(24px, env(safe-area-inset-top));
+  background: linear-gradient(#071523ef, #07152300);
+}
+footer {
+  bottom: 0;
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+  background: linear-gradient(#07152300, #071523ef);
+}
+h1 {
+  font-size: clamp(20px, 3vw, 32px);
+  margin: 8px 0;
+  text-shadow: 0 2px 12px #071523;
+}
+h1 span {
+  color: #d7c2ff;
+  margin-left: 8px;
+}
+.eyebrow {
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: #c5b5e1;
+}
+p {
+  font-size: 13px;
+  margin: 0;
+}
+button {
+  flex-shrink: 0;
+  min-width: 44px;
+  min-height: 44px;
+  border: 1px solid #a5a7c36b;
+  border-radius: 10px;
+  padding: 8px 14px;
+  color: inherit;
+  background: #18293fea;
+  cursor: pointer;
+}
+button:focus-visible {
+  outline: 2px solid #dac2ff;
+  outline-offset: 4px;
+}
+.close {
+  font-size: 26px;
+  line-height: 1;
+}
+.flake {
+  position: absolute;
+  top: -180px;
+  animation: fall linear infinite;
+}
+.sway {
+  animation: sway 9s ease-in-out infinite alternate;
+}
+.dvd {
+  position: relative;
+  aspect-ratio: 3 / 4.2;
+  transform-style: preserve-3d;
+  animation: turn linear infinite;
+}
+.front {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  border: 3px solid #26374e;
+  border-left-width: 6px;
+  border-radius: 4px 6px 6px 4px;
+  background: #13233b;
+  overflow: hidden;
+  box-shadow: 3px 5px 8px #0005;
+  backface-visibility: visible;
+}
+.case-top {
+  color: #ccd9ef;
+  background: #243b68;
+  font-size: 5px;
+  letter-spacing: 0.5px;
+  text-align: center;
+  padding: 3px 0;
+}
+.front img {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  object-fit: cover;
+}
+.spine {
+  position: absolute;
+  left: -5px;
+  top: 1px;
+  bottom: 1px;
+  width: 7px;
+  background: linear-gradient(90deg, #08121e, #587194, #18293e);
+  transform: rotateY(-45deg);
+  border-radius: 3px 0 0 3px;
+}
+.shine {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, #ffffff25, transparent 35%, transparent 70%, #ffffff12);
+}
+.missing {
+  margin: auto;
+  padding: 8px;
+  font-size: 10px;
+  overflow-wrap: anywhere;
+  text-align: center;
+  color: #d6c4ff;
+}
+.paused .flake,
+.paused .sway,
+.paused .dvd {
+  animation-play-state: paused;
+}
+@keyframes fall {
+  to {
+    transform: translate3d(0, calc(100vh + 220px), 0);
+  }
+}
+@keyframes sway {
+  from {
+    transform: translateX(-12px);
+  }
+  to {
+    transform: translateX(16px);
+  }
+}
+@keyframes turn {
+  from {
+    transform: rotateZ(calc(var(--turn) * -25deg)) rotateY(-25deg);
+  }
+  to {
+    transform: rotateZ(calc(var(--turn) * 335deg)) rotateY(25deg);
+  }
+}
+@media (max-width: 767px) {
+  header,
+  footer {
+    padding-inline: 16px;
+  }
+  footer p {
+    max-width: 190px;
+  }
+  h1 {
+    max-width: 270px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sky {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 110px));
+    align-content: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 130px 20px 100px;
+    overflow: auto;
+  }
+  .flake {
+    position: relative;
+    top: auto;
+    left: auto !important;
+    width: 100% !important;
+  }
+  .flake,
+  .sway,
+  .dvd {
+    animation: none;
+  }
+  .dvd {
+    transform: rotate(-8deg);
+  }
+  @media (max-width: 767px) {
+    .sky {
+      grid-template-columns: repeat(3, minmax(0, 70px));
+    }
+  }
+}
+
+.empty {
+  position: absolute;
+  top: 45%;
+  left: 20px;
+  right: 20px;
+  text-align: center;
+}

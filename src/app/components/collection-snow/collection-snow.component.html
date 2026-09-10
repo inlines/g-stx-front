@@ -1,0 +1,49 @@
+<section class="snow" [class.paused]="paused() || hidden()">
+  <div class="sky" aria-hidden="true">
+    @for (box of boxes; track box.id) {
+      <div
+        class="flake"
+        [style.left.%]="box.left"
+        [style.width.px]="box.size"
+        [style.animation-duration.s]="box.duration"
+        [style.animation-delay.s]="box.delay"
+        [style.--turn]="box.turn"
+      >
+        <div class="sway" [style.animation-delay.s]="box.delay">
+          <div
+            class="dvd"
+            [style.animation-duration.s]="box.duration * 1.4"
+            [style.animation-delay.s]="box.delay"
+          >
+            <div class="spine"></div>
+            <div class="front">
+              <span class="case-top">GAME COLLECTION</span>
+              @if (box.image) {
+                <img [src]="box.image" alt="" decoding="async" (error)="box.image = null" />
+              } @else {
+                <span class="missing">{{ box.name }}</span>
+              }
+              <span class="shine"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+  @if (!boxes.length) {
+    <p class="empty">Здесь появятся обложки, когда в текущем списке будут игры.</p>
+  }
+  <header>
+    <div>
+      <span class="eyebrow">СЕКРЕТНАЯ КОМНАТА</span>
+      <h1 id="collection-snow-title">Осадки из любимых игр<span aria-hidden="true">*</span></h1>
+    </div>
+    <button type="button" class="close" aria-label="Закрыть пасхалку" (click)="modal.close()">×</button>
+  </header>
+  <footer>
+    <p>Ваша коллекция. Немного невесомости.</p>
+    <button type="button" [attr.aria-pressed]="paused()" (click)="paused.set(!paused())">
+      {{ paused() ? 'Продолжить' : 'Пауза' }}
+    </button>
+  </footer>
+</section>

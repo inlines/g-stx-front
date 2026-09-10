@@ -1,3 +1,4 @@
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { LibraryCsvDownload } from '@app/shared/library-csv';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpTestingController } from '@angular/common/http/testing';
@@ -55,6 +56,25 @@ describe('Personal library pages', () => {
   function cards() {
     return fixture.nativeElement.querySelectorAll('app-release-card');
   }
+  it('opens the easter egg with only the current page and preserves collection data', async () => {
+    const component = mount();
+    component.page(3);
+    fixture.detectChanges();
+    const dialog = {
+      componentInstance: { items: [] as ICollectionItem[] },
+      close: vi.fn(),
+      result: new Promise(() => {}),
+    };
+    const open = vi.spyOn(TestBed.inject(NgbModal), 'open').mockReturnValue(dialog as never);
+    await component.openSnow();
+    expect(open).toHaveBeenCalledOnce();
+    expect(dialog.componentInstance.items.map((x) => x.release_id)).toEqual([49]);
+    expect(dialog.componentInstance.items[0]).not.toBe(items[48]);
+    await component.openSnow();
+    expect(open).toHaveBeenCalledOnce();
+    fixture.destroy();
+    expect(dialog.close).toHaveBeenCalledOnce();
+  });
   it('renders only 24 releases and clamps the last page after removal', () => {
     const component = mount();
     expect(cards().length).toBe(24);
