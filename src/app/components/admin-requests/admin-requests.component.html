@@ -13,6 +13,7 @@
         <a class="game" [routerLink]="['/products', item.product_id, { platform: item.platform_id }]">{{ item.product_name }}</a>
         <p class="release">{{ item.platform_name }} · {{ item.region_name }}<br><small>Релиз #{{ item.release_id }} · {{ item.release_date ? ((item.release_date * 1000) | date:'dd.MM.yyyy':'UTC') : 'Дата не указана' }}{{ item.digital_only ? ' · Цифровой релиз' : '' }}</small></p>
         <p class="proposed">{{ status === 'pending' ? 'Предлагаемый серийник' : 'Принятый серийник' }}<strong>{{ item.serial }}</strong></p>
+        @if (item.submitted_serial && item.submitted_serial !== item.serial) { <p class="meta">В заявке пользователя: {{ item.submitted_serial }}</p> }
         <details class="existing" [open]="item.existing_serials.length <= 5">
           <summary>Уже в релизе · {{ item.existing_serials.length }}</summary>
           <ul>@for (serial of item.existing_serials; track $index) { <li>{{ serial }}</li> } @empty { <li>Серийники пока не указаны</li> }</ul>
@@ -21,16 +22,24 @@
         @if (item.reviewed_at) { <p class="meta">Принял: {{ item.reviewer || 'Удалённый аккаунт' }} · {{ item.reviewed_at | date:'dd.MM.yyyy HH:mm' }}</p> }
         @if (status === 'pending') {
           <div class="actions">
-            <button type="button" class="accept" [disabled]="busy" (click)="decision = { item, action: 'accept' }">Принять</button>
-            <button type="button" class="reject" [disabled]="busy" (click)="decision = { item, action: 'reject' }">Отклонить</button>
+            <button type="button" class="accept" [disabled]="busy" (click)="decide(item, 'accept')">Принять</button>
+            <button type="button" class="reject" [disabled]="busy" (click)="decide(item, 'reject')">Отклонить</button>
           </div>
+        } @else {
+          <button type="button" class="delete-archived reject" [disabled]="busy" (click)="decide(item, 'delete')">Удалить из архива</button>
+        }
           @if (decision?.item?.id === item.id) {
             <div class="confirmation">
-              <p>{{ decision?.action === 'accept' ? 'Добавить ' + item.serial + ' к этому релизу и перенести заявку в архив?' : 'Удалить эту заявку и фото без возможности восстановления?' }}</p>
-              <div class="actions"><button type="button" [disabled]="busy" (click)="decision = null">Отмена</button><button type="button" [disabled]="busy" (click)="confirm()">{{ busy ? 'Сохраняем…' : 'Подтвердить' }}</button></div>
+              @if (decision?.action === 'accept') {
+                <label [for]="'accepted-serial-' + item.id">Серийник для добавления в релиз</label>
+                <input [id]="'accepted-serial-' + item.id" [(ngModel)]="editedSerial" maxlength="64" [disabled]="busy" autocomplete="off" autocapitalize="characters" spellcheck="false">
+                <p class="meta">Проверьте номер по фото. Латинские буквы, цифры, пробелы и - _ . /, от 3 до 64 символов.</p>
+              }
+              @if (decision?.action === 'delete') { <p>Добавленный серийник останется в релизе.</p> }
+              <p>{{ decision?.action === 'accept' ? 'Добавить ' + normalizedSerial + ' к этому релизу и перенести заявку в архив?' : 'Удалить эту заявку и фото без возможности восстановления?' }}</p>
+              <div class="actions"><button type="button" [disabled]="busy" (click)="decision = null">Отмена</button><button type="button" [disabled]="busy || (decision?.action === 'accept' && !validSerial)" (click)="confirm()">{{ busy ? 'Сохраняем…' : 'Подтвердить' }}</button></div>
             </div>
           }
-        }
       </div>
       <app-request-photo [requestId]="item.id"/>
     </article>

@@ -1,3 +1,4 @@
+import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, output } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -9,7 +10,7 @@ import { RequestPhotoComponent } from './request-photo.component';
 
 @Component({
   selector: 'app-admin-requests',
-  imports: [DatePipe, RouterLink, PagerComponent, RequestPhotoComponent],
+  imports: [FormsModule, DatePipe, RouterLink, PagerComponent, RequestPhotoComponent],
   templateUrl: './admin-requests.component.html',
   styleUrl: './admin-requests.component.scss',
   changeDetection: ChangeDetectionStrategy.Eager,
@@ -27,7 +28,20 @@ export class AdminRequestsComponent implements OnInit {
   busy = false;
   error = '';
   success = '';
-  decision: { item: SerialRequest; action: 'accept' | 'reject' } | null = null;
+  decision: { item: SerialRequest; action: 'accept' | 'reject' | 'delete' } | null = null;
+  editedSerial = '';
+  get normalizedSerial() {
+    return this.editedSerial.trim().toUpperCase();
+  }
+  get validSerial() {
+    return /^[A-Z0-9 ._/-]{3,64}$/.test(this.normalizedSerial) && /[A-Z0-9]/.test(this.normalizedSerial);
+  }
+  decide(item: SerialRequest, action: 'accept' | 'reject' | 'delete') {
+    if (this.busy) return;
+    this.editedSerial = item.serial;
+    this.decision = { item, action };
+    this.error = '';
+  }
   private request?: Subscription;
   ngOnInit() {
     this.load();
@@ -74,10 +88,17 @@ export class AdminRequestsComponent implements OnInit {
   confirm() {
     if (!this.decision || this.busy) return;
     const { item, action } = this.decision;
+    if (action === 'accept' && !this.validSerial) return;
+    const serial = this.normalizedSerial;
     this.busy = true;
     this.error = '';
     this.success = '';
-    const request = action === 'accept' ? this.api.accept(item.id) : this.api.reject(item.id);
+    const request =
+      action === 'accept'
+        ? this.api.accept(item.id, serial)
+        : action === 'delete'
+          ? this.api.deleteArchived(item.id)
+          : this.api.reject(item.id);
     request
       .pipe(
         takeUntilDestroyed(this.destroy),
@@ -88,7 +109,7 @@ export class AdminRequestsComponent implements OnInit {
           this.decision = null;
           this.success =
             action === 'accept'
-              ? `Серийник ${item.serial} добавлен. Заявка перенесена в архив.`
+              ? `Серийник ${serial} добавлен. Заявка перенесена в архив.`
               : 'Заявка и фотография удалены.';
           this.load();
         },

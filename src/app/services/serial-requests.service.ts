@@ -16,6 +16,7 @@ export interface SerialRequest {
   existing_serials: string[];
   submitter: string;
   serial: string;
+  submitted_serial?: string;
   status: 'pending' | 'accepted';
   created_at: string;
   reviewed_at: string | null;
@@ -44,8 +45,11 @@ export class SerialRequestsService {
   photo(id: number) {
     return this.http.get(`${this.api}/admin/serial-requests/${id}/photo`, { responseType: 'blob' });
   }
-  accept(id: number) {
-    return this.http.post<void>(`${this.api}/admin/serial-requests/${id}/accept`, {});
+  accept(id: number, serial: string) {
+    return this.http.post<void>(`${this.api}/admin/serial-requests/${id}/accept`, { serial });
+  }
+  deleteArchived(id: number) {
+    return this.http.delete<void>(`${this.api}/admin/serial-requests/${id}/archive`);
   }
   reject(id: number) {
     return this.http.delete<void>(`${this.api}/admin/serial-requests/${id}`);

@@ -62,15 +62,16 @@ describe('Serial request moderation', () => {
     expect(root.querySelector('app-request-photo img')).not.toBeNull();
     fixture.destroy();
   });
-  it('waits for confirmation, accepts once, then switches to a read-only archive', () => {
+  it('waits for confirmation, accepts once, then switches to an archive with permanent deletion', () => {
     const { fixture, component, http } = setup();
     (fixture.nativeElement.querySelector('button.accept') as HTMLButtonElement).click();
     http.expectNone((r) => r.method === 'POST');
+    component.editedSerial = '  CUSA-CORRECTED ';
     component.confirm();
     component.confirm();
-    http
-      .expectOne('/api/admin/serial-requests/3/accept')
-      .flush(null, { status: 204, statusText: 'No content' });
+    const acceptance = http.expectOne('/api/admin/serial-requests/3/accept');
+    expect(acceptance.request.body).toEqual({ serial: 'CUSA-CORRECTED' });
+    acceptance.flush(null, { status: 204, statusText: 'No content' });
     http.expectOne((r) => r.url === '/api/admin/serial-requests').flush({ items: [], total_count: 0 });
     component.select('accepted');
     const archive = http.expectOne((r) => r.url === '/api/admin/serial-requests');
@@ -83,7 +84,7 @@ describe('Serial request moderation', () => {
     // A new photo request is needed only if Angular destroyed the previous row.
     for (const req of http.match('/api/admin/serial-requests/3/photo')) req.flush(new Blob(['jpeg']));
     expect(fixture.nativeElement.querySelector('button.accept')).toBeNull();
-    expect(fixture.nativeElement.querySelector('button.reject')).toBeNull();
+    expect(fixture.nativeElement.querySelector('button.delete-archived')).not.toBeNull();
     expect(fixture.nativeElement.textContent).toContain('Принял: admin');
     fixture.destroy();
   });
@@ -98,6 +99,32 @@ describe('Serial request moderation', () => {
     expect(component.busy).toBe(false);
     component.confirm();
     http.expectOne('/api/admin/serial-requests/3').flush(null);
+    http.expectOne((r) => r.url === '/api/admin/serial-requests').flush({ items: [], total_count: 0 });
+    expect(component.success).toContain('фотография удалены');
+    fixture.destroy();
+  });
+  it('requires a valid edited serial and permanently deletes an archive entry with confirmation', () => {
+    const { fixture, component, http } = setup();
+    component.decide(item, 'accept');
+    component.editedSerial = '';
+    component.confirm();
+    http.expectNone((r) => r.method === 'POST');
+    component.select('accepted');
+    http
+      .expectOne((r) => r.url === '/api/admin/serial-requests')
+      .flush({
+        items: [{ ...item, status: 'accepted', serial: 'CORRECT-123', submitted_serial: 'CUSA-NEW' }],
+        total_count: 1,
+      });
+    fixture.detectChanges();
+    for (const photo of http.match('/api/admin/serial-requests/3/photo')) photo.flush(new Blob(['jpeg']));
+    expect(fixture.nativeElement.textContent).toContain('В заявке пользователя: CUSA-NEW');
+    (fixture.nativeElement.querySelector('.delete-archived') as HTMLButtonElement).click();
+    http.expectNone((r) => r.method === 'DELETE');
+    component.confirm();
+    const deletion = http.expectOne('/api/admin/serial-requests/3/archive');
+    expect(deletion.request.method).toBe('DELETE');
+    deletion.flush(null);
     http.expectOne((r) => r.url === '/api/admin/serial-requests').flush({ items: [], total_count: 0 });
     expect(component.success).toContain('фотография удалены');
     fixture.destroy();

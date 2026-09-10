@@ -6,3 +6,6 @@ article { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap
 .accept { border-color: #79d9ac; }.reject, .error { color: #ffb4b4; }.success { color: #79d9ac; }.empty { padding: 24px 0; color: #a3b8cb; }.confirmation { margin-top: 12px; padding: 12px; border: 1px solid #536f89; border-radius: 8px; }
 button:focus-visible, a:focus-visible, summary:focus-visible { outline: 2px solid #c2a4ed; outline-offset: 3px; }
 @media(max-width:640px) { article { grid-template-columns: minmax(0,1fr); gap: 16px; }.actions button { flex: 1; } }
+
+.confirmation input { display: block; width: 100%; min-height: 44px; margin: 8px 0; padding: 10px 12px; border: 1px solid #536f89; border-radius: 8px; background: #102231; color: #e4edf6; font: inherit; }
+.confirmation input:focus-visible { outline: 2px solid #c2a4ed; outline-offset: 3px; }
