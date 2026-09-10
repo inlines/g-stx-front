@@ -1,3 +1,4 @@
+import { KudosComponent } from '../kudos/kudos.component';
 import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnDestroy, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -14,7 +15,7 @@ import { cropSquare, pixelAvatar } from './avatar-image';
 @Component({
   selector: 'app-profile',
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [AsyncPipe, FormsModule, ReactiveFormsModule, UserAvatarComponent, AdminComponent],
+  imports: [KudosComponent, AsyncPipe, FormsModule, ReactiveFormsModule, UserAvatarComponent, AdminComponent],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss',
 })

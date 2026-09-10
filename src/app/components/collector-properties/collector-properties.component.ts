@@ -1,3 +1,4 @@
+import { KudosComponent } from '../kudos/kudos.component';
 import { UserAvatarComponent } from '../user-avatar/user-avatar.component';
 import { PlatformState } from '@app/states/platforms/states/platforms.state';
 import { CollectorsService } from '@app/states/collectors/services/collectors.service';
@@ -17,7 +18,7 @@ import { PagerComponent } from '../pager/pager.component';
 import { ReleaseCardComponent } from '../release-card/release-card.component';
 @Component({
   selector: 'app-collector-properties',
-  imports: [UserAvatarComponent, RouterLink, AsyncPipe, PagerComponent, ReleaseCardComponent],
+  imports: [KudosComponent, UserAvatarComponent, RouterLink, AsyncPipe, PagerComponent, ReleaseCardComponent],
   templateUrl: './collector-properties.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './collector-properties.component.scss',

@@ -1,3 +1,4 @@
+import { KudosComponent } from '../kudos/kudos.component';
 import { UserAvatarComponent } from '../user-avatar/user-avatar.component';
 import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
@@ -11,7 +12,7 @@ import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-header',
-  imports: [UserAvatarComponent, RouterLink, AsyncPipe, RouterModule],
+  imports: [KudosComponent, UserAvatarComponent, RouterLink, AsyncPipe, RouterModule],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
   changeDetection: ChangeDetectionStrategy.Eager,

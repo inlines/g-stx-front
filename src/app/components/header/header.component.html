@@ -46,9 +46,10 @@
   <div style="background-color: rgba(0, 0, 0, 0.5);">
     @if (isAuthorised$ | async;) {
       <div class="container-fluid container-lg">
-        <div class="row align-items-center" style="height: 60px;">
+        <div class="row align-items-center" style="min-height: 60px; padding: 12px 0;">
           <!-- Лого и кнопки -->
           <div class="col d-flex align-items-center gap-2 gap-md-5 flex-wrap">
+            <a class="kudos-challenge-link" routerLink="/kudos-challenge" routerLinkActive="nav-active">Kudos Challenge <app-kudos [login]="currentUser$ | async" [compact]="true"/></a>
             <!-- Кнопка "Каталог" -->
             <a class="nav-link text-white d-flex align-items-center" routerLink="/products" routerLinkActive="nav-active" [routerLinkActiveOptions]="{exact: true}">
               Каталог

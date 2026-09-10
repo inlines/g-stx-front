@@ -63,3 +63,5 @@
 .profile-login { max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .mobile-profile { display: none; }
 @media(max-width:767px){ .profile-link .desktop-avatar, .profile-login { display:none; }.mobile-profile { display:block; }.profile-link { justify-content:center; margin-right:4px; }.chat-entry { margin-right:0; } .header-bg > .container-fluid > div > svg { width:120px; flex-shrink:0; } }
+
+.kudos-challenge-link { display: inline-flex; align-items: center; gap: 8px; color: #ffdb78; min-height: 44px; }

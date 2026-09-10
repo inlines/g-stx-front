@@ -1,3 +1,4 @@
+import { KudosComponent } from '../kudos/kudos.component';
 import { UserAvatarComponent } from '../user-avatar/user-avatar.component';
 import { ChatService } from '@app/states/chat/services/chat.service';
 import { AsyncPipe } from '@angular/common';
@@ -11,7 +12,7 @@ import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-collectors',
-  imports: [UserAvatarComponent, AsyncPipe, RouterModule],
+  imports: [KudosComponent, UserAvatarComponent, AsyncPipe, RouterModule],
   templateUrl: './collectors.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './collectors.component.scss',

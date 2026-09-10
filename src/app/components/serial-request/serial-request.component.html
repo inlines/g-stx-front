@@ -2,7 +2,7 @@
   <header><h2 id="serial-request-title">Уточнить серийник</h2><button type="button" aria-label="Закрыть" [disabled]="busy" (click)="modal.dismiss()">×</button></header>
   <p><strong>{{ productName }}</strong><br>{{ release.platform_name }} · {{ release.release_region }}</p>
   @if (sent) {
-    <p role="status" class="success">Заявка отправлена. После проверки администратором серийник появится у этого релиза.</p>
+    <p role="status" class="success">Заявка отправлена. После принятия администратором серийник появится у этого релиза, а вы получите +10 Kudos.</p>
     <button type="button" (click)="modal.close()">Готово</button>
   } @else {
     <form (ngSubmit)="submit()">

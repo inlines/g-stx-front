@@ -5,6 +5,11 @@ import { CollectorPropertiesResolver } from './resolvers/collector-properties.re
 
 export const routes: Routes = [
   {
+    path: 'kudos-challenge',
+    loadComponent: () =>
+      import('./components/kudos-challenge/kudos-challenge.component').then((m) => m.KudosChallengeComponent),
+  },
+  {
     path: '',
     redirectTo: 'products',
     pathMatch: 'full',

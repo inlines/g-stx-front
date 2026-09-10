@@ -1,5 +1,5 @@
 <section class="profile">
-  <header class="profile-heading"><app-user-avatar [login]="login$ | async"/><div><h1>Профиль</h1><p>{{login$ | async}}</p></div></header>
+  <header class="profile-heading"><app-user-avatar [login]="login$ | async"/><div><h1>Профиль</h1><p>{{login$ | async}}</p><app-kudos [login]="login$ | async"/></div></header>
   <nav class="tabs" aria-label="Настройки профиля">
     <button type="button" [class.selected]="tab === 'password'" [attr.aria-pressed]="tab === 'password'" (click)="tab = 'password'">Сменить пароль</button>
     <button type="button" [class.selected]="tab === 'avatar'" [attr.aria-pressed]="tab === 'avatar'" (click)="tab = 'avatar'">Аватар</button>

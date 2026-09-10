@@ -1,7 +1,7 @@
 @if(vm$ | async;as vm){
 <section class="collector-library" aria-labelledby="collector-heading">
   <a class="back" routerLink="/collectors">← Все коллекционеры</a>
-  <header><div class="collector-identity"><app-user-avatar class="collector-avatar" [login]="vm.login"/><div class="collector-description"><h1 id="collector-heading">Коллекция {{vm.login}}</h1><p>Игровая библиотека коллекционера</p></div></div><button type="button" (click)="startChatWith()" [disabled]="!vm.login">Написать</button></header>
+  <header><div class="collector-identity"><app-user-avatar class="collector-avatar" [login]="vm.login"/><div class="collector-description"><h1 id="collector-heading">Коллекция {{vm.login}}</h1><p>Игровая библиотека коллекционера</p><a routerLink="/kudos-challenge" aria-label="Kudos Challenge"><app-kudos [login]="vm.login"/></a></div></div><button type="button" (click)="startChatWith()" [disabled]="!vm.login">Написать</button></header>
   <nav class="library-tabs" aria-label="Раздел профиля"><button type="button" [class.selected]="vm.tab === 'collection'" [attr.aria-pressed]="vm.tab === 'collection'" (click)="selectTab('collection')">Коллекция</button><button type="button" [class.selected]="vm.tab === 'wts'" [attr.aria-pressed]="vm.tab === 'wts'" (click)="selectTab('wts')">Хочет продать</button></nav>
   @if(vm.loading){<p class="status" role="status">Загружаем список…</p>}
   @else if(vm.failed){<div class="status" role="alert">Не удалось загрузить список. <button type="button" (click)="retry()">Повторить</button></div>}
