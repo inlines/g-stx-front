@@ -1,0 +1,5 @@
+// Shared focus treatment. Mixins keep each component's selector and specificity.
+@mixin focus-ring($color: #c2a4ed, $offset: 3px) {
+  outline: 2px solid $color;
+  outline-offset: $offset;
+}

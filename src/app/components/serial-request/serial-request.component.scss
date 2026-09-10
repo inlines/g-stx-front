@@ -1,3 +1,5 @@
+@use "../../../styles/controls";
+
 .request-modal {
   padding: 24px;
   background: #102231;
@@ -110,8 +112,7 @@ button:focus-visible,
 input:focus-visible,
 a:focus-visible,
 .file:focus-within {
-  outline: 2px solid #c2a4ed;
-  outline-offset: 3px;
+  @include controls.focus-ring(#c2a4ed, 3px);
 }
 @media (max-width: 575px) {
   .request-modal {

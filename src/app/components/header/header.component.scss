@@ -1,3 +1,5 @@
+@use "../../../styles/controls";
+
 .nav-active {
   color: rgba(189, 167, 234, 1) !important;
 }
@@ -30,8 +32,7 @@
   font-weight: 700;
 }
 .chat-toggle:focus-visible {
-  outline: 2px solid #c2a4ed;
-  outline-offset: 3px;
+  @include controls.focus-ring(#c2a4ed, 3px);
 }
 
 .chat-entry {

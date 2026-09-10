@@ -1,3 +1,5 @@
+@use "../../../styles/controls";
+
 :host {
   display: block;
   position: relative;
@@ -116,8 +118,7 @@ li a {
 }
 a:focus-visible,
 button:focus-visible {
-  outline: 2px solid #ffd353;
-  outline-offset: 3px;
+  @include controls.focus-ring(#ffd353, 3px);
 }
 li a:hover {
   background: #24394a;

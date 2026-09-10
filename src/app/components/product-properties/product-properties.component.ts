@@ -176,7 +176,7 @@ export class ProductPropertiesComponent implements OnInit {
   }
 
   canSuggestSerial(release: IReleaseItem) {
-    return [7, 9, 48, 167, 38].includes(release.platform_id);
+    return [8, 9, 48, 167, 38].includes(release.platform_id);
   }
   suggestSerial(release: IReleaseItem) {
     if (!this.canSuggestSerial(release) || !this.store.selectSnapshot(AuthState.isAuthorised)) return;

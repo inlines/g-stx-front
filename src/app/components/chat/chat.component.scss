@@ -1,3 +1,5 @@
+@use "../../../styles/controls";
+
 .chat-container {
   background-color: rgba(1, 7, 11, 0.9);
   display: flex;
@@ -185,14 +187,12 @@
 }
 .dialog-item:focus-visible,
 .incoming-dialogs button:focus-visible {
-  outline: 2px solid #c2a4ed;
-  outline-offset: 2px;
+  @include controls.focus-ring(#c2a4ed, 2px);
 }
 @media (prefers-reduced-motion: reduce) {
   .highlight {
     animation: none;
-    outline: 2px solid #c2a4ed;
-    outline-offset: -2px;
+    @include controls.focus-ring(#c2a4ed, -2px);
   }
   .dialog-item,
   .message-item {

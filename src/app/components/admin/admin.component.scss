@@ -1,3 +1,5 @@
+@use "../../../styles/controls";
+
 :host { display: block; position: relative; z-index: 1; color: #e4edf6; }
 .admin-panel { border: 1px solid #294053; border-radius: 16px; padding: 24px; background: #102231; }
 .sections, .actions, .heading, .search { display: flex; gap: 10px; align-items: center; }
@@ -8,7 +10,7 @@ button, input { min-height: 44px; border: 1px solid #536f89; border-radius: 8px;
 button { background: #21354b; cursor: pointer; } input { background: #08141f; min-width: 0; }
 button.selected { background: #c2a4ed; color: #102231; border-color: #c2a4ed; }
 button:disabled { opacity: .5; cursor: default; }
-button:focus-visible, input:focus-visible { outline: 2px solid #c2a4ed; outline-offset: 3px; }
+button:focus-visible, input:focus-visible { @include controls.focus-ring(#c2a4ed, 3px); }
 .danger { color: #ffb4b4; border-color: #b96774; }
 .users { list-style: none; padding: 0; margin: 0; }
 .users li { display: flex; align-items: center; gap: 14px; padding: 18px 0; border-top: 1px solid #294053; }

@@ -1,3 +1,5 @@
+@use "../../../styles/controls";
+
 :host {
   display: block;
   color: #e4edf6;
@@ -69,8 +71,7 @@ button:focus-visible,
 input:focus-visible,
 select:focus-visible,
 a:focus-visible {
-  outline: 2px solid #c2a4ed;
-  outline-offset: 3px;
+  @include controls.focus-ring(#c2a4ed, 3px);
 }
 .toolbar {
   display: flex;

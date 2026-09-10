@@ -68,7 +68,7 @@ describe('ProductPropertiesComponent', () => {
       .expectOne('/api/products/1')
       .flush({
         product: { id: 1, name: 'Game', image_url: null, first_release_date: null },
-        releases: [7, 9, 48, 167, 38, 6, 49].map((platform_id, index) => ({
+        releases: [8, 9, 48, 167, 38, 7, 6, 49].map((platform_id, index) => ({
           release_id: index + 1,
           platform_id,
           platform_name: 'Platform',
@@ -85,6 +85,8 @@ describe('ProductPropertiesComponent', () => {
       });
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelectorAll('.suggest-serial')).toHaveLength(5);
+    expect(component.canSuggestSerial({ platform_id: 8 } as any)).toBe(true);
+    expect(component.canSuggestSerial({ platform_id: 7 } as any)).toBe(false);
     component.isAuthorised$ = of(false);
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelectorAll('.suggest-serial')).toHaveLength(0);

@@ -1,3 +1,5 @@
+@use "../../../styles/controls";
+
 :host {
   display: block;
   color: #e4edf6;
@@ -110,8 +112,7 @@ small {
 button:focus-visible,
 a:focus-visible,
 summary:focus-visible {
-  outline: 2px solid #c2a4ed;
-  outline-offset: 3px;
+  @include controls.focus-ring(#c2a4ed, 3px);
 }
 @media (max-width: 640px) {
   article {
@@ -136,8 +137,7 @@ summary:focus-visible {
   font: inherit;
 }
 .confirmation input:focus-visible {
-  outline: 2px solid #c2a4ed;
-  outline-offset: 3px;
+  @include controls.focus-ring(#c2a4ed, 3px);
 }
 
 .existing summary,
