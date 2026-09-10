@@ -1,3 +1,4 @@
+import { ActivatedRoute } from '@angular/router';
 import { AdminRequestsComponent } from '../admin-requests/admin-requests.component';
 import { DatePipe } from '@angular/common';
 import {
@@ -54,7 +55,11 @@ export class AdminComponent implements OnInit, OnDestroy {
     return !!this.dialog;
   }
 
+  private readonly route = inject(ActivatedRoute, { optional: true });
   ngOnInit() {
+    this.route?.queryParamMap.pipe(takeUntilDestroyed(this.destroy)).subscribe(params => {
+      if (params.get('section') === 'requests') this.section = 'requests';
+    });
     this.load();
   }
   searchUsers() {

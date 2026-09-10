@@ -6,7 +6,9 @@
           <path fill-rule="evenodd" clip-rule="evenodd" d="M10.6392 20.4471L19.2511 29.5535L17.3157 31.6L5.4 19L17.3157 6.40002L19.2511 8.44652L10.6392 17.5529H30.6V20.4471H10.6392Z" fill="#2D587E"/>
         </svg>
       </button>
-      <h1 class="game-title" appCopyToClipboard>{{ productProperties.product.name }}</h1>
+      <div class="game-heading-copy"><h1 class="game-title" appCopyToClipboard>{{ productProperties.product.name }}</h1>
+        @if (isAuthorised$ | async) { <button type="button" class="btn-blue suggest-name" (click)="suggestName()">Дополнить название</button> }
+      </div>
     </div>
     <div class="col-12 col-lg-4 product-sidebar">
       <div class="text-white product-info">
@@ -30,16 +32,16 @@
           </div>
         }
         <div class="product-metadata">
-          @if (productProperties?.product?.alternative_names?.length) {
-            <div>
-              <span class="game-header mb-1">Также известна как:</span>
-              @if (productProperties?.product?.alternative_names?.length || 0 > 0) {
-                <div class="mt-2 mb-1">
-                  <span>{{ (productProperties?.product?.alternative_names || []).join(' | ') }}</span>
-                </div>
-              }
+          <div class="alternative-names">
+            <div class="names-heading"><span class="game-header">Также известна как:</span>
             </div>
-          }
+            @if (productProperties.product.alternative_names?.length) {
+              <details class="serials" [open]="(productProperties.product.alternative_names?.length ?? 0) <= 3">
+                <summary>Названия · {{ productProperties.product.alternative_names!.length }}</summary>
+                <ul>@for (name of productProperties.product.alternative_names; track $index) { <li>{{ name }}</li> }</ul>
+              </details>
+            } @else { <p class="digital-label">Пока не указаны</p> }
+          </div>
           @if ((productProperties?.franschises?.length || 0) > 0) {
             <div class="mt-4 mb-1">
               <span class="game-header">Является частью франшиз:</span>

@@ -1,3 +1,4 @@
+import { ActivatedRoute } from '@angular/router';
 import { KudosComponent } from '../kudos/kudos.component';
 import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnDestroy, OnInit } from '@angular/core';
@@ -27,7 +28,11 @@ export class ProfileComponent implements OnDestroy, OnInit {
   private readonly adminApi = inject(AdminService);
   me: AdminUser | null = null;
   roleError = '';
+  private readonly route = inject(ActivatedRoute, { optional: true });
   ngOnInit() {
+    this.route?.queryParamMap.pipe(takeUntilDestroyed(this.destroy)).subscribe(params => {
+      if (params.get('tab') === 'admin') this.tab = 'admin';
+    });
     this.loadRole();
   }
   loadRole() {

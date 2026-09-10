@@ -1,3 +1,4 @@
+import { normalizeAlternativeName, validAlternativeName } from '@app/shared/contribution-value';
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, Input, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -15,8 +16,17 @@ import { preparePhoto } from './prepare-photo';
   changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class SerialRequestComponent implements OnDestroy {
-  @Input({ required: true }) release!: IReleaseItem;
+  @Input() release!: IReleaseItem;
   @Input() productName = '';
+  @Input() productId = 0;
+  @Input() kind: 'serial' | 'alternative_name' = 'serial';
+  @Input() existingNames: string[] = [];
+  get isName() {
+    return this.kind === 'alternative_name';
+  }
+  get existingValues() {
+    return this.isName ? this.existingNames : (this.release?.serial ?? []);
+  }
   readonly modal = inject(NgbActiveModal);
   private readonly api = inject(SerialRequestsService);
   private readonly destroy = inject(DestroyRef);
@@ -30,9 +40,10 @@ export class SerialRequestComponent implements OnDestroy {
   error = '';
   private revision = 0;
   get normalizedSerial() {
-    return this.serial.trim().toUpperCase();
+    return this.isName ? normalizeAlternativeName(this.serial) : this.serial.trim().toUpperCase();
   }
   get validSerial() {
+    if (this.isName) return validAlternativeName(this.normalizedSerial);
     return /^[A-Z0-9 ._/-]{3,64}$/.test(this.normalizedSerial) && /[A-Z0-9]/.test(this.normalizedSerial);
   }
   async choose(event: Event) {
@@ -65,14 +76,20 @@ export class SerialRequestComponent implements OnDestroy {
   submit() {
     if (!this.validSerial || !this.photo || !this.readable || this.busy || this.preparing || this.sent)
       return;
-    if (this.release.serial?.some((s) => s.trim().toUpperCase() === this.normalizedSerial)) {
-      this.error = 'Этот серийник уже указан у релиза';
+    if (
+      (this.isName ? [...this.existingNames, this.productName] : this.existingValues).some(
+        (s) => s.trim().toUpperCase() === this.normalizedSerial.toUpperCase(),
+      )
+    ) {
+      this.error = this.isName ? 'Это название уже указано у игры' : 'Этот серийник уже указан у релиза';
       return;
     }
     this.busy = true;
     this.error = '';
-    this.api
-      .submit(this.release.release_id, this.normalizedSerial, this.photo)
+    const request = this.isName
+      ? this.api.submitName(this.productId, this.normalizedSerial, this.photo)
+      : this.api.submit(this.release.release_id, this.normalizedSerial, this.photo);
+    request
       .pipe(
         takeUntilDestroyed(this.destroy),
         finalize(() => (this.busy = false)),

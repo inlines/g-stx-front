@@ -1,3 +1,4 @@
+import { ToastService } from '@app/services/toast.service';
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, OnDestroy } from '@angular/core';
 import { ENVIRONMENT } from '@app/environments/environment.token';
@@ -7,6 +8,7 @@ import { IMessage, isMessage } from '../interfaces/message.interface';
 
 @Injectable({ providedIn: 'root' })
 export class ChatService implements OnDestroy {
+  private readonly toast = inject(ToastService);
   private readonly http = inject(HttpClient);
   private readonly environment = inject(ENVIRONMENT);
   private socket: WebSocket | null = null;
@@ -78,6 +80,19 @@ export class ChatService implements OnDestroy {
             message.online.every((login) => typeof login === 'string')
           ) {
             this.online.next(new Set(message.online));
+          }
+        } else if (message && typeof message === 'object' && 'type' in message && message.type === 'new_request') {
+          if ('request_id' in message && Number.isSafeInteger(message.request_id) && Number(message.request_id) > 0 &&
+              'kind' in message && (message.kind === 'serial' || message.kind === 'alternative_name')) {
+            this.toast.show({
+              header: 'Новая заявка',
+              body: message.kind === 'serial' ? 'Пользователь предложил серийник релиза.' : 'Пользователь предложил альтернативное название игры.',
+              delay: 10000,
+              route: '/profile',
+              queryParams: { tab: 'admin', section: 'requests' },
+              actionLabel: 'Рассмотреть заявки',
+            });
+            try { void new Audio('/audio/message.mp3').play().catch(() => {}); } catch { /* Audio may be unavailable. */ }
           }
         } else if (isMessage(message)) this.incoming.next(message);
       } catch {

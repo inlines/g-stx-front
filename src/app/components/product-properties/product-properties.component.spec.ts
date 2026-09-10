@@ -61,6 +61,54 @@ describe('ProductPropertiesComponent', () => {
     expect(fixture.nativeElement.textContent).toContain('Existing game');
   });
 
+  it('offers name contributions below the heading even with no alternative names', () => {
+    const store = TestBed.inject(Store);
+    store.reset({
+      ...store.snapshot(),
+      Auth: { ...store.snapshot().Auth, login: 'collector', token: 'test' },
+    });
+    store.dispatch(new ProductsActions.LoadProperties(1));
+    TestBed.inject(HttpTestingController)
+      .expectOne('/api/products/1')
+      .flush({
+        product: { id: 1, name: 'Game', alternative_names: [] },
+        releases: [],
+        screenshots: [],
+        companies: [],
+        franschises: [],
+      });
+    fixture.detectChanges();
+    const button = fixture.nativeElement.querySelector('.game-heading-copy .suggest-name');
+    expect(button.textContent).toContain('Дополнить название');
+    button.click();
+    fixture.detectChanges();
+    const modal = document.querySelector('.request-modal')!;
+    expect(modal.textContent).toContain('Альтернативное название игры');
+    expect(modal.querySelector('input[type=file]')?.getAttribute('accept')).toContain('image/jpeg');
+    expect(modal.querySelector('input[type=file]')?.hasAttribute('capture')).toBe(false);
+  });
+  it('collapses long alternative-name lists without removing or interpreting their contents', () => {
+    const names = ['日本語', 'Русское имя', 'Alias 3', '<script>not markup</script>', 'Alias 5'];
+    TestBed.inject(Store).dispatch(new ProductsActions.LoadProperties(1));
+    TestBed.inject(HttpTestingController)
+      .expectOne('/api/products/1')
+      .flush({
+        product: { id: 1, name: 'Game', alternative_names: names },
+        releases: [],
+        screenshots: [],
+        companies: [],
+        franschises: [],
+      });
+    fixture.detectChanges();
+    const list: HTMLDetailsElement = fixture.nativeElement.querySelector('.alternative-names details');
+    expect(list.open).toBe(false);
+    expect(Array.from(list.querySelectorAll('li'), (li) => li.textContent)).toEqual(names);
+    expect(list.querySelector('script')).toBeNull();
+    list.querySelector('summary')!.click();
+    expect(list.open).toBe(true);
+    expect(fixture.nativeElement.querySelector('.suggest-name')).toBeNull();
+  });
+
   it('offers serial requests only for supported consoles and signed-in users', () => {
     component.isAuthorised$ = of(true);
     TestBed.inject(Store).dispatch(new ProductsActions.LoadProperties(1));
@@ -207,7 +255,7 @@ describe('ProductPropertiesComponent', () => {
     fixture.detectChanges();
     const root: HTMLElement = fixture.nativeElement;
     expect(root.querySelectorAll('.release-item')).toHaveLength(3);
-    const lists = root.querySelectorAll<HTMLDetailsElement>('details.serials');
+    const lists = root.querySelectorAll<HTMLDetailsElement>('.release-item details.serials');
     expect(lists).toHaveLength(2);
     expect(lists[0].open).toBe(false);
     expect(lists[0].querySelector('summary')?.textContent).toContain('60');

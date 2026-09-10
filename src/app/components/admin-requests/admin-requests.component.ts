@@ -1,3 +1,4 @@
+import { normalizeAlternativeName, validAlternativeName } from '@app/shared/contribution-value';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, output } from '@angular/core';
@@ -30,10 +31,19 @@ export class AdminRequestsComponent implements OnInit {
   success = '';
   decision: { item: SerialRequest; action: 'accept' | 'reject' | 'delete' } | null = null;
   editedSerial = '';
+  isName(item: SerialRequest) {
+    return item.kind === 'alternative_name';
+  }
+  get nameDecision() {
+    return this.decision?.item.kind === 'alternative_name';
+  }
   get normalizedSerial() {
-    return this.editedSerial.trim().toUpperCase();
+    return this.nameDecision
+      ? normalizeAlternativeName(this.editedSerial)
+      : this.editedSerial.trim().toUpperCase();
   }
   get validSerial() {
+    if (this.nameDecision) return validAlternativeName(this.normalizedSerial);
     return /^[A-Z0-9 ._/-]{3,64}$/.test(this.normalizedSerial) && /[A-Z0-9]/.test(this.normalizedSerial);
   }
   decide(item: SerialRequest, action: 'accept' | 'reject' | 'delete') {
@@ -109,7 +119,7 @@ export class AdminRequestsComponent implements OnInit {
           this.decision = null;
           this.success =
             action === 'accept'
-              ? `Серийник ${serial} добавлен. Заявка перенесена в архив.`
+              ? `${this.isName(item) ? 'Название' : 'Серийник'} ${serial} добавлен${this.isName(item) ? 'о' : ''}. Заявка перенесена в архив.`
               : 'Заявка и фотография удалены.';
           this.load();
         },

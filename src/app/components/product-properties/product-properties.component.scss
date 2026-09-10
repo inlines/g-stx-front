@@ -299,3 +299,10 @@
     margin-top: 18px;
   }
 }
+
+.names-heading { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; justify-content: space-between; }
+.suggest-name { min-height: 44px; position: relative; z-index: 1; }
+.alternative-names .serials ul { grid-template-columns: minmax(0, 1fr); max-height: 280px; overflow: auto; }
+.alternative-names .serials li { font: inherit; }
+
+.game-heading-copy { min-width: 0; }.game-heading-copy .suggest-name { margin-top: 12px; }

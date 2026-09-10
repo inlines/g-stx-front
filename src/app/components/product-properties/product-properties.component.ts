@@ -191,6 +191,22 @@ export class ProductPropertiesComponent implements OnInit {
       this.store.selectSnapshot(ProductsState.productProperties)?.product.name || '';
   }
 
+  suggestName() {
+    if (!this.store.selectSnapshot(AuthState.isAuthorised)) return;
+    const product = this.store.selectSnapshot(ProductsState.productProperties)?.product;
+    if (!product) return;
+    const dialog: NgbModalRef = this.modalService.open(SerialRequestComponent, {
+      centered: true,
+      size: 'lg',
+      ariaLabelledBy: 'serial-request-title',
+      beforeDismiss: (): boolean => !dialog.componentInstance.busy,
+    });
+    dialog.componentInstance.kind = 'alternative_name';
+    dialog.componentInstance.productId = product.id;
+    dialog.componentInstance.productName = product.name;
+    dialog.componentInstance.existingNames = product.alternative_names ?? [];
+  }
+
   serialPreview(release: IReleaseItem): string {
     return (release.serial ?? []).slice(0, 3).join(' · ') + ((release.serial?.length ?? 0) > 3 ? ' · …' : '');
   }

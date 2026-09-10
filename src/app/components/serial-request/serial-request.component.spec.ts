@@ -44,6 +44,32 @@ describe('Serial request form', () => {
     fixture.detectChanges();
     return { fixture, component: fixture.componentInstance, http: TestBed.inject(HttpTestingController) };
   }
+  it('submits a Unicode alternative name with a photo and five-Kudos confirmation, without a release', () => {
+    const fixture = TestBed.createComponent(SerialRequestComponent);
+    fixture.componentRef.setInput('kind', 'alternative_name');
+    fixture.componentRef.setInput('productId', 7);
+    fixture.componentRef.setInput('productName', 'Game');
+    fixture.componentRef.setInput('existingNames', ['Already known']);
+    fixture.detectChanges();
+    const component = fixture.componentInstance;
+    const http = TestBed.inject(HttpTestingController);
+    component.photo = new Blob(['jpeg'], { type: 'image/jpeg' });
+    component.readable = true;
+    component.serial = 'already KNOWN';
+    component.submit();
+    http.expectNone((r) => r.method === 'POST');
+    component.serial = '  龍が如く   — Имя  ';
+    component.submit();
+    component.submit();
+    const request = http.expectOne((r) => r.url === '/api/products/7/name-requests');
+    expect(request.request.params.get('name')).toBe('龍が如く — Имя');
+    expect(request.request.body).toBe(component.photo);
+    request.flush({ id: 3, status: 'pending' });
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('+5 Kudos');
+    expect(fixture.nativeElement.textContent).not.toContain('+10 Kudos');
+    fixture.destroy();
+  });
   it('requires a photo and readability confirmation, then submits only the prepared JPEG', () => {
     const { fixture, component, http } = setup();
     component.serial = '  cusa-12345 ';

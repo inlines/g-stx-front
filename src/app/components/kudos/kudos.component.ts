@@ -8,7 +8,7 @@ import { Subscription } from 'rxjs';
   host: {
     '[class.compact]': 'compact',
     '[attr.aria-label]': 'amount === null ? "Kudos: загружается" : amount + " Kudos"',
-    title: 'Kudos — награда за вклад в каталог. +10 за принятую заявку',
+    title: 'Kudos — награда за вклад в каталог. +10 за серийник, +5 за альтернативное название',
   },
   template: `<span class="word" aria-hidden="true"><b>K</b><span class="udos">udos</span></span
     ><strong class="points" aria-hidden="true">{{

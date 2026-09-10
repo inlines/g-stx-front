@@ -2,6 +2,9 @@ import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 
 export interface Toast {
+  route?: string;
+  queryParams?: Record<string, string>;
+  actionLabel?: string;
   header?: string;
   body: string;
   classname?: string;

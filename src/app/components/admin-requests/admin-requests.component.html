@@ -10,13 +10,14 @@
   @for (item of items; track item.id) {
     <article>
       <div class="information">
-        <a class="game" [routerLink]="['/products', item.product_id, { platform: item.platform_id }]">{{ item.product_name }}</a>
-        <p class="release">{{ item.platform_name }} · {{ item.region_name }}<br><small>Релиз #{{ item.release_id }} · {{ item.release_date ? ((item.release_date * 1000) | date:'dd.MM.yyyy':'UTC') : 'Дата не указана' }}{{ item.digital_only ? ' · Цифровой релиз' : '' }}</small></p>
-        <p class="proposed">{{ status === 'pending' ? 'Предлагаемый серийник' : 'Принятый серийник' }}<strong>{{ item.serial }}</strong></p>
+        <span class="request-kind" [class.name-kind]="isName(item)">{{ isName(item) ? 'Название · +5 Kudos' : 'Серийник · +10 Kudos' }}</span>
+        <a class="game" [routerLink]="isName(item) ? ['/products', item.product_id] : ['/products', item.product_id, { platform: item.platform_id }]">{{ item.product_name }}</a>
+        @if (!isName(item)) { <p class="release">{{ item.platform_name }} · {{ item.region_name }}<br><small>Релиз #{{ item.release_id }} · {{ item.release_date ? ((item.release_date * 1000) | date:'dd.MM.yyyy':'UTC') : 'Дата не указана' }}{{ item.digital_only ? ' · Цифровой релиз' : '' }}</small></p> }
+        <p class="proposed">{{ isName(item) ? (status === 'pending' ? 'Предлагаемое название' : 'Принятое название') : (status === 'pending' ? 'Предлагаемый серийник' : 'Принятый серийник') }}<strong>{{ item.serial }}</strong></p>
         @if (item.submitted_serial && item.submitted_serial !== item.serial) { <p class="meta">В заявке пользователя: {{ item.submitted_serial }}</p> }
         <details class="existing" [open]="item.existing_serials.length <= 5">
-          <summary>Уже в релизе · {{ item.existing_serials.length }}</summary>
-          <ul>@for (serial of item.existing_serials; track $index) { <li>{{ serial }}</li> } @empty { <li>Серийники пока не указаны</li> }</ul>
+          <summary>{{ isName(item) ? 'Уже у игры' : 'Уже в релизе' }} · {{ item.existing_serials.length }}</summary>
+          <ul>@for (serial of item.existing_serials; track $index) { <li>{{ serial }}</li> } @empty { <li>{{ isName(item) ? 'Названия пока не указаны' : 'Серийники пока не указаны' }}</li> }</ul>
         </details>
         <p class="meta">От {{ item.submitter }} · {{ item.created_at | date:'dd.MM.yyyy HH:mm' }}</p>
         @if (item.reviewed_at) { <p class="meta">Принял: {{ item.reviewer || 'Удалённый аккаунт' }} · {{ item.reviewed_at | date:'dd.MM.yyyy HH:mm' }}</p> }
@@ -31,12 +32,12 @@
           @if (decision?.item?.id === item.id) {
             <div class="confirmation">
               @if (decision?.action === 'accept') {
-                <label [for]="'accepted-serial-' + item.id">Серийник для добавления в релиз</label>
-                <input [id]="'accepted-serial-' + item.id" [(ngModel)]="editedSerial" maxlength="64" [disabled]="busy" autocomplete="off" autocapitalize="characters" spellcheck="false">
-                <p class="meta">Проверьте номер по фото. Латинские буквы, цифры, пробелы и - _ . /, от 3 до 64 символов.</p>
+                <label [for]="'accepted-serial-' + item.id">{{ isName(item) ? 'Название для добавления к игре' : 'Серийник для добавления в релиз' }}</label>
+                <input [id]="'accepted-serial-' + item.id" [(ngModel)]="editedSerial" [maxlength]="isName(item) ? 400 : 64" [disabled]="busy" autocomplete="off" [attr.autocapitalize]="isName(item) ? 'off' : 'characters'" spellcheck="false">
+                <p class="meta">{{ isName(item) ? 'Проверьте название по фото. От 1 до 200 символов, любой язык. Регистр сохраняется.' : 'Проверьте номер по фото. Латинские буквы, цифры, пробелы и - _ . /, от 3 до 64 символов.' }}</p>
               }
-              @if (decision?.action === 'delete') { <p>Добавленный серийник останется в релизе.</p> }
-              <p>{{ decision?.action === 'accept' ? 'Добавить ' + normalizedSerial + ' к этому релизу и перенести заявку в архив?' : 'Удалить эту заявку и фото без возможности восстановления?' }}</p>
+              @if (decision?.action === 'delete') { <p>{{ isName(item) ? 'Добавленное название останется у игры.' : 'Добавленный серийник останется в релизе.' }} Кудос сохраняются.</p> }
+              <p>{{ decision?.action === 'accept' ? 'Добавить ' + normalizedSerial + (isName(item) ? ' к этой игре и перенести заявку в архив?' : ' к этому релизу и перенести заявку в архив?') : 'Удалить эту заявку и фото без возможности восстановления?' }}</p>
               <div class="actions"><button type="button" [disabled]="busy" (click)="decision = null">Отмена</button><button type="button" [disabled]="busy || (decision?.action === 'accept' && !validSerial)" (click)="confirm()">{{ busy ? 'Сохраняем…' : 'Подтвердить' }}</button></div>
             </div>
           }

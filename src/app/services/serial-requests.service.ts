@@ -4,7 +4,8 @@ import { ENVIRONMENT } from '@app/environments/environment.token';
 
 export interface SerialRequest {
   id: number;
-  release_id: number;
+  kind?: 'serial' | 'alternative_name';
+  release_id: number | null;
   product_id: number;
   product_name: string;
   platform_id: number;
@@ -34,6 +35,13 @@ export class SerialRequestsService {
         params: { serial },
         headers: { 'Content-Type': 'image/jpeg' },
       },
+    );
+  }
+  submitName(productId: number, name: string, photo: Blob) {
+    return this.http.post<{ id: number; status: 'pending' }>(
+      `${this.api}/products/${productId}/name-requests`,
+      photo,
+      { params: { name }, headers: { 'Content-Type': 'image/jpeg' } },
     );
   }
   list(status: 'pending' | 'accepted', offset: number, limit = 10) {

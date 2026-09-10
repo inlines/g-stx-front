@@ -16,7 +16,7 @@ import { Subscription } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.Eager,
   template: `@if (url) {
       <a [href]="url" target="_blank" rel="noopener"
-        ><img [src]="url" alt="Фото коробки, подтверждающее серийник" /><span>Открыть фото крупно ↗</span></a
+        ><img [src]="url" alt="Фото, подтверждающее заявку" /><span>Открыть фото крупно ↗</span></a
       >
     } @else if (failed) {
       <p>Не удалось загрузить фото. <button type="button" (click)="load()">Повторить</button></p>

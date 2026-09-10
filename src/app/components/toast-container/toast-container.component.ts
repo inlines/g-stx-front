@@ -1,10 +1,11 @@
+import { RouterLink } from '@angular/router';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ToastService } from '@app/services/toast.service';
 import { NgbToastModule } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-toast-container',
-  imports: [NgbToastModule],
+  imports: [NgbToastModule, RouterLink],
   templateUrl: './toast-container.component.html',
   styleUrl: './toast-container.component.scss',
   changeDetection: ChangeDetectionStrategy.Eager,

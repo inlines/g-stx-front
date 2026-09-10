@@ -62,6 +62,33 @@ describe('Serial request moderation', () => {
     expect(root.querySelector('app-request-photo img')).not.toBeNull();
     fixture.destroy();
   });
+  it('distinguishes name requests and preserves case when the administrator edits the accepted name', () => {
+    const { fixture, component, http } = setup();
+    const name: SerialRequest = {
+      ...item,
+      kind: 'alternative_name',
+      release_id: null,
+      platform_id: 0,
+      serial: 'User name',
+      existing_serials: ['旧名'],
+    };
+    component.items = [name];
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.request-kind').textContent).toContain('Название · +5');
+    expect(fixture.nativeElement.querySelector('.release')).toBeNull();
+    expect(fixture.nativeElement.querySelector('.game').getAttribute('href')).toBe('/products/5');
+    component.decide(name, 'accept');
+    component.editedSerial = '  新名 — Corrected  ';
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('Регистр сохраняется');
+    component.confirm();
+    const request = http.expectOne('/api/admin/serial-requests/3/accept');
+    expect(request.request.body).toEqual({ serial: '新名 — Corrected' });
+    request.flush(null);
+    http.expectOne((r) => r.url === '/api/admin/serial-requests').flush({ items: [], total_count: 0 });
+    expect(component.success).toContain('Название 新名 — Corrected добавлено');
+    fixture.destroy();
+  });
   it('waits for confirmation, accepts once, then switches to an archive with permanent deletion', () => {
     const { fixture, component, http } = setup();
     (fixture.nativeElement.querySelector('button.accept') as HTMLButtonElement).click();

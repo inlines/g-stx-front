@@ -2,6 +2,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { ENVIRONMENT } from '@app/environments/environment.token';
+import { ToastService } from '@app/services/toast.service';
 import { ChatService } from './chat.service';
 
 class Socket {
@@ -127,6 +128,27 @@ describe('Chat socket lifecycle and existing wire format', () => {
     socket.close(1008);
     vi.advanceTimersByTime(10000);
     expect(Socket.instances).toHaveLength(1);
+  });
+  it('notifies about requests only after authentication without emitting a chat message', async () => {
+    const play = vi.fn().mockRejectedValue(new Error('autoplay blocked'));
+    vi.stubGlobal('Audio', class { play = play; });
+    const messages = vi.fn();
+    service.messages$.subscribe(messages);
+    service.connect('alice', 'token');
+    const socket = Socket.instances[0];
+    const emit = (kind: string, request_id = 1) => socket.onmessage?.({data: JSON.stringify({ type: 'new_request', kind, request_id })});
+    emit('serial');
+    expect(TestBed.inject(ToastService).toasts).toHaveLength(0);
+    socket.open();
+    emit('serial');
+    emit('alternative_name', 2);
+    emit('unknown');
+    emit('serial', -1);
+    await Promise.resolve();
+    expect(TestBed.inject(ToastService).toasts).toHaveLength(2);
+    expect(TestBed.inject(ToastService).toasts[1]).toMatchObject({ queryParams: {tab: 'admin', section: 'requests'}, body: expect.stringContaining('название') });
+    expect(play).toHaveBeenCalledTimes(2);
+    expect(messages).not.toHaveBeenCalled();
   });
   it('does not open an anonymous connection', () => {
     service.connect('alice', '');
