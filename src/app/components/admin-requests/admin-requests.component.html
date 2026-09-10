@@ -1,0 +1,39 @@
+<nav class="tabs" aria-label="Статус заявок">
+  <button type="button" [disabled]="busy" [class.selected]="status === 'pending'" [attr.aria-pressed]="status === 'pending'" (click)="select('pending')">Активные</button>
+  <button type="button" [disabled]="busy" [class.selected]="status === 'accepted'" [attr.aria-pressed]="status === 'accepted'" (click)="select('accepted')">Архив</button>
+</nav>
+<header><h2>{{ status === 'pending' ? 'Активные заявки' : 'Архив заявок' }} · {{ total }}</h2><button type="button" [disabled]="busy || loading" (click)="decision = null; load()">Обновить</button></header>
+@if (success) { <p class="success" role="status">{{ success }}</p> }
+@if (error) { <p class="error" role="alert">{{ error }}</p> }
+@if (loading) { <p role="status">Загружаем заявки…</p> }
+@else {
+  @for (item of items; track item.id) {
+    <article>
+      <div class="information">
+        <a class="game" [routerLink]="['/products', item.product_id, { platform: item.platform_id }]">{{ item.product_name }}</a>
+        <p class="release">{{ item.platform_name }} · {{ item.region_name }}<br><small>Релиз #{{ item.release_id }} · {{ item.release_date ? ((item.release_date * 1000) | date:'dd.MM.yyyy':'UTC') : 'Дата не указана' }}{{ item.digital_only ? ' · Цифровой релиз' : '' }}</small></p>
+        <p class="proposed">{{ status === 'pending' ? 'Предлагаемый серийник' : 'Принятый серийник' }}<strong>{{ item.serial }}</strong></p>
+        <details class="existing" [open]="item.existing_serials.length <= 5">
+          <summary>Уже в релизе · {{ item.existing_serials.length }}</summary>
+          <ul>@for (serial of item.existing_serials; track $index) { <li>{{ serial }}</li> } @empty { <li>Серийники пока не указаны</li> }</ul>
+        </details>
+        <p class="meta">От {{ item.submitter }} · {{ item.created_at | date:'dd.MM.yyyy HH:mm' }}</p>
+        @if (item.reviewed_at) { <p class="meta">Принял: {{ item.reviewer || 'Удалённый аккаунт' }} · {{ item.reviewed_at | date:'dd.MM.yyyy HH:mm' }}</p> }
+        @if (status === 'pending') {
+          <div class="actions">
+            <button type="button" class="accept" [disabled]="busy" (click)="decision = { item, action: 'accept' }">Принять</button>
+            <button type="button" class="reject" [disabled]="busy" (click)="decision = { item, action: 'reject' }">Отклонить</button>
+          </div>
+          @if (decision?.item?.id === item.id) {
+            <div class="confirmation">
+              <p>{{ decision?.action === 'accept' ? 'Добавить ' + item.serial + ' к этому релизу и перенести заявку в архив?' : 'Удалить эту заявку и фото без возможности восстановления?' }}</p>
+              <div class="actions"><button type="button" [disabled]="busy" (click)="decision = null">Отмена</button><button type="button" [disabled]="busy" (click)="confirm()">{{ busy ? 'Сохраняем…' : 'Подтвердить' }}</button></div>
+            </div>
+          }
+        }
+      </div>
+      <app-request-photo [requestId]="item.id"/>
+    </article>
+  } @empty { @if (!error) { <p class="empty">{{ status === 'pending' ? 'Активных заявок пока нет.' : 'В архиве пока нет принятых заявок.' }}</p> } }
+  @if (!busy) { <app-pager [totalCount]="total" [offset]="offset" [limit]="limit" (pageChange)="page($event)"/> }
+}

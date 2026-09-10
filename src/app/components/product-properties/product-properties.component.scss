@@ -260,3 +260,5 @@ summary:focus-visible {
 .sale-dialog label { display: block; margin: 16px 0; }
 .sale-dialog input[type=number] { display: block; width: 100%; padding: 10px; margin-top: 8px; }
 .sale-dialog button { min-height: 44px; border: 1px solid #8aacc9; border-radius: 8px; background: #263b4e; color: #e4edf6; padding: 8px 14px; }
+
+.suggest-serial { position: relative; z-index: 2; }

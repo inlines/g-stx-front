@@ -61,6 +61,68 @@ describe('ProductPropertiesComponent', () => {
     expect(fixture.nativeElement.textContent).toContain('Existing game');
   });
 
+  it('offers serial requests only for supported consoles and signed-in users', () => {
+    component.isAuthorised$ = of(true);
+    TestBed.inject(Store).dispatch(new ProductsActions.LoadProperties(1));
+    TestBed.inject(HttpTestingController)
+      .expectOne('/api/products/1')
+      .flush({
+        product: { id: 1, name: 'Game', image_url: null, first_release_date: null },
+        releases: [7, 9, 48, 167, 38, 6, 49].map((platform_id, index) => ({
+          release_id: index + 1,
+          platform_id,
+          platform_name: 'Platform',
+          release_region: 'Europe',
+          release_date: null,
+          release_status: 0,
+          digital_only: false,
+          serial: [],
+          seller_logins: [],
+        })),
+        companies: [],
+        franschises: [],
+        screenshots: [],
+      });
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelectorAll('.suggest-serial')).toHaveLength(5);
+    component.isAuthorised$ = of(false);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelectorAll('.suggest-serial')).toHaveLength(0);
+  });
+  it('opens the serial modal with the selected release and a gallery file input', () => {
+    const store = TestBed.inject(Store);
+    store.reset({
+      ...store.snapshot(),
+      Auth: { ...store.snapshot().Auth, login: 'collector', token: 'test-token' },
+    });
+    store.dispatch(new ProductsActions.LoadProperties(1));
+    TestBed.inject(HttpTestingController)
+      .expectOne('/api/products/1')
+      .flush({
+        product: { id: 1, name: 'Selected game', image_url: null, first_release_date: null },
+        releases: [],
+        companies: [],
+        franschises: [],
+        screenshots: [],
+      });
+    component.suggestSerial({
+      release_id: 77,
+      platform_id: 48,
+      platform_name: 'PS4',
+      release_region: 'Asia',
+      release_date: null,
+      release_status: 0,
+      digital_only: false,
+      serial: ['OLD-123'],
+      seller_logins: [],
+    });
+    fixture.detectChanges();
+    const modal = document.querySelector('ngb-modal-window')!;
+    expect(modal.textContent).toContain('Selected game');
+    expect(modal.textContent).toContain('PS4 · Asia');
+    expect(modal.querySelector('input[type=file]')).not.toBeNull();
+    expect(modal.textContent).toContain('OLD-123');
+  });
   it('does not describe server failures as a missing game', () => {
     TestBed.inject(Store).dispatch(new ProductsActions.LoadProperties(1));
     TestBed.inject(HttpTestingController)

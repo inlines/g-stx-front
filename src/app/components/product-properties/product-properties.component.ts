@@ -1,3 +1,4 @@
+import { SerialRequestComponent } from '../serial-request/serial-request.component';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { priceValidator } from '@app/shared/price-validator';
 import { RequestStatus } from '@app/constants/request-status.const';
@@ -16,7 +17,7 @@ import { OwnershipState } from '@app/states/ownership/states/ownership.state';
 import { IProductPropertiesResponse } from '@app/states/products/interfaces/product-properties-response.interface';
 import { IReleaseItem } from '@app/states/products/interfaces/release-item.interface';
 import { ProductsState } from '@app/states/products/states/products.state';
-import { NgbCarouselModule, NgbModal, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbCarouselModule, NgbModal, NgbModalRef, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngxs/store';
 import { combineLatest, map, Observable } from 'rxjs';
 
@@ -172,6 +173,22 @@ export class ProductPropertiesComponent implements OnInit {
     this.store.dispatch(new ChatActions.SetRecepient(user));
     this.store.dispatch(new ChatActions.RequestMessages(user));
     this.store.dispatch(new ChatActions.ToggleChatVisibility());
+  }
+
+  canSuggestSerial(release: IReleaseItem) {
+    return [7, 9, 48, 167, 38].includes(release.platform_id);
+  }
+  suggestSerial(release: IReleaseItem) {
+    if (!this.canSuggestSerial(release) || !this.store.selectSnapshot(AuthState.isAuthorised)) return;
+    const dialog: NgbModalRef = this.modalService.open(SerialRequestComponent, {
+      centered: true,
+      size: 'lg',
+      ariaLabelledBy: 'serial-request-title',
+      beforeDismiss: (): boolean => !dialog.componentInstance.busy,
+    });
+    dialog.componentInstance.release = release;
+    dialog.componentInstance.productName =
+      this.store.selectSnapshot(ProductsState.productProperties)?.product.name || '';
   }
 
   serialPreview(release: IReleaseItem): string {

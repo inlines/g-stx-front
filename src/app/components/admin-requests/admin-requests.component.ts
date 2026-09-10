@@ -1,0 +1,102 @@
+import { DatePipe } from '@angular/common';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, output } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { RouterLink } from '@angular/router';
+import { SerialRequest, SerialRequestsService } from '@app/services/serial-requests.service';
+import { finalize, Subscription } from 'rxjs';
+import { PagerComponent } from '../pager/pager.component';
+import { RequestPhotoComponent } from './request-photo.component';
+
+@Component({
+  selector: 'app-admin-requests',
+  imports: [DatePipe, RouterLink, PagerComponent, RequestPhotoComponent],
+  templateUrl: './admin-requests.component.html',
+  styleUrl: './admin-requests.component.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
+})
+export class AdminRequestsComponent implements OnInit {
+  private readonly api = inject(SerialRequestsService);
+  private readonly destroy = inject(DestroyRef);
+  readonly accessDenied = output<void>();
+  status: 'pending' | 'accepted' = 'pending';
+  items: SerialRequest[] = [];
+  total = 0;
+  offset = 0;
+  readonly limit = 10;
+  loading = false;
+  busy = false;
+  error = '';
+  success = '';
+  decision: { item: SerialRequest; action: 'accept' | 'reject' } | null = null;
+  private request?: Subscription;
+  ngOnInit() {
+    this.load();
+  }
+  select(status: 'pending' | 'accepted') {
+    if (this.busy || this.status === status) return;
+    this.status = status;
+    this.decision = null;
+    this.success = '';
+    this.load(0);
+  }
+  page(page: number) {
+    if (!this.busy) {
+      this.decision = null;
+      this.load((page - 1) * this.limit);
+    }
+  }
+  load(offset = this.offset) {
+    this.request?.unsubscribe();
+    this.offset = offset;
+    this.error = '';
+    this.loading = true;
+    this.request = this.api
+      .list(this.status, offset, this.limit)
+      .pipe(
+        takeUntilDestroyed(this.destroy),
+        finalize(() => (this.loading = false)),
+      )
+      .subscribe({
+        next: (response) => {
+          this.items = response.items;
+          this.total = response.total_count;
+          if (!this.items.length && this.total && offset >= this.total)
+            this.load(Math.floor((this.total - 1) / this.limit) * this.limit);
+        },
+        error: (error) => {
+          this.items = [];
+          this.total = 0;
+          this.error = error.error?.error || 'Не удалось загрузить заявки';
+          if (error.status === 403) this.accessDenied.emit();
+        },
+      });
+  }
+  confirm() {
+    if (!this.decision || this.busy) return;
+    const { item, action } = this.decision;
+    this.busy = true;
+    this.error = '';
+    this.success = '';
+    const request = action === 'accept' ? this.api.accept(item.id) : this.api.reject(item.id);
+    request
+      .pipe(
+        takeUntilDestroyed(this.destroy),
+        finalize(() => (this.busy = false)),
+      )
+      .subscribe({
+        next: () => {
+          this.decision = null;
+          this.success =
+            action === 'accept'
+              ? `Серийник ${item.serial} добавлен. Заявка перенесена в архив.`
+              : 'Заявка и фотография удалены.';
+          this.load();
+        },
+        error: (error) => {
+          this.error =
+            error.error?.error || 'Не удалось обработать заявку. Обновите список и попробуйте ещё раз.';
+          if (error.status === 403) this.accessDenied.emit();
+        },
+      });
+  }
+}

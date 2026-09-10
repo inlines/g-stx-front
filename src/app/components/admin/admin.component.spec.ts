@@ -24,7 +24,7 @@ describe('Admin users', () => {
     fixture.detectChanges();
     return { fixture, http, component: fixture.componentInstance };
   }
-  it('shows roles and no actions on the current account; requests stay empty', () => {
+  it('shows roles and no actions on the current account; opens active requests', () => {
     const { fixture, component, http } = setup();
     const rows = fixture.nativeElement.querySelectorAll('.users li');
     expect(rows[0].querySelector('button')).toBeNull();
@@ -32,8 +32,11 @@ describe('Admin users', () => {
     expect(rows[1].querySelectorAll('button').length).toBe(2);
     component.section = 'requests';
     fixture.detectChanges();
-    expect(fixture.nativeElement.textContent).toContain('Здесь пока пусто');
-    http.expectNone((r) => r.url.includes('requests'));
+    http
+      .expectOne('/api/admin/serial-requests?status=pending&offset=0&limit=10')
+      .flush({ items: [], total_count: 0 });
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('Активных заявок пока нет');
     fixture.destroy();
   });
   it('searches on the server and cancels a stale page request', () => {

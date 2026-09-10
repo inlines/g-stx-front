@@ -4,7 +4,7 @@
     <button type="button" [class.selected]="section === 'requests'" [attr.aria-pressed]="section === 'requests'" (click)="section = 'requests'">Заявки</button>
   </nav>
   @if (section === 'requests') {
-    <div class="empty"><h2>Заявки</h2><p>Здесь пока пусто.</p></div>
+    <app-admin-requests (accessDenied)="accessDenied.emit()"/>
   } @else {
     <div class="heading"><h2>Пользователи <span class="count">{{ total }}</span></h2>
       <form (ngSubmit)="searchUsers()" class="search">
@@ -43,7 +43,7 @@
     <h2 id="admin-confirm-title">{{ action === 'delete' ? 'Удалить пользователя?' : 'Назначить администратора?' }}</h2>
     <p id="admin-confirm-description">
       @if (action === 'delete') {
-        Аккаунт <strong>{{ selected?.user_login }}</strong>, его аватар, коллекция, вишлист, WTS и вся переписка будут удалены без возможности восстановления.
+        Аккаунт <strong>{{ selected?.user_login }}</strong>, его аватар, коллекция, вишлист, WTS, заявки с фотографиями и вся переписка будут удалены без возможности восстановления.
       } @else {
         <strong>{{ selected?.user_login }}</strong> получит доступ к админке: сможет назначать администраторов и удалять пользователей.
       }

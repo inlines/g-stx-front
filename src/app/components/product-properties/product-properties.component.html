@@ -102,7 +102,7 @@
               <span>{{ release.release_region }}</span>
               <span>{{ release.release_date ? (release.release_date | date:'dd.MM.yy':'UTC') : 'Дата не указана' }}</span>
             </div>
-            @if (!release.digital_only && release.serial?.length) {
+            @if (release.serial?.length) {
               <details class="serials">
                 <summary [ngbTooltip]="serialPreview(release)" triggers="mouseenter:mouseleave" container="body">Серийники · {{ release.serial.length }}</summary>
                 <ul aria-label="Все серийники">
@@ -117,6 +117,9 @@
       <ng-template #releaseActions let-release>
         @if (isAuthorised$ | async) {
           <div class="release-actions">
+            @if (canSuggestSerial(release)) {
+              <button type="button" class="btn-blue small suggest-serial" (click)="suggestSerial(release)">Уточнить серийник</button>
+            }
             <button type="button" class="btn-blue small"
               [disabled]="release.owned || release.digital_only || release.release_status === 5 || !release.release_date || (collectionChanging$ | async)"
               [hidden]="release.owned"

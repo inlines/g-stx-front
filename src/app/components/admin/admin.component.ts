@@ -1,3 +1,4 @@
+import { AdminRequestsComponent } from '../admin-requests/admin-requests.component';
 import { DatePipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -20,7 +21,7 @@ import { UserAvatarComponent } from '../user-avatar/user-avatar.component';
 
 @Component({
   selector: 'app-admin',
-  imports: [DatePipe, FormsModule, PagerComponent, UserAvatarComponent],
+  imports: [DatePipe, FormsModule, PagerComponent, UserAvatarComponent, AdminRequestsComponent],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.scss',
   changeDetection: ChangeDetectionStrategy.Eager,
