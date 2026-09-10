@@ -13,6 +13,22 @@ describe('Profile', () => {
     TestBed.inject(HttpTestingController).verify();
     vi.restoreAllMocks();
   });
+  it.each([false, true])('only renders the admin tab with a server-confirmed role: %s', (is_admin) => {
+    const fixture = TestBed.createComponent(ProfileComponent);
+    fixture.detectChanges();
+    const http = TestBed.inject(HttpTestingController);
+    expect(fixture.nativeElement.textContent).not.toContain('Админка');
+    http.expectOne('/api/profile/me').flush({ id: 1, user_login: 'user', is_admin, created_at: null });
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent.includes('Админка')).toBe(is_admin);
+    http.expectNone((r) => r.url === '/api/admin/users');
+    if (!is_admin) {
+      fixture.componentInstance.tab = 'admin';
+      fixture.detectChanges();
+      expect(fixture.nativeElement.querySelector('app-admin')).toBeNull();
+    }
+    fixture.destroy();
+  });
   it('requires matching passwords, sends the old password and keeps errors in the form', () => {
     const fixture = TestBed.createComponent(ProfileComponent);
     const component = fixture.componentInstance;

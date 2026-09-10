@@ -1,5 +1,5 @@
 import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnDestroy, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ProfileService } from '@app/services/profile.service';
@@ -7,21 +7,47 @@ import { AuthState } from '@app/states/auth/states/auth.state';
 import { Store } from '@ngxs/store';
 import { finalize } from 'rxjs';
 import { UserAvatarComponent } from '../user-avatar/user-avatar.component';
+import { AdminComponent } from '../admin/admin.component';
+import { AdminService, AdminUser } from '@app/services/admin.service';
 import { cropSquare, pixelAvatar } from './avatar-image';
 
 @Component({
   selector: 'app-profile',
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [AsyncPipe, FormsModule, ReactiveFormsModule, UserAvatarComponent],
+  imports: [AsyncPipe, FormsModule, ReactiveFormsModule, UserAvatarComponent, AdminComponent],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss',
 })
-export class ProfileComponent implements OnDestroy {
+export class ProfileComponent implements OnDestroy, OnInit {
   private readonly api = inject(ProfileService);
   private readonly destroy = inject(DestroyRef);
   readonly login$ = inject(Store).select(AuthState.login);
   readonly Math = Math;
-  tab: 'password' | 'avatar' = 'password';
+  private readonly adminApi = inject(AdminService);
+  me: AdminUser | null = null;
+  roleError = '';
+  ngOnInit() {
+    this.loadRole();
+  }
+  loadRole() {
+    this.roleError = '';
+    this.adminApi
+      .me()
+      .pipe(takeUntilDestroyed(this.destroy))
+      .subscribe({
+        next: (me) => (this.me = me),
+        error: () => {
+          this.me = null;
+          this.roleError = 'Не удалось загрузить права доступа';
+        },
+      });
+  }
+  adminAccessDenied() {
+    this.me = null;
+    this.tab = 'password';
+    this.roleError = 'Доступ к админке больше недоступен';
+  }
+  tab: 'password' | 'avatar' | 'admin' = 'password';
   readonly password = new FormGroup({
     old: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     next: new FormControl('', {

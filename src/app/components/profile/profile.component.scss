@@ -4,7 +4,7 @@
 .profile-heading app-user-avatar { width: 64px; height: 64px; }
 h1 { font-size: 30px; margin: 0; } h2 { font-size: 22px; } h3 { font-size: 18px; }
 .profile-heading p { margin: 4px 0 0; overflow-wrap: anywhere; }
-.tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
 button, .file-button { min-height: 44px; border: 1px solid #536f89; border-radius: 8px; background: #21354b; color: #e4edf6; padding: 10px 16px; cursor: pointer; }
 button.selected, button.primary { background: #c2a4ed; color: #102231; border-color: #c2a4ed; }
 button:disabled { opacity: .55; cursor: default; }

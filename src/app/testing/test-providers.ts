@@ -1,3 +1,5 @@
+import { of } from 'rxjs';
+import { UserBadgesService } from '@app/services/user-badges.service';
 import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideRouter } from '@angular/router';
@@ -13,6 +15,7 @@ import { RegistrationState } from '@app/states/registration/states/registration.
 import { provideStore } from '@ngxs/store';
 
 export const TEST_PROVIDERS = [
+  { provide: UserBadgesService, useValue: { admins$: of([]), refresh() {} } },
   provideRouter([]),
   provideHttpClient(withXhr()),
   provideHttpClientTesting(),

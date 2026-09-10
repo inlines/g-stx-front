@@ -3,7 +3,12 @@
   <nav class="tabs" aria-label="Настройки профиля">
     <button type="button" [class.selected]="tab === 'password'" [attr.aria-pressed]="tab === 'password'" (click)="tab = 'password'">Сменить пароль</button>
     <button type="button" [class.selected]="tab === 'avatar'" [attr.aria-pressed]="tab === 'avatar'" (click)="tab = 'avatar'">Аватар</button>
+    @if (me?.is_admin) {
+      <button type="button" [class.selected]="tab === 'admin'" [attr.aria-pressed]="tab === 'admin'" (click)="tab = 'admin'">Админка</button>
+    }
   </nav>
+  @if (roleError) { <p role="alert" class="error">{{ roleError }} <button type="button" (click)="loadRole()">Повторить</button></p> }
+  @if (tab === 'admin' && me?.is_admin) { <app-admin [currentUserId]="me!.id" (accessDenied)="adminAccessDenied()"/> }
   @if(tab === 'password') {
     <form class="password-panel panel" [formGroup]="password" (ngSubmit)="changePassword()">
       <h2>Смена пароля</h2>
@@ -15,7 +20,7 @@
       @if(passwordSuccess){<p role="status" class="success">{{passwordSuccess}}</p>}
       <button class="primary" type="submit" [disabled]="password.invalid || passwordBusy">{{passwordBusy ? 'Сохраняем…' : 'Изменить пароль'}}</button>
     </form>
-  } @else {
+  } @else if (tab === 'avatar') {
     <div class="panel">
       <h2>Ваш пиксельный аватар</h2><p class="hint">Выберите фото, выделите квадрат и посмотрите результат. Исходное изображение не отправляется на сервер.</p>
       <div class="dropzone" [class.dragging]="dragging" (dragover)="$event.preventDefault(); dragging = true" (dragleave)="dragging = false" (drop)="drop($event)">
