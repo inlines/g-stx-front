@@ -10,7 +10,10 @@ export function filterCollection(
 ): ICollectionItem[] {
   const search = query.trim().toLocaleLowerCase();
   return items
-    .filter((item) => item.product_name.toLocaleLowerCase().includes(search))
+    .filter((item) =>
+      item.product_name.toLocaleLowerCase().includes(search) ||
+      item.alternative_names?.some((name) => name.toLocaleLowerCase().includes(search)),
+    )
     .sort((a, b) => {
       if (sort !== 'name') {
         const left = sort === 'date' ? a.release_date : a.price;

@@ -301,8 +301,24 @@
 }
 
 .names-heading { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; justify-content: space-between; }
-.suggest-name { min-height: 44px; position: relative; z-index: 1; }
+.suggest-name {
+  min-height: 44px;
+  position: relative;
+  z-index: 1;
+  padding: 8px 0;
+  border: 0;
+  background: transparent;
+  color: #9fc8ed;
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.suggest-name:hover { color: #fff; }
+.suggest-name:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
 .alternative-names .serials ul { grid-template-columns: minmax(0, 1fr); max-height: 280px; overflow: auto; }
 .alternative-names .serials li { font: inherit; }
 
-.game-heading-copy { min-width: 0; }.game-heading-copy .suggest-name { margin-top: 12px; }
+.game-heading-copy { min-width: 0; }.game-heading-copy .suggest-name { margin-top: 2px; }

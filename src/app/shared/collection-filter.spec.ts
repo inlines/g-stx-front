@@ -28,6 +28,17 @@ describe('Collection filtering', () => {
     expect(filterCollection(items, '  MARIO ', 'name').map((x) => x.release_id)).toEqual([2, 3]);
     expect(items.map((x) => x.release_id)).toEqual([1, 2, 3]);
   });
+  it('matches alternative names and Unicode without duplicating releases or requiring the new field', () => {
+    const values = [
+      { ...item(1, 'Game', null, null), alternative_names: ['Другое имя', 'Другой вариант', '日本語'] },
+      { ...item(2, 'Other', null, null), alternative_names: null },
+      item(3, 'Legacy', null, null),
+    ];
+    expect(filterCollection(values, ' ДРУГ ', 'name').map(x => x.release_id)).toEqual([1]);
+    expect(filterCollection(values, '日本', 'name').map(x => x.release_id)).toEqual([1]);
+    expect(filterCollection(values, 'legacy', 'name').map(x => x.release_id)).toEqual([3]);
+    expect(filterCollection(values, '', 'name')).toHaveLength(3);
+  });
   it('treats zero as a real price and puts unknown prices last', () => {
     expect(filterCollection(items, '', 'price').map((x) => x.release_id)).toEqual([3, 2, 1]);
   });

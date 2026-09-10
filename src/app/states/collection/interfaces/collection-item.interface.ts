@@ -3,6 +3,7 @@ export interface ICollectionItem {
   release_date: number | null;
   platform_name: string;
   product_name: string;
+  alternative_names?: string[] | null;
   image_url: string | null;
   region_name: string | null;
   product_id: number;
