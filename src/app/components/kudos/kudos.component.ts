@@ -20,7 +20,8 @@ import { Subscription } from 'rxjs';
         display: inline-flex;
         align-items: center;
         gap: 9px;
-        white-space: nowrap;
+        flex-wrap: wrap;
+        max-width: 100%;
         vertical-align: middle;
         font-family: Arial, sans-serif;
         line-height: 1.1;
@@ -48,6 +49,8 @@ import { Subscription } from 'rxjs';
         letter-spacing: -0.06em;
       }
       .points {
+        overflow-wrap: anywhere;
+        min-width: 0;
         font-size: 1.3em;
         font-style: italic;
         color: #fff8dc;
@@ -65,6 +68,8 @@ import { Subscription } from 'rxjs';
         font-size: 1.45em;
       }
       :host.compact .points {
+        overflow-wrap: anywhere;
+        min-width: 0;
         font-size: 1.1em;
       }
     `,

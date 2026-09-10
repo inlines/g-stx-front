@@ -258,5 +258,31 @@ input::placeholder {
   color: #a3b8cb;
 }
 
-.list-info { flex-wrap: wrap; align-items: center; gap: 12px; }
-.csv-export { position: relative; z-index: 1; }
+.list-info {
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+.csv-export {
+  position: relative;
+  z-index: 1;
+}
+
+.toolbar > *,
+.library-heading > * {
+  min-width: 0;
+}
+.price-dialog header > button {
+  flex-shrink: 0;
+}
+.price-dialog footer {
+  flex-wrap: wrap;
+}
+@media (max-width: 575px) {
+  .price-dialog {
+    padding: 16px;
+  }
+  .price-dialog footer button {
+    flex: 1 1 120px;
+  }
+}

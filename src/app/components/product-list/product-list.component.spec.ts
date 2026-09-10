@@ -22,6 +22,7 @@ describe('Catalog filters', () => {
     http.verify({ ignoreCancelled: true });
     vi.useRealTimers();
     vi.restoreAllMocks();
+    vi.unstubAllGlobals();
   });
   function mount() {
     fixture = TestBed.createComponent(ProductListComponent);
@@ -34,6 +35,19 @@ describe('Catalog filters', () => {
   function flushInitial() {
     nextRequest().flush({ items: [], total_count: 100 });
   }
+
+  it('does not open the keyboard on touch devices when entering or switching platforms', () => {
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn(() => ({ matches: false })),
+    );
+    const focus = vi.spyOn(HTMLInputElement.prototype, 'focus');
+    const component = mount();
+    flushInitial();
+    component.setActiveCategory(48);
+    nextRequest().flush({ items: [], total_count: 0 });
+    expect(focus).not.toHaveBeenCalled();
+  });
 
   it('restores the saved page with a single initial request', () => {
     store.dispatch(new ProductsActions.SetRequestParams({ cat: 8, offset: 45, query: 'Mario' }));

@@ -1,31 +1,213 @@
-:host { display: block; position: relative; z-index: 1; color: #e4edf6; }
-.profile { max-width: 960px; margin: 24px auto; }
-.profile-heading { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
-.profile-heading app-user-avatar { width: 64px; height: 64px; }
-h1 { font-size: 30px; margin: 0; } h2 { font-size: 22px; } h3 { font-size: 18px; }
-.profile-heading p { margin: 4px 0 0; overflow-wrap: anywhere; }
-.tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
-button, .file-button { min-height: 44px; border: 1px solid #536f89; border-radius: 8px; background: #21354b; color: #e4edf6; padding: 10px 16px; cursor: pointer; }
-button.selected, button.primary { background: #c2a4ed; color: #102231; border-color: #c2a4ed; }
-button:disabled { opacity: .55; cursor: default; }
-.panel { padding: 24px; border: 1px solid #294053; border-radius: 16px; background: #102231; }
-.password-panel { max-width: 480px; }
-label { display: block; margin: 16px 0 8px; }
-input:not([type=file]), select { display: block; width: 100%; min-height: 44px; margin-top: 8px; padding: 8px 12px; border: 1px solid #536f89; border-radius: 8px; background: #08141f; color: #e4edf6; }
-input[type=range] { padding: 0; accent-color: #c2a4ed; }
-.hint, small { color: #a3b8cb; font-size: 14px; }
-.success { color: #79d9ac; margin-top: 16px; }.error { color: #ffb4b4; margin-top: 16px; }
-.dropzone { border: 2px dashed #536f89; border-radius: 12px; text-align: center; padding: 20px; }
-.dropzone.dragging { border-color: #c2a4ed; background: #26354b; }
-.file-button { display: inline-block; position: relative; overflow: hidden; margin: 0 0 12px; }
-.file-button input { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
-.file-button:focus-within, button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid #c2a4ed; outline-offset: 3px; }
-small { display: block; }
-.editor { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 24px; margin-top: 24px; }
-.crop-stage { position: relative; overflow: hidden; margin: 0 auto; }
-.crop-stage > img { display: block; width: 100%; height: auto; user-select: none; }
-.crop-square { position: absolute; border: 2px solid #fff; box-shadow: 0 0 0 800px #0009; cursor: move; touch-action: none; box-sizing: border-box; }
-.crop-square span { position: absolute; inset: 33.333%; border: 1px solid #fff8; pointer-events: none; }
-.pixel-preview { width: 192px; max-width: 100%; aspect-ratio: 1; image-rendering: pixelated; background: #08141f; border-radius: 8px; }
-fieldset { border: 0; padding: 0; min-width: 0; }
-@media(max-width: 640px) { .editor { grid-template-columns: minmax(0, 1fr); }.panel { padding: 16px; }.tabs button { flex: 1; padding: 10px; }.preview-panel { text-align: center; } }
+:host {
+  display: block;
+  position: relative;
+  z-index: 1;
+  color: #e4edf6;
+}
+.profile {
+  max-width: 960px;
+  margin: 24px auto;
+}
+.profile-heading {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.profile-heading app-user-avatar {
+  width: 64px;
+  height: 64px;
+}
+h1 {
+  font-size: 30px;
+  margin: 0;
+}
+h2 {
+  font-size: 22px;
+}
+h3 {
+  font-size: 18px;
+}
+.profile-heading p {
+  margin: 4px 0 0;
+  overflow-wrap: anywhere;
+}
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+button,
+.file-button {
+  min-height: 44px;
+  border: 1px solid #536f89;
+  border-radius: 8px;
+  background: #21354b;
+  color: #e4edf6;
+  padding: 10px 16px;
+  cursor: pointer;
+}
+button.selected,
+button.primary {
+  background: #c2a4ed;
+  color: #102231;
+  border-color: #c2a4ed;
+}
+button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.panel {
+  padding: 24px;
+  border: 1px solid #294053;
+  border-radius: 16px;
+  background: #102231;
+}
+.password-panel {
+  max-width: 480px;
+}
+label {
+  display: block;
+  margin: 16px 0 8px;
+}
+input:not([type='file']),
+select {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  margin-top: 8px;
+  padding: 8px 12px;
+  border: 1px solid #536f89;
+  border-radius: 8px;
+  background: #08141f;
+  color: #e4edf6;
+}
+input[type='range'] {
+  padding: 0;
+  accent-color: #c2a4ed;
+}
+.hint,
+small {
+  color: #a3b8cb;
+  font-size: 14px;
+}
+.success {
+  color: #79d9ac;
+  margin-top: 16px;
+}
+.error {
+  color: #ffb4b4;
+  margin-top: 16px;
+}
+.dropzone {
+  border: 2px dashed #536f89;
+  border-radius: 12px;
+  text-align: center;
+  padding: 20px;
+}
+.dropzone.dragging {
+  border-color: #c2a4ed;
+  background: #26354b;
+}
+.file-button {
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+  margin: 0 0 12px;
+}
+.file-button input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+.file-button:focus-within,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid #c2a4ed;
+  outline-offset: 3px;
+}
+small {
+  display: block;
+}
+.editor {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 24px;
+  margin-top: 24px;
+}
+.crop-stage {
+  position: relative;
+  overflow: hidden;
+  margin: 0 auto;
+}
+.crop-stage > img {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+}
+.crop-square {
+  position: absolute;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 800px #0009;
+  cursor: move;
+  touch-action: none;
+  box-sizing: border-box;
+}
+.crop-square span {
+  position: absolute;
+  inset: 33.333%;
+  border: 1px solid #fff8;
+  pointer-events: none;
+}
+.pixel-preview {
+  width: 192px;
+  max-width: 100%;
+  aspect-ratio: 1;
+  image-rendering: pixelated;
+  background: #08141f;
+  border-radius: 8px;
+}
+fieldset {
+  border: 0;
+  padding: 0;
+  min-width: 0;
+}
+@media (max-width: 640px) {
+  .editor {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .panel {
+    padding: 16px;
+  }
+  .tabs button {
+    flex: 1;
+    padding: 10px;
+  }
+  .preview-panel {
+    text-align: center;
+  }
+}
+
+.profile-heading > div {
+  min-width: 0;
+}
+@media (max-width: 575px) {
+  .profile {
+    margin-top: 12px;
+  }
+  .tabs button {
+    flex: 1 1 110px;
+  }
+  .dropzone {
+    padding: 14px;
+  }
+  .panel {
+    padding: 14px;
+  }
+}

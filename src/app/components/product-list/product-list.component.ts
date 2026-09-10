@@ -113,7 +113,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.query?.nativeElement.focus();
+    if (window.matchMedia?.('(hover: hover) and (pointer: fine)').matches) this.query?.nativeElement.focus();
   }
 
   private updateFilters(): void {
@@ -137,7 +137,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
     // Emit to cancel any pending debounced search from the previous platform.
     this.queryForm.patchValue({ query: '', sort: 'date' });
     this.updateFilters();
-    this.query?.nativeElement.focus();
+    if (window.matchMedia?.('(hover: hover) and (pointer: fine)').matches) this.query?.nativeElement.focus();
   }
 
   pageChanged(page: number): void {

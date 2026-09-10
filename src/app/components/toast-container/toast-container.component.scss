@@ -1,0 +1,10 @@
+:host {
+  display: block;
+  padding: 12px;
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+  overflow-wrap: anywhere;
+}
+ngb-toast {
+  max-width: 100%;
+  margin-top: 8px;
+}

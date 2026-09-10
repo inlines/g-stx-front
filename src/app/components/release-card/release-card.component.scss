@@ -226,3 +226,20 @@ button:focus-visible {
   font-size: 12px;
   line-height: 1.5;
 }
+
+.price,
+.metadata {
+  overflow-wrap: anywhere;
+}
+@media (max-width: 575px) {
+  .serials ul {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .serials li {
+    font-size: 14px;
+  }
+  .collection-actions button {
+    font-size: 13px;
+    padding-inline: 6px;
+  }
+}

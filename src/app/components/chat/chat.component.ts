@@ -1,3 +1,4 @@
+import { ChatViewportDirective } from '@app/directives/chat-viewport.directive';
 import { UserAvatarComponent } from '../user-avatar/user-avatar.component';
 import { ChatService } from '@app/states/chat/services/chat.service';
 import { DestroyRef, inject, Injector, afterNextRender } from '@angular/core';
@@ -27,7 +28,15 @@ import { debounceTime, map, Observable, withLatestFrom } from 'rxjs';
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.scss'],
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [UserAvatarComponent, FormsModule, AsyncPipe, DatePipe, TrapScrollDirective, NgClass],
+  imports: [
+    ChatViewportDirective,
+    UserAvatarComponent,
+    FormsModule,
+    AsyncPipe,
+    DatePipe,
+    TrapScrollDirective,
+    NgClass,
+  ],
 })
 export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('scrollbox') scrollbox!: ElementRef;

@@ -1,11 +1,159 @@
-:host { display: block; color: #e4edf6; }button { min-height: 44px; padding: 10px 14px; border: 1px solid #536f89; border-radius: 8px; background: #21354b; color: #e4edf6; cursor: pointer; }button:disabled { opacity: .5; cursor: default; }
-.tabs, header, .actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }.tabs { margin-bottom: 20px; }.selected { background: #c2a4ed; color: #102231; }header { justify-content: space-between; margin-bottom: 16px; }h2 { font-size: 22px; margin: 0; }
-article { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 24px; border-top: 1px solid #385069; padding: 24px 0; overflow-wrap: anywhere; }.information { min-width: 0; }.game { color: #d5b8ff; font-size: 20px; font-weight: 600; }.release { margin: 10px 0; }.meta, small { color: #a3b8cb; font-size: 13px; }.meta { margin: 12px 0; }
-.proposed { background: #21354b; padding: 12px; border-radius: 8px; }.proposed strong { display: block; color: #ffe397; font-family: monospace; font-size: 20px; margin-top: 6px; }
-.existing ul { max-height: 160px; overflow: auto; margin: 10px 0; padding-left: 24px; }.existing summary { cursor: pointer; min-height: 32px; }
-.accept { border-color: #79d9ac; }.reject, .error { color: #ffb4b4; }.success { color: #79d9ac; }.empty { padding: 24px 0; color: #a3b8cb; }.confirmation { margin-top: 12px; padding: 12px; border: 1px solid #536f89; border-radius: 8px; }
-button:focus-visible, a:focus-visible, summary:focus-visible { outline: 2px solid #c2a4ed; outline-offset: 3px; }
-@media(max-width:640px) { article { grid-template-columns: minmax(0,1fr); gap: 16px; }.actions button { flex: 1; } }
+:host {
+  display: block;
+  color: #e4edf6;
+}
+button {
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1px solid #536f89;
+  border-radius: 8px;
+  background: #21354b;
+  color: #e4edf6;
+  cursor: pointer;
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.tabs,
+header,
+.actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.tabs {
+  margin-bottom: 20px;
+}
+.selected {
+  background: #c2a4ed;
+  color: #102231;
+}
+header {
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+h2 {
+  font-size: 22px;
+  margin: 0;
+}
+article {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 24px;
+  border-top: 1px solid #385069;
+  padding: 24px 0;
+  overflow-wrap: anywhere;
+}
+.information {
+  min-width: 0;
+}
+.game {
+  color: #d5b8ff;
+  font-size: 20px;
+  font-weight: 600;
+}
+.release {
+  margin: 10px 0;
+}
+.meta,
+small {
+  color: #a3b8cb;
+  font-size: 13px;
+}
+.meta {
+  margin: 12px 0;
+}
+.proposed {
+  background: #21354b;
+  padding: 12px;
+  border-radius: 8px;
+}
+.proposed strong {
+  display: block;
+  color: #ffe397;
+  font-family: monospace;
+  font-size: 20px;
+  margin-top: 6px;
+}
+.existing ul {
+  max-height: 160px;
+  overflow: auto;
+  margin: 10px 0;
+  padding-left: 24px;
+}
+.existing summary {
+  cursor: pointer;
+  min-height: 32px;
+}
+.accept {
+  border-color: #79d9ac;
+}
+.reject,
+.error {
+  color: #ffb4b4;
+}
+.success {
+  color: #79d9ac;
+}
+.empty {
+  padding: 24px 0;
+  color: #a3b8cb;
+}
+.confirmation {
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid #536f89;
+  border-radius: 8px;
+}
+button:focus-visible,
+a:focus-visible,
+summary:focus-visible {
+  outline: 2px solid #c2a4ed;
+  outline-offset: 3px;
+}
+@media (max-width: 640px) {
+  article {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+  .actions button {
+    flex: 1;
+  }
+}
 
-.confirmation input { display: block; width: 100%; min-height: 44px; margin: 8px 0; padding: 10px 12px; border: 1px solid #536f89; border-radius: 8px; background: #102231; color: #e4edf6; font: inherit; }
-.confirmation input:focus-visible { outline: 2px solid #c2a4ed; outline-offset: 3px; }
+.confirmation input {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  margin: 8px 0;
+  padding: 10px 12px;
+  border: 1px solid #536f89;
+  border-radius: 8px;
+  background: #102231;
+  color: #e4edf6;
+  font: inherit;
+}
+.confirmation input:focus-visible {
+  outline: 2px solid #c2a4ed;
+  outline-offset: 3px;
+}
+
+.existing summary,
+details summary {
+  min-height: 44px;
+  padding-block: 10px;
+}
+@media (max-width: 575px) {
+  .confirmation {
+    padding: 12px;
+  }
+  .actions {
+    flex-wrap: wrap;
+  }
+  .actions button {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+}

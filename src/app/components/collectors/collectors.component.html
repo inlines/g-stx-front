@@ -2,14 +2,14 @@
 
 <div class="row collector-row"> <!-- Добавлен класс collector-row -->
   @for (collector of collectors$ | async; track collector.user_login) {
-    <div class="col-md-3 col-lg-3 col-sm-4 mb-3" [routerLink]="[collector.user_login]">
+    <a class="col-md-3 col-lg-3 col-sm-4 mb-3" [routerLink]="[collector.user_login]">
       <div
         class="collector-card h-100 border-0 shadow-sm hover-shadow position-relative row align-items-center mx-0"
         style="cursor: pointer;"
-      > 
-        <div class="col-12 px-2 px-md-3 text-truncate-fix collector-person"><app-user-avatar [login]="collector.user_login"/><div class="collector-copy">
+      >
+        <div class="col-12 px-2 px-md-3 collector-person"><app-user-avatar [login]="collector.user_login"/><div class="collector-copy">
           @if ((online$ | async)?.has(collector.user_login)) { <span class="online-label">Онлайн</span> }
-          <h6 class="collector-name text-truncate fw-bold mb-1">{{ collector.user_login }}</h6><app-kudos [value]="collector.kudos ?? 0" [compact]="true"/>
+          <h6 class="collector-name fw-bold mb-1">{{ collector.user_login }}</h6><app-kudos [value]="collector.kudos ?? 0" [compact]="true"/>
           <div class="collector-stats small text-light-muted">
             <span class="me-3">
               <i class="bi bi-collection me-1"></i>
@@ -18,6 +18,6 @@
           </div>
         </div></div>
       </div>
-    </div>
+    </a>
   }
 </div>

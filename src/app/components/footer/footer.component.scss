@@ -1,7 +1,7 @@
 .footer {
   background-color: rgba(10, 24, 37, 1);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
-  
+
   a.nav-link:hover {
     color: #ffffff;
     text-decoration: underline;
@@ -13,9 +13,13 @@
   }
 
   .text-light {
-    color: rgba(138, 172, 201, 1)!important;
+    color: rgba(138, 172, 201, 1) !important;
     font-size: 16px;
     line-height: 20px;
     margin-top: 16px;
   }
+}
+
+.footer {
+  padding-bottom: max(24px, env(safe-area-inset-bottom)) !important;
 }
