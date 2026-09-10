@@ -1,0 +1,196 @@
+<section class="tour">
+  <header class="tour-header">
+    <span class="brand"
+      ><svg width="74" height="24" viewBox="0 0 176 33" aria-hidden="true">
+        <use href="/icons.svg#brand" /></svg
+      ><span>Быстрый старт</span></span
+    >
+    <button type="button" class="quiet" (click)="modal.close()" aria-label="Закрыть обучение">
+      Пропустить <span aria-hidden="true">×</span>
+    </button>
+  </header>
+  <nav class="steps" aria-label="Шаги обучения">
+    @for (item of steps; track $index) {
+      <button
+        type="button"
+        [class.current]="index() === $index"
+        [attr.aria-current]="index() === $index ? 'step' : null"
+        [attr.aria-label]="$index + 1 + '. ' + item.name"
+        (click)="select($index)"
+      >
+        <span>{{ $index + 1 }}</span
+        ><span class="step-name">{{ item.name }}</span>
+      </button>
+    }
+  </nav>
+  <main #content class="tour-content">
+    <div class="explanation">
+      <span class="eyebrow">ВАША КОЛЛЕКЦИЯ НАЧИНАЕТСЯ ЗДЕСЬ</span>
+      <h1 id="onboarding-title">{{ step.title }}</h1>
+      <p>{{ step.text }}</p>
+      <small>Это учебный пример. Ваши игры, заявки и сообщения не изменяются.</small>
+    </div>
+    <div class="demo" [class.acted]="phase() === 2" [class.kudos-demo]="index() === 7">
+      <div class="demo-heading">
+        <span>{{ step.name }}</span
+        ><small>ДЕМОНСТРАЦИЯ</small>
+      </div>
+      <div class="scene">
+        @if (index() === 0) {
+          <div class="platforms">
+            <span>PS3</span><span class="selected">PS4</span><span>PS5</span><span>PSP</span>
+          </div>
+          <div class="search" aria-label="Пример поиска">
+            <span aria-hidden="true">⌕</span> {{ phase() ? 'Night Circuit' : 'Название игры…'
+            }}<span class="caret" aria-hidden="true">|</span>
+          </div>
+        }
+        @if (index() < 5 && index() !== 2) {
+          <div class="game-preview" inert aria-hidden="true" [class.reveal]="index() !== 0 || phase() === 2">
+            <app-release-card [item]="game" [readOnly]="true" [saleMode]="index() === 4" />
+          </div>
+        }
+        @if (index() === 2) {
+          <div class="request-tabs" aria-label="Тип учебной заявки">
+            <button
+              type="button"
+              [class.selected]="requestKind() === 'serial'"
+              [attr.aria-pressed]="requestKind() === 'serial'"
+              (click)="chooseRequest('serial')"
+            >
+              Серийник · +10
+            </button>
+            <button
+              type="button"
+              [class.selected]="requestKind() === 'name'"
+              [attr.aria-pressed]="requestKind() === 'name'"
+              (click)="chooseRequest('name')"
+            >
+              Название · +5
+            </button>
+          </div>
+          <div class="request-modal">
+            <strong>{{ requestKind() === 'serial' ? 'Уточнить серийник' : 'Дополнить название' }}</strong>
+            <small
+              >Night Circuit · {{ requestKind() === 'serial' ? 'PS4 · Europe' : 'Альтернативное имя' }}</small
+            >
+            <div class="sample-field">
+              {{
+                phase()
+                  ? requestKind() === 'serial'
+                    ? 'CUSA-01234'
+                    : 'Ночная трасса'
+                  : 'Введите ' + (requestKind() === 'serial' ? 'серийник…' : 'название…')
+              }}
+            </div>
+            <div class="proof">
+              <img src="/tutorial-cover.svg" alt="Учебный пример коробки" width="44" height="56" /><span
+                >Фото коробки<small>{{
+                  phase() ? '✓ Фото прикреплено' : 'Из галереи или с компьютера'
+                }}</small></span
+              >
+            </div>
+          </div>
+        }
+        @if (index() === 4) {
+          <div class="sale-fields">
+            <span>Цена продажи <b>1 500 ₽</b></span
+            ><span>☑ CIB · Полный комплект</span>
+          </div>
+        }
+        @if (index() === 5) {
+          <div class="players">
+            @for (player of ['Player One', 'Retro Pilot', 'Pixel Hunter']; track player; let i = $index) {
+              <div class="player">
+                <span class="avatar" aria-hidden="true">{{ player[0] }}</span>
+                <div>
+                  <small class="online">Онлайн</small><strong>{{ player }}</strong
+                  ><small>{{ 120 - i * 30 }} игр в коллекции</small>
+                </div>
+                <b class="gold">K {{ 350 - i * 80 }}</b>
+              </div>
+            }
+          </div>
+          @if (phase() === 2) {
+            <div class="profile-tabs"><span class="selected">Коллекция</span><span>Хочет продать</span></div>
+          }
+        }
+        @if (index() === 7) {
+          <div class="challenge">
+            <span class="challenge-label">KUDOS CHALLENGE</span>
+            <div class="kudos-score" [class.earned]="phase() === 2">
+              <span class="k-mark">K</span><strong>{{ phase() === 2 ? '360' : '350' }}</strong
+              ><span class="award">{{ phase() === 2 ? '+10' : 'Kudos' }}</span>
+            </div>
+            <div class="rewards">
+              <span>Серийник <b>+10</b></span
+              ><span>Название <b>+5</b></span>
+            </div>
+            <div class="leaderboard">
+              <div style="order: 1"><span>01</span><b>Pixel Legend</b><strong>420 K</strong></div>
+              <div class="you" [style.order]="phase() === 2 ? 2 : 3">
+                <span>{{ phase() === 2 ? '02' : '03' }}</span
+                ><b>Вы <small>Ваш вклад заметен</small></b
+                ><strong>{{ phase() === 2 ? '360' : '350' }} K</strong>
+              </div>
+              <div [style.order]="phase() === 2 ? 3 : 2">
+                <span>{{ phase() === 2 ? '03' : '02' }}</span
+                ><b>Retro Pilot</b><strong>355 K</strong>
+              </div>
+            </div>
+            <small>Учебные очки и места. В рейтинге — до 100 игроков.</small>
+          </div>
+        }
+        @if (index() === 6) {
+          <div class="chat-example">
+            <div class="companion">
+              <span class="avatar" aria-hidden="true">P</span
+              ><span><small class="online">Онлайн</small>Player One</span>
+            </div>
+            <div class="bubble">Привет! Night Circuit ещё продаётся?</div>
+            <div class="bubble mine" [class.reveal]="phase() === 2">
+              Да, полный комплект. Могу прислать фото!
+            </div>
+            <div class="sample-field">{{ phase() === 2 ? 'Сообщение…' : 'Да, полный комплект…' }}</div>
+          </div>
+        }
+        <button type="button" class="demo-action" [class.tap]="phase() === 1" (click)="demonstrate()">
+          {{
+            phase() === 2
+              ? '✓ ' +
+                (index() === 0
+                  ? 'Игра найдена'
+                  : index() === 1
+                    ? 'В коллекции'
+                    : index() === 2
+                      ? 'На рассмотрении'
+                      : index() === 3
+                        ? 'В вишлисте'
+                        : index() === 4
+                          ? 'Выставлена на продажу'
+                          : index() === 5
+                            ? 'Профиль игрока открыт'
+                            : index() === 7
+                              ? '+10 Kudos за принятую заявку'
+                              : 'Сообщение отправлено')
+              : step.action
+          }}
+        </button>
+      </div>
+      <p class="outcome" aria-live="polite">
+        {{ phase() === 2 ? step.result : 'Смотрите пример или нажмите на действие сами.' }}
+      </p>
+    </div>
+  </main>
+  <footer class="tour-footer">
+    <button type="button" class="quiet replay" (click)="replay()">↻ Повторить пример</button>
+    <div class="navigation">
+      <button type="button" class="quiet" [disabled]="index() === 0" (click)="select(index() - 1)">
+        Назад</button
+      ><span>{{ index() + 1 }} / {{ steps.length }}</span
+      ><button type="button" class="next" (click)="next()">
+        {{ index() === steps.length - 1 ? 'Начать пользоваться' : 'Далее →' }}
+      </button>
+    </div>
+  </footer>
+</section>

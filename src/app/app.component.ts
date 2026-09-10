@@ -1,3 +1,4 @@
+import { OnboardingService } from './services/onboarding.service';
 import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
@@ -31,9 +32,10 @@ export class AppComponent implements OnInit {
   public isChatVisible$!: Observable<boolean>;
   public isAuthorized$!: Observable<boolean>;
 
-  constructor(private store: Store) {}
+  constructor(private store: Store, private onboarding: OnboardingService) {}
 
   public ngOnInit(): void {
+    this.onboarding.start();
     this.store.dispatch(new PlatformsActions.LoadPlaformsRequest());
     this.isChatVisible$ = this.store.select(ChatState.visible);
     this.isAuthorized$ = this.store.select(AuthState.isAuthorised);
