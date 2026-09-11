@@ -17,6 +17,7 @@ export function normalizeListParams(params: IProductListRequest): IProductListRe
   const query = params.query?.trim();
   if (query) result.query = query;
   if (params.sort) result.sort = params.sort === 'date' || params.sort === 'rating' ? params.sort : 'name';
+  if (typeof params.include_unreleased === 'boolean') result.include_unreleased = params.include_unreleased;
   if (typeof params.ignore_digital === 'boolean') result.ignore_digital = params.ignore_digital;
   if (typeof params.local_multiplayer === 'boolean') result.local_multiplayer = params.local_multiplayer;
   if (typeof params.online_multiplayer === 'boolean') result.online_multiplayer = params.online_multiplayer;
@@ -37,6 +38,7 @@ export function catalogParams(params: IProductListRequest): IProductListRequest 
 export function sameListParams(a: IProductListRequest, b: IProductListRequest): boolean {
   return (
     a.cat === b.cat &&
+    (a.include_unreleased ?? false) === (b.include_unreleased ?? false) &&
     a.local_multiplayer === b.local_multiplayer &&
     a.online_multiplayer === b.online_multiplayer &&
     a.franchise_id === b.franchise_id &&

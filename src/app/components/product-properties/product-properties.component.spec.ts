@@ -61,7 +61,7 @@ describe('ProductPropertiesComponent', () => {
     expect(fixture.nativeElement.textContent).toContain('Existing game');
   });
 
-  it('keeps all releases visible but only offers actions for PS2/PS3/PS4/PS5/PSP', () => {
+  it('keeps dated releases on all platforms visible but only offers actions for PS2/PS3/PS4/PS5/PSP', () => {
     const store = TestBed.inject(Store);
     store.reset({
       ...store.snapshot(),
@@ -76,6 +76,7 @@ describe('ProductPropertiesComponent', () => {
           release_id: id,
           platform_id: id,
           platform_name: `Platform ${id}`,
+          release_date: 1000,
           release_region: 'Europe',
         })),
         screenshots: [],
@@ -167,7 +168,7 @@ describe('ProductPropertiesComponent', () => {
       .expectOne('/api/products/1')
       .flush({
         product: { id: 1, name: 'Game', alternative_names: [] },
-        releases: [{ release_id: 10, platform_id: 48, platform_name: 'PS4', release_region: 'Europe' }],
+        releases: [{ release_id: 10, platform_id: 48, platform_name: 'PS4', release_region: 'Europe', release_date: 1000 }],
         screenshots: [],
         companies: [],
         franschises: [],
@@ -236,13 +237,13 @@ describe('ProductPropertiesComponent', () => {
     TestBed.inject(HttpTestingController)
       .expectOne('/api/products/1')
       .flush({
-        product: { id: 1, name: 'Game', image_url: null, first_release_date: null },
+        product: { id: 1, name: 'Game', image_url: null, first_release_date: 1000 },
         releases: [8, 9, 48, 167, 38, 7, 6, 49].map((platform_id, index) => ({
           release_id: index + 1,
           platform_id,
           platform_name: 'Platform',
           release_region: 'Europe',
-          release_date: null,
+          release_date: 1000,
           release_status: 0,
           digital_only: false,
           serial: [],
@@ -320,7 +321,7 @@ describe('ProductPropertiesComponent', () => {
     expect(links[0].textContent).toContain('Studio');
     expect(fixture.nativeElement.querySelector('a[href="/companies/999"]')).toBeNull();
   });
-  it('keeps every serial, release and metadata field while serial lists start collapsed', () => {
+  it('hides undated releases while keeping dated release serials and game metadata', () => {
     const serials = Array.from({ length: 60 }, (_, index) => `CUSA-${index}`);
     TestBed.inject(Store).dispatch(new ProductsActions.LoadProperties(1));
     TestBed.inject(HttpTestingController)
@@ -375,24 +376,17 @@ describe('ProductPropertiesComponent', () => {
       });
     fixture.detectChanges();
     const root: HTMLElement = fixture.nativeElement;
-    expect(root.querySelectorAll('.release-item')).toHaveLength(3);
+    expect(root.querySelectorAll('.release-item')).toHaveLength(1);
     const lists = root.querySelectorAll<HTMLDetailsElement>('.release-item details.serials');
-    expect(lists).toHaveLength(2);
+    expect(lists).toHaveLength(1);
     expect(lists[0].open).toBe(false);
     expect(lists[0].querySelector('summary')?.textContent).toContain('60');
     lists[0].querySelector('summary')!.click();
     expect(lists[0].open).toBe(true);
     expect(Array.from(lists[0].querySelectorAll('li'), (li) => li.textContent)).toEqual(serials);
-    expect(lists[1].querySelectorAll('li')).toHaveLength(2);
     for (const text of [
       'PS4',
       'Europe',
-      'Xbox',
-      'Japan',
-      'PC',
-      'World',
-      'Цифровая версия',
-      'Дата не указана',
       'Alias one',
       'Alias two',
       'Full description',
@@ -400,7 +394,7 @@ describe('ProductPropertiesComponent', () => {
     ]) {
       expect(root.textContent).toContain(text);
     }
-    expect(root.querySelectorAll('.text-decoration-line-through')).toHaveLength(1);
+    expect(root.querySelectorAll('.text-decoration-line-through')).toHaveLength(0);
     expect(root.querySelector('img.screenshot')?.getAttribute('alt')).toBe('Game — скриншот 1');
     expect(root.querySelector('button[aria-label="Назад"]')).not.toBeNull();
   });

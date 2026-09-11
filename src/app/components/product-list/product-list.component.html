@@ -23,12 +23,20 @@
               <input type="checkbox" id="onlyDigitalSwitch" formControlName="skipDigitalFilter" />
               <span>Пропустить цифровые</span>
             </label>
+            <label class="digital-option">
+              <input type="checkbox" formControlName="includeUnreleased" aria-describedby="release-filter-help" />
+              <span>Показывать невышедшие игры</span>
+            </label>
             <label class="catalog-sort">Сортировка
               <select class="form-select" formControlName="sort">
                 <option value="name">По названию</option><option value="date">По дате</option><option value="rating">По рейтингу IGDB ↓</option>
               </select>
             </label>
           </div>
+          <p class="catalog-filter-help" id="release-filter-help">Без даты выхода — только с галочкой «Показывать невышедшие игры».</p>
+          @if (queryForm.controls.skipDigitalFilter.value) {
+            <p class="catalog-filter-help">Показываем издания с серийником на этой платформе. Остальные ищите по названию — физический выпуск пока не подтверждён.</p>
+          }
 
             <div class="row">
               <div class="col">
@@ -103,7 +111,7 @@
               @if (product.first_release_date) {
                 c {{ product.first_release_date | date: 'dd.MM.yy' : 'UTC' }}
               } @else {
-                никогда не была выпущена
+                Дата выхода не указана
               }
             </div>
           </div>

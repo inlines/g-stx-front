@@ -36,6 +36,31 @@ describe('Catalog filters', () => {
     nextRequest().flush({ items: [], total_count: 100 });
   }
 
+  it('requires explicit opt-in for undated games and resets the page on each toggle', () => {
+    const component = mount();
+    expect(component.queryForm.controls.includeUnreleased.value).toBe(false);
+    const initial = nextRequest();
+    expect(initial.request.params.get('include_unreleased')).not.toBe('true');
+    initial.flush({ items: [], total_count: 50 });
+    component.pageChanged(2);
+    nextRequest().flush({ items: [], total_count: 50 });
+    for (const enabled of [true, false]) {
+      component.queryForm.controls.includeUnreleased.setValue(enabled);
+      vi.advanceTimersByTime(300);
+      const req = nextRequest();
+      expect(req.request.params.get('include_unreleased')).toBe(String(enabled));
+      expect(req.request.params.get('offset')).toBe('0');
+      req.flush({ items: [], total_count: 0 });
+    }
+  });
+  it('restores the undated checkbox from saved catalog filters', () => {
+    store.dispatch(new ProductsActions.SetRequestParams({ cat: 48, include_unreleased: true }));
+    const component = mount();
+    expect(component.queryForm.controls.includeUnreleased.value).toBe(true);
+    const req = nextRequest();
+    expect(req.request.params.get('include_unreleased')).toBe('true');
+    req.flush({ items: [], total_count: 0 });
+  });
   it('replaces a saved PC page with the first PS4 page', () => {
     store.dispatch(new ProductsActions.SetRequestParams({ cat: 6, offset: 45 }));
     mount();

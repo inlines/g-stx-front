@@ -12,5 +12,6 @@ export interface IProductListRequest {
   franchise_id?: number;
   company_id?: number;
   company_role?: 'developer' | 'publisher';
+  include_unreleased?: boolean;
   ignore_digital?: boolean;
 }

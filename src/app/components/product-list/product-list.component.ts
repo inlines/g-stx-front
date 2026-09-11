@@ -73,6 +73,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
     sort: new FormControl<ProductSort>('date', { nonNullable: true }),
     localMultiplayer: new FormControl(false, { nonNullable: true }),
     onlineMultiplayer: new FormControl(false, { nonNullable: true }),
+    includeUnreleased: new FormControl(false, { nonNullable: true }),
     skipDigitalFilter: new FormControl(true, { nonNullable: true }),
   });
   activeCategory = 48;
@@ -101,6 +102,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
             query: '',
             sort: 'date',
             ignore_digital: true,
+            include_unreleased: false,
             local_multiplayer: false,
             online_multiplayer: false,
           }),
@@ -110,6 +112,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
       {
         query: params.query ?? '',
         sort: params.sort!,
+        includeUnreleased: params.include_unreleased ?? false,
         skipDigitalFilter: params.ignore_digital!,
         localMultiplayer: params.local_multiplayer ?? false,
         onlineMultiplayer: params.online_multiplayer ?? false,
@@ -142,7 +145,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   }
 
   private updateFilters(): void {
-    const { query, sort, skipDigitalFilter, localMultiplayer, onlineMultiplayer } =
+    const { query, sort, skipDigitalFilter, localMultiplayer, onlineMultiplayer, includeUnreleased } =
       this.queryForm.getRawValue();
     const current = this.store.selectSnapshot(ProductsState.productsParams);
     const next = catalogParams({
@@ -151,6 +154,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
       sort,
       cat: this.activeCategory,
       ignore_digital: skipDigitalFilter,
+      include_unreleased: includeUnreleased,
       local_multiplayer: localMultiplayer,
       online_multiplayer: onlineMultiplayer,
     });

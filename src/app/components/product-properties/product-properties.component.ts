@@ -64,12 +64,14 @@ export class ProductPropertiesComponent implements OnInit {
         const have = new Set(ownership.flatMap((item) => item.have_ids ?? []));
         const wish = new Set(ownership.flatMap((item) => item.wish_ids ?? []));
         const sales = new Set(ownership.flatMap((item) => item.wts_ids ?? []));
-        return (properties?.releases ?? []).map((release) => ({
-          ...release,
-          owned: have.has(release.release_id),
-          wished: wish.has(release.release_id),
-          forSale: sales.has(release.release_id),
-        }));
+        return (properties?.releases ?? [])
+          .filter((release) => release.release_date != null)
+          .map((release) => ({
+            ...release,
+            owned: have.has(release.release_id),
+            wished: wish.has(release.release_id),
+            forSale: sales.has(release.release_id),
+          }));
       }),
     );
   }

@@ -22,6 +22,12 @@ describe('List query contract', () => {
       ignore_digital: true,
     });
   });
+  it('preserves explicit unreleased switches and detects visibility changes', () => {
+    expect(listHttpParams({ include_unreleased: false })).toEqual({ include_unreleased: false });
+    expect(listHttpParams({ include_unreleased: true })).toEqual({ include_unreleased: true });
+    expect(sameListParams({}, { include_unreleased: false })).toBe(true);
+    expect(sameListParams({}, { include_unreleased: true })).toBe(false);
+  });
   it('bounds invalid pagination and rejects non-finite values', () => {
     expect(normalizeListParams({ limit: -3, offset: -20, cat: NaN })).toEqual({ limit: 1, offset: 0 });
   });
