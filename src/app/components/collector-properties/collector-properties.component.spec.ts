@@ -143,4 +143,38 @@ describe('Collector library', () => {
       '/products/1;platform=48',
     );
   });
+  it('filters by platform and region union, resetting pagination and restoring all platforms', () => {
+    const state = store.snapshot();
+    store.reset({ ...state,
+      Platforms: { ...state.Platforms, platforms: [
+        { id: 48, name: 'PS4', europe_games: 100, america_games: 80, other_games: 50 },
+        { id: 167, name: 'PS5' },
+      ] },
+      Collectors: { ...state.Collectors, loadedCollection: [
+        { ...items[0], platform_id: 48, region_id: 1 },
+        { ...items[1], platform_id: 48, region_id: 2 },
+        { ...items[2], platform_id: 48, region_id: 10 },
+        { ...items[3], platform_id: 167, region_id: 1 },
+      ] },
+    });
+    const component = fixture.componentInstance;
+    component.page(2);
+    component.selectPlatform(48);
+    component.toggleRegion('europe');
+    fixture.detectChanges();
+    const host = fixture.nativeElement as HTMLElement;
+    expect(host.querySelectorAll('app-release-card')).toHaveLength(1);
+    expect(host.querySelector('app-region-filters')!.textContent).toContain('100');
+    expect(host.querySelector('.platform-filters')!.textContent).not.toContain('100');
+    component.toggleRegion('other');
+    fixture.detectChanges();
+    expect(host.querySelectorAll('app-release-card')).toHaveLength(2);
+    expect(host.textContent).toContain('Release 3');
+    expect(host.textContent).not.toContain('Release 2');
+    component.selectPlatform(null);
+    fixture.detectChanges();
+    expect(host.querySelectorAll('app-release-card')).toHaveLength(4);
+    expect(host.querySelector('app-region-filters')).toBeNull();
+  });
+
 });

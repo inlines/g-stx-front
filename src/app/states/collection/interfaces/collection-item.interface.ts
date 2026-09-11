@@ -1,5 +1,8 @@
 export interface ICollectionItem {
   release_id: number;
+  platform_id?: number;
+  region_id?: number | null;
+  digital_only?: boolean;
   release_date: number | null;
   platform_name: string;
   product_name: string;

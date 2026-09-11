@@ -8,15 +8,15 @@
             @for (cat of (categories$ | async); track cat.id) {
               <li><button type="button" class="btn-pink" [class.active]="activeCategory === cat.id"
                 [attr.aria-pressed]="activeCategory === cat.id" (click)="setActiveCategory(cat.id)">
-                {{ cat.abbreviation }} @if(!franchiseId && !companyId){<span>{{ cat.total_games }}</span>}
+                {{ cat.abbreviation }}
               </button></li>
             }
           </ul>
+          <app-region-filters [selected]="selectedRegions" [totals]="(selectedRegionCounts$ | async) ?? {}" (regionToggle)="toggleRegion($event)"/>
           <fieldset class="multiplayer-filters">
             <legend>Мультиплеер на выбранной платформе</legend>
             <label><input type="checkbox" formControlName="localMultiplayer"> Локально · 2+ игрока</label>
             <label><input type="checkbox" formControlName="onlineMultiplayer"> Онлайн · 2+ игрока</label>
-            <small>Оба фильтра — игры с обоими режимами. Только подтверждённые данные IGDB.</small>
           </fieldset>
           <div class="catalog-options">
             <label class="digital-option" for="onlyDigitalSwitch">
@@ -33,7 +33,6 @@
               </select>
             </label>
           </div>
-          <p class="catalog-filter-help" id="release-filter-help">Без даты выхода — только с галочкой «Показывать невышедшие игры».</p>
 
             <div class="row">
               <div class="col">

@@ -4,6 +4,9 @@ export interface IPlatformItem {
   name: string;
   generation: number | null;
   total_games: number;
+  europe_games?: number;
+  america_games?: number;
+  other_games?: number;
   user_games?: number;
   total_spent?: number;
 }

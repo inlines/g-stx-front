@@ -1,3 +1,5 @@
+import { RegionFiltersComponent } from '../region-filters/region-filters.component';
+import { matchesRegion, ownedRegionCounts, platformRegionCounts, RegionGroup, toggleRegion } from '@app/shared/region-filter';
 import { priceValidator } from '@app/shared/price-validator';
 import { libraryCsv, LibraryCsvDownload } from '@app/shared/library-csv';
 import { OwnershipState } from '@app/states/ownership/states/ownership.state';
@@ -32,7 +34,7 @@ import { ReleaseCardComponent } from '../release-card/release-card.component';
 import { buildPages } from '../pager/pagination';
 @Component({
   selector: 'app-personal-library',
-  imports: [AsyncPipe, CurrencyPipe, ReactiveFormsModule, RouterLink, ReleaseCardComponent],
+  imports: [RegionFiltersComponent, AsyncPipe, CurrencyPipe, ReactiveFormsModule, RouterLink, ReleaseCardComponent],
   providers: [PersonalListController],
   templateUrl: './personal-library.component.html',
   styleUrl: './personal-library.component.scss',
@@ -84,17 +86,20 @@ export class PersonalLibraryComponent implements OnInit, OnDestroy {
       this.store.select(CollectionState.libraryStatuses),
       this.store.select(OwnershipState.ownership),
       this.changes,
+      this.list.platforms$,
     ]).pipe(
-      map(([items, statuses, ownership]) => {
+      map(([items, statuses, ownership, , platforms]) => {
         const status = statuses[this.kind];
         const filtered =
-          this.kind === 'collection' ? filterCollection(items, this.view.query, this.view.sort) : items;
+          this.kind === 'collection' ? filterCollection(items.filter((item) => matchesRegion(item, this.view.regions)), this.view.query, this.view.sort) : items;
         const total = filtered.length;
         const pages = Math.max(1, Math.ceil(total / this.view.size));
         // Do not discard the saved page while a fresh list is loading.
         if (status === RequestStatus.Load) this.view.page = Math.min(this.view.page, pages);
         const start = (this.view.page - 1) * this.view.size;
         return {
+          regionTotals: platformRegionCounts(platforms.find((p) => p.id === this.list.activeCategory)),
+          ownedRegions: status === RequestStatus.Load ? ownedRegionCounts(items) : {},
           exportCount: items.length,
           forSale: new Set(ownership.flatMap((item) => item.wts_ids ?? [])),
           items: filtered.slice(start, start + this.view.size),
@@ -162,6 +167,15 @@ export class PersonalLibraryComponent implements OnInit, OnDestroy {
       libraryCsv(ordered, this.kind, selling),
       `${this.kind}-${this.list.activeCategory ?? 'all'}-${new Date().toISOString().slice(0, 10)}.csv`,
     );
+  }
+  clearFilters(): void {
+    this.view.regions = [];
+    this.query.setValue('');
+  }
+  toggleRegion(region: RegionGroup): void {
+    this.view.regions = toggleRegion(this.view.regions, region);
+    this.view.page = 1;
+    this.changes.next();
   }
   selectPlatform(cat: number): void {
     if (cat === this.list.activeCategory) return;

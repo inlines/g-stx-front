@@ -1,3 +1,5 @@
+import { RegionFiltersComponent } from '../region-filters/region-filters.component';
+import { normalizeRegions, platformRegionCounts, RegionGroup, toggleRegion } from '@app/shared/region-filter';
 import { GameStatsComponent } from '../game-stats/game-stats.component';
 import { supportsReleaseActions } from '@app/shared/release-platforms';
 import { AsyncPipe, DatePipe } from '@angular/common';
@@ -28,7 +30,7 @@ import { combineLatest, debounceTime, distinctUntilChanged, map } from 'rxjs';
 
 @Component({
   selector: 'app-product-list',
-  imports: [GameStatsComponent, AsyncPipe, DatePipe, RouterModule, ReactiveFormsModule, PagerComponent],
+  imports: [RegionFiltersComponent, GameStatsComponent, AsyncPipe, DatePipe, RouterModule, ReactiveFormsModule, PagerComponent],
   templateUrl: './product-list.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './product-list.component.scss',
@@ -52,6 +54,12 @@ export class ProductListComponent implements OnInit, AfterViewInit {
         platforms.filter((p) => p.id !== 6 && (this.platformIds === null || this.platformIds.includes(p.id))),
       ),
     );
+  readonly selectedRegionCounts$ = combineLatest([this.categories$, this.productParams$]).pipe(map(([platforms, params]) => platformRegionCounts(platforms.find((p) => p.id === params.cat))));
+  get selectedRegions() { return normalizeRegions(this.queryForm.controls.regions.value); }
+  toggleRegion(region: RegionGroup): void {
+    this.queryForm.controls.regions.setValue(toggleRegion(this.selectedRegions, region).join(','));
+    this.updateFilters();
+  }
   readonly productsTotalCount$ = this.store.select(ProductsState.totalCountProducts);
   readonly isAuthorised$ = this.store.select(AuthState.isAuthorised);
   readonly loading$ = this.store.select(ProductsState.listLoading);
@@ -74,6 +82,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
     localMultiplayer: new FormControl(false, { nonNullable: true }),
     onlineMultiplayer: new FormControl(false, { nonNullable: true }),
     includeUnreleased: new FormControl(false, { nonNullable: true }),
+    regions: new FormControl('', { nonNullable: true }),
     skipDigitalFilter: new FormControl(true, { nonNullable: true }),
   });
   activeCategory = 48;
@@ -103,6 +112,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
             sort: 'date',
             ignore_digital: true,
             include_unreleased: false,
+            regions: '',
             local_multiplayer: false,
             online_multiplayer: false,
           }),
@@ -113,6 +123,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
         query: params.query ?? '',
         sort: params.sort!,
         includeUnreleased: params.include_unreleased ?? false,
+        regions: params.regions ?? '',
         skipDigitalFilter: params.ignore_digital!,
         localMultiplayer: params.local_multiplayer ?? false,
         onlineMultiplayer: params.online_multiplayer ?? false,
@@ -145,7 +156,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   }
 
   private updateFilters(): void {
-    const { query, sort, skipDigitalFilter, localMultiplayer, onlineMultiplayer, includeUnreleased } =
+    const { query, sort, skipDigitalFilter, localMultiplayer, onlineMultiplayer, includeUnreleased, regions } =
       this.queryForm.getRawValue();
     const current = this.store.selectSnapshot(ProductsState.productsParams);
     const next = catalogParams({
@@ -155,6 +166,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
       cat: this.activeCategory,
       ignore_digital: skipDigitalFilter,
       include_unreleased: includeUnreleased,
+      regions,
       local_multiplayer: localMultiplayer,
       online_multiplayer: onlineMultiplayer,
     });

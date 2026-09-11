@@ -1,3 +1,4 @@
+import { normalizeRegions } from './region-filter';
 import { IProductListRequest } from '@app/states/products/interfaces/product-list-request.interface';
 
 export const CATALOG_PAGE_SIZE = 15;
@@ -14,6 +15,7 @@ export function normalizeListParams(params: IProductListRequest): IProductListRe
   if (Number.isInteger(params.company_id) && params.company_id! > 0) result.company_id = params.company_id;
   if (params.company_role === 'developer' || params.company_role === 'publisher')
     result.company_role = params.company_role;
+  if (params.regions !== undefined) result.regions = normalizeRegions(params.regions).join(',');
   const query = params.query?.trim();
   if (query) result.query = query;
   if (params.sort) result.sort = params.sort === 'date' || params.sort === 'rating' ? params.sort : 'name';
@@ -38,6 +40,7 @@ export function catalogParams(params: IProductListRequest): IProductListRequest 
 export function sameListParams(a: IProductListRequest, b: IProductListRequest): boolean {
   return (
     a.cat === b.cat &&
+    (a.regions ?? '') === (b.regions ?? '') &&
     (a.include_unreleased ?? false) === (b.include_unreleased ?? false) &&
     a.local_multiplayer === b.local_multiplayer &&
     a.online_multiplayer === b.online_multiplayer &&

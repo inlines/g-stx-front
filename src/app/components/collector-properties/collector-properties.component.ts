@@ -1,3 +1,5 @@
+import { RegionFiltersComponent } from '../region-filters/region-filters.component';
+import { matchesRegion, ownedRegionCounts, platformRegionCounts, RegionGroup, toggleRegion } from '@app/shared/region-filter';
 import { KudosComponent } from '../kudos/kudos.component';
 import { UserAvatarComponent } from '../user-avatar/user-avatar.component';
 import { PlatformState } from '@app/states/platforms/states/platforms.state';
@@ -18,7 +20,7 @@ import { PagerComponent } from '../pager/pager.component';
 import { ReleaseCardComponent } from '../release-card/release-card.component';
 @Component({
   selector: 'app-collector-properties',
-  imports: [KudosComponent, UserAvatarComponent, RouterLink, AsyncPipe, PagerComponent, ReleaseCardComponent],
+  imports: [RegionFiltersComponent, KudosComponent, UserAvatarComponent, RouterLink, AsyncPipe, PagerComponent, ReleaseCardComponent],
   templateUrl: './collector-properties.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './collector-properties.component.scss',
@@ -68,25 +70,48 @@ export class CollectorPropertiesComponent {
   ]).pipe(
     map(([{ items, login, status, tab }, , platforms]) => {
       const view = this.views.get(tab === 'wts' ? `collector-wts:${login}` : `collector:${login}`);
-      const pages = Math.max(1, Math.ceil(items.length / view.size));
+      const availablePlatforms = platforms.filter((p) => items.some((item) => item.platform_id === p.id || (!item.platform_id && item.platform_name === p.name)));
+      if (status === RequestStatus.Load && view.platform && !availablePlatforms.some((p) => p.id === view.platform)) view.platform = null;
+      const selectedPlatform = availablePlatforms.find((p) => p.id === view.platform);
+      const platformItems = tab === 'collection' && selectedPlatform
+        ? items.filter((item) => item.platform_id === selectedPlatform.id || (!item.platform_id && item.platform_name === selectedPlatform.name)) : items;
+      const filtered = tab === 'collection' ? platformItems.filter((item) => matchesRegion(item, view.regions)) : items;
+      const pages = Math.max(1, Math.ceil(filtered.length / view.size));
       if (status === RequestStatus.Load) view.page = Math.min(view.page, pages);
       const offset = (view.page - 1) * view.size;
       return {
         login,
         tab,
-        total: items.length,
+        total: filtered.length,
+        unfilteredTotal: items.length,
+        platforms: availablePlatforms,
+        selectedPlatform: view.platform,
+        regions: view.regions,
+        regionTotals: platformRegionCounts(selectedPlatform),
+        ownedRegions: status === RequestStatus.Load ? ownedRegionCounts(platformItems) : {},
         offset,
         page: view.page,
         size: view.size,
-        items: items.slice(offset, offset + view.size).map((item) => ({
+        items: filtered.slice(offset, offset + view.size).map((item) => ({
           ...item,
-          platformId: platforms.find((platform) => platform.name === item.platform_name)?.id ?? null,
+          platformId: item.platform_id ?? platforms.find((platform) => platform.name === item.platform_name)?.id ?? null,
         })),
         loading: status === RequestStatus.Pending,
         failed: status === RequestStatus.Error,
       };
     }),
   );
+  selectPlatform(id: number | null): void {
+    this.view.platform = id;
+    if (id === null) this.view.regions = [];
+    this.view.page = 1;
+    this.changes.next();
+  }
+  toggleRegion(region: RegionGroup): void {
+    this.view.regions = toggleRegion(this.view.regions, region);
+    this.view.page = 1;
+    this.changes.next();
+  }
   page(page: number): void {
     this.view.page = page;
     this.changes.next();
