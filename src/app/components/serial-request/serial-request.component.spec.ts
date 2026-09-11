@@ -44,6 +44,50 @@ describe('Serial request form', () => {
     fixture.detectChanges();
     return { fixture, component: fixture.componentInstance, http: TestBed.inject(HttpTestingController) };
   }
+  it.each([false, true])(
+    'saves a direct admin contribution without a photo (name=%s) and refreshes the game',
+    (isName) => {
+      const { fixture, component, http } = setup();
+      fixture.componentRef.setInput('direct', true);
+      fixture.componentRef.setInput('productId', 7);
+      fixture.componentRef.setInput('kind', isName ? 'alternative_name' : 'serial');
+      fixture.detectChanges();
+      expect(fixture.nativeElement.querySelector('input[type=file]')).toBeNull();
+      expect(fixture.nativeElement.querySelector('.readable')).toBeNull();
+      component.serial = isName ? '日本語 Alias' : 'cusa-98765';
+      component.submit();
+      component.submit();
+      const request = http.expectOne(
+        isName ? '/api/admin/products/7/alternative-names' : '/api/admin/releases/12/serials',
+      );
+      expect(request.request.body).toEqual(isName ? { name: '日本語 Alias' } : { serial: 'CUSA-98765' });
+      request.flush(null, { status: 204, statusText: 'No Content' });
+      http
+        .expectOne('/api/products/7')
+        .flush({
+          product: { id: 7, name: 'Game' },
+          releases: [],
+          screenshots: [],
+          companies: [],
+          franschises: [],
+        });
+      expect(component.sent).toBe(true);
+      fixture.destroy();
+    },
+  );
+  it('does not fall back to a photo-free user request if admin access is rejected', () => {
+    const { fixture, component, http } = setup();
+    fixture.componentRef.setInput('direct', true);
+    component.serial = 'CUSA-12345';
+    component.submit();
+    http
+      .expectOne('/api/admin/releases/12/serials')
+      .flush({ error: 'Только для администратора' }, { status: 403, statusText: 'Forbidden' });
+    expect(component.error).toBe('Только для администратора');
+    expect(component.sent).toBe(false);
+    http.expectNone((req) => req.url.includes('serial-requests'));
+    fixture.destroy();
+  });
   it('submits a Unicode alternative name with a photo and five-Kudos confirmation, without a release', () => {
     const fixture = TestBed.createComponent(SerialRequestComponent);
     fixture.componentRef.setInput('kind', 'alternative_name');

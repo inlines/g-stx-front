@@ -1,3 +1,5 @@
+import { Store } from '@ngxs/store';
+import { ProductsActions } from '@app/states/products/states/products.actions';
 import { normalizeAlternativeName, validAlternativeName } from '@app/shared/contribution-value';
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, Input, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -5,7 +7,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { IReleaseItem } from '@app/states/products/interfaces/release-item.interface';
 import { SerialRequestsService } from '@app/services/serial-requests.service';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { finalize } from 'rxjs';
+import { finalize, Observable } from 'rxjs';
 import { preparePhoto } from './prepare-photo';
 
 @Component({
@@ -17,6 +19,8 @@ import { preparePhoto } from './prepare-photo';
 })
 export class SerialRequestComponent implements OnDestroy {
   @Input() release!: IReleaseItem;
+  @Input() direct = false;
+  private readonly store = inject(Store);
   @Input() productName = '';
   @Input() productId = 0;
   @Input() kind: 'serial' | 'alternative_name' = 'serial';
@@ -74,7 +78,13 @@ export class SerialRequestComponent implements OnDestroy {
     }
   }
   submit() {
-    if (!this.validSerial || !this.photo || !this.readable || this.busy || this.preparing || this.sent)
+    if (
+      !this.validSerial ||
+      (!this.direct && (!this.photo || !this.readable)) ||
+      this.busy ||
+      this.preparing ||
+      this.sent
+    )
       return;
     if (
       (this.isName ? [...this.existingNames, this.productName] : this.existingValues).some(
@@ -86,18 +96,32 @@ export class SerialRequestComponent implements OnDestroy {
     }
     this.busy = true;
     this.error = '';
-    const request = this.isName
-      ? this.api.submitName(this.productId, this.normalizedSerial, this.photo)
-      : this.api.submit(this.release.release_id, this.normalizedSerial, this.photo);
+    const request: Observable<unknown> = this.direct
+      ? this.isName
+        ? this.api.addNameDirect(this.productId, this.normalizedSerial)
+        : this.api.addSerialDirect(this.release.release_id, this.normalizedSerial)
+      : this.isName
+        ? this.api.submitName(this.productId, this.normalizedSerial, this.photo!)
+        : this.api.submit(this.release.release_id, this.normalizedSerial, this.photo!);
     request
       .pipe(
         takeUntilDestroyed(this.destroy),
         finalize(() => (this.busy = false)),
       )
       .subscribe({
-        next: () => (this.sent = true),
+        next: () => {
+          this.sent = true;
+          if (this.direct) {
+            this.store.dispatch(new ProductsActions.LoadProperties(this.productId));
+            this.modal.close(true);
+          }
+        },
         error: (error) =>
-          (this.error = error.error?.error || 'Не удалось отправить заявку. Попробуйте ещё раз.'),
+          (this.error =
+            error.error?.error ||
+            (this.direct
+              ? 'Не удалось сохранить изменение. Попробуйте ещё раз.'
+              : 'Не удалось отправить заявку. Попробуйте ещё раз.')),
       });
   }
   ngOnDestroy() {

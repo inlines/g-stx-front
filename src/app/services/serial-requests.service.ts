@@ -27,6 +27,12 @@ export interface SerialRequest {
 export class SerialRequestsService {
   private readonly http = inject(HttpClient);
   private readonly api = inject(ENVIRONMENT).apiUrl;
+  addSerialDirect(releaseId: number, serial: string) {
+    return this.http.post<void>(`${this.api}/admin/releases/${releaseId}/serials`, { serial });
+  }
+  addNameDirect(productId: number, name: string) {
+    return this.http.post<void>(`${this.api}/admin/products/${productId}/alternative-names`, { name });
+  }
   submit(releaseId: number, serial: string, photo: Blob) {
     return this.http.post<{ id: number; status: 'pending' }>(
       `${this.api}/releases/${releaseId}/serial-requests`,

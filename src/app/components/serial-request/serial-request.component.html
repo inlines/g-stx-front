@@ -9,6 +9,9 @@
       <label for="proposed-serial">{{ isName ? 'Альтернативное название игры' : 'Серийный номер релиза' }}</label>
       <input id="proposed-serial" name="serial" [(ngModel)]="serial" [maxlength]="isName ? 400 : 64" required autocomplete="off" [attr.autocapitalize]="isName ? 'off' : 'characters'" spellcheck="false" [placeholder]="isName ? 'Название, напечатанное на коробке' : 'Например, CUSA-12345'" [disabled]="busy">
       @if (existingValues.length) { <details><summary>{{ isName ? 'Уже известные названия' : 'Уже известные серийники' }} · {{ existingValues.length }}</summary><ul>@for (value of existingValues; track $index) { <li>{{ value }}</li> }</ul></details> }
+      @if (direct) {
+        <p class="hint">Изменение администратора будет сразу добавлено в каталог. Заявка и фотография не нужны.</p>
+      } @else {
       <p class="hint">{{ isName ? 'Укажите одно название (до 200 символов) и приложите фото коробки, на котором оно хорошо читается. Регистр и язык сохраняются.' : 'Сфотографируйте коробку так, чтобы были видны название игры, регион издания и серийник.' }}</p>
       <label class="file">Выбрать фото / из галереи<input type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" [disabled]="busy || preparing" (change)="choose($event)"></label>
       <p class="hint">До 15 МБ. Фото уменьшается на устройстве; оригинал не отправляется.</p>
@@ -17,8 +20,9 @@
         <a [href]="preview" target="_blank" rel="noopener" class="preview-link"><img [src]="preview" alt="Фото, которое будет отправлено администратору"><span>Открыть крупно и проверить {{ isName ? 'название' : 'серийник' }}</span></a>
         <label class="readable"><input type="checkbox" name="readable" [(ngModel)]="readable" [disabled]="busy">{{ isName ? 'Название читается' : 'Серийник читается' }} на подготовленном фото</label>
       }
+      }
       @if (error) { <p class="error" role="alert">{{ error }}</p> }
-      <footer><button type="button" [disabled]="busy" (click)="modal.dismiss()">Отмена</button><button type="submit" [disabled]="!validSerial || !photo || !readable || preparing || busy">{{ busy ? 'Отправляем…' : 'Отправить заявку' }}</button></footer>
+      <footer><button type="button" [disabled]="busy" (click)="modal.dismiss()">Отмена</button><button type="submit" [disabled]="!validSerial || (!direct && (!photo || !readable)) || preparing || busy">{{ busy ? (direct ? 'Сохраняем…' : 'Отправляем…') : (direct ? 'Добавить в каталог' : 'Отправить заявку') }}</button></footer>
     </form>
   }
 </div>

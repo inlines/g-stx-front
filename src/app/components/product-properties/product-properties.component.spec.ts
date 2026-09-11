@@ -1,5 +1,5 @@
 import { NgbModal, NgbConfig } from '@ng-bootstrap/ng-bootstrap';
-import { of } from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
 import { ActivatedRoute, convertToParamMap } from '@angular/router';
 import { CollectionActions } from '@app/states/collection/states/collection-actions';
 import { Store } from '@ngxs/store';
@@ -123,6 +123,64 @@ describe('ProductPropertiesComponent', () => {
       component.similarLink({ id: 3, name: 'Other', image_url: null, platform_ids: [48, 167] }, 167),
     ).toEqual(['/products', 3, { platform: 167 }]);
     expect(root.querySelectorAll('.similar-heading button')).toHaveLength(2);
+  });
+  it('filters similar games by the current platform and reacts to platform navigation', () => {
+    const params = new BehaviorSubject(convertToParamMap({ platform: '48' }));
+    Object.defineProperty(TestBed.inject(ActivatedRoute), 'paramMap', { value: params, configurable: true });
+    component.ngOnInit();
+    TestBed.inject(Store).dispatch(new ProductsActions.LoadProperties(1));
+    TestBed.inject(HttpTestingController)
+      .expectOne('/api/products/1')
+      .flush({
+        product: { id: 1, name: 'Game' },
+        releases: [],
+        screenshots: [],
+        companies: [],
+        franschises: [],
+        similar_games: [
+          { id: 2, name: 'PS4 only', image_url: null, platform_ids: [48] },
+          { id: 3, name: 'PS5 only', image_url: null, platform_ids: [167] },
+          { id: 4, name: 'Both', image_url: null, platform_ids: [48, 167] },
+          { id: 5, name: 'Unknown platform', image_url: null, platform_ids: [] },
+        ],
+      });
+    fixture.detectChanges();
+    const links = () =>
+      Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('.similar-card'), (a) =>
+        a.getAttribute('href'),
+      );
+    expect(links()).toEqual(['/products/2;platform=48', '/products/4;platform=48']);
+    params.next(convertToParamMap({ platform: '167' }));
+    fixture.detectChanges();
+    expect(links()).toEqual(['/products/3;platform=167', '/products/4;platform=167']);
+    params.next(convertToParamMap({ platform: '9' }));
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.similar-section')).toBeNull();
+  });
+  it('opens direct editing from both contribution links for an administrator', () => {
+    Object.defineProperty(component, 'isAdmin$', { value: of(true) });
+    const store = TestBed.inject(Store);
+    store.reset({ ...store.snapshot(), Auth: { ...store.snapshot().Auth, login: 'admin', token: 'test' } });
+    component.isAuthorised$ = of(true);
+    TestBed.inject(Store).dispatch(new ProductsActions.LoadProperties(1));
+    TestBed.inject(HttpTestingController)
+      .expectOne('/api/products/1')
+      .flush({
+        product: { id: 1, name: 'Game', alternative_names: [] },
+        releases: [{ release_id: 10, platform_id: 48, platform_name: 'PS4', release_region: 'Europe' }],
+        screenshots: [],
+        companies: [],
+        franschises: [],
+      });
+    fixture.detectChanges();
+    for (const selector of ['.suggest-name', '.suggest-serial']) {
+      fixture.nativeElement.querySelector(selector).click();
+      fixture.detectChanges();
+      const dialog = document.querySelector('.request-modal')!;
+      expect(dialog.querySelector('input[type=file]')).toBeNull();
+      expect(dialog.textContent).toContain('Добавить в каталог');
+      TestBed.inject(NgbModal).dismissAll();
+    }
   });
   it('offers name contributions below the heading even with no alternative names', () => {
     const store = TestBed.inject(Store);

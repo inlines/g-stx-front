@@ -1,3 +1,4 @@
+import { UserBadgesService } from '@app/services/user-badges.service';
 import { GameStatsComponent } from '../game-stats/game-stats.component';
 import { ISimilarGame } from '@app/states/products/interfaces/product-properties-response.interface';
 import { supportsReleaseActions } from '@app/shared/release-platforms';
@@ -73,14 +74,27 @@ export class ProductPropertiesComponent implements OnInit {
     );
   }
 
+  readonly isAdmin$ = combineLatest([
+    inject(UserBadgesService).admins$,
+    inject(Store).select(AuthState.login),
+  ]).pipe(map(([admins, login]) => !!login && admins.includes(login)));
+
   readonly failure$: Observable<{ failed: boolean; notFound: boolean }>;
 
   public platformId$!: Observable<number>;
+  public similarGames$!: Observable<ISimilarGame[]>;
 
   public sortedReleases$!: Observable<{ highlighted: IReleaseItem[]; others: IReleaseItem[] }>;
 
   public ngOnInit(): void {
     this.platformId$ = this.params.paramMap.pipe(map((params) => Number(params.get('platform') ?? 0)));
+    this.similarGames$ = combineLatest([this.productProperties$, this.platformId$]).pipe(
+      map(([properties, platformId]) =>
+        (properties?.similar_games ?? []).filter(
+          (game) => !platformId || game.platform_ids.includes(platformId),
+        ),
+      ),
+    );
     this.sortedReleases$ = combineLatest([this.releases$, this.platformId$]).pipe(
       map(([releases, platformId]) => {
         if (!platformId || platformId === 0) {
@@ -182,7 +196,7 @@ export class ProductPropertiesComponent implements OnInit {
   canSuggestSerial(release: IReleaseItem) {
     return supportsReleaseActions(release.platform_id);
   }
-  suggestSerial(release: IReleaseItem) {
+  suggestSerial(release: IReleaseItem, direct = false) {
     if (!this.canSuggestSerial(release) || !this.store.selectSnapshot(AuthState.isAuthorised)) return;
     const dialog: NgbModalRef = this.modalService.open(SerialRequestComponent, {
       centered: true,
@@ -190,12 +204,15 @@ export class ProductPropertiesComponent implements OnInit {
       ariaLabelledBy: 'serial-request-title',
       beforeDismiss: (): boolean => !dialog.componentInstance.busy,
     });
+    dialog.componentInstance.direct = direct;
+    dialog.componentInstance.productId =
+      this.store.selectSnapshot(ProductsState.productProperties)?.product.id || 0;
     dialog.componentInstance.release = release;
     dialog.componentInstance.productName =
       this.store.selectSnapshot(ProductsState.productProperties)?.product.name || '';
   }
 
-  suggestName() {
+  suggestName(direct = false) {
     if (!this.store.selectSnapshot(AuthState.isAuthorised)) return;
     const product = this.store.selectSnapshot(ProductsState.productProperties)?.product;
     if (!product) return;
@@ -205,6 +222,7 @@ export class ProductPropertiesComponent implements OnInit {
       ariaLabelledBy: 'serial-request-title',
       beforeDismiss: (): boolean => !dialog.componentInstance.busy,
     });
+    dialog.componentInstance.direct = direct;
     dialog.componentInstance.kind = 'alternative_name';
     dialog.componentInstance.productId = product.id;
     dialog.componentInstance.productName = product.name;
