@@ -1,3 +1,5 @@
+import { GameStatsComponent } from '../game-stats/game-stats.component';
+import { ISimilarGame } from '@app/states/products/interfaces/product-properties-response.interface';
 import { supportsReleaseActions } from '@app/shared/release-platforms';
 import { SerialRequestComponent } from '../serial-request/serial-request.component';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -25,6 +27,7 @@ import { combineLatest, map, Observable } from 'rxjs';
 @Component({
   selector: 'app-product-properties',
   imports: [
+    GameStatsComponent,
     ReactiveFormsModule,
     RouterLink,
     AsyncPipe,
@@ -210,6 +213,20 @@ export class ProductPropertiesComponent implements OnInit {
 
   serialPreview(release: IReleaseItem): string {
     return (release.serial ?? []).slice(0, 3).join(' · ') + ((release.serial?.length ?? 0) > 3 ? ' · …' : '');
+  }
+
+  similarLink(game: ISimilarGame, selectedPlatform: number): (string | number | { platform: number })[] {
+    const platform = game.platform_ids.includes(selectedPlatform)
+      ? selectedPlatform
+      : game.platform_ids.find(supportsReleaseActions);
+    return platform ? ['/products', game.id, { platform }] : ['/products', game.id];
+  }
+
+  scrollSimilar(track: HTMLElement, direction: number): void {
+    track.scrollBy({
+      left: direction * track.clientWidth * 0.8,
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+    });
   }
 
   public goBack() {

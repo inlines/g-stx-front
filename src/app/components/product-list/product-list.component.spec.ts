@@ -85,6 +85,21 @@ describe('Catalog filters', () => {
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('.ownership-mark')).not.toBeNull();
   });
+  it('sends platform-specific multiplayer filters and rating sort, resetting the page', () => {
+    const component = mount();
+    flushInitial();
+    component.pageChanged(3);
+    nextRequest().flush({ items: [], total_count: 50 });
+    component.queryForm.patchValue({ sort: 'rating', localMultiplayer: true, onlineMultiplayer: true });
+    vi.advanceTimersByTime(300);
+    const req = nextRequest();
+    expect(req.request.params.get('cat')).toBe('48');
+    expect(req.request.params.get('sort')).toBe('rating');
+    expect(req.request.params.get('local_multiplayer')).toBe('true');
+    expect(req.request.params.get('online_multiplayer')).toBe('true');
+    expect(req.request.params.get('offset')).toBe('0');
+    req.flush({ items: [], total_count: 0 });
+  });
   it('does not open the keyboard on touch devices when entering or switching platforms', () => {
     vi.stubGlobal(
       'matchMedia',

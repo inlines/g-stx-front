@@ -1,3 +1,4 @@
+import { GameStatsComponent } from '../game-stats/game-stats.component';
 import { supportsReleaseActions } from '@app/shared/release-platforms';
 import { AsyncPipe, DatePipe } from '@angular/common';
 import {
@@ -27,7 +28,7 @@ import { combineLatest, debounceTime, distinctUntilChanged, map } from 'rxjs';
 
 @Component({
   selector: 'app-product-list',
-  imports: [AsyncPipe, DatePipe, RouterModule, ReactiveFormsModule, PagerComponent],
+  imports: [GameStatsComponent, AsyncPipe, DatePipe, RouterModule, ReactiveFormsModule, PagerComponent],
   templateUrl: './product-list.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './product-list.component.scss',
@@ -70,6 +71,8 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   readonly queryForm = new FormGroup({
     query: new FormControl('', { nonNullable: true }),
     sort: new FormControl<ProductSort>('date', { nonNullable: true }),
+    localMultiplayer: new FormControl(false, { nonNullable: true }),
+    onlineMultiplayer: new FormControl(false, { nonNullable: true }),
     skipDigitalFilter: new FormControl(true, { nonNullable: true }),
   });
   activeCategory = 48;
@@ -91,11 +94,26 @@ export class ProductListComponent implements OnInit, AfterViewInit {
       franchise_id: this.franchiseId,
       company_id: this.companyId,
       company_role: this.companyRole,
-      ...(sameCatalogContext ? {} : { offset: 0, query: '', sort: 'date', ignore_digital: true }),
+      ...(sameCatalogContext
+        ? {}
+        : {
+            offset: 0,
+            query: '',
+            sort: 'date',
+            ignore_digital: true,
+            local_multiplayer: false,
+            online_multiplayer: false,
+          }),
     });
     this.activeCategory = params.cat!;
     this.queryForm.setValue(
-      { query: params.query ?? '', sort: params.sort!, skipDigitalFilter: params.ignore_digital! },
+      {
+        query: params.query ?? '',
+        sort: params.sort!,
+        skipDigitalFilter: params.ignore_digital!,
+        localMultiplayer: params.local_multiplayer ?? false,
+        onlineMultiplayer: params.online_multiplayer ?? false,
+      },
       { emitEvent: false },
     );
     this.store.dispatch(
@@ -124,7 +142,8 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   }
 
   private updateFilters(): void {
-    const { query, sort, skipDigitalFilter } = this.queryForm.getRawValue();
+    const { query, sort, skipDigitalFilter, localMultiplayer, onlineMultiplayer } =
+      this.queryForm.getRawValue();
     const current = this.store.selectSnapshot(ProductsState.productsParams);
     const next = catalogParams({
       ...current,
@@ -132,6 +151,8 @@ export class ProductListComponent implements OnInit, AfterViewInit {
       sort,
       cat: this.activeCategory,
       ignore_digital: skipDigitalFilter,
+      local_multiplayer: localMultiplayer,
+      online_multiplayer: onlineMultiplayer,
     });
     if (!sameListParams(current, next)) {
       this.store.dispatch(new ProductsActions.SetRequestParams({ ...next, query: next.query, offset: 0 }));

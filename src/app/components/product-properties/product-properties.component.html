@@ -7,7 +7,8 @@
         </svg>
       </button>
       <div class="game-heading-copy"><h1 class="game-title" appCopyToClipboard>{{ productProperties.product.name }}</h1>
-        @if (isAuthorised$ | async) { <button type="button" class="suggest-name" (click)="suggestName()">Дополнить название</button> }
+        <app-game-stats [game]="productProperties.product" [showMultiplayer]="false" />
+        @if (isAuthorised$ | async) { <button type="button" class="suggest-name kudos-link" (click)="suggestName()" title="Дополнить название · +5 Kudos после принятия заявки"><span class="contribution-label">Дополнить название</span><span class="contribution-reward" aria-hidden="true">+5 <b>K</b></span></button> }
       </div>
     </div>
     <div class="col-12 col-lg-4 product-sidebar">
@@ -82,6 +83,18 @@
       </div>
     </div>
     <div class="col-12 col-lg-8 product-content">
+      <section class="game-multiplayer" aria-labelledby="multiplayer-heading">
+        <h2 id="multiplayer-heading">Игроки и мультиплеер</h2>
+        @for (mode of productProperties.multiplayer ?? []; track mode.platform_id) {
+          <div class="multiplayer-row">
+            <strong>{{mode.platform_name || (mode.platform_id ? 'Платформа ' + mode.platform_id : 'Платформа не указана IGDB')}}</strong>
+            <span>Локально: {{mode.local_players ? 'до ' + mode.local_players + ' игроков' : mode.local_multiplayer ? 'есть, число игроков не указано' : 'нет данных'}}</span>
+            <span>Онлайн: {{mode.online_players ? 'до ' + mode.online_players + ' игроков' : mode.online_multiplayer ? 'есть, число игроков не указано' : 'нет данных'}}</span>
+            @if (mode.offline_coop) { <span>Локальный кооператив{{mode.offline_coop_players ? ': до ' + mode.offline_coop_players : ''}}</span> }
+            @if (mode.online_coop) { <span>Онлайн-кооператив{{mode.online_coop_players ? ': до ' + mode.online_coop_players : ''}}</span> }
+          </div>
+        } @empty { <p>IGDB пока не предоставила данные о числе игроков.</p> }
+      </section>
       <div class="releases-section">
         <h2 class="release-header">Релизы</h2>
         <ul class="list-group list-group-flush">
@@ -120,7 +133,7 @@
         @if ((isAuthorised$ | async) && canSuggestSerial(release)) {
           <div class="release-actions">
             @if (canSuggestSerial(release)) {
-              <button type="button" class="btn-blue small suggest-serial" (click)="suggestSerial(release)">Уточнить серийник</button>
+              <button type="button" class="suggest-serial kudos-link" (click)="suggestSerial(release)" aria-label="Уточнить серийник" title="Уточнить серийник · +10 Kudos после принятия заявки"><span class="contribution-label">Уточнить</span><span class="contribution-reward" aria-hidden="true">+10 <b>K</b></span></button>
             }
             <button type="button" class="btn-blue small"
               [disabled]="release.owned || release.digital_only || release.release_status === 5 || !release.release_date || (collectionChanging$ | async)"
@@ -168,6 +181,23 @@
       </div>
     }
   </div>
+  @if (productProperties.similar_games?.length) {
+    <section class="col-12 similar-section" aria-labelledby="similar-heading">
+      <div class="similar-heading"><h2 id="similar-heading">Похожие игры</h2>
+        <div><button type="button" aria-label="Предыдущие похожие игры" (click)="scrollSimilar(similarTrack, -1)">←</button><button type="button" aria-label="Следующие похожие игры" (click)="scrollSimilar(similarTrack, 1)">→</button></div>
+      </div>
+      <p>Рекомендации IGDB · игры из нашего каталога</p>
+      <div #similarTrack class="similar-track" tabindex="0" aria-label="Похожие игры, горизонтальная прокрутка">
+        @for (game of productProperties.similar_games; track game.id) {
+          <a class="similar-card" [routerLink]="similarLink(game, (platformId$ | async) || 0)">
+            @if (game.image_url) { <img [src]="game.image_url" [alt]="game.name" loading="lazy" (error)="game.image_url = null" /> }
+            @else { <span class="similar-placeholder">Нет обложки</span> }
+            <strong>{{game.name}}</strong>
+          </a>
+        }
+      </div>
+    </section>
+  }
 </div>
 } @else if ((failure$ | async)?.failed) {
   <section class="product-error" role="alert">

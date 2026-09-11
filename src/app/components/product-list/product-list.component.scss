@@ -251,3 +251,9 @@ input::placeholder {
   font-size: 12px;
   line-height: 1.4;
 }
+
+.multiplayer-filters {border:0;padding:0;margin:0 0 14px;display:flex;gap:8px 16px;flex-wrap:wrap;color:#c5daed;min-width:0}
+.multiplayer-filters legend {font-size:14px;margin-bottom:6px}
+.multiplayer-filters label {display:flex;align-items:center;gap:8px;min-height:44px;cursor:pointer}
+.multiplayer-filters input {appearance:auto;width:20px;height:20px;min-height:20px;padding:0;accent-color:#c2a4ed}
+.multiplayer-filters small {flex-basis:100%;color:#9eafc1;line-height:1.4}

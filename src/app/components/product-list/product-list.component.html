@@ -12,6 +12,12 @@
               </button></li>
             }
           </ul>
+          <fieldset class="multiplayer-filters">
+            <legend>Мультиплеер на выбранной платформе</legend>
+            <label><input type="checkbox" formControlName="localMultiplayer"> Локально · 2+ игрока</label>
+            <label><input type="checkbox" formControlName="onlineMultiplayer"> Онлайн · 2+ игрока</label>
+            <small>Оба фильтра — игры с обоими режимами. Только подтверждённые данные IGDB.</small>
+          </fieldset>
           <div class="catalog-options">
             <label class="digital-option" for="onlyDigitalSwitch">
               <input type="checkbox" id="onlyDigitalSwitch" formControlName="skipDigitalFilter" />
@@ -19,7 +25,7 @@
             </label>
             <label class="catalog-sort">Сортировка
               <select class="form-select" formControlName="sort">
-                <option value="name">По названию</option><option value="date">По дате</option>
+                <option value="name">По названию</option><option value="date">По дате</option><option value="rating">По рейтингу IGDB ↓</option>
               </select>
             </label>
           </div>
@@ -43,7 +49,7 @@
   @if (loading$ | async) { <p class="text-light" role="status">Загрузка...</p> }
   @if (failed$ | async) { <p class="text-warning" role="alert">Не удалось загрузить каталог. Попробуйте изменить фильтры или обновить страницу.</p> }
 
-  @if((franchiseId || companyId) && !(loading$ | async) && !(failed$ | async) && (productsTotalCount$ | async) === 0){<p class="text-light" role="status">По выбранным фильтрам игр не найдено. Попробуйте другую платформу или измените поиск.</p>}
+  @if(!(loading$ | async) && !(failed$ | async) && (productsTotalCount$ | async) === 0){<p class="text-light" role="status">По выбранным фильтрам игр не найдено. Попробуйте другую платформу или измените поиск.</p>}
   @for (product of products$ | async; track product.id) {
     <!-- Desktop / tablet: карточки -->
     <div class="catalog-cell col-xl-3 col-lg-4 col-md-4 col-sm-6 p-3">
@@ -89,6 +95,7 @@
         <div class="d-flex flex-column justify-content-between">
           <div class="game-content">
             <div class="title">{{ product.name }}</div>
+            <app-game-stats [game]="product" />
             @if (product.has_serials === false && supportsReleaseActions(activeCategory)) {
               <small class="missing-serial-hint">Знаете серийник? Дополните →</small>
             }

@@ -91,6 +91,39 @@ describe('ProductPropertiesComponent', () => {
         .map((row) => row.querySelector('.release-platform')?.textContent?.trim()),
     ).toEqual(['Platform 8', 'Platform 9', 'Platform 48', 'Platform 167', 'Platform 38']);
   });
+  it('shows rating, per-platform players and navigable similar-game cards', () => {
+    const store = TestBed.inject(Store);
+    store.dispatch(new ProductsActions.LoadProperties(1));
+    TestBed.inject(HttpTestingController)
+      .expectOne('/api/products/1')
+      .flush({
+        product: { id: 1, name: 'Game', total_rating: 82.5, total_rating_count: 20 },
+        releases: [],
+        screenshots: [],
+        companies: [],
+        franschises: [],
+        multiplayer: [
+          {
+            platform_id: 48,
+            platform_name: 'PS4',
+            local_players: 4,
+            online_players: 8,
+            local_multiplayer: true,
+            online_multiplayer: true,
+          },
+        ],
+        similar_games: [{ id: 2, name: 'Similar', image_url: null, platform_ids: [48] }],
+      });
+    fixture.detectChanges();
+    const root = fixture.nativeElement as HTMLElement;
+    expect(root.querySelector('.rating')?.textContent).toContain('82.5');
+    expect(root.querySelector('.multiplayer-row')?.textContent).toContain('до 4 игроков');
+    expect(root.querySelector('.similar-card')?.getAttribute('href')).toBe('/products/2;platform=48');
+    expect(
+      component.similarLink({ id: 3, name: 'Other', image_url: null, platform_ids: [48, 167] }, 167),
+    ).toEqual(['/products', 3, { platform: 167 }]);
+    expect(root.querySelectorAll('.similar-heading button')).toHaveLength(2);
+  });
   it('offers name contributions below the heading even with no alternative names', () => {
     const store = TestBed.inject(Store);
     store.reset({
