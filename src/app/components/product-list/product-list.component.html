@@ -12,7 +12,7 @@
               </button></li>
             }
           </ul>
-          <app-region-filters [selected]="selectedRegions" [totals]="(selectedRegionCounts$ | async) ?? {}" (regionToggle)="toggleRegion($event)"/>
+          <app-region-filters [unknown]="unknown" [selected]="selectedRegions" [totals]="(selectedRegionCounts$ | async) ?? {}" (regionToggle)="toggleRegion($event)"/>
           <fieldset class="multiplayer-filters">
             <legend>Мультиплеер на выбранной платформе</legend>
             <label><input type="checkbox" formControlName="localMultiplayer"> Локально · 2+ игрока</label>

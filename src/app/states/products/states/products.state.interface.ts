@@ -1,3 +1,4 @@
+import { RegionCounts } from '@app/shared/region-filter';
 import { IProductListItem } from '@app/states/products/interfaces/product-list-item.interface';
 import { IProductListRequest } from '@app/states/products/interfaces/product-list-request.interface';
 import { RequestStatus } from '@app/constants/request-status.const';
@@ -6,6 +7,7 @@ import { IProductPropertiesResponse } from '@app/states/products/interfaces/prod
 export interface IproductState {
   productList: IProductListItem[];
   productsTotalCount: number;
+  regionCounts?: RegionCounts;
   productListRequestStatus: RequestStatus;
   productListRequestParams: IProductListRequest;
   productProperties: IProductPropertiesResponse | null;

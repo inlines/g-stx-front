@@ -17,10 +17,10 @@ export function itemRegion(item: ICollectionItem): RegionGroup {
   return name === 'europe' ? 'europe' : name === 'north_america' ? 'america' : name === 'japan' ? 'japan' : 'other';
 }
 export function matchesRegion(item: ICollectionItem, selected: readonly RegionGroup[]): boolean {
-  return !selected.length || selected.includes(itemRegion(item));
+  return !selected.length || item.region_id === 8 || (item.region_id === undefined && item.region_name?.trim().toLowerCase() === 'worldwide') || selected.includes(itemRegion(item));
 }
 export function ownedRegionCounts(items: readonly ICollectionItem[]): RegionCounts {
-  return Object.fromEntries(REGION_GROUPS.map((region) => [region, new Set(items.filter((item) => !item.digital_only && itemRegion(item) === region).map((item) => item.product_id)).size]));
+  return Object.fromEntries(REGION_GROUPS.map((region) => [region, new Set(items.filter((item) => !item.digital_only && matchesRegion(item, [region])).map((item) => item.product_id)).size]));
 }
 export function platformRegionCounts(platform?: IPlatformItem): RegionCounts {
   return { europe: platform?.europe_games, america: platform?.america_games, japan: platform?.japan_games, other: platform?.other_games };

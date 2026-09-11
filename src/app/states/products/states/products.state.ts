@@ -34,6 +34,7 @@ export class ProductsState {
   public loadList(ctx: StateContext<IproductState>, action: ProductsActions.LoadList) {
     ctx.patchState({
       productListRequestStatus: RequestStatus.Pending,
+      regionCounts: {},
     });
 
     const currentParams = ctx.getState().productListRequestParams;
@@ -54,6 +55,7 @@ export class ProductsState {
         first_release_date: unixMilliseconds(x.first_release_date),
       })),
       productsTotalCount: action.payload.total_count,
+      regionCounts: action.payload.region_counts ?? {},
     });
   }
 
@@ -124,6 +126,9 @@ export class ProductsState {
       notFound: state.productPropertiesErrorStatus === 404,
     };
   }
+
+  @Selector()
+  static regionCounts(state: IproductState) { return state.regionCounts ?? {}; }
 
   @Selector()
   static listLoading(state: IproductState) {

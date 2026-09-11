@@ -28,4 +28,12 @@ describe('Regional collection filters', () => {
     expect(normalizeRegions('other, europe,other,invalid')).toEqual(['europe', 'other']);
     expect(platformRegionCounts().europe).toBeUndefined();
   });
+  it('includes Worldwide in every filter and distinct owned count', () => {
+    const values = [item(1, 8), item(1, 1), item(2, 8, true)];
+    for (const region of ['europe', 'america', 'japan', 'other'] as const) {
+      expect(matchesRegion(values[0], [region])).toBe(true);
+      expect(ownedRegionCounts(values)[region]).toBe(1);
+    }
+  });
+
 });

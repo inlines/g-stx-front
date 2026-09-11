@@ -12,7 +12,7 @@ import { REGION_GROUPS, RegionCounts, RegionGroup } from '@app/shared/region-fil
           </button>
         }
       </div>
-      <small>{{owned ? 'Есть у игрока / всего на платформе.' : 'Всего игр на платформе.'}} Цифровые не учитываются.</small>
+      <small>@if(unknown){Неидентифицированные игры с учётом фильтров.}@else{ {{owned ? 'Есть у игрока / всего на платформе.' : 'Всего игр на платформе.'}} Цифровые не учитываются.}</small>
     </section>`,
   styles: `
     :host{display:block;position:relative;z-index:1;margin:12px 0 20px}
@@ -26,6 +26,7 @@ import { REGION_GROUPS, RegionCounts, RegionGroup } from '@app/shared/region-fil
   `,
 })
 export class RegionFiltersComponent {
+  @Input() unknown = false;
   @Input() selected: readonly RegionGroup[] = [];
   @Input() totals: RegionCounts = {};
   @Input() owned?: RegionCounts;

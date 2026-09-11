@@ -42,7 +42,10 @@ describe('Catalog filters', () => {
     fixture.detectChanges();
     const initial = nextRequest();
     expect(initial.request.params.get('unknown')).toBe('true');
-    initial.flush({ items: [], total_count: 50 });
+    initial.flush({ items: [], total_count: 50, region_counts: { europe: 12, america: 15, japan: 9, other: 14 } });
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('app-region-filters').textContent).toContain('12');
+    expect(fixture.nativeElement.querySelector('app-region-filters').textContent).toContain('Неидентифицированные');
     fixture.componentInstance.toggleRegion('japan');
     const filtered = nextRequest();
     expect(filtered.request.params.get('unknown')).toBe('true');
