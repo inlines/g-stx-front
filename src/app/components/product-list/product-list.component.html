@@ -19,10 +19,12 @@
             <label><input type="checkbox" formControlName="onlineMultiplayer"> Онлайн · 2+ игрока</label>
           </fieldset>
           <div class="catalog-options">
+            @if (!unknown) {
             <label class="digital-option" for="onlyDigitalSwitch">
               <input type="checkbox" id="onlyDigitalSwitch" formControlName="skipDigitalFilter" />
               <span>Пропустить цифровые</span>
             </label>
+            }
             <label class="digital-option">
               <input type="checkbox" formControlName="includeUnreleased" aria-describedby="release-filter-help" />
               <span>Показывать невышедшие игры</span>
@@ -62,7 +64,7 @@
         [routerLink]="['/products', product.id, {platform: activeCategory}]"
         style="cursor: pointer;"
         >
-        @if (product.has_serials === false && supportsReleaseActions(activeCategory)) {
+        @if (product.has_serials === false && !product.digital_only && supportsReleaseActions(activeCategory)) {
           <span class="missing-serial" role="img" aria-label="Серийники пока не указаны. Откройте игру, чтобы дополнить их."
             title="Серийники пока не указаны. Знаете номер? Дополните на странице игры.">?</span>
         }
@@ -100,7 +102,7 @@
           <div class="game-content">
             <div class="title">{{ product.name }}</div>
             <app-game-stats [game]="product" />
-            @if (product.has_serials === false && supportsReleaseActions(activeCategory)) {
+            @if (product.has_serials === false && !product.digital_only && supportsReleaseActions(activeCategory)) {
               <small class="missing-serial-hint">Знаете серийник? Дополните →</small>
             }
             <div class="game-first-release text-lite-muted small">

@@ -42,6 +42,8 @@ describe('Catalog filters', () => {
     fixture.detectChanges();
     const initial = nextRequest();
     expect(initial.request.params.get('unknown')).toBe('true');
+    expect(initial.request.params.get('ignore_digital')).toBe('true');
+    expect(fixture.nativeElement.querySelector('#onlyDigitalSwitch')).toBeNull();
     initial.flush({ items: [], total_count: 50, region_counts: { europe: 12, america: 15, japan: 9, other: 14 } });
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('app-region-filters').textContent).toContain('12');
@@ -59,6 +61,7 @@ describe('Catalog filters', () => {
     mount();
     const regular = nextRequest();
     expect(regular.request.params.get('unknown')).toBe('false');
+    expect(fixture.nativeElement.querySelector('#onlyDigitalSwitch')).not.toBeNull();
     expect(regular.request.params.get('offset')).toBe('0');
     regular.flush({ items: [], total_count: 50 });
   });
@@ -95,15 +98,16 @@ describe('Catalog filters', () => {
     expect(req.request.params.get('offset')).toBe('0');
     req.flush({ items: [], total_count: 0 });
   });
-  it('marks missing serials but does not mark known or unknown serial availability', () => {
+  it('marks missing serials only for non-digital games with known serial availability', () => {
     mount();
     nextRequest().flush({
       items: [
         { id: 1, name: 'Missing', has_serials: false },
         { id: 2, name: 'Known', has_serials: true },
         { id: 3, name: 'Old API' },
+        { id: 4, name: 'Digital only', has_serials: false, digital_only: true },
       ],
-      total_count: 3,
+      total_count: 4,
     });
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelectorAll('.missing-serial').length).toBe(1);

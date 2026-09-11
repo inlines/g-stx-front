@@ -120,6 +120,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
             online_multiplayer: false,
           }),
     });
+    if (this.unknown) params.ignore_digital = true;
     this.activeCategory = params.cat!;
     this.queryForm.setValue(
       {
@@ -127,7 +128,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
         sort: params.sort!,
         includeUnreleased: params.include_unreleased ?? false,
         regions: params.regions ?? '',
-        skipDigitalFilter: params.ignore_digital!,
+        skipDigitalFilter: this.unknown || params.ignore_digital!,
         localMultiplayer: params.local_multiplayer ?? false,
         onlineMultiplayer: params.online_multiplayer ?? false,
       },
@@ -168,7 +169,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
       query,
       sort,
       cat: this.activeCategory,
-      ignore_digital: skipDigitalFilter,
+      ignore_digital: this.unknown || skipDigitalFilter,
       include_unreleased: includeUnreleased,
       regions,
       local_multiplayer: localMultiplayer,
