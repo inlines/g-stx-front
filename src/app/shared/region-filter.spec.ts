@@ -10,13 +10,13 @@ const item = (product_id: number, region_id: number | null, digital_only = false
 describe('Regional collection filters', () => {
   it('groups only North America as America, including Brazil and unknown in Other', () => {
     expect([1, 2, 5, 8, 10, null].map(id => itemRegion(item(1, id))))
-      .toEqual(['europe', 'america', 'other', 'other', 'other', 'other']);
+      .toEqual(['europe', 'america', 'japan', 'other', 'other', 'other']);
   });
   it('counts unique games within each region and excludes digital copies', () => {
     expect(ownedRegionCounts([
       item(1, 1), item(1, 1), item(1, 2), item(2, 10),
       item(2, 5), item(3, null), item(4, 1, true),
-    ])).toEqual({ europe: 1, america: 1, other: 2 });
+    ])).toEqual({ europe: 1, america: 1, japan: 1, other: 2 });
   });
   it('uses a union of regions and restores all records when selection is cleared', () => {
     const items = [item(1, 1), item(2, 2), item(3, 10)];

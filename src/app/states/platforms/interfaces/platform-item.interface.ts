@@ -6,6 +6,7 @@ export interface IPlatformItem {
   total_games: number;
   europe_games?: number;
   america_games?: number;
+  japan_games?: number;
   other_games?: number;
   user_games?: number;
   total_spent?: number;

@@ -31,5 +31,5 @@ export class RegionFiltersComponent {
   @Input() owned?: RegionCounts;
   @Output() regionToggle = new EventEmitter<RegionGroup>();
   readonly groups = REGION_GROUPS;
-  readonly labels = { europe: 'Европа', america: 'Америка', other: 'Другие' };
+  readonly labels = { europe: 'Европа', america: 'Америка', japan: 'Япония', other: 'Другие' };
 }
