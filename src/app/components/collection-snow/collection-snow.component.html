@@ -36,12 +36,10 @@
   <header>
     <div>
       <span class="eyebrow">СЕКРЕТНАЯ КОМНАТА</span>
-      <h1 id="collection-snow-title">Осадки из любимых игр<span aria-hidden="true">*</span></h1>
     </div>
     <button type="button" class="close" aria-label="Закрыть пасхалку" (click)="modal.close()">×</button>
   </header>
   <footer>
-    <p>Ваша коллекция. Немного невесомости.</p>
     <button type="button" [attr.aria-pressed]="paused()" (click)="paused.set(!paused())">
       {{ paused() ? 'Продолжить' : 'Пауза' }}
     </button>

@@ -88,13 +88,13 @@
         <h2 id="multiplayer-heading">Игроки и мультиплеер</h2>
         @for (mode of productProperties.multiplayer ?? []; track mode.platform_id) {
           <div class="multiplayer-row">
-            <strong>{{mode.platform_name || (mode.platform_id ? 'Платформа ' + mode.platform_id : 'Платформа не указана IGDB')}}</strong>
+            <strong>{{mode.platform_name || (mode.platform_id ? 'Платформа ' + mode.platform_id : 'Платформа не указана')}}</strong>
             <span>Локально: {{mode.local_players ? 'до ' + mode.local_players + ' игроков' : mode.local_multiplayer ? 'есть, число игроков не указано' : 'нет данных'}}</span>
             <span>Онлайн: {{mode.online_players ? 'до ' + mode.online_players + ' игроков' : mode.online_multiplayer ? 'есть, число игроков не указано' : 'нет данных'}}</span>
             @if (mode.offline_coop) { <span>Локальный кооператив{{mode.offline_coop_players ? ': до ' + mode.offline_coop_players : ''}}</span> }
             @if (mode.online_coop) { <span>Онлайн-кооператив{{mode.online_coop_players ? ': до ' + mode.online_coop_players : ''}}</span> }
           </div>
-        } @empty { <p>IGDB пока не предоставила данные о числе игроков.</p> }
+        } @empty { <p>нет данных о числе игроков.</p> }
       </section>
       <div class="releases-section">
         <h2 class="release-header">Релизы</h2>
@@ -188,7 +188,7 @@
       <div class="similar-heading"><h2 id="similar-heading">Похожие игры</h2>
         <div><button type="button" aria-label="Предыдущие похожие игры" (click)="scrollSimilar(similarTrack, -1)">←</button><button type="button" aria-label="Следующие похожие игры" (click)="scrollSimilar(similarTrack, 1)">→</button></div>
       </div>
-      <p>Рекомендации IGDB · игры из нашего каталога</p>
+      <p>Похожие игры</p>
       <div #similarTrack class="similar-track" tabindex="0" aria-label="Похожие игры, горизонтальная прокрутка">
         @for (game of similarGames; track game.id) {
           <a class="similar-card" [routerLink]="similarLink(game, (platformId$ | async) || 0)">

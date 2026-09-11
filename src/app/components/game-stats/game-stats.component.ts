@@ -10,12 +10,12 @@ import { IProductListItem } from '@app/states/products/interfaces/product-list-i
       <span
         class="rating"
         [title]="
-          'IGDB: общий рейтинг пользователей и критиков. Оценок: ' + (game.total_rating_count ?? 'нет данных')
+          'общий рейтинг пользователей и критиков. Оценок: ' + (game.total_rating_count ?? 'нет данных')
         "
-        >★ {{ game.total_rating | number: '1.0-1' }}<small>/100 · IGDB</small></span
+        >★ {{ game.total_rating | number: '1.0-1' }}<small>/100 </small></span
       >
     } @else {
-      <span class="unknown">IGDB · нет оценки</span>
+      <span class="unknown"> нет оценки</span>
     }
     @if (showMultiplayer) {
       @if (game.local_players || game.local_multiplayer) {
