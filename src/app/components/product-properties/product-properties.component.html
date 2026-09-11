@@ -117,7 +117,7 @@
           </li>
         </ng-template>
       <ng-template #releaseActions let-release>
-        @if (isAuthorised$ | async) {
+        @if ((isAuthorised$ | async) && canSuggestSerial(release)) {
           <div class="release-actions">
             @if (canSuggestSerial(release)) {
               <button type="button" class="btn-blue small suggest-serial" (click)="suggestSerial(release)">Уточнить серийник</button>

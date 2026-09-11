@@ -61,6 +61,36 @@ describe('ProductPropertiesComponent', () => {
     expect(fixture.nativeElement.textContent).toContain('Existing game');
   });
 
+  it('keeps all releases visible but only offers actions for PS2/PS3/PS4/PS5/PSP', () => {
+    const store = TestBed.inject(Store);
+    store.reset({
+      ...store.snapshot(),
+      Auth: { ...store.snapshot().Auth, login: 'collector', token: 'test' },
+    });
+    store.dispatch(new ProductsActions.LoadProperties(1));
+    TestBed.inject(HttpTestingController)
+      .expectOne('/api/products/1')
+      .flush({
+        product: { id: 1, name: 'Game' },
+        releases: [6, 7, 8, 9, 48, 167, 38].map((id) => ({
+          release_id: id,
+          platform_id: id,
+          platform_name: `Platform ${id}`,
+          release_region: 'Europe',
+        })),
+        screenshots: [],
+        companies: [],
+        franschises: [],
+      });
+    fixture.detectChanges();
+    const rows = Array.from(fixture.nativeElement.querySelectorAll('.release-item')) as HTMLElement[];
+    expect(rows.length).toBe(7);
+    expect(
+      rows
+        .filter((row) => row.querySelector('.release-actions'))
+        .map((row) => row.querySelector('.release-platform')?.textContent?.trim()),
+    ).toEqual(['Platform 8', 'Platform 9', 'Platform 48', 'Platform 167', 'Platform 38']);
+  });
   it('offers name contributions below the heading even with no alternative names', () => {
     const store = TestBed.inject(Store);
     store.reset({
@@ -297,7 +327,7 @@ describe('ProductPropertiesComponent', () => {
       .expectOne('/api/products/1')
       .flush({
         product: { id: 1, name: 'Game', image_url: null, first_release_date: null },
-        releases: [48, 49].map((platform_id, i) => ({
+        releases: [48, 167].map((platform_id, i) => ({
           release_id: i + 10,
           platform_id,
           platform_name: 'Platform',

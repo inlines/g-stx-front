@@ -226,3 +226,28 @@ input::placeholder {
     width: 20%;
   }
 }
+
+.missing-serial {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 2px solid #f5d783;
+  border-radius: 50%;
+  background: #302744;
+  color: #ffe49a;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1;
+}
+.missing-serial-hint {
+  display: block;
+  margin-top: 8px;
+  color: #f5d783;
+  font-size: 12px;
+  line-height: 1.4;
+}

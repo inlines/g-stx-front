@@ -1,3 +1,4 @@
+import { supportsReleaseActions } from '@app/shared/release-platforms';
 import { AsyncPipe, DatePipe } from '@angular/common';
 import {
   AfterViewInit,
@@ -47,7 +48,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
     .select(PlatformState.loadedPlatforms)
     .pipe(
       map((platforms) =>
-        this.platformIds === null ? platforms : platforms.filter((p) => this.platformIds!.includes(p.id)),
+        platforms.filter((p) => p.id !== 6 && (this.platformIds === null || this.platformIds.includes(p.id))),
       ),
     );
   readonly productsTotalCount$ = this.store.select(ProductsState.totalCountProducts);
@@ -57,9 +58,12 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   readonly products$ = combineLatest([
     this.store.select(ProductsState.loadedProducts),
     this.store.select(OwnershipState.ownership),
+    this.productParams$,
   ]).pipe(
-    map(([products, ownership]) => {
-      const owned = new Set(ownership.flatMap((item) => item.have_prod_ids ?? []));
+    map(([products, ownership, params]) => {
+      const owned = new Set(
+        ownership.filter((item) => item.platform === params.cat).flatMap((item) => item.have_prod_ids ?? []),
+      );
       return products.map((product) => ({ ...product, owned: owned.has(product.id) }));
     }),
   );
@@ -68,7 +72,8 @@ export class ProductListComponent implements OnInit, AfterViewInit {
     sort: new FormControl<ProductSort>('date', { nonNullable: true }),
     skipDigitalFilter: new FormControl(true, { nonNullable: true }),
   });
-  activeCategory = 6;
+  activeCategory = 48;
+  readonly supportsReleaseActions = supportsReleaseActions;
 
   ngOnInit(): void {
     const saved = this.store.selectSnapshot(ProductsState.productsParams);
@@ -76,11 +81,13 @@ export class ProductListComponent implements OnInit, AfterViewInit {
       saved.franchise_id === this.franchiseId &&
       saved.company_id === this.companyId &&
       saved.company_role === this.companyRole;
-    const cat =
-      this.platformIds && !this.platformIds.includes(saved.cat ?? 6) ? this.platformIds[0] : saved.cat;
+    const availableIds = this.platformIds?.filter((id) => id !== 6);
+    const preferred = saved.cat && saved.cat !== 6 ? saved.cat : 48;
+    const cat = availableIds?.length && !availableIds.includes(preferred) ? availableIds[0] : preferred;
     const params = catalogParams({
       ...saved,
       cat,
+      ...(cat !== saved.cat ? { offset: 0 } : {}),
       franchise_id: this.franchiseId,
       company_id: this.companyId,
       company_role: this.companyRole,
@@ -132,7 +139,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   }
 
   setActiveCategory(cat: number): void {
-    if (cat === this.activeCategory) return;
+    if (cat === 6 || cat === this.activeCategory) return;
     this.activeCategory = cat;
     // Emit to cancel any pending debounced search from the previous platform.
     this.queryForm.patchValue({ query: '', sort: 'date' });

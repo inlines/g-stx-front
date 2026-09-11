@@ -1,3 +1,4 @@
+import { supportsReleaseActions } from '@app/shared/release-platforms';
 import { SerialRequestComponent } from '../serial-request/serial-request.component';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { priceValidator } from '@app/shared/price-validator';
@@ -176,7 +177,7 @@ export class ProductPropertiesComponent implements OnInit {
   }
 
   canSuggestSerial(release: IReleaseItem) {
-    return [8, 9, 48, 167, 38].includes(release.platform_id);
+    return supportsReleaseActions(release.platform_id);
   }
   suggestSerial(release: IReleaseItem) {
     if (!this.canSuggestSerial(release) || !this.store.selectSnapshot(AuthState.isAuthorised)) return;

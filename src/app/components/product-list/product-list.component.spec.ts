@@ -36,6 +36,55 @@ describe('Catalog filters', () => {
     nextRequest().flush({ items: [], total_count: 100 });
   }
 
+  it('replaces a saved PC page with the first PS4 page', () => {
+    store.dispatch(new ProductsActions.SetRequestParams({ cat: 6, offset: 45 }));
+    mount();
+    const req = nextRequest();
+    expect(req.request.params.get('cat')).toBe('48');
+    expect(req.request.params.get('offset')).toBe('0');
+    req.flush({ items: [], total_count: 0 });
+  });
+  it('marks missing serials but does not mark known or unknown serial availability', () => {
+    mount();
+    nextRequest().flush({
+      items: [
+        { id: 1, name: 'Missing', has_serials: false },
+        { id: 2, name: 'Known', has_serials: true },
+        { id: 3, name: 'Old API' },
+      ],
+      total_count: 3,
+    });
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelectorAll('.missing-serial').length).toBe(1);
+    expect(
+      fixture.nativeElement.querySelector('.missing-serial').closest('.game-card').textContent,
+    ).toContain('Missing');
+  });
+  it('marks ownership only on the platform of the owned release and updates when switching', () => {
+    store.reset({
+      ...store.snapshot(),
+      Ownership: {
+        ...store.snapshot().Ownership,
+        ownership: [
+          { platform: 48, have_prod_ids: [1], have_ids: [10] },
+          { platform: 167, have_prod_ids: [], have_ids: [] },
+        ],
+      },
+    });
+    const component = mount();
+    const response = { items: [{ id: 1, name: 'Cross-platform game' }], total_count: 1 };
+    nextRequest().flush(response);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.ownership-mark')).not.toBeNull();
+    component.setActiveCategory(167);
+    nextRequest().flush(response);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.ownership-mark')).toBeNull();
+    component.setActiveCategory(48);
+    nextRequest().flush(response);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.ownership-mark')).not.toBeNull();
+  });
   it('does not open the keyboard on touch devices when entering or switching platforms', () => {
     vi.stubGlobal(
       'matchMedia',
@@ -44,7 +93,7 @@ describe('Catalog filters', () => {
     const focus = vi.spyOn(HTMLInputElement.prototype, 'focus');
     const component = mount();
     flushInitial();
-    component.setActiveCategory(48);
+    component.setActiveCategory(167);
     nextRequest().flush({ items: [], total_count: 0 });
     expect(focus).not.toHaveBeenCalled();
   });
