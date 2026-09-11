@@ -44,6 +44,9 @@
           <!-- Лого и кнопки -->
           <div class="col primary-navigation">
             <a class="kudos-challenge-link" routerLink="/kudos-challenge" routerLinkActive="nav-active">Kudos Challenge <app-kudos [login]="currentUser$ | async" [compact]="true"/></a>
+            @if ((badges.admins$ | async)?.includes((currentUser$ | async) ?? '')) {
+              <a class="text-white d-flex align-items-center" routerLink="/unknown" routerLinkActive="nav-active">Unknown</a>
+            }
             <!-- Кнопка "Каталог" -->
             <a class="nav-link text-white d-flex align-items-center" routerLink="/products" routerLinkActive="nav-active" [routerLinkActiveOptions]="{exact: true}">
               Каталог

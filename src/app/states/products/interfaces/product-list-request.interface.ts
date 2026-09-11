@@ -5,6 +5,7 @@ export interface IProductListRequest {
   limit?: number;
   offset?: number;
   query?: string;
+  unknown?: boolean;
   regions?: string;
   sort?: ProductSort;
   local_multiplayer?: boolean;

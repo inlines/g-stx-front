@@ -36,6 +36,29 @@ describe('Catalog filters', () => {
     nextRequest().flush({ items: [], total_count: 100 });
   }
 
+  it('keeps Unknown through filters and pagination, and clears it when returning to the catalogue', () => {
+    fixture = TestBed.createComponent(ProductListComponent);
+    fixture.componentRef.setInput('unknown', true);
+    fixture.detectChanges();
+    const initial = nextRequest();
+    expect(initial.request.params.get('unknown')).toBe('true');
+    initial.flush({ items: [], total_count: 50 });
+    fixture.componentInstance.toggleRegion('japan');
+    const filtered = nextRequest();
+    expect(filtered.request.params.get('unknown')).toBe('true');
+    expect(filtered.request.params.get('regions')).toBe('japan');
+    filtered.flush({ items: [], total_count: 50 });
+    fixture.componentInstance.pageChanged(2);
+    const page = nextRequest();
+    expect(page.request.params.get('unknown')).toBe('true');
+    page.flush({ items: [], total_count: 50 });
+    fixture.destroy();
+    mount();
+    const regular = nextRequest();
+    expect(regular.request.params.get('unknown')).toBe('false');
+    expect(regular.request.params.get('offset')).toBe('0');
+    regular.flush({ items: [], total_count: 50 });
+  });
   it('requires explicit opt-in for undated games and resets the page on each toggle', () => {
     const component = mount();
     expect(component.queryForm.controls.includeUnreleased.value).toBe(false);

@@ -36,6 +36,7 @@ import { combineLatest, debounceTime, distinctUntilChanged, map } from 'rxjs';
   styleUrl: './product-list.component.scss',
 })
 export class ProductListComponent implements OnInit, AfterViewInit {
+  @Input() unknown = false;
   @Input() franchiseId?: number;
   @Input() companyId?: number;
   @Input() companyRole?: 'developer' | 'publisher';
@@ -91,6 +92,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     const saved = this.store.selectSnapshot(ProductsState.productsParams);
     const sameCatalogContext =
+      (saved.unknown ?? false) === this.unknown &&
       saved.franchise_id === this.franchiseId &&
       saved.company_id === this.companyId &&
       saved.company_role === this.companyRole;
@@ -101,6 +103,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
       ...saved,
       cat,
       ...(cat !== saved.cat ? { offset: 0 } : {}),
+      unknown: this.unknown,
       franchise_id: this.franchiseId,
       company_id: this.companyId,
       company_role: this.companyRole,
@@ -133,7 +136,8 @@ export class ProductListComponent implements OnInit, AfterViewInit {
     this.store.dispatch(
       new ProductsActions.SetRequestParams({
         ...params,
-        franchise_id: this.franchiseId,
+        unknown: this.unknown,
+      franchise_id: this.franchiseId,
         company_id: this.companyId,
         company_role: this.companyRole,
         query: params.query,

@@ -1,9 +1,11 @@
+import { adminGuard } from '@app/guards/admin.guard';
 import { Routes } from '@angular/router';
 import { authGuard } from '@app/guards/auth.guard';
 import { ProductPropertiesResolver } from '@app/resolvers/product-properties.resolver';
 import { CollectorPropertiesResolver } from './resolvers/collector-properties.resolver';
 
 export const routes: Routes = [
+  { path: 'unknown', canActivate: [authGuard, adminGuard], loadComponent: () => import('./components/unknown/unknown.component').then(m => m.UnknownComponent) },
   {
     path: 'kudos-challenge',
     loadComponent: () =>

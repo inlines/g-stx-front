@@ -1,3 +1,5 @@
+import { UserBadgesService } from '@app/services/user-badges.service';
+import { inject } from '@angular/core';
 import { KudosComponent } from '../kudos/kudos.component';
 import { UserAvatarComponent } from '../user-avatar/user-avatar.component';
 import { AsyncPipe } from '@angular/common';
@@ -19,6 +21,7 @@ import { Observable } from 'rxjs';
   standalone: true,
 })
 export class HeaderComponent {
+  readonly badges = inject(UserBadgesService);
   constructor(
     private readonly store: Store,
     private router: Router,
