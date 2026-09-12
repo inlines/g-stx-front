@@ -43,6 +43,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   @Input() companyId?: number;
   @Input() companyRole?: 'developer' | 'publisher';
   @Input() platformIds: number[] | null = null;
+  get isNamedCatalog(): boolean { return this.franchiseId !== undefined || this.companyId !== undefined; }
   private readonly store = inject(Store);
   private readonly destroyRef = inject(DestroyRef);
   @ViewChild('query') query?: ElementRef<HTMLInputElement>;
@@ -127,6 +128,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
           }),
     });
     if (params.search_mode === 'serial' && params.query && !validSerial(params.query)) params.query = '';
+    if (this.isNamedCatalog) params.regions = '';
     if (this.unknown) params.ignore_digital = true;
     this.activeCategory = params.cat!;
     this.queryForm.setValue(
@@ -185,7 +187,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
       cat: this.activeCategory,
       ignore_digital: this.unknown || skipDigitalFilter,
       include_unreleased: includeUnreleased,
-      regions,
+      regions: this.isNamedCatalog ? '' : regions,
       local_multiplayer: localMultiplayer,
       online_multiplayer: onlineMultiplayer,
     });

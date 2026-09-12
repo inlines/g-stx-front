@@ -329,4 +329,23 @@ describe('Catalog filters', () => {
     const byName = nextRequest(); expect(byName.request.params.get('search_mode')).toBe('name'); byName.flush({items: [],total_count:0});
   });
 
+  for (const group of ['company', 'franchise'] as const) {
+    it(`shows all regions without region buttons in a ${group} catalogue, including restored filters`, () => {
+      const grouping = group === 'company' ? {company_id: 7, company_role: 'developer' as const} : {franchise_id: 7};
+      store.dispatch(new ProductsActions.SetRequestParams({cat:48,regions:'japan',...grouping}));
+      fixture = TestBed.createComponent(ProductListComponent);
+      fixture.componentRef.setInput(group === 'company' ? 'companyId' : 'franchiseId',7);
+      if (group === 'company') fixture.componentRef.setInput('companyRole','developer');
+      fixture.detectChanges();
+      const initial = nextRequest();
+      expect(initial.request.params.get('regions')).toBe('');
+      initial.flush({items:[],total_count:0});
+      expect(fixture.nativeElement.querySelector('app-region-filters')).toBeNull();
+      expect(fixture.componentInstance.selectedRegions).toEqual([]);
+      fixture.componentInstance.queryForm.controls.query.setValue('Game');
+      vi.advanceTimersByTime(301);
+      const searched = nextRequest(); expect(searched.request.params.get('regions')).toBe(''); searched.flush({items:[],total_count:0});
+    });
+  }
+
 });
