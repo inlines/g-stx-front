@@ -90,8 +90,17 @@ describe('Chat socket lifecycle and existing wire format', () => {
     const socket = Socket.instances[0];
     socket.open();
     const message = service.sendMessage(payload);
-    expect(message).toEqual({ ...payload, created_at: expect.any(String) });
-    expect(JSON.parse(socket.send.mock.calls.at(-1)![0])).toEqual({ recipient: 'bob', body: 'Hello' });
+    expect(message).toEqual({
+      ...payload,
+      created_at: expect.any(String),
+      client_id: expect.any(String),
+      status: 'sending',
+    });
+    expect(JSON.parse(socket.send.mock.calls.at(-1)![0])).toEqual({
+      recipient: 'bob',
+      body: 'Hello',
+      client_id: message!.client_id,
+    });
   });
   it('updates presence independently from messages and clears it on disconnect', () => {
     const online = vi.fn();
@@ -131,12 +140,18 @@ describe('Chat socket lifecycle and existing wire format', () => {
   });
   it('notifies about requests only after authentication without emitting a chat message', async () => {
     const play = vi.fn().mockRejectedValue(new Error('autoplay blocked'));
-    vi.stubGlobal('Audio', class { play = play; });
+    vi.stubGlobal(
+      'Audio',
+      class {
+        play = play;
+      },
+    );
     const messages = vi.fn();
     service.messages$.subscribe(messages);
     service.connect('alice', 'token');
     const socket = Socket.instances[0];
-    const emit = (kind: string, request_id = 1) => socket.onmessage?.({data: JSON.stringify({ type: 'new_request', kind, request_id })});
+    const emit = (kind: string, request_id = 1) =>
+      socket.onmessage?.({ data: JSON.stringify({ type: 'new_request', kind, request_id }) });
     emit('serial');
     expect(TestBed.inject(ToastService).toasts).toHaveLength(0);
     socket.open();
@@ -146,12 +161,48 @@ describe('Chat socket lifecycle and existing wire format', () => {
     emit('serial', -1);
     await Promise.resolve();
     expect(TestBed.inject(ToastService).toasts).toHaveLength(2);
-    expect(TestBed.inject(ToastService).toasts[1]).toMatchObject({ queryParams: {tab: 'admin', section: 'requests'}, body: expect.stringContaining('название') });
+    expect(TestBed.inject(ToastService).toasts[1]).toMatchObject({
+      queryParams: { tab: 'admin', section: 'requests' },
+      body: expect.stringContaining('название'),
+    });
     expect(play).toHaveBeenCalledTimes(2);
     expect(messages).not.toHaveBeenCalled();
   });
   it('does not open an anonymous connection', () => {
     service.connect('alice', '');
     expect(Socket.instances).toHaveLength(0);
+  });
+  it('expires typing without a stop frame and clears it when the user goes offline', () => {
+    const typing = vi.fn();
+    service.typing$.subscribe(typing);
+    service.connect('alice', 'valid-token');
+    const socket = Socket.instances[0];
+    socket.open();
+    socket.onmessage?.({ data: JSON.stringify({ type: 'typing', sender: 'bob', typing: true }) });
+    expect(typing).toHaveBeenLastCalledWith(new Set(['bob']));
+    vi.advanceTimersByTime(4501);
+    expect(typing).toHaveBeenLastCalledWith(new Set());
+    socket.onmessage?.({ data: JSON.stringify({ type: 'typing', sender: 'bob', typing: true }) });
+    socket.onmessage?.({ data: JSON.stringify({ type: 'presence', online: ['alice'] }) });
+    expect(typing).toHaveBeenLastCalledWith(new Set());
+  });
+  it('accepts validated control events separately and sends recipient-bound reads and typing', () => {
+    const events = vi.fn();
+    service.events$.subscribe(events);
+    service.connect('alice', 'valid-token');
+    const socket = Socket.instances[0];
+    socket.open();
+    socket.onmessage?.({ data: JSON.stringify({ type: 'unread', revision: 2, unread: { bob: 3 } }) });
+    expect(events).toHaveBeenCalledOnce();
+    socket.onmessage?.({ data: JSON.stringify({ type: 'unread', revision: 1, unread: { bob: -1 } }) });
+    expect(events).toHaveBeenCalledOnce();
+    service.readMessages([5, 6]);
+    expect(JSON.parse(socket.send.mock.calls.at(-1)![0])).toEqual({ type: 'read', ids: [5, 6] });
+    service.sendTyping('bob', true);
+    expect(JSON.parse(socket.send.mock.calls.at(-1)![0])).toEqual({
+      type: 'typing',
+      recipient: 'bob',
+      typing: true,
+    });
   });
 });

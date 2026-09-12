@@ -13,5 +13,6 @@ export interface IChatState {
   messagesReqeustStatus: RequestStatus;
   showWarning: boolean;
   unread: Record<string, number>;
+  unreadRevision: number;
   notification: { sequence: number; sender: string; active: boolean; message: IMessage } | null;
 }

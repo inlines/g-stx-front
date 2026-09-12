@@ -36,13 +36,57 @@ describe('Catalog filters', () => {
     nextRequest().flush({ items: [], total_count: 100 });
   }
 
+  it('retains the old grid and page during loading and failure, then commits the replacement together', () => {
+    const component = mount();
+    const game = {
+      id: 1,
+      name: 'Old result',
+      first_release_date: null,
+      image_url: null,
+      alternative_names: [],
+    };
+    nextRequest().flush({ items: [game], total_count: 100 });
+    fixture.detectChanges();
+    component.pageChanged(2);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('Old result');
+    expect(fixture.nativeElement.querySelector('app-loading-panel [role="status"]').textContent).toContain(
+      'Загружается',
+    );
+    expect(store.selectSnapshot(ProductsState.displayedParams).offset).toBe(0);
+    expect(fixture.nativeElement.querySelector('app-pager [aria-current="page"]').textContent.trim()).toBe(
+      '1',
+    );
+    nextRequest().flush({}, { status: 500, statusText: 'Unavailable' });
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('Old result');
+    expect(store.selectSnapshot(ProductsState.displayedParams).offset).toBe(0);
+    component.retry();
+    nextRequest().flush({ items: [{ ...game, id: 2, name: 'New result' }], total_count: 100 });
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).not.toContain('Old result');
+    expect(fixture.nativeElement.textContent).toContain('New result');
+    expect(fixture.nativeElement.querySelector('app-pager [aria-current="page"]').textContent.trim()).toBe(
+      '2',
+    );
+  });
   it('keeps Unknown through filters and pagination, and clears it when returning to the catalogue', () => {
     fixture = TestBed.createComponent(ProductListComponent);
     store.reset({
       ...store.snapshot(),
-      Platforms: { ...store.snapshot().Platforms, platforms: [
-        { id: 48, abbreviation: 'PS4', europe_games: 100, america_games: 200, japan_games: 300, other_games: 400 },
-      ] },
+      Platforms: {
+        ...store.snapshot().Platforms,
+        platforms: [
+          {
+            id: 48,
+            abbreviation: 'PS4',
+            europe_games: 100,
+            america_games: 200,
+            japan_games: 300,
+            other_games: 400,
+          },
+        ],
+      },
     });
     fixture.componentRef.setInput('unknown', true);
     fixture.detectChanges();
@@ -50,12 +94,24 @@ describe('Catalog filters', () => {
     expect(initial.request.params.get('unknown')).toBe('true');
     expect(initial.request.params.get('ignore_digital')).toBe('true');
     expect(fixture.nativeElement.querySelector('#onlyDigitalSwitch')).toBeNull();
-    initial.flush({ items: [], total_count: 50, region_counts: { europe: 12, america: 15, japan: 9, other: 14 } });
+    initial.flush({
+      items: [],
+      total_count: 50,
+      region_counts: { europe: 12, america: 15, japan: 9, other: 14 },
+    });
     fixture.detectChanges();
-    const regionButtons = [...fixture.nativeElement.querySelectorAll('app-region-filters button')]
-      .map((button: any) => button.textContent.replace(/\s+/g, ' ').trim());
-    expect(regionButtons).toEqual(['Европа 12 / 100', 'Америка 15 / 200', 'Япония 9 / 300', 'Другие 14 / 400']);
-    expect(fixture.nativeElement.querySelector('app-region-filters').textContent).toContain('Неидентифицированные');
+    const regionButtons = [...fixture.nativeElement.querySelectorAll('app-region-filters button')].map(
+      (button: any) => button.textContent.replace(/\s+/g, ' ').trim(),
+    );
+    expect(regionButtons).toEqual([
+      'Европа 12 / 100',
+      'Америка 15 / 200',
+      'Япония 9 / 300',
+      'Другие 14 / 400',
+    ]);
+    expect(fixture.nativeElement.querySelector('app-region-filters').textContent).toContain(
+      'Неидентифицированные',
+    );
     fixture.componentInstance.toggleRegion('japan');
     const filtered = nextRequest();
     expect(filtered.request.params.get('unknown')).toBe('true');
@@ -297,7 +353,13 @@ describe('Catalog filters', () => {
   });
   it('does not display catalogue serials until a region is selected; keeps the unknown hint', () => {
     const component = mount();
-    const response = { items: [{id: 1, name: 'Known', has_serials: true, serial: ['CUSA-12345','CUSA-23456']}, {id: 2,name: 'Unknown',has_serials: false}], total_count: 2 };
+    const response = {
+      items: [
+        { id: 1, name: 'Known', has_serials: true, serial: ['CUSA-12345', 'CUSA-23456'] },
+        { id: 2, name: 'Unknown', has_serials: false },
+      ],
+      total_count: 2,
+    };
     nextRequest().flush(response);
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('app-serial-list')).toBeNull();
@@ -305,7 +367,9 @@ describe('Catalog filters', () => {
     component.toggleRegion('europe');
     nextRequest().flush(response);
     fixture.detectChanges();
-    expect(fixture.nativeElement.querySelector('app-serial-list summary').textContent).toContain('CUSA-12345');
+    expect(fixture.nativeElement.querySelector('app-serial-list summary').textContent).toContain(
+      'CUSA-12345',
+    );
     expect(fixture.nativeElement.querySelector('app-serial-list summary').textContent).toContain('+1');
     component.toggleRegion('europe');
     nextRequest().flush(response);
@@ -313,39 +377,45 @@ describe('Catalog filters', () => {
     expect(fixture.nativeElement.querySelector('app-serial-list')).toBeNull();
   });
   it('only requests complete valid serials and resets pagination when the search mode changes', () => {
-    const component = mount(); flushInitial();
-    component.queryForm.patchValue({searchMode: 'serial', query: 'CUSA-123'});
+    const component = mount();
+    flushInitial();
+    component.queryForm.patchValue({ searchMode: 'serial', query: 'CUSA-123' });
     vi.advanceTimersByTime(301);
-    http.expectNone(req => req.url === '/api/products');
+    http.expectNone((req) => req.url === '/api/products');
     expect(component.invalidSerial).toBe(true);
     component.queryForm.controls.query.setValue(' cusa12345 ');
     vi.advanceTimersByTime(301);
     const request = nextRequest();
     expect(request.request.params.get('query')).toBe('CUSA-12345');
     expect(request.request.params.get('search_mode')).toBe('serial');
-    expect(request.request.params.get('offset')).toBe('0'); request.flush({items: [],total_count:0});
-    component.queryForm.patchValue({searchMode: 'name', query: 'Mario'});
+    expect(request.request.params.get('offset')).toBe('0');
+    request.flush({ items: [], total_count: 0 });
+    component.queryForm.patchValue({ searchMode: 'name', query: 'Mario' });
     vi.advanceTimersByTime(301);
-    const byName = nextRequest(); expect(byName.request.params.get('search_mode')).toBe('name'); byName.flush({items: [],total_count:0});
+    const byName = nextRequest();
+    expect(byName.request.params.get('search_mode')).toBe('name');
+    byName.flush({ items: [], total_count: 0 });
   });
 
   for (const group of ['company', 'franchise'] as const) {
     it(`shows all regions without region buttons in a ${group} catalogue, including restored filters`, () => {
-      const grouping = group === 'company' ? {company_id: 7, company_role: 'developer' as const} : {franchise_id: 7};
-      store.dispatch(new ProductsActions.SetRequestParams({cat:48,regions:'japan',...grouping}));
+      const grouping =
+        group === 'company' ? { company_id: 7, company_role: 'developer' as const } : { franchise_id: 7 };
+      store.dispatch(new ProductsActions.SetRequestParams({ cat: 48, regions: 'japan', ...grouping }));
       fixture = TestBed.createComponent(ProductListComponent);
-      fixture.componentRef.setInput(group === 'company' ? 'companyId' : 'franchiseId',7);
-      if (group === 'company') fixture.componentRef.setInput('companyRole','developer');
+      fixture.componentRef.setInput(group === 'company' ? 'companyId' : 'franchiseId', 7);
+      if (group === 'company') fixture.componentRef.setInput('companyRole', 'developer');
       fixture.detectChanges();
       const initial = nextRequest();
       expect(initial.request.params.get('regions')).toBe('');
-      initial.flush({items:[],total_count:0});
+      initial.flush({ items: [], total_count: 0 });
       expect(fixture.nativeElement.querySelector('app-region-filters')).toBeNull();
       expect(fixture.componentInstance.selectedRegions).toEqual([]);
       fixture.componentInstance.queryForm.controls.query.setValue('Game');
       vi.advanceTimersByTime(301);
-      const searched = nextRequest(); expect(searched.request.params.get('regions')).toBe(''); searched.flush({items:[],total_count:0});
+      const searched = nextRequest();
+      expect(searched.request.params.get('regions')).toBe('');
+      searched.flush({ items: [], total_count: 0 });
     });
   }
-
 });

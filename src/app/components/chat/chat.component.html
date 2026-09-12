@@ -34,30 +34,36 @@
       <!-- Режим чата с конкретным пользователем -->
       <div class="d-flex flex-column flex-grow-1 overflow-hidden">
         <!-- Контейнер для сообщений с прокруткой -->
-        <div class="messages-wrapper flex-grow-1 overflow-auto px-3" trapScroll trapKeyScroll #scrollbox>
+        <div class="messages-wrapper flex-grow-1 overflow-auto px-3" trapScroll trapKeyScroll #scrollbox (scroll)="markVisibleRead()">
           <div [class.justify-content-end]="(recepient$ | async)" class="messages d-flex flex-column gap-2">
             @for (message of (messages$ | async); track $index) {
               <div
-                [attr.data-message-index]="$index"
+                [attr.data-message-index]="$index" [attr.data-message-id]="message.id"
                 class="p-2 message-item rounded text-light col-auto col-11"
                 [ngClass]="{
-                'yours': message.sender === 'Вы',
-                'others': message.sender !== 'Вы'
+                'yours': message.own,
+                'others': !message.own
                 }"
                 >
                 <p class="mb-0">
                   <strong>{{ message.sender }}:</strong> {{ message.body }}
                 </p>
-                <p class="small mt-2 mb-0" style="text-align: right; color: rgba(138, 172, 201, 1);">{{message.created_at | date:'dd.MM.yy':'UTC'}}</p>
+                <p class="small mt-2 mb-0" style="text-align: right; color: rgba(138, 172, 201, 1);">{{message.created_at | date:'dd.MM.yy HH:mm'}}
+                  @if(message.own){<span class="message-status" [class.read]="message.read">{{message.status === 'sending' ? ' · Отправляется…' : message.status === 'failed' ? ' · Не отправлено' : message.read ? ' · ✓✓ Прочитано' : ' · ✓ Отправлено'}}</span>}
+                </p>
+                @if(message.own && message.status === 'failed'){<button type="button" class="retry-message" [disabled]="!(isConnected$ | async)" (click)="retryMessage(message)">Повторить отправку</button>}
               </div>
             }
           </div>
         </div>
 
+        @if ((typing$ | async)?.has((recepient$ | async) ?? '')) {
+          <div class="typing-indicator" role="status" aria-live="polite"><span>{{recepient$ | async}} печатает</span><span class="typing-dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+        }
         <!-- Поле ввода (фиксировано снизу) -->
         <div class="chat-input mt-auto">
           <div class="input-group px-3 pb-3">
-            <input [(ngModel)]="message"
+            <input [(ngModel)]="message" (ngModelChange)="onDraftChange()" (blur)="stopTyping()" maxlength="4000"
               class="form-control"
               (keydown.enter)="sendMessage()"
               (focus)="onFocus()"

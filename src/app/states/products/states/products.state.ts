@@ -34,13 +34,12 @@ export class ProductsState {
   public loadList(ctx: StateContext<IproductState>, action: ProductsActions.LoadList) {
     ctx.patchState({
       productListRequestStatus: RequestStatus.Pending,
-      regionCounts: {},
     });
 
     const currentParams = ctx.getState().productListRequestParams;
     return this.service.productsRequest(currentParams).pipe(
       tap((response) => {
-        ctx.dispatch(new ProductsActions.LoadListSuccess(response));
+        ctx.dispatch(new ProductsActions.LoadListSuccess(response, currentParams));
       }),
       catchError(() => ctx.dispatch(new ProductsActions.LoadListFail())),
     );
@@ -50,6 +49,7 @@ export class ProductsState {
   public loadListSuccess(ctx: StateContext<IproductState>, action: ProductsActions.LoadListSuccess) {
     ctx.patchState({
       productListRequestStatus: RequestStatus.Load,
+      displayedParams: action.params ?? ctx.getState().productListRequestParams,
       productList: action.payload.items.map((x) => ({
         ...x,
         first_release_date: unixMilliseconds(x.first_release_date),
@@ -128,7 +128,9 @@ export class ProductsState {
   }
 
   @Selector()
-  static regionCounts(state: IproductState) { return state.regionCounts ?? {}; }
+  static regionCounts(state: IproductState) {
+    return state.regionCounts ?? {};
+  }
 
   @Selector()
   static listLoading(state: IproductState) {
@@ -147,6 +149,11 @@ export class ProductsState {
   @Selector()
   public static totalCountProducts(state: IproductState): number {
     return state.productsTotalCount;
+  }
+
+  @Selector()
+  public static displayedParams(state: IproductState): IProductListRequest {
+    return state.displayedParams ?? { offset: 0, cat: 48 };
   }
 
   @Selector()

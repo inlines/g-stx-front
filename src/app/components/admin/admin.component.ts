@@ -1,3 +1,8 @@
+import { LoadingPanelComponent } from '../loading-panel/loading-panel.component';
+import { PageSwipeDirective } from '@app/directives/page-swipe.directive';
+import { Store } from '@ngxs/store';
+import { ChatActions } from '@app/states/chat/states/chat-actions';
+import { ChatState } from '@app/states/chat/states/chat.state';
 import { ActivatedRoute } from '@angular/router';
 import { AdminRequestsComponent } from '../admin-requests/admin-requests.component';
 import { DatePipe } from '@angular/common';
@@ -22,7 +27,15 @@ import { UserAvatarComponent } from '../user-avatar/user-avatar.component';
 
 @Component({
   selector: 'app-admin',
-  imports: [DatePipe, FormsModule, PagerComponent, UserAvatarComponent, AdminRequestsComponent],
+  imports: [
+    LoadingPanelComponent,
+    PageSwipeDirective,
+    DatePipe,
+    FormsModule,
+    PagerComponent,
+    UserAvatarComponent,
+    AdminRequestsComponent,
+  ],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.scss',
   changeDetection: ChangeDetectionStrategy.Eager,
@@ -31,6 +44,7 @@ export class AdminComponent implements OnInit, OnDestroy {
   readonly currentUserId = input.required<number>();
   readonly accessDenied = output<void>();
   private readonly api = inject(AdminService);
+  private readonly store = inject(Store);
   private readonly destroy = inject(DestroyRef);
   private readonly modal = inject(NgbModal);
   private request?: Subscription;
@@ -43,6 +57,7 @@ export class AdminComponent implements OnInit, OnDestroy {
   readonly limit = 20;
   offset = 0;
   loading = false;
+  private loadVersion = 0;
   busy = false;
   error = '';
   success = '';
@@ -57,7 +72,7 @@ export class AdminComponent implements OnInit, OnDestroy {
 
   private readonly route = inject(ActivatedRoute, { optional: true });
   ngOnInit() {
-    this.route?.queryParamMap.pipe(takeUntilDestroyed(this.destroy)).subscribe(params => {
+    this.route?.queryParamMap.pipe(takeUntilDestroyed(this.destroy)).subscribe((params) => {
       if (params.get('section') === 'requests') this.section = 'requests';
     });
     this.load();
@@ -68,21 +83,24 @@ export class AdminComponent implements OnInit, OnDestroy {
     this.load(0);
   }
   pageChanged(page: number) {
-    if (!this.busy && !this.dialog) this.load((page - 1) * this.limit);
+    if (!this.busy && !this.loading && !this.dialog) this.load((page - 1) * this.limit);
   }
   load(offset = this.offset) {
+    const version = ++this.loadVersion;
     this.request?.unsubscribe();
     this.loading = true;
     this.error = '';
-    this.offset = offset;
     this.request = this.api
       .users(this.search, offset, this.limit)
       .pipe(
         takeUntilDestroyed(this.destroy),
-        finalize(() => (this.loading = false)),
+        finalize(() => {
+          if (version === this.loadVersion) this.loading = false;
+        }),
       )
       .subscribe({
         next: (response) => {
+          this.offset = offset;
           this.users = response.items;
           this.total = response.total_count;
           // Another administrator may have removed the final item on this page.
@@ -91,12 +109,17 @@ export class AdminComponent implements OnInit, OnDestroy {
           }
         },
         error: (error) => {
-          this.users = [];
-          this.total = 0;
           this.error = error.error?.error || 'Не удалось загрузить пользователей';
           if (error.status === 403) this.accessDenied.emit();
         },
       });
+  }
+  startChat(user: AdminUser): void {
+    if (user.id === this.currentUserId() || this.busy) return;
+    this.store.dispatch(new ChatActions.SetRecepient(user.user_login));
+    this.store.dispatch(new ChatActions.RequestMessages(user.user_login));
+    if (!this.store.selectSnapshot(ChatState.visible))
+      this.store.dispatch(new ChatActions.ToggleChatVisibility());
   }
   open(user: AdminUser, action: 'promote' | 'delete', template: TemplateRef<unknown>) {
     if (this.busy || user.id === this.currentUserId() || (action === 'promote' && user.is_admin)) return;

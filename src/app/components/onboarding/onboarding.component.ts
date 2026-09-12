@@ -1,3 +1,4 @@
+import { OnboardingCatalogComponent } from '../onboarding-catalog/onboarding-catalog.component';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -15,7 +16,7 @@ import { ICollectionItem } from '@app/states/collection/interfaces/collection-it
 @Component({
   selector: 'app-onboarding',
   standalone: true,
-  imports: [ReleaseCardComponent],
+  imports: [OnboardingCatalogComponent, ReleaseCardComponent],
   templateUrl: './onboarding.component.html',
   styleUrl: './onboarding.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -23,12 +24,13 @@ import { ICollectionItem } from '@app/states/collection/interfaces/collection-it
 export class OnboardingComponent implements OnInit, OnDestroy {
   readonly modal = inject(NgbActiveModal);
   playNavigationSound: () => void = () => {};
+  @ViewChild('stepsNav') private stepsNav?: ElementRef<HTMLElement>;
   @ViewChild('content') private content?: ElementRef<HTMLElement>;
   readonly index = signal(0);
   readonly phase = signal(0);
   readonly requestKind = signal<'serial' | 'name'>('serial');
   private timers: ReturnType<typeof setTimeout>[] = [];
-  readonly steps = [
+  private readonly originalSteps = [
     {
       name: 'Каталог',
       title: 'Найдите свои игры',
@@ -89,6 +91,41 @@ export class OnboardingComponent implements OnInit, OnDestroy {
         'Принятая заявка на серийник: +10 Kudos. На альтернативное имя: +5. Каждое полезное дополнение приближает к вершине!',
     },
   ];
+  readonly steps = [
+    { ...this.originalSteps[0], scene: 0 },
+    {
+      name: 'Фильтры',
+      title: 'Сузьте поиск до нужных игр',
+      text: 'Сначала выберите консоль. Затем можно выбрать один или несколько регионов, локальный или сетевой мультиплеер. «Пропустить цифровые» скрывает отмеченные digital-only игры. Для будущих игр включите «Показывать невышедшие». Ищете конкретный диск? Переключите поиск на серийник и введите его целиком.',
+      action: 'Применить фильтры',
+      result:
+        'Показаны подходящие игры выбранной платформы. По рейтингу можно отсортировать от высокой оценки к низкой.',
+      scene: 8,
+    },
+    {
+      name: 'Листание',
+      title: 'Листайте каталог удобным способом',
+      text: 'Переключайте страницы кнопками под сеткой. На компьютере работают также стрелки ← и → вне полей ввода. На телефоне проведите по сетке: влево — следующая страница, вправо — предыдущая. Пока данные загружаются, текущая сетка остаётся на месте под затемнением.',
+      action: 'Следующая страница',
+      result:
+        'Новая страница и её номер появляются вместе. Свайп не открывает карточку, а вертикальное движение прокручивает список.',
+      scene: 9,
+    },
+    ...this.originalSteps.slice(1).map((step, i) => ({ ...step, scene: i + 1 })),
+  ];
+  scene() {
+    return this.step.scene;
+  }
+  readonly soundEnabled = signal(true);
+  playEffect: (kind: 'filter' | 'page' | 'reward') => void = () => {};
+  onSoundToggle: (enabled: boolean) => void = () => {};
+  sound(kind: 'filter' | 'page' | 'reward') {
+    if (this.soundEnabled()) this.playEffect(kind);
+  }
+  toggleSound() {
+    this.soundEnabled.update((value) => !value);
+    this.onSoundToggle(this.soundEnabled());
+  }
   readonly game: ICollectionItem = {
     release_id: 0,
     product_id: 0,
@@ -109,8 +146,12 @@ export class OnboardingComponent implements OnInit, OnDestroy {
   }
   select(index: number) {
     if (index < 0 || index >= this.steps.length) return;
-    if (index !== this.index()) this.playNavigationSound();
+    if (index !== this.index() && this.soundEnabled()) this.playNavigationSound();
     this.index.set(index);
+    (this.stepsNav?.nativeElement.children[index] as HTMLElement | undefined)?.scrollIntoView?.({
+      block: 'nearest',
+      inline: 'nearest',
+    });
     if (this.content) this.content.nativeElement.scrollTop = 0;
     this.replay();
   }
@@ -122,10 +163,22 @@ export class OnboardingComponent implements OnInit, OnDestroy {
       return;
     }
     this.phase.set(0);
-    this.timers.push(setTimeout(() => this.phase.set(1), 700));
-    this.timers.push(setTimeout(() => this.phase.set(2), 2100));
+    this.timers.push(
+      setTimeout(() => {
+        this.phase.set(1);
+        if (this.scene() === 8) this.sound('filter');
+        if (this.scene() === 9) this.sound('page');
+      }, 700),
+    );
+    this.timers.push(
+      setTimeout(() => {
+        this.phase.set(2);
+        if (this.scene() === 7) this.sound('reward');
+      }, 2100),
+    );
   }
   demonstrate() {
+    this.sound(this.scene() === 8 ? 'filter' : this.scene() === 9 ? 'page' : 'reward');
     this.clearTimers();
     this.phase.set(2);
   }

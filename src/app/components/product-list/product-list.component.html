@@ -58,19 +58,19 @@
       </div>
     </div>
   </div>
-  @if (loading$ | async) { <p class="text-light" role="status">Загрузка...</p> }
-  @if (failed$ | async) { <p class="text-warning" role="alert">Не удалось загрузить каталог. Попробуйте изменить фильтры или обновить страницу.</p> }
+  @if (failed$ | async) { <p class="text-warning" role="alert">Не удалось загрузить каталог. Показаны предыдущие результаты. <button type="button" class="btn-pink" (click)="retry()">Повторить</button></p> }
 
   @if(!(loading$ | async) && !(failed$ | async) && (productsTotalCount$ | async) === 0){<p class="text-light" role="status">По выбранным фильтрам игр не найдено. Попробуйте другую платформу или измените поиск.</p>}
+  <app-loading-panel [loading]="(loading$ | async) ?? false"><div #results class="catalog-grid" pageSwipe [swipeDisabled]="(loading$ | async) ?? false" (swipePage)="swipePage($event)">
   @for (product of products$ | async; track product.id) {
     <!-- Desktop / tablet: карточки -->
     <div class="catalog-cell col-xl-3 col-lg-4 col-md-4 col-sm-6 p-3">
       <div
         class="card game-card border-0 d-flex flex-column justify-content-between position-relative"
-        [routerLink]="['/products', product.id, {platform: activeCategory}]"
+        [routerLink]="['/products', product.id, {platform: (displayedParams$ | async)?.cat}]"
         style="cursor: pointer;"
         >
-        @if (product.has_serials === false && !product.digital_only && supportsReleaseActions(activeCategory)) {
+        @if (product.has_serials === false && !product.digital_only && supportsReleaseActions((displayedParams$ | async)?.cat ?? activeCategory)) {
           <span class="missing-serial" role="img" aria-label="Серийники пока не указаны. Откройте игру, чтобы дополнить их."
             title="Серийники пока не указаны. Знаете номер? Дополните на странице игры.">?</span>
         }
@@ -108,9 +108,9 @@
           <div class="game-content">
             <div class="title">{{ product.name }}</div>
             <app-game-stats [game]="product" />
-            @if (selectedRegions.length && product.serial?.length) {
+            @if ((displayedParams$ | async)?.regions && product.serial?.length) {
               <app-serial-list [serials]="product.serial" />
-            } @else if (product.has_serials === false && !product.digital_only && supportsReleaseActions(activeCategory)) {
+            } @else if (product.has_serials === false && !product.digital_only && supportsReleaseActions((displayedParams$ | async)?.cat ?? activeCategory)) {
               <small class="missing-serial-hint">Знаете серийник? Дополните →</small>
             }
             <div class="game-first-release text-lite-muted small">
@@ -128,9 +128,11 @@
 
 
 
+  </div></app-loading-panel>
   <div class="col-12 py-0">
     <app-pager
       (pageChange)="pageChanged($event)"
+      [busy]="(loading$ | async) ?? false"
       [limit]="limit"
       [offset]="(offset$ | async) || 0"
       [totalCount]="(productsTotalCount$ | async) || 0"

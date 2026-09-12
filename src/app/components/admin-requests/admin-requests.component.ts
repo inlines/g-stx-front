@@ -1,3 +1,5 @@
+import { LoadingPanelComponent } from '../loading-panel/loading-panel.component';
+import { PageSwipeDirective } from '@app/directives/page-swipe.directive';
 import { canonicalSerial, validSerial, SERIAL_HINT } from '@app/shared/serial-number';
 import { normalizeAlternativeName, validAlternativeName } from '@app/shared/contribution-value';
 import { FormsModule } from '@angular/forms';
@@ -12,7 +14,15 @@ import { RequestPhotoComponent } from './request-photo.component';
 
 @Component({
   selector: 'app-admin-requests',
-  imports: [FormsModule, DatePipe, RouterLink, PagerComponent, RequestPhotoComponent],
+  imports: [
+    LoadingPanelComponent,
+    PageSwipeDirective,
+    FormsModule,
+    DatePipe,
+    RouterLink,
+    PagerComponent,
+    RequestPhotoComponent,
+  ],
   templateUrl: './admin-requests.component.html',
   styleUrl: './admin-requests.component.scss',
   changeDetection: ChangeDetectionStrategy.Eager,
@@ -22,11 +32,13 @@ export class AdminRequestsComponent implements OnInit {
   private readonly destroy = inject(DestroyRef);
   readonly accessDenied = output<void>();
   status: 'pending' | 'accepted' = 'pending';
+  displayedStatus: 'pending' | 'accepted' = 'pending';
   items: SerialRequest[] = [];
   total = 0;
   offset = 0;
   readonly limit = 10;
   loading = false;
+  private loadVersion = 0;
   busy = false;
   error = '';
   success = '';
@@ -66,32 +78,35 @@ export class AdminRequestsComponent implements OnInit {
     this.load(0);
   }
   page(page: number) {
-    if (!this.busy) {
+    if (!this.busy && !this.loading) {
       this.decision = null;
       this.load((page - 1) * this.limit);
     }
   }
   load(offset = this.offset) {
+    const requestedStatus = this.status;
+    const version = ++this.loadVersion;
     this.request?.unsubscribe();
-    this.offset = offset;
     this.error = '';
     this.loading = true;
     this.request = this.api
       .list(this.status, offset, this.limit)
       .pipe(
         takeUntilDestroyed(this.destroy),
-        finalize(() => (this.loading = false)),
+        finalize(() => {
+          if (version === this.loadVersion) this.loading = false;
+        }),
       )
       .subscribe({
         next: (response) => {
+          this.offset = offset;
+          this.displayedStatus = requestedStatus;
           this.items = response.items;
           this.total = response.total_count;
           if (!this.items.length && this.total && offset >= this.total)
             this.load(Math.floor((this.total - 1) / this.limit) * this.limit);
         },
         error: (error) => {
-          this.items = [];
-          this.total = 0;
           this.error = error.error?.error || 'Не удалось загрузить заявки';
           if (error.status === 403) this.accessDenied.emit();
         },

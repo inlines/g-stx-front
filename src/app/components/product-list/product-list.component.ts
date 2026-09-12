@@ -1,3 +1,5 @@
+import { PageSwipeDirective } from '@app/directives/page-swipe.directive';
+import { LoadingPanelComponent } from '../loading-panel/loading-panel.component';
 import { SerialListComponent } from '../serial-list/serial-list.component';
 import { canonicalSerial, validSerial, SERIAL_HINT, SearchMode } from '@app/shared/serial-number';
 import { RegionFiltersComponent } from '../region-filters/region-filters.component';
@@ -6,6 +8,8 @@ import { GameStatsComponent } from '../game-stats/game-stats.component';
 import { supportsReleaseActions } from '@app/shared/release-platforms';
 import { AsyncPipe, DatePipe } from '@angular/common';
 import {
+  afterNextRender,
+  Injector,
   AfterViewInit,
   ChangeDetectionStrategy,
   Component,
@@ -32,7 +36,18 @@ import { combineLatest, debounceTime, distinctUntilChanged, map } from 'rxjs';
 
 @Component({
   selector: 'app-product-list',
-  imports: [SerialListComponent, RegionFiltersComponent, GameStatsComponent, AsyncPipe, DatePipe, RouterModule, ReactiveFormsModule, PagerComponent],
+  imports: [
+    PageSwipeDirective,
+    LoadingPanelComponent,
+    SerialListComponent,
+    RegionFiltersComponent,
+    GameStatsComponent,
+    AsyncPipe,
+    DatePipe,
+    RouterModule,
+    ReactiveFormsModule,
+    PagerComponent,
+  ],
   templateUrl: './product-list.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './product-list.component.scss',
@@ -43,14 +58,20 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   @Input() companyId?: number;
   @Input() companyRole?: 'developer' | 'publisher';
   @Input() platformIds: number[] | null = null;
-  get isNamedCatalog(): boolean { return this.franchiseId !== undefined || this.companyId !== undefined; }
+  get isNamedCatalog(): boolean {
+    return this.franchiseId !== undefined || this.companyId !== undefined;
+  }
   private readonly store = inject(Store);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly injector = inject(Injector);
+  private pendingPageOffset: number | null = null;
+  @ViewChild('results') results?: ElementRef<HTMLElement>;
   @ViewChild('query') query?: ElementRef<HTMLInputElement>;
 
   readonly limit = CATALOG_PAGE_SIZE;
   readonly productParams$ = this.store.select(ProductsState.productsParams);
-  readonly offset$ = this.productParams$.pipe(map((params) => params.offset ?? 0));
+  readonly displayedParams$ = this.store.select(ProductsState.displayedParams);
+  readonly offset$ = this.displayedParams$.pipe(map((params) => params.offset ?? 0));
   readonly categories$ = this.store
     .select(PlatformState.loadedPlatforms)
     .pipe(
@@ -62,7 +83,9 @@ export class ProductListComponent implements OnInit, AfterViewInit {
     map(([platforms, params]) => platformRegionCounts(platforms.find((p) => p.id === params.cat))),
   );
   readonly unknownRegionCounts$ = this.store.select(ProductsState.regionCounts);
-  get selectedRegions() { return normalizeRegions(this.queryForm.controls.regions.value); }
+  get selectedRegions() {
+    return normalizeRegions(this.queryForm.controls.regions.value);
+  }
   toggleRegion(region: RegionGroup): void {
     this.queryForm.controls.regions.setValue(toggleRegion(this.selectedRegions, region).join(','));
     this.updateFilters();
@@ -74,7 +97,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   readonly products$ = combineLatest([
     this.store.select(ProductsState.loadedProducts),
     this.store.select(OwnershipState.ownership),
-    this.productParams$,
+    this.displayedParams$,
   ]).pipe(
     map(([products, ownership, params]) => {
       const owned = new Set(
@@ -148,7 +171,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
       new ProductsActions.SetRequestParams({
         ...params,
         unknown: this.unknown,
-      franchise_id: this.franchiseId,
+        franchise_id: this.franchiseId,
         company_id: this.companyId,
         company_role: this.companyRole,
         query: params.query,
@@ -158,10 +181,18 @@ export class ProductListComponent implements OnInit, AfterViewInit {
     this.queryForm.valueChanges
       .pipe(debounceTime(300), takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.updateFilters());
+    this.displayedParams$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
+      if (this.pendingPageOffset !== null && params.offset === this.pendingPageOffset) {
+        this.pendingPageOffset = null;
+        afterNextRender(
+          () => this.results?.nativeElement.scrollIntoView?.({ block: 'start', behavior: 'auto' }),
+          { injector: this.injector },
+        );
+      }
+    });
     this.productParams$
       .pipe(distinctUntilChanged(sameListParams), takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
         this.store.dispatch(new ProductsActions.LoadList());
       });
   }
@@ -170,14 +201,29 @@ export class ProductListComponent implements OnInit, AfterViewInit {
     if (window.matchMedia?.('(hover: hover) and (pointer: fine)').matches) this.query?.nativeElement.focus();
   }
 
+  retry(): void {
+    this.store.dispatch(new ProductsActions.LoadList());
+  }
   readonly serialHint = SERIAL_HINT;
   get invalidSerial(): boolean {
-    return this.queryForm.controls.searchMode.value === 'serial' && !!this.queryForm.controls.query.value.trim() && !validSerial(this.queryForm.controls.query.value);
+    return (
+      this.queryForm.controls.searchMode.value === 'serial' &&
+      !!this.queryForm.controls.query.value.trim() &&
+      !validSerial(this.queryForm.controls.query.value)
+    );
   }
   private updateFilters(): void {
     if (this.invalidSerial) return;
-    const { query, searchMode, sort, skipDigitalFilter, localMultiplayer, onlineMultiplayer, includeUnreleased, regions } =
-      this.queryForm.getRawValue();
+    const {
+      query,
+      searchMode,
+      sort,
+      skipDigitalFilter,
+      localMultiplayer,
+      onlineMultiplayer,
+      includeUnreleased,
+      regions,
+    } = this.queryForm.getRawValue();
     const current = this.store.selectSnapshot(ProductsState.productsParams);
     const next = catalogParams({
       ...current,
@@ -192,6 +238,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
       online_multiplayer: onlineMultiplayer,
     });
     if (!sameListParams(current, next)) {
+      this.pendingPageOffset = null;
       this.store.dispatch(new ProductsActions.SetRequestParams({ ...next, query: next.query, offset: 0 }));
     }
   }
@@ -205,8 +252,15 @@ export class ProductListComponent implements OnInit, AfterViewInit {
     if (window.matchMedia?.('(hover: hover) and (pointer: fine)').matches) this.query?.nativeElement.focus();
   }
 
+  swipePage(direction: number): void {
+    const params = this.store.selectSnapshot(ProductsState.displayedParams);
+    const page = Math.floor((params.offset ?? 0) / this.limit) + 1 + direction;
+    const pages = Math.ceil(this.store.selectSnapshot(ProductsState.totalCountProducts) / this.limit);
+    if (page >= 1 && page <= pages) this.pageChanged(page);
+  }
   pageChanged(page: number): void {
-    if (this.invalidSerial) return;
-    this.store.dispatch(new ProductsActions.SetRequestParams({ offset: (page - 1) * this.limit }));
+    if (this.invalidSerial || this.store.selectSnapshot(ProductsState.listLoading)) return;
+    this.pendingPageOffset = (page - 1) * this.limit;
+    this.store.dispatch(new ProductsActions.SetRequestParams({ offset: this.pendingPageOffset }));
   }
 }

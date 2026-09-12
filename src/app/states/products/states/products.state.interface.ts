@@ -9,6 +9,7 @@ export interface IproductState {
   productsTotalCount: number;
   regionCounts?: RegionCounts;
   productListRequestStatus: RequestStatus;
+  displayedParams?: IProductListRequest;
   productListRequestParams: IProductListRequest;
   productProperties: IProductPropertiesResponse | null;
   productPropertiesErrorStatus: number | null;

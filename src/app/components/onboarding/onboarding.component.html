@@ -5,11 +5,12 @@
         <use href="/icons.svg#brand" /></svg
       ><span>Быстрый старт</span></span
     >
+    <button type="button" class="quiet sound-toggle" [attr.aria-pressed]="soundEnabled()" (click)="toggleSound()">{{soundEnabled() ? "♫ Вкл" : "♫ Выкл"}}</button>
     <button type="button" class="quiet" (click)="modal.close()" aria-label="Закрыть обучение">
       Пропустить <span aria-hidden="true">×</span>
     </button>
   </header>
-  <nav class="steps" aria-label="Шаги обучения">
+  <nav #stepsNav class="steps" aria-label="Шаги обучения">
     @for (item of steps; track $index) {
       <button
         type="button"
@@ -30,27 +31,20 @@
       <p>{{ step.text }}</p>
       <small>Это учебный пример. Ваши игры, заявки и сообщения не изменяются.</small>
     </div>
-    <div class="demo" [class.acted]="phase() === 2" [class.kudos-demo]="index() === 7">
+    <div class="demo" [class.acted]="phase() === 2" [class.kudos-demo]="scene() === 7">
       <div class="demo-heading">
         <span>{{ step.name }}</span
         ><small>ДЕМОНСТРАЦИЯ</small>
       </div>
       <div class="scene">
-        @if (index() === 0) {
-          <div class="platforms">
-            <span>PS3</span><span class="selected">PS4</span><span>PS5</span><span>PSP</span>
-          </div>
-          <div class="search" aria-label="Пример поиска">
-            <span aria-hidden="true">⌕</span> {{ phase() ? 'Night Circuit' : 'Название игры…'
-            }}<span class="caret" aria-hidden="true">|</span>
+        @if(scene() === 8 || scene() === 9){<app-onboarding-catalog [mode]="scene() === 8 ? 'filters' : 'paging'" [phase]="phase()" (effect)="sound($event)"/>}
+        @if(scene() === 0){<app-onboarding-catalog mode="search" [phase]="phase()"/>}
+        @if (scene() > 0 && scene() < 5 && scene() !== 2) {
+          <div class="game-preview" inert aria-hidden="true" [class.reveal]="scene() !== 0 || phase() === 2">
+            <app-release-card [item]="game" [readOnly]="true" [saleMode]="scene() === 4" />
           </div>
         }
-        @if (index() < 5 && index() !== 2) {
-          <div class="game-preview" inert aria-hidden="true" [class.reveal]="index() !== 0 || phase() === 2">
-            <app-release-card [item]="game" [readOnly]="true" [saleMode]="index() === 4" />
-          </div>
-        }
-        @if (index() === 2) {
+        @if (scene() === 2) {
           <div class="request-tabs" aria-label="Тип учебной заявки">
             <button
               type="button"
@@ -92,13 +86,13 @@
             </div>
           </div>
         }
-        @if (index() === 4) {
+        @if (scene() === 4) {
           <div class="sale-fields">
             <span>Цена продажи <b>1 500 ₽</b></span
             ><span>☑ CIB · Полный комплект</span>
           </div>
         }
-        @if (index() === 5) {
+        @if (scene() === 5) {
           <div class="players">
             @for (player of ['Player One', 'Retro Pilot', 'Pixel Hunter']; track player; let i = $index) {
               <div class="player">
@@ -115,7 +109,7 @@
             <div class="profile-tabs"><span class="selected">Коллекция</span><span>Хочет продать</span></div>
           }
         }
-        @if (index() === 7) {
+        @if (scene() === 7) {
           <div class="challenge">
             <span class="challenge-label">KUDOS CHALLENGE</span>
             <div class="kudos-score" [class.earned]="phase() === 2">
@@ -141,7 +135,7 @@
             <small>Учебные очки и места. В рейтинге — до 100 игроков.</small>
           </div>
         }
-        @if (index() === 6) {
+        @if (scene() === 6) {
           <div class="chat-example">
             <div class="companion">
               <span class="avatar" aria-hidden="true">P</span
@@ -154,28 +148,28 @@
             <div class="sample-field">{{ phase() === 2 ? 'Сообщение…' : 'Да, полный комплект…' }}</div>
           </div>
         }
-        <button type="button" class="demo-action" [class.tap]="phase() === 1" (click)="demonstrate()">
+        @if(scene() < 8) {<button type="button" class="demo-action" [class.tap]="phase() === 1" (click)="demonstrate()">
           {{
             phase() === 2
               ? '✓ ' +
-                (index() === 0
+                (scene() === 0
                   ? 'Игра найдена'
-                  : index() === 1
+                  : scene() === 1
                     ? 'В коллекции'
-                    : index() === 2
+                    : scene() === 2
                       ? 'На рассмотрении'
-                      : index() === 3
+                      : scene() === 3
                         ? 'В вишлисте'
-                        : index() === 4
+                        : scene() === 4
                           ? 'Выставлена на продажу'
-                          : index() === 5
+                          : scene() === 5
                             ? 'Профиль игрока открыт'
-                            : index() === 7
+                            : scene() === 7
                               ? '+10 Kudos за принятую заявку'
                               : 'Сообщение отправлено')
               : step.action
           }}
-        </button>
+        </button>}
       </div>
       <p class="outcome" aria-live="polite">
         {{ phase() === 2 ? step.result : 'Смотрите пример или нажмите на действие сами.' }}
@@ -185,7 +179,7 @@
   <footer class="tour-footer">
     <button type="button" class="quiet replay" (click)="replay()">↻ Повторить пример</button>
     <div class="navigation">
-      <button type="button" class="quiet" [disabled]="index() === 0" (click)="select(index() - 1)">
+      <button type="button" class="quiet" [disabled]="scene() === 0" (click)="select(index() - 1)">
         Назад</button
       ><span>{{ index() + 1 }} / {{ steps.length }}</span
       ><button type="button" class="next" (click)="next()">

@@ -1,3 +1,5 @@
+import { Store } from '@ngxs/store';
+import { ChatState } from '@app/states/chat/states/chat.state';
 import { TestBed } from '@angular/core/testing';
 import { HttpTestingController } from '@angular/common/http/testing';
 import { NgbConfig, NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -29,7 +31,7 @@ describe('Admin users', () => {
     const rows = fixture.nativeElement.querySelectorAll('.users li');
     expect(rows[0].querySelector('button')).toBeNull();
     expect(rows[0].textContent).toContain('Администратор');
-    expect(rows[1].querySelectorAll('button').length).toBe(2);
+    expect(rows[1].querySelectorAll('button').length).toBe(3);
     component.section = 'requests';
     fixture.detectChanges();
     http
@@ -79,10 +81,18 @@ describe('Admin users', () => {
   });
   it('cancelling a confirmation makes no mutation; promotion refreshes the list', () => {
     const { fixture, component, http } = setup();
-    (fixture.nativeElement.querySelector('.users .actions button') as HTMLButtonElement).click();
+    (
+      fixture.nativeElement.querySelector(
+        '.users .actions button:not(.start-chat):not(.danger)',
+      ) as HTMLButtonElement
+    ).click();
     component.cancel();
     http.expectNone((r) => r.method === 'POST' || r.method === 'DELETE');
-    (fixture.nativeElement.querySelector('.users .actions button') as HTMLButtonElement).click();
+    (
+      fixture.nativeElement.querySelector(
+        '.users .actions button:not(.start-chat):not(.danger)',
+      ) as HTMLButtonElement
+    ).click();
     component.confirm();
     const promotion = http.expectOne('/api/admin/users/2/promote');
     expect(promotion.request.method).toBe('POST');
@@ -98,7 +108,11 @@ describe('Admin users', () => {
     const { fixture, component, http } = setup();
     const denied = vi.fn();
     component.accessDenied.subscribe(denied);
-    (fixture.nativeElement.querySelector('.users .actions button') as HTMLButtonElement).click();
+    (
+      fixture.nativeElement.querySelector(
+        '.users .actions button:not(.start-chat):not(.danger)',
+      ) as HTMLButtonElement
+    ).click();
     component.confirm();
     http
       .expectOne('/api/admin/users/2/promote')
@@ -115,6 +129,23 @@ describe('Admin users', () => {
     expect(last.request.params.get('offset')).toBe('0');
     last.flush({ items: [me], total_count: 20 });
     expect(component.loading).toBe(false);
+    fixture.destroy();
+  });
+  it('opens the selected user conversation and never closes an already open sidebar', () => {
+    const { fixture, http, component } = setup();
+    const store = TestBed.inject(Store);
+    fixture.nativeElement.querySelector('.start-chat').click();
+    http
+      .expectOne((req) => req.url === '/api/messages' && req.params.get('companion') === 'collector')
+      .flush([]);
+    http.expectOne('/api/dialogs').flush([]);
+    expect(store.selectSnapshot(ChatState.visible)).toBe(true);
+    expect(store.selectSnapshot(ChatState.recepient)).toBe('collector');
+    component.startChat(other);
+    http.expectOne((req) => req.url === '/api/messages').flush([]);
+    expect(store.selectSnapshot(ChatState.visible)).toBe(true);
+    component.startChat(me);
+    http.expectNone((req) => req.url === '/api/messages');
     fixture.destroy();
   });
 });

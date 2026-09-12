@@ -255,3 +255,17 @@ summary:focus-visible {
 
 .collection-snow-window .modal-dialog { margin: 0; width: 100%; max-width: none; height: 100%; }
 .collection-snow-window .modal-content { height: 100%; overflow: hidden; }
+
+/* Tactile feedback without affecting layout or the committed selection. */
+:where(app-pager, app-region-filters, .catalog-platforms, .platforms, .pager, .tabs, .sections) button {
+  transition: background-color .12s, border-color .12s, box-shadow .12s, transform .12s;
+}
+:where(app-pager, app-region-filters, .catalog-platforms, .platforms, .pager, .tabs, .sections) button:active:not(:disabled) {
+  transform: translateY(1px) scale(.97);
+  box-shadow: inset 0 0 0 2px #c2a4ed;
+}
+:where(.digital-option, .multiplayer-filters label):active { color: #e2cdfc; }
+@media (prefers-reduced-motion: reduce) {
+  :where(app-pager, app-region-filters, .catalog-platforms, .platforms, .pager, .tabs, .sections) button { transition:none; }
+  :where(app-pager, app-region-filters, .catalog-platforms, .platforms, .pager, .tabs, .sections) button:active:not(:disabled) { transform:none; }
+}

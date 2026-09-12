@@ -448,3 +448,6 @@ small {
     animation: none;
   }
 }
+
+.steps{overflow-x:auto;justify-content:flex-start;flex-shrink:0}.steps button{flex-shrink:0;white-space:nowrap}.tour-content>*{min-width:0}.sound-toggle{margin-left:auto;white-space:nowrap}
+@media(max-width:767px){.steps button{flex:0 0 44px;min-width:44px}.brand>span{display:none}.tour-header{gap:4px}.tour-header button{padding:8px}.player>div{min-width:0;overflow-wrap:anywhere}}

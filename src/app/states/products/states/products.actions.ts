@@ -22,7 +22,10 @@ export namespace ProductsActions {
   export class LoadListSuccess {
     public static readonly type = ProductsActionList.LOAD_LIST_SUCCESS;
 
-    constructor(public payload: IproductListResponse) {}
+    constructor(
+      public payload: IproductListResponse,
+      public params?: IProductListRequest,
+    ) {}
   }
 
   export class LoadProperties {

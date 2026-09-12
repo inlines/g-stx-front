@@ -1,6 +1,15 @@
+import { PagerComponent } from '../pager/pager.component';
+import { LoadingPanelComponent } from '../loading-panel/loading-panel.component';
+import { PageSwipeDirective } from '@app/directives/page-swipe.directive';
 import { validSerial, SERIAL_HINT, SearchMode } from '@app/shared/serial-number';
 import { RegionFiltersComponent } from '../region-filters/region-filters.component';
-import { matchesRegion, ownedRegionCounts, platformRegionCounts, RegionGroup, toggleRegion } from '@app/shared/region-filter';
+import {
+  matchesRegion,
+  ownedRegionCounts,
+  platformRegionCounts,
+  RegionGroup,
+  toggleRegion,
+} from '@app/shared/region-filter';
 import { priceValidator } from '@app/shared/price-validator';
 import { libraryCsv, LibraryCsvDownload } from '@app/shared/library-csv';
 import { OwnershipState } from '@app/states/ownership/states/ownership.state';
@@ -35,7 +44,17 @@ import { ReleaseCardComponent } from '../release-card/release-card.component';
 import { buildPages } from '../pager/pagination';
 @Component({
   selector: 'app-personal-library',
-  imports: [RegionFiltersComponent, AsyncPipe, CurrencyPipe, ReactiveFormsModule, RouterLink, ReleaseCardComponent],
+  imports: [
+    PageSwipeDirective,
+    LoadingPanelComponent,
+    PagerComponent,
+    RegionFiltersComponent,
+    AsyncPipe,
+    CurrencyPipe,
+    ReactiveFormsModule,
+    RouterLink,
+    ReleaseCardComponent,
+  ],
   providers: [PersonalListController],
   templateUrl: './personal-library.component.html',
   styleUrl: './personal-library.component.scss',
@@ -92,7 +111,14 @@ export class PersonalLibraryComponent implements OnInit, OnDestroy {
       map(([items, statuses, ownership, , platforms]) => {
         const status = statuses[this.kind];
         const filtered =
-          this.kind === 'collection' ? filterCollection(items.filter((item) => matchesRegion(item, this.view.regions)), this.view.query, this.view.sort, this.view.searchMode) : items;
+          this.kind === 'collection'
+            ? filterCollection(
+                items.filter((item) => matchesRegion(item, this.view.regions)),
+                this.view.query,
+                this.view.sort,
+                this.view.searchMode,
+              )
+            : items;
         const total = filtered.length;
         const pages = Math.max(1, Math.ceil(total / this.view.size));
         // Do not discard the saved page while a fresh list is loading.
@@ -170,7 +196,9 @@ export class PersonalLibraryComponent implements OnInit, OnDestroy {
     );
   }
   readonly serialHint = SERIAL_HINT;
-  get invalidSerial(): boolean { return this.view?.searchMode === 'serial' && !!this.query.value.trim() && !validSerial(this.query.value); }
+  get invalidSerial(): boolean {
+    return this.view?.searchMode === 'serial' && !!this.query.value.trim() && !validSerial(this.query.value);
+  }
   searchMode(value: SearchMode): void {
     this.view.searchMode = value;
     this.view.page = 1;

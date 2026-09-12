@@ -12,5 +12,6 @@ export const CHAT_STATE_DEFAULTS: IChatState = {
   dialogs: [],
   showWarning: false,
   unread: {},
+  unreadRevision: -1,
   notification: null,
 };

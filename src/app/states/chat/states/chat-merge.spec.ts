@@ -61,4 +61,16 @@ describe('Chat history merge', () => {
       expect(mergeDialogs([remote], [local])).toEqual([remote]);
     },
   );
+  it('keeps identical text with different persisted IDs and reconciles an optimistic message', () => {
+    expect(mergeMessages([{ ...message, id: 1 }], [{ ...message, id: 2 }])).toHaveLength(2);
+    const pending = { ...message, client_id: 'one', status: 'sending' as const };
+    const confirmed = { ...message, client_id: 'one', id: 1, read: false };
+    expect(mergeMessages([pending], [confirmed])).toEqual([confirmed]);
+  });
+  it('never loses a read receipt to a delayed history response or delivery echo', () => {
+    const read = { ...message, id: 1, read: true, read_at: '2026-09-12T10:00:00Z' };
+    const merged = mergeMessages([read], [{ ...message, id: 1, read: false, read_at: null }]);
+    expect(merged[0].read).toBe(true);
+    expect(merged[0].read_at).toBe(read.read_at);
+  });
 });

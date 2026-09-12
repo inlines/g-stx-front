@@ -52,7 +52,7 @@ export class OnboardingSound {
     );
     [523.25, 783.99, 1046.5].forEach((frequency, i) => note(frequency, 0.6 + i * 0.24, 1.55, 0.18, 'sine'));
   }
-  navigate(): void {
+  navigate(kind: 'navigate' | 'filter' | 'page' | 'reward' = 'navigate'): void {
     if (!this.context || this.context.state === 'closed') this.prepare();
     const context = this.context;
     if (!context) return;
@@ -61,7 +61,13 @@ export class OnboardingSound {
       const start = context.currentTime;
       if (start - this.lastTick < 0.08) return;
       this.lastTick = start;
-      [660, 990].forEach((frequency, index) => {
+      const notes = {
+        navigate: [660, 990],
+        filter: [440, 660],
+        page: [330, 495, 660],
+        reward: [523.25, 659.25, 783.99, 1046.5],
+      };
+      notes[kind].forEach((frequency, index) => {
         const oscillator = context.createOscillator();
         const gain = context.createGain();
         const at = start + index * 0.035;

@@ -1,4 +1,4 @@
-@use "../../../styles/controls";
+@use '../../../styles/controls';
 
 .chat-container {
   background-color: rgba(1, 7, 11, 0.9);
@@ -281,4 +281,66 @@
 .chat-control:disabled {
   opacity: 0.5;
   cursor: default;
+}
+
+.message-status {
+  margin-left: 4px;
+  font-size: 11px;
+}
+.message-status.read {
+  color: #c2a4ed;
+}
+.retry-message {
+  color: #ffd28a;
+  background: transparent;
+  border: 1px solid currentColor;
+  border-radius: 6px;
+  padding: 6px 10px;
+  min-height: 36px;
+}
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  min-height: 32px;
+  color: #a3b8cb;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.typing-dots {
+  display: inline-flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.typing-dots i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #c2a4ed;
+  animation: chat-typing 1.2s ease-in-out infinite;
+}
+.typing-dots i:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.typing-dots i:nth-child(3) {
+  animation-delay: 0.3s;
+}
+@keyframes chat-typing {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  30% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .typing-dots i {
+    animation: none;
+    opacity: 1;
+  }
 }

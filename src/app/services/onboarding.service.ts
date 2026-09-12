@@ -90,8 +90,13 @@ export class OnboardingService {
       this.dialog?.close();
       const dialog = openOnboarding(this.injector);
       this.dialog = dialog;
-      if (dialog.componentInstance)
+      if (dialog.componentInstance) {
         dialog.componentInstance.playNavigationSound = () => this.sound.navigate();
+        dialog.componentInstance.playEffect = (kind: 'filter' | 'page' | 'reward') =>
+          this.sound.navigate(kind);
+        dialog.componentInstance.onSoundToggle = (enabled: boolean) =>
+          enabled ? this.sound.prepare() : this.sound.stop();
+      }
       dialog.shown?.pipe(take(1)).subscribe(() => {
         if (this.dialog === dialog) this.sound.play();
       });

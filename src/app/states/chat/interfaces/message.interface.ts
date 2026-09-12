@@ -1,4 +1,10 @@
 export interface IMessage {
+  id?: number;
+  own?: boolean;
+  client_id?: string | null;
+  read?: boolean;
+  read_at?: string | null;
+  status?: 'sending' | 'failed';
   sender: string;
   recipient: string;
   body: string;

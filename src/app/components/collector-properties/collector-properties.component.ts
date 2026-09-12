@@ -1,5 +1,13 @@
+import { LoadingPanelComponent } from '../loading-panel/loading-panel.component';
+import { PageSwipeDirective } from '@app/directives/page-swipe.directive';
 import { RegionFiltersComponent } from '../region-filters/region-filters.component';
-import { matchesRegion, ownedRegionCounts, platformRegionCounts, RegionGroup, toggleRegion } from '@app/shared/region-filter';
+import {
+  matchesRegion,
+  ownedRegionCounts,
+  platformRegionCounts,
+  RegionGroup,
+  toggleRegion,
+} from '@app/shared/region-filter';
 import { KudosComponent } from '../kudos/kudos.component';
 import { UserAvatarComponent } from '../user-avatar/user-avatar.component';
 import { PlatformState } from '@app/states/platforms/states/platforms.state';
@@ -20,7 +28,17 @@ import { PagerComponent } from '../pager/pager.component';
 import { ReleaseCardComponent } from '../release-card/release-card.component';
 @Component({
   selector: 'app-collector-properties',
-  imports: [RegionFiltersComponent, KudosComponent, UserAvatarComponent, RouterLink, AsyncPipe, PagerComponent, ReleaseCardComponent],
+  imports: [
+    PageSwipeDirective,
+    LoadingPanelComponent,
+    RegionFiltersComponent,
+    KudosComponent,
+    UserAvatarComponent,
+    RouterLink,
+    AsyncPipe,
+    PagerComponent,
+    ReleaseCardComponent,
+  ],
   templateUrl: './collector-properties.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './collector-properties.component.scss',
@@ -70,12 +88,28 @@ export class CollectorPropertiesComponent {
   ]).pipe(
     map(([{ items, login, status, tab }, , platforms]) => {
       const view = this.views.get(tab === 'wts' ? `collector-wts:${login}` : `collector:${login}`);
-      const availablePlatforms = platforms.filter((p) => items.some((item) => item.platform_id === p.id || (!item.platform_id && item.platform_name === p.name)));
-      if (status === RequestStatus.Load && view.platform && !availablePlatforms.some((p) => p.id === view.platform)) view.platform = null;
+      const availablePlatforms = platforms.filter((p) =>
+        items.some(
+          (item) => item.platform_id === p.id || (!item.platform_id && item.platform_name === p.name),
+        ),
+      );
+      if (
+        status === RequestStatus.Load &&
+        view.platform &&
+        !availablePlatforms.some((p) => p.id === view.platform)
+      )
+        view.platform = null;
       const selectedPlatform = availablePlatforms.find((p) => p.id === view.platform);
-      const platformItems = tab === 'collection' && selectedPlatform
-        ? items.filter((item) => item.platform_id === selectedPlatform.id || (!item.platform_id && item.platform_name === selectedPlatform.name)) : items;
-      const filtered = tab === 'collection' ? platformItems.filter((item) => matchesRegion(item, view.regions)) : items;
+      const platformItems =
+        tab === 'collection' && selectedPlatform
+          ? items.filter(
+              (item) =>
+                item.platform_id === selectedPlatform.id ||
+                (!item.platform_id && item.platform_name === selectedPlatform.name),
+            )
+          : items;
+      const filtered =
+        tab === 'collection' ? platformItems.filter((item) => matchesRegion(item, view.regions)) : items;
       const pages = Math.max(1, Math.ceil(filtered.length / view.size));
       if (status === RequestStatus.Load) view.page = Math.min(view.page, pages);
       const offset = (view.page - 1) * view.size;
@@ -94,7 +128,10 @@ export class CollectorPropertiesComponent {
         size: view.size,
         items: filtered.slice(offset, offset + view.size).map((item) => ({
           ...item,
-          platformId: item.platform_id ?? platforms.find((platform) => platform.name === item.platform_name)?.id ?? null,
+          platformId:
+            item.platform_id ??
+            platforms.find((platform) => platform.name === item.platform_name)?.id ??
+            null,
         })),
         loading: status === RequestStatus.Pending,
         failed: status === RequestStatus.Error,

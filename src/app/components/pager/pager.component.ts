@@ -1,4 +1,6 @@
 import {
+  ElementRef,
+  inject,
   ChangeDetectionStrategy,
   Component,
   EventEmitter,
@@ -19,9 +21,12 @@ import { buildPages, PageItem } from './pagination';
   changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class PagerComponent implements OnChanges, OnInit {
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
   @Input() totalCount: number = 0;
   @Input() offset: number = 0;
   @Input() limit: number = 10;
+  @Input() busy = false;
+  pendingPage: number | null = null;
 
   @Output() pageChange = new EventEmitter<number>();
 
@@ -31,13 +36,16 @@ export class PagerComponent implements OnChanges, OnInit {
   range: number = 5; // сколько страниц показывать вокруг текущей
 
   public ngOnInit(): void {
-    if (window.innerWidth < 576) {
-      this.range = 1;
-    }
+    this.resize();
+  }
+  @HostListener('window:resize')
+  resize(): void {
+    this.range = window.innerWidth < 576 ? 1 : 5;
     this.ngOnChanges();
   }
 
   ngOnChanges(): void {
+    if (!this.busy) this.pendingPage = null;
     this.limit = Math.max(1, this.limit);
     this.currentPage = Math.floor(this.offset / this.limit) + 1;
     this.totalPages = Math.max(0, Math.ceil(this.totalCount / this.limit));
@@ -46,6 +54,17 @@ export class PagerComponent implements OnChanges, OnInit {
 
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent): void {
+    if (
+      this.busy ||
+      event.defaultPrevented ||
+      event.altKey ||
+      event.ctrlKey ||
+      event.metaKey ||
+      event.shiftKey
+    )
+      return;
+    const modal = document.querySelector('.modal.show');
+    if (modal ? !modal.contains(this.host) : document.querySelector('app-chat:not(.invisible)')) return;
     // Проверяем, не находится ли фокус в поле ввода
     const activeElement = document.activeElement as HTMLElement;
     const isInputFocused =
@@ -61,9 +80,11 @@ export class PagerComponent implements OnChanges, OnInit {
 
     switch (event.key) {
       case 'ArrowLeft':
+        if (this.currentPage > 1) event.preventDefault();
         this.goToPreviousPage();
         break;
       case 'ArrowRight':
+        if (this.currentPage < this.totalPages) event.preventDefault();
         this.goToNextPage();
         break;
     }
@@ -74,9 +95,15 @@ export class PagerComponent implements OnChanges, OnInit {
   }
 
   selectPage(page: PageItem): void {
-    if (typeof page !== 'number' || page < 1 || page > this.totalPages || page === this.currentPage) return;
-    this.currentPage = page;
-    this.pages = this.buildPages();
+    if (
+      this.busy ||
+      typeof page !== 'number' ||
+      page < 1 ||
+      page > this.totalPages ||
+      page === this.currentPage
+    )
+      return;
+    this.pendingPage = page;
     this.pageChange.emit(page);
   }
 

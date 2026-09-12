@@ -15,9 +15,8 @@
     </div>
     @if (success) { <p class="success" role="status">{{ success }}</p> }
     @if (error) { <div role="alert" class="error">{{ error }} <button type="button" (click)="load()">Повторить</button></div> }
-    @if (loading) { <p role="status" class="empty">Загружаем пользователей…</p> }
-    @else if (!error) {
-      <ul class="users">
+    <app-loading-panel [loading]="loading">
+      <ul class="users" pageSwipe [swipeDisabled]="loading || busy" (swipePage)="offset + $event * limit >= 0 && offset + $event * limit < total && pageChanged(offset / limit + 1 + $event)">
         @for (user of users; track user.id) {
           <li>
             <app-user-avatar [login]="user.user_login"/>
@@ -27,6 +26,7 @@
             </div>
             @if (user.id !== currentUserId()) {
               <div class="actions">
+                <button type="button" class="start-chat" [disabled]="busy" (click)="startChat(user)">Начать диалог</button>
                 @if (!user.is_admin) { <button type="button" [disabled]="busy" (click)="open(user, 'promote', confirmationDialog)">Назначить админом</button> }
                 <button type="button" class="danger" [disabled]="busy" (click)="open(user, 'delete', confirmationDialog)">Удалить</button>
               </div>
@@ -34,8 +34,8 @@
           </li>
         } @empty { <li class="empty">Пользователи не найдены.</li> }
       </ul>
-      @if (!confirmationOpen) { <app-pager [totalCount]="total" [limit]="limit" [offset]="offset" (pageChange)="pageChanged($event)"/> }
-    }
+      @if (!confirmationOpen) { <app-pager [busy]="loading || busy" [totalCount]="total" [limit]="limit" [offset]="offset" (pageChange)="pageChanged($event)"/> }
+    </app-loading-panel>
   }
 </section>
 <ng-template #confirmationDialog>
