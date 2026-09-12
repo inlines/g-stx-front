@@ -48,4 +48,12 @@ describe('Collection filtering', () => {
     expect(unixMilliseconds(0)).toBe(0);
     expect(unixMilliseconds(100)).toBe(100000);
   });
+  it('searches only the owned release by exact canonical serial and preserves suffixes', () => {
+    const values = [{...item(1,'One',null,null),serial:['CUSA12345/H/ITA']},{...item(2,'Two',null,null),serial:['CUSA-12345']}];
+    expect(filterCollection(values,'cusa12345','name','serial').map(x=>x.release_id)).toEqual([2]);
+    expect(filterCollection(values,'CUSA-12345/H/ITA','name','serial').map(x=>x.release_id)).toEqual([1]);
+    expect(filterCollection(values,'CUSA-123','name','serial')).toEqual([]);
+    expect(filterCollection(values,'','name','serial')).toHaveLength(2);
+  });
+
 });

@@ -1,3 +1,5 @@
+import { SerialListComponent } from '../serial-list/serial-list.component';
+import { canonicalSerial, validSerial, SERIAL_HINT, SearchMode } from '@app/shared/serial-number';
 import { RegionFiltersComponent } from '../region-filters/region-filters.component';
 import { normalizeRegions, platformRegionCounts, RegionGroup, toggleRegion } from '@app/shared/region-filter';
 import { GameStatsComponent } from '../game-stats/game-stats.component';
@@ -30,7 +32,7 @@ import { combineLatest, debounceTime, distinctUntilChanged, map } from 'rxjs';
 
 @Component({
   selector: 'app-product-list',
-  imports: [RegionFiltersComponent, GameStatsComponent, AsyncPipe, DatePipe, RouterModule, ReactiveFormsModule, PagerComponent],
+  imports: [SerialListComponent, RegionFiltersComponent, GameStatsComponent, AsyncPipe, DatePipe, RouterModule, ReactiveFormsModule, PagerComponent],
   templateUrl: './product-list.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './product-list.component.scss',
@@ -82,6 +84,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   );
   readonly queryForm = new FormGroup({
     query: new FormControl('', { nonNullable: true }),
+    searchMode: new FormControl<SearchMode>('name', { nonNullable: true }),
     sort: new FormControl<ProductSort>('date', { nonNullable: true }),
     localMultiplayer: new FormControl(false, { nonNullable: true }),
     onlineMultiplayer: new FormControl(false, { nonNullable: true }),
@@ -123,11 +126,13 @@ export class ProductListComponent implements OnInit, AfterViewInit {
             online_multiplayer: false,
           }),
     });
+    if (params.search_mode === 'serial' && params.query && !validSerial(params.query)) params.query = '';
     if (this.unknown) params.ignore_digital = true;
     this.activeCategory = params.cat!;
     this.queryForm.setValue(
       {
         query: params.query ?? '',
+        searchMode: params.search_mode ?? 'name',
         sort: params.sort!,
         includeUnreleased: params.include_unreleased ?? false,
         regions: params.regions ?? '',
@@ -163,13 +168,19 @@ export class ProductListComponent implements OnInit, AfterViewInit {
     if (window.matchMedia?.('(hover: hover) and (pointer: fine)').matches) this.query?.nativeElement.focus();
   }
 
+  readonly serialHint = SERIAL_HINT;
+  get invalidSerial(): boolean {
+    return this.queryForm.controls.searchMode.value === 'serial' && !!this.queryForm.controls.query.value.trim() && !validSerial(this.queryForm.controls.query.value);
+  }
   private updateFilters(): void {
-    const { query, sort, skipDigitalFilter, localMultiplayer, onlineMultiplayer, includeUnreleased, regions } =
+    if (this.invalidSerial) return;
+    const { query, searchMode, sort, skipDigitalFilter, localMultiplayer, onlineMultiplayer, includeUnreleased, regions } =
       this.queryForm.getRawValue();
     const current = this.store.selectSnapshot(ProductsState.productsParams);
     const next = catalogParams({
       ...current,
-      query,
+      query: searchMode === 'serial' ? canonicalSerial(query) : query,
+      search_mode: searchMode,
       sort,
       cat: this.activeCategory,
       ignore_digital: this.unknown || skipDigitalFilter,
@@ -193,6 +204,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   }
 
   pageChanged(page: number): void {
+    if (this.invalidSerial) return;
     this.store.dispatch(new ProductsActions.SetRequestParams({ offset: (page - 1) * this.limit }));
   }
 }

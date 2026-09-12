@@ -1,5 +1,6 @@
 export interface IProductListItem {
   id: number;
+  serial?: string[];
   total_rating?: number | null;
   total_rating_count?: number | null;
   local_players?: number | null;

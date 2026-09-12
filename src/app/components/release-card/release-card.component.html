@@ -15,10 +15,7 @@
     </div>
   </div>
   @if ((collection || (readOnly && !saleMode)) && item.serial?.length) {
-    <details class="serials">
-      <summary [ngbTooltip]="serialPreview" triggers="mouseenter:mouseleave" container="body">Серийники · {{item.serial.length}}</summary>
-      <ul aria-label="Все серийники">@for (serial of item.serial; track $index) { <li>{{serial}}</li> }</ul>
-    </details>
+    <app-serial-list [serials]="item.serial" />
   }
   @if (!readOnly || saleMode) {
   <footer>

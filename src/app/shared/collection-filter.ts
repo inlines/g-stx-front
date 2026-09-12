@@ -1,3 +1,4 @@
+import { canonicalSerial, validSerial, SearchMode } from './serial-number';
 import { ICollectionItem } from '@app/states/collection/interfaces/collection-item.interface';
 
 export type CollectionSort = 'name' | 'date' | 'price';
@@ -7,12 +8,16 @@ export function filterCollection(
   items: readonly ICollectionItem[],
   query: string,
   sort: CollectionSort,
+  mode: SearchMode = 'name',
 ): ICollectionItem[] {
   const search = query.trim().toLocaleLowerCase();
+  const serialQuery = mode === 'serial' && validSerial(query) ? canonicalSerial(query) : null;
   return items
     .filter((item) =>
-      item.product_name.toLocaleLowerCase().includes(search) ||
-      item.alternative_names?.some((name) => name.toLocaleLowerCase().includes(search)),
+      mode === 'serial'
+        ? !search || (serialQuery !== null && item.serial?.some((s) => canonicalSerial(s) === serialQuery))
+        : item.product_name.toLocaleLowerCase().includes(search) ||
+          item.alternative_names?.some((name) => name.toLocaleLowerCase().includes(search)),
     )
     .sort((a, b) => {
       if (sort !== 'name') {

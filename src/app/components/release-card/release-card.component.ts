@@ -1,3 +1,4 @@
+import { SerialListComponent } from '../serial-list/serial-list.component';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { RouterLink } from '@angular/router';
@@ -5,7 +6,7 @@ import { ICollectionItem } from '@app/states/collection/interfaces/collection-it
 import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 @Component({
   selector: 'app-release-card',
-  imports: [CurrencyPipe, DatePipe, RouterLink, NgbTooltipModule],
+  imports: [SerialListComponent, CurrencyPipe, DatePipe, RouterLink, NgbTooltipModule],
   templateUrl: './release-card.component.html',
   styleUrl: './release-card.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -27,7 +28,4 @@ export class ReleaseCardComponent {
   @Input() busy = false;
   @Output() editPrice = new EventEmitter<ICollectionItem>();
   @Output() removeRelease = new EventEmitter<number>();
-  get serialPreview(): string {
-    return (this.item.serial ?? []).slice(0, 3).join(' · ') + (this.item.serial?.length > 3 ? ' · …' : '');
-  }
 }

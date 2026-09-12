@@ -1,3 +1,4 @@
+import { canonicalSerial, validSerial, SERIAL_HINT } from '@app/shared/serial-number';
 import { normalizeAlternativeName, validAlternativeName } from '@app/shared/contribution-value';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
@@ -40,11 +41,12 @@ export class AdminRequestsComponent implements OnInit {
   get normalizedSerial() {
     return this.nameDecision
       ? normalizeAlternativeName(this.editedSerial)
-      : this.editedSerial.trim().toUpperCase();
+      : canonicalSerial(this.editedSerial);
   }
+  readonly serialHint = SERIAL_HINT;
   get validSerial() {
     if (this.nameDecision) return validAlternativeName(this.normalizedSerial);
-    return /^[A-Z0-9 ._/-]{3,64}$/.test(this.normalizedSerial) && /[A-Z0-9]/.test(this.normalizedSerial);
+    return validSerial(this.normalizedSerial);
   }
   decide(item: SerialRequest, action: 'accept' | 'reject' | 'delete') {
     if (this.busy) return;

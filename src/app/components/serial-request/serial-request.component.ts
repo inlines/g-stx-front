@@ -1,5 +1,6 @@
 import { Store } from '@ngxs/store';
 import { ProductsActions } from '@app/states/products/states/products.actions';
+import { canonicalSerial, validSerial, SERIAL_HINT } from '@app/shared/serial-number';
 import { normalizeAlternativeName, validAlternativeName } from '@app/shared/contribution-value';
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, Input, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -44,11 +45,12 @@ export class SerialRequestComponent implements OnDestroy {
   error = '';
   private revision = 0;
   get normalizedSerial() {
-    return this.isName ? normalizeAlternativeName(this.serial) : this.serial.trim().toUpperCase();
+    return this.isName ? normalizeAlternativeName(this.serial) : canonicalSerial(this.serial);
   }
+  readonly serialHint = SERIAL_HINT;
   get validSerial() {
     if (this.isName) return validAlternativeName(this.normalizedSerial);
-    return /^[A-Z0-9 ._/-]{3,64}$/.test(this.normalizedSerial) && /[A-Z0-9]/.test(this.normalizedSerial);
+    return validSerial(this.normalizedSerial);
   }
   async choose(event: Event) {
     const input = event.target as HTMLInputElement;
@@ -88,7 +90,7 @@ export class SerialRequestComponent implements OnDestroy {
       return;
     if (
       (this.isName ? [...this.existingNames, this.productName] : this.existingValues).some(
-        (s) => s.trim().toUpperCase() === this.normalizedSerial.toUpperCase(),
+        (s) => (this.isName ? s.trim().toUpperCase() : canonicalSerial(s)) === this.normalizedSerial.toUpperCase(),
       )
     ) {
       this.error = this.isName ? 'Это название уже указано у игры' : 'Этот серийник уже указан у релиза';

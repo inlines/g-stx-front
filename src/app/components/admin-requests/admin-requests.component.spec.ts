@@ -93,11 +93,11 @@ describe('Serial request moderation', () => {
     const { fixture, component, http } = setup();
     (fixture.nativeElement.querySelector('button.accept') as HTMLButtonElement).click();
     http.expectNone((r) => r.method === 'POST');
-    component.editedSerial = '  CUSA-CORRECTED ';
+    component.editedSerial = '  CUSA-90005 ';
     component.confirm();
     component.confirm();
     const acceptance = http.expectOne('/api/admin/serial-requests/3/accept');
-    expect(acceptance.request.body).toEqual({ serial: 'CUSA-CORRECTED' });
+    expect(acceptance.request.body).toEqual({ serial: 'CUSA-90005' });
     acceptance.flush(null, { status: 204, statusText: 'No content' });
     http.expectOne((r) => r.url === '/api/admin/serial-requests').flush({ items: [], total_count: 0 });
     component.select('accepted');

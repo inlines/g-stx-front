@@ -38,13 +38,17 @@
 
             <div class="row">
               <div class="col">
-                <input id="query" aria-label="Поиск игры по названию"
+                <label class="catalog-sort">Искать по
+                  <select class="form-select" formControlName="searchMode"><option value="name">Названию</option><option value="serial">Серийнику</option></select>
+                </label>
+                <input id="query" [attr.aria-label]="queryForm.controls.searchMode.value === 'serial' ? 'Поиск игры по серийнику' : 'Поиск игры по названию'" [attr.aria-invalid]="invalidSerial" [attr.aria-describedby]="queryForm.controls.searchMode.value === 'serial' ? 'serial-search-help' : null"
                   #query
                   class="border-0 rounded-3 w-100"
                   type="text"
-                  placeholder="Название"
+                  [placeholder]="queryForm.controls.searchMode.value === 'serial' ? 'CUSA-12345' : 'Название'"
                   autocomplete="off"
                   formControlName="query" />
+                @if (queryForm.controls.searchMode.value === 'serial') {<p id="serial-search-help" class="text-light small" [attr.role]="invalidSerial ? 'status' : null">{{serialHint}} @if(invalidSerial){Введите полный корректный номер, чтобы обновить результаты.}</p>}
               </div>
             </div>
           </form>
@@ -102,7 +106,9 @@
           <div class="game-content">
             <div class="title">{{ product.name }}</div>
             <app-game-stats [game]="product" />
-            @if (product.has_serials === false && !product.digital_only && supportsReleaseActions(activeCategory)) {
+            @if (selectedRegions.length && product.serial?.length) {
+              <app-serial-list [serials]="product.serial" />
+            } @else if (product.has_serials === false && !product.digital_only && supportsReleaseActions(activeCategory)) {
               <small class="missing-serial-hint">Знаете серийник? Дополните →</small>
             }
             <div class="game-first-release text-lite-muted small">

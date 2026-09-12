@@ -80,34 +80,7 @@
   color: #a3b8cb;
   margin-top: 8px;
 }
-.serials {
-  padding: 0 18px 14px;
-}
-.serials summary {
-  color: #c2a4ed;
-  cursor: pointer;
-  font-size: 13px;
-  min-height: 44px;
-  align-content: center;
-}
-.serials ul {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 7px;
-  list-style: none;
-  padding: 10px 0 0;
-  margin: 0;
-}
-.serials li {
-  font:
-    12px/1.6 ui-monospace,
-    monospace;
-  background: #08141f;
-  border-radius: 4px;
-  padding: 7px;
-  overflow-wrap: anywhere;
-  user-select: all;
-}
+app-serial-list { padding: 0 18px 14px; }
 footer {
   display: flex;
   justify-content: space-between;
@@ -187,11 +160,6 @@ button:focus-visible {
   }
 }
 
-.serials,
-.serials summary {
-  position: relative;
-  z-index: 1;
-}
 
 .actions {
   position: relative;
@@ -233,12 +201,6 @@ button:focus-visible {
   overflow-wrap: anywhere;
 }
 @media (max-width: 575px) {
-  .serials ul {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .serials li {
-    font-size: 14px;
-  }
   .collection-actions button {
     font-size: 13px;
     padding-inline: 6px;

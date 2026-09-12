@@ -295,4 +295,38 @@ describe('Catalog filters', () => {
     expect(req.request.params.has('company_role')).toBe(false);
     req.flush({ items: [], total_count: 50 });
   });
+  it('does not display catalogue serials until a region is selected; keeps the unknown hint', () => {
+    const component = mount();
+    const response = { items: [{id: 1, name: 'Known', has_serials: true, serial: ['CUSA-12345','CUSA-23456']}, {id: 2,name: 'Unknown',has_serials: false}], total_count: 2 };
+    nextRequest().flush(response);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('app-serial-list')).toBeNull();
+    expect(fixture.nativeElement.textContent).toContain('Знаете серийник?');
+    component.toggleRegion('europe');
+    nextRequest().flush(response);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('app-serial-list summary').textContent).toContain('CUSA-12345');
+    expect(fixture.nativeElement.querySelector('app-serial-list summary').textContent).toContain('+1');
+    component.toggleRegion('europe');
+    nextRequest().flush(response);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('app-serial-list')).toBeNull();
+  });
+  it('only requests complete valid serials and resets pagination when the search mode changes', () => {
+    const component = mount(); flushInitial();
+    component.queryForm.patchValue({searchMode: 'serial', query: 'CUSA-123'});
+    vi.advanceTimersByTime(301);
+    http.expectNone(req => req.url === '/api/products');
+    expect(component.invalidSerial).toBe(true);
+    component.queryForm.controls.query.setValue(' cusa12345 ');
+    vi.advanceTimersByTime(301);
+    const request = nextRequest();
+    expect(request.request.params.get('query')).toBe('CUSA-12345');
+    expect(request.request.params.get('search_mode')).toBe('serial');
+    expect(request.request.params.get('offset')).toBe('0'); request.flush({items: [],total_count:0});
+    component.queryForm.patchValue({searchMode: 'name', query: 'Mario'});
+    vi.advanceTimersByTime(301);
+    const byName = nextRequest(); expect(byName.request.params.get('search_mode')).toBe('name'); byName.flush({items: [],total_count:0});
+  });
+
 });

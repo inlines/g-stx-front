@@ -13,7 +13,7 @@ const release: IReleaseItem = {
   release_date: null,
   release_status: 0,
   digital_only: false,
-  serial: ['OLD-123'],
+  serial: ['CUSA-00123'],
   seller_logins: [],
 };
 describe('Serial request form', () => {
@@ -133,18 +133,18 @@ describe('Serial request form', () => {
     request.flush({ id: 1, status: 'pending' });
     fixture.detectChanges();
     expect(fixture.nativeElement.textContent).toContain('Заявка отправлена');
-    expect(release.serial).toEqual(['OLD-123']);
+    expect(release.serial).toEqual(['CUSA-00123']);
     fixture.destroy();
   });
   it('prevents known duplicates and keeps server errors in the modal', () => {
     const { fixture, component, http } = setup();
     component.photo = new Blob(['jpeg']);
     component.readable = true;
-    component.serial = 'old-123';
+    component.serial = 'cusa00123';
     component.submit();
     http.expectNone((r) => r.method === 'POST');
     expect(component.error).toContain('уже указан');
-    component.serial = 'NEW-123';
+    component.serial = 'CUSA-00124';
     component.submit();
     http
       .expectOne((r) => r.url.endsWith('/serial-requests'))

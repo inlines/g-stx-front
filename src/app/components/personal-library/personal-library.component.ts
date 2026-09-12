@@ -1,3 +1,4 @@
+import { validSerial, SERIAL_HINT, SearchMode } from '@app/shared/serial-number';
 import { RegionFiltersComponent } from '../region-filters/region-filters.component';
 import { matchesRegion, ownedRegionCounts, platformRegionCounts, RegionGroup, toggleRegion } from '@app/shared/region-filter';
 import { priceValidator } from '@app/shared/price-validator';
@@ -91,7 +92,7 @@ export class PersonalLibraryComponent implements OnInit, OnDestroy {
       map(([items, statuses, ownership, , platforms]) => {
         const status = statuses[this.kind];
         const filtered =
-          this.kind === 'collection' ? filterCollection(items.filter((item) => matchesRegion(item, this.view.regions)), this.view.query, this.view.sort) : items;
+          this.kind === 'collection' ? filterCollection(items.filter((item) => matchesRegion(item, this.view.regions)), this.view.query, this.view.sort, this.view.searchMode) : items;
         const total = filtered.length;
         const pages = Math.max(1, Math.ceil(total / this.view.size));
         // Do not discard the saved page while a fresh list is loading.
@@ -167,6 +168,13 @@ export class PersonalLibraryComponent implements OnInit, OnDestroy {
       libraryCsv(ordered, this.kind, selling),
       `${this.kind}-${this.list.activeCategory ?? 'all'}-${new Date().toISOString().slice(0, 10)}.csv`,
     );
+  }
+  readonly serialHint = SERIAL_HINT;
+  get invalidSerial(): boolean { return this.view?.searchMode === 'serial' && !!this.query.value.trim() && !validSerial(this.query.value); }
+  searchMode(value: SearchMode): void {
+    this.view.searchMode = value;
+    this.view.page = 1;
+    this.changes.next();
   }
   clearFilters(): void {
     this.view.regions = [];

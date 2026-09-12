@@ -6,6 +6,7 @@ export interface LibraryView {
   regions: RegionGroup[];
   platform: number | null;
   query: string;
+  searchMode?: 'name' | 'serial';
   sort: CollectionSort;
   page: number;
   size: number;

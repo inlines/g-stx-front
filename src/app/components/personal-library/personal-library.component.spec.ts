@@ -130,13 +130,10 @@ describe('Personal library pages', () => {
     expect(fixture.nativeElement.textContent).not.toContain('Цена покупки');
     expect(fixture.nativeElement.querySelector('details')).toBeNull();
   });
-  it('exposes all serials through a keyboard-accessible disclosure', () => {
+  it('shows a single serial directly without a redundant disclosure', () => {
     mount();
-    const disclosure = fixture.nativeElement.querySelector('details') as HTMLDetailsElement;
-    expect(disclosure.open).toBe(false);
-    disclosure.querySelector('summary')!.click();
-    expect(disclosure.open).toBe(true);
-    expect(disclosure.textContent).toContain('CUSA-12345');
+    expect(fixture.nativeElement.querySelector('app-serial-list').textContent).toContain('CUSA-12345');
+    expect(fixture.nativeElement.querySelector('app-serial-list details')).toBeNull();
   });
   it('prepopulates the price editor, including a legitimate zero', () => {
     const component = mount();

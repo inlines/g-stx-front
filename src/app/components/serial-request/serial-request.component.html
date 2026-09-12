@@ -7,7 +7,8 @@
   } @else {
     <form (ngSubmit)="submit()">
       <label for="proposed-serial">{{ isName ? 'Альтернативное название игры' : 'Серийный номер релиза' }}</label>
-      <input id="proposed-serial" name="serial" [(ngModel)]="serial" [maxlength]="isName ? 400 : 64" required autocomplete="off" [attr.autocapitalize]="isName ? 'off' : 'characters'" spellcheck="false" [placeholder]="isName ? 'Название, напечатанное на коробке' : 'Например, CUSA-12345'" [disabled]="busy">
+      <input id="proposed-serial" [attr.aria-invalid]="!!serial && !validSerial" [attr.aria-describedby]="!isName ? 'serial-format-help' : null" name="serial" [(ngModel)]="serial" [maxlength]="isName ? 400 : 64" required autocomplete="off" [attr.autocapitalize]="isName ? 'off' : 'characters'" spellcheck="false" [placeholder]="isName ? 'Название, напечатанное на коробке' : 'Например, CUSA-12345'" [disabled]="busy">
+      @if (!isName) {<p id="serial-format-help" class="hint" role="status">{{serialHint}} @if(serial && !validSerial){Некорректный формат номера.}</p>}
       @if (existingValues.length) { <details><summary>{{ isName ? 'Уже известные названия' : 'Уже известные серийники' }} · {{ existingValues.length }}</summary><ul>@for (value of existingValues; track $index) { <li>{{ value }}</li> }</ul></details> }
       @if (direct) {
         <p class="hint">Изменение администратора будет сразу добавлено в каталог. Заявка и фотография не нужны.</p>

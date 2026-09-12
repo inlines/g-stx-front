@@ -5,6 +5,7 @@ export interface IProductListRequest {
   limit?: number;
   offset?: number;
   query?: string;
+  search_mode?: 'name' | 'serial';
   unknown?: boolean;
   regions?: string;
   sort?: ProductSort;

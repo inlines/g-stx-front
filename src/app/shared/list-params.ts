@@ -17,6 +17,7 @@ export function normalizeListParams(params: IProductListRequest): IProductListRe
     result.company_role = params.company_role;
   if (params.regions !== undefined) result.regions = normalizeRegions(params.regions).join(',');
   if (typeof params.unknown === 'boolean') result.unknown = params.unknown;
+  if (params.search_mode === 'serial' || params.search_mode === 'name') result.search_mode = params.search_mode;
   const query = params.query?.trim();
   if (query) result.query = query;
   if (params.sort) result.sort = params.sort === 'date' || params.sort === 'rating' ? params.sort : 'name';
@@ -52,6 +53,7 @@ export function sameListParams(a: IProductListRequest, b: IProductListRequest): 
     a.limit === b.limit &&
     a.offset === b.offset &&
     a.query === b.query &&
+    (a.search_mode ?? 'name') === (b.search_mode ?? 'name') &&
     a.sort === b.sort &&
     a.ignore_digital === b.ignore_digital
   );

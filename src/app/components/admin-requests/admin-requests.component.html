@@ -33,8 +33,8 @@
             <div class="confirmation">
               @if (decision?.action === 'accept') {
                 <label [for]="'accepted-serial-' + item.id">{{ isName(item) ? 'Название для добавления к игре' : 'Серийник для добавления в релиз' }}</label>
-                <input [id]="'accepted-serial-' + item.id" [(ngModel)]="editedSerial" [maxlength]="isName(item) ? 400 : 64" [disabled]="busy" autocomplete="off" [attr.autocapitalize]="isName(item) ? 'off' : 'characters'" spellcheck="false">
-                <p class="meta">{{ isName(item) ? 'Проверьте название по фото. От 1 до 200 символов, любой язык. Регистр сохраняется.' : 'Проверьте номер по фото. Латинские буквы, цифры, пробелы и - _ . /, от 3 до 64 символов.' }}</p>
+                <input [id]="'accepted-serial-' + item.id" [(ngModel)]="editedSerial" [attr.aria-invalid]="!!editedSerial && !validSerial" [maxlength]="isName(item) ? 400 : 64" [disabled]="busy" autocomplete="off" [attr.autocapitalize]="isName(item) ? 'off' : 'characters'" spellcheck="false">
+                <p class="meta">{{ isName(item) ? 'Проверьте название по фото. От 1 до 200 символов, любой язык. Регистр сохраняется.' : serialHint }}</p>
               }
               @if (decision?.action === 'delete') { <p>{{ isName(item) ? 'Добавленное название останется у игры.' : 'Добавленный серийник останется в релизе.' }} Кудос сохраняются.</p> }
               <p>{{ decision?.action === 'accept' ? 'Добавить ' + normalizedSerial + (isName(item) ? ' к этой игре и перенести заявку в архив?' : ' к этому релизу и перенести заявку в архив?') : 'Удалить эту заявку и фото без возможности восстановления?' }}</p>
