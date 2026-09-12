@@ -38,6 +38,12 @@ describe('Catalog filters', () => {
 
   it('keeps Unknown through filters and pagination, and clears it when returning to the catalogue', () => {
     fixture = TestBed.createComponent(ProductListComponent);
+    store.reset({
+      ...store.snapshot(),
+      Platforms: { ...store.snapshot().Platforms, platforms: [
+        { id: 48, abbreviation: 'PS4', europe_games: 100, america_games: 200, japan_games: 300, other_games: 400 },
+      ] },
+    });
     fixture.componentRef.setInput('unknown', true);
     fixture.detectChanges();
     const initial = nextRequest();
@@ -46,7 +52,9 @@ describe('Catalog filters', () => {
     expect(fixture.nativeElement.querySelector('#onlyDigitalSwitch')).toBeNull();
     initial.flush({ items: [], total_count: 50, region_counts: { europe: 12, america: 15, japan: 9, other: 14 } });
     fixture.detectChanges();
-    expect(fixture.nativeElement.querySelector('app-region-filters').textContent).toContain('12');
+    const regionButtons = [...fixture.nativeElement.querySelectorAll('app-region-filters button')]
+      .map((button: any) => button.textContent.replace(/\s+/g, ' ').trim());
+    expect(regionButtons).toEqual(['Европа 12 / 100', 'Америка 15 / 200', 'Япония 9 / 300', 'Другие 14 / 400']);
     expect(fixture.nativeElement.querySelector('app-region-filters').textContent).toContain('Неидентифицированные');
     fixture.componentInstance.toggleRegion('japan');
     const filtered = nextRequest();

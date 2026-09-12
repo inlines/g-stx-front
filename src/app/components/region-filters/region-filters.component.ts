@@ -8,11 +8,11 @@ import { REGION_GROUPS, RegionCounts, RegionGroup } from '@app/shared/region-fil
       <div class="regions" role="group" aria-label="Фильтр по регионам">
         @for (region of groups; track region) {
           <button type="button" [class.selected]="selected.includes(region)" [attr.aria-pressed]="selected.includes(region)" (click)="regionToggle.emit(region)">
-            {{ labels[region] }} <span>@if(owned){ {{owned[region] ?? '—'}} / }{{ totals[region] ?? '—' }}</span>
+            {{ labels[region] }} <span>@if(unknown){ {{unidentified[region] ?? '—'}} / }@else if(owned){ {{owned[region] ?? '—'}} / }{{ totals[region] ?? '—' }}</span>
           </button>
         }
       </div>
-      <small>@if(unknown){Неидентифицированные игры с учётом фильтров.}@else{ {{owned ? 'Есть у игрока / всего на платформе.' : 'Всего игр на платформе.'}} Цифровые не учитываются.}</small>
+      <small>@if(unknown){Неидентифицированные с учётом фильтров / всего игр на платформе в регионе. Цифровые не учитываются.}@else{ {{owned ? 'Есть у игрока / всего на платформе.' : 'Всего игр на платформе.'}} Цифровые не учитываются.}</small>
     </section>`,
   styles: `
     :host{display:block;position:relative;z-index:1;margin:12px 0 20px}
@@ -30,6 +30,7 @@ export class RegionFiltersComponent {
   @Input() selected: readonly RegionGroup[] = [];
   @Input() totals: RegionCounts = {};
   @Input() owned?: RegionCounts;
+  @Input() unidentified: RegionCounts = {};
   @Output() regionToggle = new EventEmitter<RegionGroup>();
   readonly groups = REGION_GROUPS;
   readonly labels = { europe: 'Европа', america: 'Америка', japan: 'Япония', other: 'Другие' };

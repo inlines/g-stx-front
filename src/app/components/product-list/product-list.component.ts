@@ -55,7 +55,10 @@ export class ProductListComponent implements OnInit, AfterViewInit {
         platforms.filter((p) => p.id !== 6 && (this.platformIds === null || this.platformIds.includes(p.id))),
       ),
     );
-  readonly selectedRegionCounts$ = combineLatest([this.categories$, this.productParams$, this.store.select(ProductsState.regionCounts)]).pipe(map(([platforms, params, counts]) => this.unknown ? counts : platformRegionCounts(platforms.find((p) => p.id === params.cat))));
+  readonly selectedRegionCounts$ = combineLatest([this.categories$, this.productParams$]).pipe(
+    map(([platforms, params]) => platformRegionCounts(platforms.find((p) => p.id === params.cat))),
+  );
+  readonly unknownRegionCounts$ = this.store.select(ProductsState.regionCounts);
   get selectedRegions() { return normalizeRegions(this.queryForm.controls.regions.value); }
   toggleRegion(region: RegionGroup): void {
     this.queryForm.controls.regions.setValue(toggleRegion(this.selectedRegions, region).join(','));
