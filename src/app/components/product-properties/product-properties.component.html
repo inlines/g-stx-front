@@ -1,7 +1,7 @@
 @let isAdmin = (isAdmin$ | async) === true;
 @if ((productProperties$ | async); as productProperties) {
   <div class="row g-4 product-page">
-    <div class="col-12 product-heading">
+    <div class="col-12 product-heading" #productHeading>
       <button type="button" class="back-button" aria-label="Назад" (click)="goBack()">
         <svg aria-hidden="true" width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path fill-rule="evenodd" clip-rule="evenodd" d="M10.6392 20.4471L19.2511 29.5535L17.3157 31.6L5.4 19L17.3157 6.40002L19.2511 8.44652L10.6392 17.5529H30.6V20.4471H10.6392Z" fill="#2D587E"/>

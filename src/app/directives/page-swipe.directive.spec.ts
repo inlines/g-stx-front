@@ -11,6 +11,43 @@ class Host {
   pages: number[] = [];
 }
 describe('Page swipes', () => {
+  it('allows a fresh card tap immediately after repeated swipes, even without trailing clicks', () => {
+    vi.useFakeTimers();
+    const fixture = TestBed.createComponent(Host);
+    try {
+      fixture.detectChanges();
+      const link = fixture.nativeElement.querySelector('a');
+      const opened = vi.fn();
+      // Observe whether the capture handler lets the click reach the card.
+      link.addEventListener('click', (event: Event) => { opened(); event.preventDefault(); });
+      const touch = (type: string, x: number) => {
+        const event = new Event(type, { bubbles: true, cancelable: true });
+        Object.assign(event, {
+          touches: type === 'touchend' ? [] : [{ clientX: x, clientY: 100 }],
+          changedTouches: [{ clientX: x, clientY: 100 }],
+        });
+        link.dispatchEvent(event);
+      };
+      for (let i = 0; i < 6; i++) {
+        touch('touchstart', 250);
+        touch('touchmove', 100);
+        touch('touchend', 80);
+        if (i % 2 === 0) {
+          link.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+        }
+      }
+      expect(opened).not.toHaveBeenCalled();
+      expect(fixture.componentInstance.pages).toEqual([1, 1, 1, 1, 1, 1]);
+      touch('touchstart', 150);
+      touch('touchend', 150);
+      link.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+      expect(opened).toHaveBeenCalledTimes(1);
+    } finally {
+      fixture.destroy();
+      vi.useRealTimers();
+    }
+  });
+
   it('navigates both ways, leaves vertical scrolling and controls alone, and suppresses the trailing card click', () => {
     const fixture = TestBed.createComponent(Host);
     fixture.detectChanges();

@@ -6,7 +6,7 @@ import { SerialRequestComponent } from '../serial-request/serial-request.compone
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { priceValidator } from '@app/shared/price-validator';
 import { RequestStatus } from '@app/constants/request-status.const';
-import { DestroyRef, inject } from '@angular/core';
+import { afterEveryRender, DestroyRef, ElementRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ICompanyItem } from '@app/states/products/interfaces/company-item.interface';
 import { AsyncPipe, DatePipe, Location, NgTemplateOutlet } from '@angular/common';
@@ -44,6 +44,9 @@ import { combineLatest, map, Observable } from 'rxjs';
   standalone: true,
 })
 export class ProductPropertiesComponent implements OnInit {
+  @ViewChild('productHeading') productHeading?: ElementRef<HTMLElement>;
+  private scrolledProductId?: number;
+
   @ViewChild('sellersModal', { static: true }) sellersModalRef!: TemplateRef<unknown>;
 
   constructor(
@@ -52,6 +55,15 @@ export class ProductPropertiesComponent implements OnInit {
     private readonly params: ActivatedRoute,
     private location: Location,
   ) {
+    afterEveryRender(() => {
+      const heading = this.productHeading?.nativeElement;
+      const id = this.store.selectSnapshot(ProductsState.productProperties)?.product.id;
+      if (!heading || !id || id === this.scrolledProductId) return;
+      this.scrolledProductId = id;
+      if (window.matchMedia?.('(max-width: 767px)').matches) {
+        heading.scrollIntoView?.({ block: 'start', behavior: 'instant' });
+      }
+    });
     this.failure$ = this.store.select(ProductsState.propertiesFailure);
     this.productProperties$ = this.store.select(ProductsState.productProperties);
     this.isAuthorised$ = this.store.select(AuthState.isAuthorised);

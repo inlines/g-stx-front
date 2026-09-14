@@ -11,6 +11,8 @@ export class PageSwipeDirective {
   constructor() {
     const begin = (event: TouchEvent) => {
       this.start = null;
+      // A fresh touch is a new gesture, not the synthetic click from the last swipe.
+      this.suppressClickUntil = 0;
       if (this.swipeDisabled || event.touches.length !== 1) return;
       let target = event.target as HTMLElement | null;
       if (target?.closest('button,input,select,textarea,summary,[contenteditable]')) return;

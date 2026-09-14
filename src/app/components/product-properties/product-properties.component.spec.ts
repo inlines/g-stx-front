@@ -30,6 +30,37 @@ describe('ProductPropertiesComponent', () => {
     fixture.detectChanges();
   });
 
+  it('scrolls to the mobile heading after loading each game, not on repeated renders', async () => {
+    const previous = HTMLElement.prototype.scrollIntoView;
+    const scroll = vi.fn();
+    HTMLElement.prototype.scrollIntoView = scroll;
+    vi.stubGlobal('matchMedia', () => ({ matches: true }));
+    try {
+      const store = TestBed.inject(Store);
+      const http = TestBed.inject(HttpTestingController);
+      for (const id of [1, 2]) {
+        store.dispatch(new ProductsActions.LoadProperties(id));
+        fixture.detectChanges();
+        await fixture.whenStable();
+        expect(scroll).toHaveBeenCalledTimes(id - 1);
+        http.expectOne(`/api/products/${id}`).flush({
+          product: { id, name: `Game ${id}`, image_url: null, first_release_date: null },
+          releases: [], screenshots: [], companies: [], franschises: [],
+        });
+        fixture.detectChanges();
+        await fixture.whenStable();
+        expect(scroll).toHaveBeenCalledTimes(id);
+        expect(scroll.mock.instances[id - 1]).toBe(fixture.nativeElement.querySelector('.product-heading'));
+        fixture.detectChanges();
+        await fixture.whenStable();
+        expect(scroll).toHaveBeenCalledTimes(id);
+      }
+    } finally {
+      HTMLElement.prototype.scrollIntoView = previous;
+      vi.unstubAllGlobals();
+    }
+  });
+
   it('should create', () => {
     expect(component).toBeTruthy();
   });
