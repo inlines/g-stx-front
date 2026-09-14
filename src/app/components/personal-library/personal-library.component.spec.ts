@@ -75,6 +75,13 @@ describe('Personal library pages', () => {
     fixture.destroy();
     expect(dialog.close).toHaveBeenCalledOnce();
   });
+  it('clears selected regions when switching collection search to serial', () => {
+    const component = mount();
+    component.toggleRegion('japan');
+    component.searchMode('serial');
+    expect(component.view.regions).toEqual([]);
+    expect(component.view.page).toBe(1);
+  });
   it('renders only 24 releases and clamps the last page after removal', () => {
     const component = mount();
     expect(cards().length).toBe(24);

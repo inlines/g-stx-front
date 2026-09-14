@@ -1,3 +1,4 @@
+import { Clipboard } from '@angular/cdk/clipboard';
 import { NgbModal, NgbConfig } from '@ng-bootstrap/ng-bootstrap';
 import { BehaviorSubject, of } from 'rxjs';
 import { ActivatedRoute, convertToParamMap } from '@angular/router';
@@ -379,11 +380,14 @@ describe('ProductPropertiesComponent', () => {
     expect(root.querySelectorAll('.release-item')).toHaveLength(1);
     const lists = root.querySelectorAll<HTMLDetailsElement>('.release-item details.serials');
     expect(lists).toHaveLength(1);
-    expect(lists[0].open).toBe(false);
-    expect(lists[0].querySelector('summary')?.textContent).toContain('60');
-    lists[0].querySelector('summary')!.click();
     expect(lists[0].open).toBe(true);
-    expect(Array.from(lists[0].querySelectorAll('li'), (li) => li.textContent)).toEqual(serials);
+    expect(lists[0].querySelector('summary')?.textContent).toContain('60');
+    const copy = vi.spyOn(TestBed.inject(Clipboard), 'copy').mockReturnValue(true);
+    lists[0].querySelector<HTMLButtonElement>('.serial-copy')!.click();
+    expect(copy).toHaveBeenCalledWith(serials[0]);
+    expect(Array.from(lists[0].querySelectorAll('li'), (li) => li.textContent?.trim())).toEqual(serials);
+    lists[0].querySelector('summary')!.click();
+    expect(lists[0].open).toBe(false);
     for (const text of [
       'PS4',
       'Europe',

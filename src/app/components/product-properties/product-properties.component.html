@@ -119,10 +119,10 @@
               <span>{{ release.release_date ? (release.release_date | date:'dd.MM.yy':'UTC') : 'Дата не указана' }}</span>
             </div>
             @if (release.serial?.length) {
-              <details class="serials">
+              <details class="serials" open>
                 <summary [ngbTooltip]="serialPreview(release)" triggers="mouseenter:mouseleave" container="body">Серийники · {{ release.serial.length }}</summary>
                 <ul aria-label="Все серийники">
-                  @for (serial of release.serial; track $index) { <li>{{ serial }}</li> }
+                  @for (serial of release.serial; track $index) { <li><button type="button" class="serial-copy" appCopyToClipboard [attr.aria-label]="'Скопировать серийник ' + serial" title="Скопировать серийник">{{ serial }}</button></li> }
                 </ul>
               </details>
             }

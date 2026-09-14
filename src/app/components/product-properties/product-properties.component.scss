@@ -346,3 +346,13 @@
 .similar-card strong {padding:10px;font-size:14px;overflow-wrap:anywhere}
 .similar-card:focus-visible,.similar-track:focus-visible,.similar-heading button:focus-visible {outline:2px solid #dbc2ff;outline-offset:2px}
 @media(max-width:575px){.similar-card{flex-basis:138px}.similar-track{gap:10px}}
+
+.serials li:has(.serial-copy) { padding: 0; }
+.serial-copy {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  width: 100%; min-height: 44px; padding: 8px; border: 0; border-radius: 4px;
+  background: transparent; color: inherit; font: inherit; text-align: left;
+  overflow-wrap: anywhere; cursor: pointer;
+}
+.serial-copy:hover { background: #193044; }
+.serial-copy:focus-visible { outline: 2px solid #c2a4ed; outline-offset: 2px; }

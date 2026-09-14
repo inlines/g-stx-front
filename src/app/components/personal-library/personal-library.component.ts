@@ -201,6 +201,7 @@ export class PersonalLibraryComponent implements OnInit, OnDestroy {
   }
   searchMode(value: SearchMode): void {
     this.view.searchMode = value;
+    if (value === 'serial') this.view.regions = [];
     this.view.page = 1;
     this.changes.next();
   }

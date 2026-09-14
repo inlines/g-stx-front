@@ -178,6 +178,12 @@ export class ProductListComponent implements OnInit, AfterViewInit {
       }),
     );
 
+    this.queryForm.controls.searchMode.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((mode) => {
+        if (mode === 'serial') this.queryForm.controls.regions.setValue('', { emitEvent: false });
+      });
+
     this.queryForm.valueChanges
       .pipe(debounceTime(300), takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.updateFilters());

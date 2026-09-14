@@ -379,13 +379,17 @@ describe('Catalog filters', () => {
   it('only requests complete valid serials and resets pagination when the search mode changes', () => {
     const component = mount();
     flushInitial();
+    component.toggleRegion('japan');
+    nextRequest().flush({ items: [], total_count: 0 });
     component.queryForm.patchValue({ searchMode: 'serial', query: 'CUSA-123' });
+    expect(component.queryForm.controls.regions.value).toBe('');
     vi.advanceTimersByTime(301);
     http.expectNone((req) => req.url === '/api/products');
     expect(component.invalidSerial).toBe(true);
     component.queryForm.controls.query.setValue(' cusa12345 ');
     vi.advanceTimersByTime(301);
     const request = nextRequest();
+    expect(request.request.params.get('regions')).toBe('');
     expect(request.request.params.get('query')).toBe('CUSA-12345');
     expect(request.request.params.get('search_mode')).toBe('serial');
     expect(request.request.params.get('offset')).toBe('0');
