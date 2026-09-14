@@ -114,8 +114,8 @@
               <small class="missing-serial-hint">Знаете серийник? Дополните →</small>
             }
             <div class="game-first-release text-lite-muted small">
-              @if (product.first_release_date) {
-                c {{ product.first_release_date | date: 'dd.MM.yy' : 'UTC' }}
+              @if (product.release_date) {
+                c {{ product.release_date | date: 'dd.MM.yy' : 'UTC' }}
               } @else {
                 Дата выхода не указана
               }

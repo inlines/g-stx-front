@@ -53,6 +53,7 @@ export class ProductsState {
       productList: action.payload.items.map((x) => ({
         ...x,
         first_release_date: unixMilliseconds(x.first_release_date),
+        release_date: unixMilliseconds(x.release_date === undefined ? x.first_release_date : x.release_date),
       })),
       productsTotalCount: action.payload.total_count,
       regionCounts: action.payload.region_counts ?? {},

@@ -351,6 +351,13 @@ describe('Catalog filters', () => {
     expect(req.request.params.has('company_role')).toBe(false);
     req.flush({ items: [], total_count: 50 });
   });
+  it('displays the contextual release date returned by the API instead of the original game date', () => {
+    mount();
+    nextRequest().flush({ items: [{ id: 1, name: 'Port', first_release_date: 946684800, release_date: 1577836800 }], total_count: 1 });
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('01.01.20');
+    expect(fixture.nativeElement.textContent).not.toContain('01.01.00');
+  });
   it('does not display catalogue serials until a region is selected; keeps the unknown hint', () => {
     const component = mount();
     const response = {

@@ -82,6 +82,24 @@ describe('Personal library pages', () => {
     expect(component.view.regions).toEqual([]);
     expect(component.view.page).toBe(1);
   });
+  it('re-sorts collection cards using selected-region dates without changing stored copy dates', () => {
+    const component = mount();
+    store.dispatch(new CollectionActions.GetCollectionSuccess({
+      items: [
+        { ...items[0], release_date: 900, release_dates: { all: 100, europe: 300, worldwide: 100, first: 10 } },
+        { ...items[1], release_date: 800, release_dates: { all: 200, europe: 200, first: 20 } },
+      ], total_count: 2,
+    }));
+    component.sort('date');
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.release-title').textContent).toBe('Game 01');
+    component.toggleRegion('europe');
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.release-title').textContent).toBe('Game 02');
+    component.toggleRegion('europe');
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.release-title').textContent).toBe('Game 01');
+  });
   it('renders only 24 releases and clamps the last page after removal', () => {
     const component = mount();
     expect(cards().length).toBe(24);

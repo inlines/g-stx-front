@@ -1,3 +1,5 @@
+import { withReleaseDate } from '@app/shared/release-date';
+import { filterCollection } from '@app/shared/collection-filter';
 import { LoadingPanelComponent } from '../loading-panel/loading-panel.component';
 import { PageSwipeDirective } from '@app/directives/page-swipe.directive';
 import { RegionFiltersComponent } from '../region-filters/region-filters.component';
@@ -108,8 +110,12 @@ export class CollectorPropertiesComponent {
                 (!item.platform_id && item.platform_name === selectedPlatform.name),
             )
           : items;
-      const filtered =
-        tab === 'collection' ? platformItems.filter((item) => matchesRegion(item, view.regions)) : items;
+      const datedItems = tab === 'collection'
+        ? platformItems.filter((item) => matchesRegion(item, view.regions))
+            .map((item) => withReleaseDate(item, view.regions))
+        : items;
+      const filtered = tab === 'collection' && view.sort === 'date'
+        ? filterCollection(datedItems, '', 'date') : datedItems;
       const pages = Math.max(1, Math.ceil(filtered.length / view.size));
       if (status === RequestStatus.Load) view.page = Math.min(view.page, pages);
       const offset = (view.page - 1) * view.size;
@@ -121,6 +127,7 @@ export class CollectorPropertiesComponent {
         platforms: availablePlatforms,
         selectedPlatform: view.platform,
         regions: view.regions,
+        sort: view.sort,
         regionTotals: platformRegionCounts(selectedPlatform),
         ownedRegions: status === RequestStatus.Load ? ownedRegionCounts(platformItems) : {},
         offset,
@@ -138,6 +145,12 @@ export class CollectorPropertiesComponent {
       };
     }),
   );
+  sort(value: string): void {
+    if (value !== 'name' && value !== 'date') return;
+    this.view.sort = value;
+    this.view.page = 1;
+    this.changes.next();
+  }
   selectPlatform(id: number | null): void {
     this.view.platform = id;
     if (id === null) this.view.regions = [];

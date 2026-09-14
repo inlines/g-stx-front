@@ -75,6 +75,21 @@ describe('Collector library', () => {
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('.release-title').textContent).toBe('Release 25');
   });
+  it('sorts by the same contextual date that the cards display', () => {
+    store.dispatch(new CollectorsActions.GetCollectorsPropertiesSuccess([
+      { ...items[0], release_dates: { all: 100, europe: 300, worldwide: 100, first: 10 } },
+      { ...items[1], release_dates: { all: 200, europe: 200, first: 20 } },
+    ]));
+    fixture.componentInstance.sort('date');
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.release-title').textContent).toBe('Release 1');
+    fixture.componentInstance.toggleRegion('europe');
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.release-title').textContent).toBe('Release 2');
+    fixture.componentInstance.toggleRegion('europe');
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.release-title').textContent).toBe('Release 1');
+  });
   it('preserves a missing release date instead of converting it to 1970', () => {
     store.dispatch(new CollectorsActions.GetCollectorsPropertiesSuccess(items));
     expect(store.selectSnapshot(CollectorsState.loadedCollection)[0].release_date).toBeNull();

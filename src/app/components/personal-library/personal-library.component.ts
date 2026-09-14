@@ -1,3 +1,4 @@
+import { withReleaseDate } from '@app/shared/release-date';
 import { PagerComponent } from '../pager/pager.component';
 import { LoadingPanelComponent } from '../loading-panel/loading-panel.component';
 import { PageSwipeDirective } from '@app/directives/page-swipe.directive';
@@ -113,7 +114,8 @@ export class PersonalLibraryComponent implements OnInit, OnDestroy {
         const filtered =
           this.kind === 'collection'
             ? filterCollection(
-                items.filter((item) => matchesRegion(item, this.view.regions)),
+                items.filter((item) => matchesRegion(item, this.view.regions))
+                  .map((item) => withReleaseDate(item, this.view.regions)),
                 this.view.query,
                 this.view.sort,
                 this.view.searchMode,
@@ -189,7 +191,7 @@ export class PersonalLibraryComponent implements OnInit, OnDestroy {
     const selling = new Set(
       this.store.selectSnapshot(OwnershipState.ownership).flatMap((item) => item.wts_ids ?? []),
     );
-    const ordered = this.kind === 'collection' ? filterCollection(items, '', this.view.sort) : items;
+    const ordered = this.kind === 'collection' ? filterCollection(items.map((item) => withReleaseDate(item, this.view.regions)), '', this.view.sort) : items;
     this.csvDownload.save(
       libraryCsv(ordered, this.kind, selling),
       `${this.kind}-${this.list.activeCategory ?? 'all'}-${new Date().toISOString().slice(0, 10)}.csv`,

@@ -13,6 +13,7 @@ export interface IProductListItem {
   digital_only?: boolean;
   name: string;
   first_release_date: number | null;
+  release_date?: number | null;
   image_url: string | null;
   alternative_names: string[] | null;
 }
