@@ -9,6 +9,7 @@ export interface AdminUser {
   user_login: string;
   is_admin: boolean;
   created_at: string | null;
+  last_seen_at?: string | null;
 }
 export interface AdminUsers {
   items: AdminUser[];

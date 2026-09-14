@@ -29,3 +29,7 @@ app-user-avatar { width: 48px; height: 48px; flex: 0 0 48px; }
   .users li { flex-wrap: wrap; }.identity { flex-basis: calc(100% - 62px); }
   .users .actions { width: 100%; }.users .actions button { flex: 1; }
 }
+
+.last-seen { color: #a3b8cb; }
+.last-seen.is-online { color: #79d9ac; font-weight: 600; }
+.last-seen time { display: inline-block; }

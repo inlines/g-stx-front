@@ -1,3 +1,5 @@
+import { BehaviorSubject } from 'rxjs';
+import { ChatService } from '@app/states/chat/services/chat.service';
 import { Store } from '@ngxs/store';
 import { ChatState } from '@app/states/chat/states/chat.state';
 import { TestBed } from '@angular/core/testing';
@@ -26,6 +28,28 @@ describe('Admin users', () => {
     fixture.detectChanges();
     return { fixture, http, component: fixture.componentInstance };
   }
+  it('shows live online state, last-seen dates and unknown history; refreshes silently on disconnect', () => {
+    const online = new BehaviorSubject<ReadonlySet<string>>(new Set());
+    const chat = TestBed.inject(ChatService);
+    Object.defineProperty(chat, 'online$', { value: online.asObservable() });
+    const { fixture, component, http } = setup();
+    expect(fixture.nativeElement.querySelectorAll('.last-seen')[1].textContent).toContain('нет данных');
+    component.users = [me, { ...other, last_seen_at: '2026-09-14T10:00:00Z' }];
+    fixture.detectChanges();
+    const label = () => fixture.nativeElement.querySelectorAll('.last-seen')[1];
+    expect(label().textContent).toContain('Был онлайн:');
+    expect(label().querySelector('time').getAttribute('datetime')).toBe('2026-09-14T10:00:00Z');
+    online.next(new Set(['collector']));
+    fixture.detectChanges();
+    expect(label().textContent.trim()).toBe('Онлайн');
+    expect(label().classList.contains('is-online')).toBe(true);
+    online.next(new Set());
+    expect(component.loading).toBe(false);
+    http.expectOne(r => r.url === '/api/admin/users').flush({ items: [me, { ...other, last_seen_at: '2026-09-14T10:05:00Z' }], total_count: 2 });
+    fixture.detectChanges();
+    expect(label().querySelector('time').getAttribute('datetime')).toBe('2026-09-14T10:05:00Z');
+    fixture.destroy();
+  });
   it('shows roles and no actions on the current account; opens active requests', () => {
     const { fixture, component, http } = setup();
     const rows = fixture.nativeElement.querySelectorAll('.users li');

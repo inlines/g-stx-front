@@ -5,6 +5,7 @@ import { ChatActions } from '@app/states/chat/states/chat-actions';
 import { ChatState } from '@app/states/chat/states/chat.state';
 import { ActivatedRoute } from '@angular/router';
 import { AdminRequestsComponent } from '../admin-requests/admin-requests.component';
+import { ChatService } from '@app/states/chat/services/chat.service';
 import { DatePipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -17,11 +18,11 @@ import {
   output,
   TemplateRef,
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { AdminService, AdminUser } from '@app/services/admin.service';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { finalize, Observable, Subscription } from 'rxjs';
+import { finalize, Observable, Subscription, pairwise } from 'rxjs';
 import { PagerComponent } from '../pager/pager.component';
 import { UserAvatarComponent } from '../user-avatar/user-avatar.component';
 
@@ -44,6 +45,9 @@ export class AdminComponent implements OnInit, OnDestroy {
   readonly currentUserId = input.required<number>();
   readonly accessDenied = output<void>();
   private readonly api = inject(AdminService);
+  private readonly chat = inject(ChatService);
+  readonly online = toSignal(this.chat.online$, { initialValue: new Set<string>() });
+  readonly timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   private readonly store = inject(Store);
   private readonly destroy = inject(DestroyRef);
   private readonly modal = inject(NgbModal);
@@ -75,6 +79,12 @@ export class AdminComponent implements OnInit, OnDestroy {
     this.route?.queryParamMap.pipe(takeUntilDestroyed(this.destroy)).subscribe((params) => {
       if (params.get('section') === 'requests') this.section = 'requests';
     });
+    this.chat.online$.pipe(pairwise(), takeUntilDestroyed(this.destroy)).subscribe(([before, after]) => {
+      if (this.section === 'users' && !this.loading && !this.busy &&
+          this.users.some(user => before.has(user.user_login) && !after.has(user.user_login))) {
+        this.load(this.offset, true);
+      }
+    });
     this.load();
   }
   searchUsers() {
@@ -85,10 +95,10 @@ export class AdminComponent implements OnInit, OnDestroy {
   pageChanged(page: number) {
     if (!this.busy && !this.loading && !this.dialog) this.load((page - 1) * this.limit);
   }
-  load(offset = this.offset) {
+  load(offset = this.offset, silent = false) {
     const version = ++this.loadVersion;
     this.request?.unsubscribe();
-    this.loading = true;
+    this.loading = !silent;
     this.error = '';
     this.request = this.api
       .users(this.search, offset, this.limit)
