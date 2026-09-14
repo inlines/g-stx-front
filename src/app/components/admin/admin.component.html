@@ -6,7 +6,9 @@
   @if (section === 'requests') {
     <app-admin-requests (accessDenied)="accessDenied.emit()"/>
   } @else {
-    <div class="heading"><h2>Пользователи <span class="count">{{ total }}</span></h2>
+    <div class="heading"><div class="heading-title"><h2>Пользователи <span class="count">{{ total }}</span></h2>
+      <button type="button" class="refresh-users" [disabled]="loading || busy || confirmationOpen" (click)="load()" aria-label="Обновить список пользователей">Обновить</button>
+    </div>
       <form (ngSubmit)="searchUsers()" class="search">
         <label class="visually-hidden" for="admin-search">Имя пользователя</label>
         <input id="admin-search" name="search" type="search" [(ngModel)]="query" placeholder="Поиск по имени" maxlength="200" [disabled]="busy">

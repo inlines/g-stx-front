@@ -2,8 +2,9 @@
 
 :host { display: block; position: relative; z-index: 1; color: #e4edf6; }
 .admin-panel { border: 1px solid #294053; border-radius: 16px; padding: 24px; background: #102231; }
-.sections, .actions, .heading, .search { display: flex; gap: 10px; align-items: center; }
+.sections, .actions, .heading, .heading-title, .search { display: flex; gap: 10px; align-items: center; }
 .sections { flex-wrap: wrap; margin-bottom: 24px; }
+.heading-title { flex-wrap: wrap; }
 .heading { justify-content: space-between; flex-wrap: wrap; margin-bottom: 16px; }
 h2 { font-size: 22px; margin: 0; }.count, small { color: #a3b8cb; }
 button, input { min-height: 44px; border: 1px solid #536f89; border-radius: 8px; padding: 9px 12px; color: #e4edf6; font: inherit; }
