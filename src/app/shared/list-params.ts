@@ -28,11 +28,11 @@ export function normalizeListParams(params: IProductListRequest): IProductListRe
   return result;
 }
 
-export function catalogParams(params: IProductListRequest): IProductListRequest {
+export function catalogParams(params: IProductListRequest, limit = CATALOG_PAGE_SIZE): IProductListRequest {
   return normalizeListParams({
     ...params,
     cat: params.cat || 6,
-    limit: CATALOG_PAGE_SIZE,
+    limit,
     offset: params.offset ?? 0,
     sort: params.sort ?? 'date',
     ignore_digital: params.ignore_digital ?? true,

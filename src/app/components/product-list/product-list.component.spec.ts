@@ -36,6 +36,29 @@ describe('Catalog filters', () => {
     nextRequest().flush({ items: [], total_count: 100 });
   }
 
+  it('uses 16 cards on the two-column mobile grid through paging, swipes and filters', () => {
+    vi.stubGlobal('matchMedia', (query: string) => ({ matches: query === '(max-width: 575px)' }));
+    store.dispatch(new ProductsActions.SetRequestParams({ cat: 48, limit: 15, offset: 45 }));
+    const component = mount();
+    const initial = nextRequest();
+    expect(initial.request.params.get('limit')).toBe('16');
+    expect(initial.request.params.get('offset')).toBe('0');
+    initial.flush({ items: [], total_count: 100 });
+    component.pageChanged(2);
+    const second = nextRequest();
+    expect(second.request.params.get('offset')).toBe('16');
+    second.flush({ items: [], total_count: 100 });
+    component.swipePage(1);
+    const third = nextRequest();
+    expect(third.request.params.get('offset')).toBe('32');
+    third.flush({ items: [], total_count: 100 });
+    component.setActiveCategory(167);
+    const filtered = nextRequest();
+    expect(filtered.request.params.get('limit')).toBe('16');
+    expect(filtered.request.params.get('offset')).toBe('0');
+    filtered.flush({ items: [], total_count: 0 });
+  });
+
   it('retains the old grid and page during loading and failure, then commits the replacement together', () => {
     const component = mount();
     const game = {

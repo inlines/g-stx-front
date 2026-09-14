@@ -68,7 +68,8 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   @ViewChild('results') results?: ElementRef<HTMLElement>;
   @ViewChild('query') query?: ElementRef<HTMLInputElement>;
 
-  readonly limit = CATALOG_PAGE_SIZE;
+  // Match the two-column grid breakpoint; keep page size stable while browsing.
+  readonly limit = window.matchMedia?.('(max-width: 575px)').matches ? 16 : CATALOG_PAGE_SIZE;
   readonly productParams$ = this.store.select(ProductsState.productsParams);
   readonly displayedParams$ = this.store.select(ProductsState.displayedParams);
   readonly offset$ = this.displayedParams$.pipe(map((params) => params.offset ?? 0));
@@ -132,7 +133,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
     const params = catalogParams({
       ...saved,
       cat,
-      ...(cat !== saved.cat ? { offset: 0 } : {}),
+      ...(cat !== saved.cat || saved.limit !== this.limit ? { offset: 0 } : {}),
       unknown: this.unknown,
       franchise_id: this.franchiseId,
       company_id: this.companyId,
@@ -149,7 +150,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
             local_multiplayer: false,
             online_multiplayer: false,
           }),
-    });
+    }, this.limit);
     if (params.search_mode === 'serial' && params.query && !validSerial(params.query)) params.query = '';
     if (this.isNamedCatalog) params.regions = '';
     if (this.unknown) params.ignore_digital = true;
@@ -242,7 +243,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
       regions: this.isNamedCatalog ? '' : regions,
       local_multiplayer: localMultiplayer,
       online_multiplayer: onlineMultiplayer,
-    });
+    }, this.limit);
     if (!sameListParams(current, next)) {
       this.pendingPageOffset = null;
       this.store.dispatch(new ProductsActions.SetRequestParams({ ...next, query: next.query, offset: 0 }));
