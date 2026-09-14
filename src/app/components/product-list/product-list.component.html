@@ -108,7 +108,7 @@
           <div class="game-content">
             <div class="title">{{ product.name }}</div>
             <app-game-stats [game]="product" />
-            @if ((displayedParams$ | async)?.regions && product.serial?.length) {
+            @if (product.serial?.length) {
               <app-serial-list [serials]="product.serial" />
             } @else if (product.has_serials === false && !product.digital_only && supportsReleaseActions((displayedParams$ | async)?.cat ?? activeCategory)) {
               <small class="missing-serial-hint">Знаете серийник? Дополните →</small>

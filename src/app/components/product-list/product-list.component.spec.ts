@@ -358,7 +358,7 @@ describe('Catalog filters', () => {
     expect(fixture.nativeElement.textContent).toContain('01.01.20');
     expect(fixture.nativeElement.textContent).not.toContain('01.01.00');
   });
-  it('does not display catalogue serials until a region is selected; keeps the unknown hint', () => {
+  it('displays catalogue serials with and without a selected region; keeps the unknown hint', () => {
     const component = mount();
     const response = {
       items: [
@@ -369,7 +369,7 @@ describe('Catalog filters', () => {
     };
     nextRequest().flush(response);
     fixture.detectChanges();
-    expect(fixture.nativeElement.querySelector('app-serial-list')).toBeNull();
+    expect(fixture.nativeElement.querySelector('app-serial-list')).not.toBeNull();
     expect(fixture.nativeElement.textContent).toContain('Знаете серийник?');
     component.toggleRegion('europe');
     nextRequest().flush(response);
@@ -381,7 +381,7 @@ describe('Catalog filters', () => {
     component.toggleRegion('europe');
     nextRequest().flush(response);
     fixture.detectChanges();
-    expect(fixture.nativeElement.querySelector('app-serial-list')).toBeNull();
+    expect(fixture.nativeElement.querySelector('app-serial-list')).not.toBeNull();
   });
   it('only requests complete valid serials and resets pagination when the search mode changes', () => {
     const component = mount();
