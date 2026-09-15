@@ -61,6 +61,21 @@ describe('ProductPropertiesComponent', () => {
     }
   });
 
+  it('shows every genre and a fallback when the next game has none', () => {
+    const store = TestBed.inject(Store);
+    const http = TestBed.inject(HttpTestingController);
+    for (const [id, genres] of [[1, [{id: 5, name: 'Shooter'}, {id: 12, name: 'Role-playing (RPG)'}]], [2, []]] as const) {
+      store.dispatch(new ProductsActions.LoadProperties(id));
+      http.expectOne(`/api/products/${id}`).flush({
+        product: {id, name: 'Game', image_url: null}, genres,
+        releases: [], screenshots: [], companies: [], franschises: [],
+      });
+      fixture.detectChanges();
+      expect(fixture.nativeElement.querySelectorAll('.genre-badge').length).toBe(genres.length);
+      if (id === 2) expect(fixture.nativeElement.querySelector('.game-genres').textContent).toContain('Пока не указаны');
+    }
+  });
+
   it('should create', () => {
     expect(component).toBeTruthy();
   });

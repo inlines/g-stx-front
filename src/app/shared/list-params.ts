@@ -7,6 +7,7 @@ export const PERSONAL_LIST_PAGE_SIZE = 1000;
 /** Explicit allowlist also removes obsolete fields restored from local storage. */
 export function normalizeListParams(params: IProductListRequest): IProductListRequest {
   const result: IProductListRequest = {};
+  if (Number.isInteger(params.genre_id) && params.genre_id! > 0) result.genre_id = params.genre_id;
   if (Number.isFinite(params.cat)) result.cat = Math.max(0, Math.trunc(params.cat!));
   if (Number.isFinite(params.limit)) result.limit = Math.max(1, Math.trunc(params.limit!));
   if (Number.isFinite(params.offset)) result.offset = Math.max(0, Math.trunc(params.offset!));
@@ -42,6 +43,7 @@ export function catalogParams(params: IProductListRequest, limit = CATALOG_PAGE_
 export function sameListParams(a: IProductListRequest, b: IProductListRequest): boolean {
   return (
     a.cat === b.cat &&
+    a.genre_id === b.genre_id &&
     (a.unknown ?? false) === (b.unknown ?? false) &&
     (a.regions ?? '') === (b.regions ?? '') &&
     (a.include_unreleased ?? false) === (b.include_unreleased ?? false) &&

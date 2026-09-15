@@ -357,3 +357,6 @@
 }
 .serial-copy:hover { background: #193044; }
 .serial-copy:focus-visible { outline: 2px solid #c2a4ed; outline-offset: 2px; }
+
+.game-genres { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; margin-top: .65rem; color: #b9cedd; font-size: .85rem; }
+.genre-badge { border: 1px solid #64798e; border-radius: 1rem; padding: .2rem .65rem; color: #e1d3fa; background: #142639; overflow-wrap: anywhere; }

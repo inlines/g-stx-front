@@ -19,6 +19,7 @@ describe('Catalog filters', () => {
   });
   afterEach(() => {
     fixture?.destroy();
+    http.match('/api/genres').filter(req => !req.cancelled).forEach(req => req.flush([{id: 5, name: 'Shooter'}]));
     http.verify({ ignoreCancelled: true });
     vi.useRealTimers();
     vi.restoreAllMocks();
@@ -35,6 +36,25 @@ describe('Catalog filters', () => {
   function flushInitial() {
     nextRequest().flush({ items: [], total_count: 100 });
   }
+
+  it('filters by genre, resets paging and restores all genres', () => {
+    const component = mount();
+    http.expectOne('/api/genres').flush([{id: 5, name: 'Shooter'}]);
+    flushInitial();
+    component.pageChanged(2);
+    nextRequest().flush({ items: [], total_count: 100 });
+    component.queryForm.controls.genre.setValue(5);
+    vi.advanceTimersByTime(300);
+    const filtered = nextRequest();
+    expect(filtered.request.params.get('genre_id')).toBe('5');
+    expect(filtered.request.params.get('offset')).toBe('0');
+    filtered.flush({ items: [], total_count: 10 });
+    component.queryForm.controls.genre.setValue(null);
+    vi.advanceTimersByTime(300);
+    const all = nextRequest();
+    expect(all.request.params.has('genre_id')).toBe(false);
+    all.flush({ items: [], total_count: 100 });
+  });
 
   it('uses 16 cards on the two-column mobile grid through paging, swipes and filters', () => {
     vi.stubGlobal('matchMedia', (query: string) => ({ matches: query === '(max-width: 575px)' }));

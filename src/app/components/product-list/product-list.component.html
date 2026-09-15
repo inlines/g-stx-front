@@ -21,6 +21,15 @@
             <label><input type="checkbox" formControlName="onlineMultiplayer"> Онлайн · 2+ игрока</label>
           </fieldset>
           <div class="catalog-options">
+            <label class="catalog-sort">Жанр
+              <select class="form-select" formControlName="genre">
+                <option [ngValue]="null">Все жанры</option>
+                @for (genre of genres$ | async; track genre.id) {
+                  <option [ngValue]="genre.id">{{ genre.name }}</option>
+                }
+              </select>
+            </label>
+            @if (genresFailed) { <span class="text-warning" role="status">Не удалось загрузить жанры. Обновите страницу, чтобы повторить.</span> }
             @if (!unknown) {
             <label class="digital-option" for="onlyDigitalSwitch">
               <input type="checkbox" id="onlyDigitalSwitch" formControlName="skipDigitalFilter" />

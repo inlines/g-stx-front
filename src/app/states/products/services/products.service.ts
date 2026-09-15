@@ -4,7 +4,7 @@ import { IEnvironment } from '@app/environments/environment.interface';
 import { ENVIRONMENT } from '@app/environments/environment.token';
 import { listHttpParams } from '@app/shared/list-params';
 import { IProductListRequest } from '@app/states/products/interfaces/product-list-request.interface';
-import { IProductPropertiesResponse } from '@app/states/products/interfaces/product-properties-response.interface';
+import { Genre, IProductPropertiesResponse } from '@app/states/products/interfaces/product-properties-response.interface';
 import { Observable } from 'rxjs';
 import { IproductListResponse } from '../interfaces/product-list-response.interface';
 
@@ -19,6 +19,10 @@ export class ProductsService {
     @Inject(ENVIRONMENT) private environment: IEnvironment,
   ) {
     this.productsPath = `${this.environment.apiUrl}/products`;
+  }
+
+  public genresRequest(): Observable<Genre[]> {
+    return this.http.get<Genre[]>(`${this.environment.apiUrl}/genres`);
   }
 
   public productsRequest(params: IProductListRequest): Observable<IproductListResponse> {

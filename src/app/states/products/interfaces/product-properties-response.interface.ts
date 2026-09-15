@@ -3,7 +3,10 @@ import { IFranschiseItem } from './franschise-item.interface';
 import { IProductDetails } from './product-details.interface';
 import { IReleaseItem } from './release-item.interface';
 
+export interface Genre { id: number; name: string; }
+
 export interface IProductPropertiesResponse {
+  genres?: Genre[];
   product: IProductDetails;
   multiplayer?: IMultiplayerMode[];
   similar_games?: ISimilarGame[];

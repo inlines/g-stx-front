@@ -1,3 +1,4 @@
+import { ProductsService } from '@app/states/products/services/products.service';
 import { PageSwipeDirective } from '@app/directives/page-swipe.directive';
 import { LoadingPanelComponent } from '../loading-panel/loading-panel.component';
 import { SerialListComponent } from '../serial-list/serial-list.component';
@@ -32,7 +33,7 @@ import { ProductSort } from '@app/states/products/interfaces/product-list-reques
 import { ProductsActions } from '@app/states/products/states/products.actions';
 import { ProductsState } from '@app/states/products/states/products.state';
 import { Store } from '@ngxs/store';
-import { combineLatest, debounceTime, distinctUntilChanged, map } from 'rxjs';
+import { catchError, of, shareReplay, combineLatest, debounceTime, distinctUntilChanged, map } from 'rxjs';
 
 @Component({
   selector: 'app-product-list',
@@ -62,6 +63,11 @@ export class ProductListComponent implements OnInit, AfterViewInit {
     return this.franchiseId !== undefined || this.companyId !== undefined;
   }
   private readonly store = inject(Store);
+  genresFailed = false;
+  readonly genres$ = inject(ProductsService).genresRequest().pipe(
+    catchError(() => { this.genresFailed = true; return of([]); }),
+    shareReplay({ bufferSize: 1, refCount: true }),
+  );
   private readonly destroyRef = inject(DestroyRef);
   private readonly injector = inject(Injector);
   private pendingPageOffset: number | null = null;
@@ -110,6 +116,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   readonly queryForm = new FormGroup({
     query: new FormControl('', { nonNullable: true }),
     searchMode: new FormControl<SearchMode>('name', { nonNullable: true }),
+    genre: new FormControl<number | null>(null),
     sort: new FormControl<ProductSort>('date', { nonNullable: true }),
     localMultiplayer: new FormControl(false, { nonNullable: true }),
     onlineMultiplayer: new FormControl(false, { nonNullable: true }),
@@ -146,6 +153,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
             sort: 'date',
             ignore_digital: true,
             include_unreleased: false,
+            genre_id: undefined,
             regions: '',
             local_multiplayer: false,
             online_multiplayer: false,
@@ -160,6 +168,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
         query: params.query ?? '',
         searchMode: params.search_mode ?? 'name',
         sort: params.sort!,
+        genre: params.genre_id ?? null,
         includeUnreleased: params.include_unreleased ?? false,
         regions: params.regions ?? '',
         skipDigitalFilter: this.unknown || params.ignore_digital!,
@@ -176,6 +185,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
         company_id: this.companyId,
         company_role: this.companyRole,
         query: params.query,
+        genre_id: params.genre_id,
       }),
     );
 
@@ -224,6 +234,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
     const {
       query,
       searchMode,
+      genre,
       sort,
       skipDigitalFilter,
       localMultiplayer,
@@ -236,6 +247,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
       ...current,
       query: searchMode === 'serial' ? canonicalSerial(query) : query,
       search_mode: searchMode,
+      genre_id: genre ?? undefined,
       sort,
       cat: this.activeCategory,
       ignore_digital: this.unknown || skipDigitalFilter,
@@ -246,7 +258,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
     }, this.limit);
     if (!sameListParams(current, next)) {
       this.pendingPageOffset = null;
-      this.store.dispatch(new ProductsActions.SetRequestParams({ ...next, query: next.query, offset: 0 }));
+      this.store.dispatch(new ProductsActions.SetRequestParams({ ...next, genre_id: next.genre_id, query: next.query, offset: 0 }));
     }
   }
 

@@ -9,6 +9,12 @@
       </button>
       <div class="game-heading-copy"><h1 class="game-title" appCopyToClipboard>{{ productProperties.product.name }}</h1>
         <app-game-stats [game]="productProperties.product" [showMultiplayer]="false" />
+        <div class="game-genres" aria-label="Жанры игры">
+          <span class="genre-label">Жанры:</span>
+          @for (genre of productProperties.genres ?? []; track genre.id) {
+            <span class="genre-badge">{{ genre.name }}</span>
+          } @empty { <span>Пока не указаны</span> }
+        </div>
         @if (isAuthorised$ | async) { <button type="button" class="suggest-name kudos-link" (click)="suggestName(isAdmin)" [title]="isAdmin ? 'Добавить название сразу в каталог' : 'Дополнить название · +5 Kudos после принятия заявки'"><span class="contribution-label">Дополнить название</span>@if (!isAdmin) { <span class="contribution-reward" aria-hidden="true">+5 <b>K</b></span> }</button> }
       </div>
     </div>

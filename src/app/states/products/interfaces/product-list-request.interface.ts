@@ -2,6 +2,7 @@ export type ProductSort = 'name' | 'date' | 'rating';
 
 /** Query fields supported by the existing Rust Pagination contract. */
 export interface IProductListRequest {
+  genre_id?: number;
   limit?: number;
   offset?: number;
   query?: string;
