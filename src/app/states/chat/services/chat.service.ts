@@ -2,7 +2,7 @@ import { ToastService } from '@app/services/toast.service';
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, OnDestroy } from '@angular/core';
 import { ENVIRONMENT } from '@app/environments/environment.token';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, EMPTY, expand, last, map, Observable, Subject } from 'rxjs';
 import { IDialog } from '../interfaces/dialog.interface';
 import { IMessage, isMessage } from '../interfaces/message.interface';
 
@@ -11,6 +11,7 @@ export interface UnreadSnapshot {
   unread: Record<string, number>;
 }
 export type ChatEvent =
+  | { type: 'session_revoked' }
   | ({ type: 'unread' } & UnreadSnapshot)
   | { type: 'read'; reader: string; ids: number[]; read_at: string }
   | { type: 'send_failed'; client_id: string | null };
@@ -138,7 +139,13 @@ export class ChatService implements OnDestroy {
           }
         } else if (message && typeof message === 'object' && 'type' in message) {
           const frame = message as any;
-          if (frame.type === 'unread' && isUnread(frame)) this.controls.next({ ...frame, type: 'unread' });
+          if (frame.type === 'rate_limited') {
+            this.toast.show({
+              body: 'Слишком много сообщений. Подождите немного и повторите отправку.',
+              delay: 4000,
+            });
+          } else if (frame.type === 'unread' && isUnread(frame))
+            this.controls.next({ ...frame, type: 'unread' });
           else if (
             frame.type === 'read' &&
             typeof frame.reader === 'string' &&
@@ -174,6 +181,7 @@ export class ChatService implements OnDestroy {
       this.online.next(new Set());
       this.clearTyping();
       this.connection.next(false);
+      if (event.code === 1008 && this.login) this.controls.next({ type: 'session_revoked' });
       if (this.login && event.code !== 1008) {
         this.reconnectTimer = setTimeout(() => this.openSocket(), this.retryDelay);
         this.retryDelay = Math.min(this.retryDelay * 2, 10000);
@@ -262,7 +270,28 @@ export class ChatService implements OnDestroy {
     return this.http.get<IDialog[]>(`${this.environment.apiUrl}/dialogs`);
   }
   requestMessages(companion: string): Observable<IMessage[]> {
-    return this.http.get<IMessage[]>(`${this.environment.apiUrl}/messages`, { params: { companion } });
+    // Bounded HTTP pages, stable ID cursor: preserve the complete existing history in the UI.
+    const page = (before?: number) =>
+      this.http.get<IMessage[]>(`${this.environment.apiUrl}/messages`, {
+        params: { companion, ...(before ? { before_id: before } : {}) },
+      });
+    return page().pipe(
+      map((items) => ({ items, pageSize: items.length })),
+      expand((result) => {
+        if (result.pageSize < 1000) return EMPTY;
+        const before = result.items[0]?.id;
+        if (!Number.isSafeInteger(before) || !before) throw new Error('Invalid history cursor');
+        return page(before).pipe(
+          map((older) => {
+            if (older.some((message) => !message.id || message.id >= before))
+              throw new Error('Invalid history page');
+            return { items: [...older, ...result.items], pageSize: older.length };
+          }),
+        );
+      }),
+      last(),
+      map((result) => result.items),
+    );
   }
   ngOnDestroy(): void {
     this.closeConnection();

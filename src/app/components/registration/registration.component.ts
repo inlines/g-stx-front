@@ -28,8 +28,16 @@ export class RegistrationComponent {
   ) {
     this.form = this.fb.group(
       {
-        user_login: new FormControl('', [Validators.required, this.latinAndNumbersValidator.bind(this)]),
-        password: new FormControl('', Validators.required),
+        user_login: new FormControl('', [
+          Validators.required,
+          Validators.maxLength(64),
+          this.latinAndNumbersValidator.bind(this),
+        ]),
+        password: new FormControl('', [
+          Validators.required,
+          Validators.minLength(8),
+          Validators.maxLength(128),
+        ]),
         passwordAgain: new FormControl('', Validators.required),
       },
       { validators: this.passwordsMatchValidator },

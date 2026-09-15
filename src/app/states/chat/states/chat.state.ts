@@ -1,3 +1,4 @@
+import { AuthActions } from '@app/states/auth/states/auth-actions';
 import { ToastService } from '@app/services/toast.service';
 import { UnreadSnapshot } from '../services/chat.service';
 import { inject } from '@angular/core';
@@ -93,6 +94,7 @@ export class ChatState implements NgxsAfterBootstrap, OnDestroy {
     );
     this.subscriptions.add(
       this.chatService.events$.subscribe((event) => {
+        if (event.type === 'session_revoked') ctx.dispatch(new AuthActions.Logout());
         if (event.type === 'unread') this.snapshot(ctx, event);
         if (event.type === 'read') {
           event.ids.forEach((id) => this.receipts.set(id, event.read_at));

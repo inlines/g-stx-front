@@ -1,5 +1,5 @@
 import { provideHttpClient } from '@angular/common/http';
-import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { ENVIRONMENT } from '@app/environments/environment.token';
 import { ToastService } from '@app/services/toast.service';
@@ -50,6 +50,48 @@ describe('Chat socket lifecycle and existing wire format', () => {
     service.closeConnection();
     vi.unstubAllGlobals();
     vi.useRealTimers();
+  });
+  it('loads all history through bounded older-ID pages without dropping messages', () => {
+    const http = TestBed.inject(HttpTestingController);
+    const message = (id: number) => ({ id, sender: 'alice', recipient: 'bob', body: String(id) });
+    let result: any[] | undefined;
+    service.requestMessages('bob').subscribe((items) => (result = items));
+    http
+      .expectOne((r) => r.url === '/api/messages' && !r.params.has('before_id'))
+      .flush(Array.from({ length: 1000 }, (_, i) => message(i + 1001)));
+    expect(result).toBeUndefined();
+    http
+      .expectOne((r) => r.params.get('before_id') === '1001')
+      .flush([message(998), message(999), message(1000)]);
+    expect(result).toHaveLength(1003);
+    expect(result?.[0].id).toBe(998);
+    expect(result?.at(-1).id).toBe(2000);
+    http.verify();
+  });
+  it('rejects a non-advancing history cursor instead of requesting forever', () => {
+    const http = TestBed.inject(HttpTestingController);
+    const fail = vi.fn();
+    const messages = Array.from({ length: 1000 }, (_, i) => ({
+      id: i + 1,
+      sender: 'alice',
+      recipient: 'bob',
+      body: 'text',
+    }));
+    service.requestMessages('bob').subscribe({ error: fail });
+    http.expectOne((r) => r.url === '/api/messages').flush(messages);
+    http.expectOne((r) => r.params.get('before_id') === '1').flush([messages[0]]);
+    expect(fail).toHaveBeenCalledOnce();
+    http.verify();
+  });
+  it('reports revoked authentication and does not reconnect with a rejected token', () => {
+    const events = vi.fn();
+    service.events$.subscribe(events);
+    service.connect('alice', 'valid-token');
+    Socket.instances[0].open();
+    Socket.instances[0].close(1008);
+    expect(events).toHaveBeenCalledWith({ type: 'session_revoked' });
+    vi.advanceTimersByTime(20000);
+    expect(Socket.instances).toHaveLength(1);
   });
   it('does not open duplicate connections while connecting or connected', () => {
     service.connect('alice', 'valid-token');

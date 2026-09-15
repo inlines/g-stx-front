@@ -5,6 +5,8 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnDestroy, OnIn
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ProfileService } from '@app/services/profile.service';
+import { AuthActions } from '@app/states/auth/states/auth-actions';
+import { ToastService } from '@app/services/toast.service';
 import { AuthState } from '@app/states/auth/states/auth.state';
 import { Store } from '@ngxs/store';
 import { finalize } from 'rxjs';
@@ -22,6 +24,8 @@ import { cropSquare, pixelAvatar } from './avatar-image';
 })
 export class ProfileComponent implements OnDestroy, OnInit {
   private readonly api = inject(ProfileService);
+  private readonly store = inject(Store);
+  private readonly toast = inject(ToastService);
   private readonly destroy = inject(DestroyRef);
   readonly login$ = inject(Store).select(AuthState.login);
   readonly Math = Math;
@@ -30,7 +34,7 @@ export class ProfileComponent implements OnDestroy, OnInit {
   roleError = '';
   private readonly route = inject(ActivatedRoute, { optional: true });
   ngOnInit() {
-    this.route?.queryParamMap.pipe(takeUntilDestroyed(this.destroy)).subscribe(params => {
+    this.route?.queryParamMap.pipe(takeUntilDestroyed(this.destroy)).subscribe((params) => {
       if (params.get('tab') === 'admin') this.tab = 'admin';
     });
     this.loadRole();
@@ -103,6 +107,8 @@ export class ProfileComponent implements OnDestroy, OnInit {
         next: () => {
           this.password.reset();
           this.passwordSuccess = 'Пароль изменён';
+          this.toast.show({ body: 'Пароль изменён. Войдите с новым паролем.', delay: 6000 });
+          this.store.dispatch(new AuthActions.Logout());
         },
         error: (error) =>
           (this.passwordError = error.error?.error || 'Не удалось изменить пароль. Попробуйте ещё раз.'),
