@@ -24,7 +24,7 @@
   @if(recepient$ | async){
     <nav class="incoming-dialogs" aria-label="Новые сообщения" aria-live="polite">
       @for(dialog of unreadDialogs$ | async; track dialog.companion){
-        <button type="button" [attr.data-companion]="dialog.companion" (click)="setActiveDialog(dialog)">Новое от {{dialog.companion}} · {{(unread$ | async)?.[dialog.companion]}}<span>{{dialog.last_message}}</span></button>
+        <button type="button" [attr.data-companion]="dialog.companion" (click)="setActiveDialog(dialog)">Новое от {{dialog.companion}} · {{(unread$ | async)?.[dialog.companion]}}<span>{{dialog.last_message_sender === dialog.companion ? dialog.last_message : 'Есть непрочитанные сообщения'}}</span></button>
       }
     </nav>
   }

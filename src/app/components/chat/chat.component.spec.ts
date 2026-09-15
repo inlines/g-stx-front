@@ -68,6 +68,7 @@ describe('Chat incoming notifications', () => {
     expect(store.selectSnapshot(ChatState.messages)).toEqual([]);
     const notice = fixture.nativeElement.querySelector('.incoming-dialogs button');
     expect(notice.textContent).toContain('Новое от alice');
+    expect(notice.textContent).toContain('Hello');
     expect(notice.classList.contains('highlight')).toBe(true);
     notice.click();
     TestBed.inject(HttpTestingController)
@@ -76,6 +77,49 @@ describe('Chat incoming notifications', () => {
     fixture.detectChanges();
     expect(store.selectSnapshot(ChatState.recepient)).toBe('alice');
     expect(store.selectSnapshot(ChatState.unread)['alice']).toBe(1);
+  });
+  it('never labels an outgoing socket echo as an incoming preview while unread messages remain', () => {
+    opened('alice');
+    store.dispatch(new ChatActions.SetMessages([incoming]));
+    const notification = store.selectSnapshot(ChatState.notification);
+    store.dispatch(
+      new ChatActions.SetMessages([
+        {
+          id: 99,
+          sender: 'me',
+          recipient: 'alice',
+          body: 'My own reply',
+          created_at: '2026-09-09T12:01:00Z',
+        },
+      ]),
+    );
+    fixture.detectChanges();
+    const notice = fixture.nativeElement.querySelector('.incoming-dialogs button');
+    expect(notice.textContent).toContain('Новое от alice');
+    expect(notice.textContent).not.toContain('My own reply');
+    expect(notice.textContent).toContain('Есть непрочитанные сообщения');
+    expect(store.selectSnapshot(ChatState.dialogs)[0].last_message).toBe('My own reply');
+    expect(store.selectSnapshot(ChatState.notification)).toEqual(notification);
+    expect(store.selectSnapshot(ChatState.unread)['alice']).toBe(1);
+    expect(play).not.toHaveBeenCalled();
+  });
+  it.each(['me', undefined])('does not trust a restored preview with sender %s', (sender) => {
+    opened('alice');
+    store.dispatch(new ChatActions.SetMessages([incoming]));
+    store.dispatch(
+      new ChatActions.RequestDialogsSuccess([
+        {
+          companion: 'alice',
+          last_message: 'My restored reply',
+          last_message_time: '2026-09-09T12:02:00Z',
+          ...{ last_message_sender: sender },
+        },
+      ]),
+    );
+    fixture.detectChanges();
+    const notice = fixture.nativeElement.querySelector('.incoming-dialogs button');
+    expect(notice.textContent).not.toContain('My restored reply');
+    expect(notice.textContent).toContain('Есть непрочитанные сообщения');
   });
   it('keeps messages received while history is loading and ignores self/foreign echoes', () => {
     opened('alice');

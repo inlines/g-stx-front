@@ -140,6 +140,7 @@ export class ChatState implements NgxsAfterBootstrap, OnDestroy {
       const dialog = {
         companion,
         last_message: message.body,
+        last_message_sender: message.sender,
         last_message_time: message.created_at ?? new Date().toISOString(),
       };
       ctx.patchState({
