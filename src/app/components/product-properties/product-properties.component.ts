@@ -1,7 +1,7 @@
 import { scrollToContent } from '@app/shared/scroll-to-content';
 import { UserBadgesService } from '@app/services/user-badges.service';
 import { GameStatsComponent } from '../game-stats/game-stats.component';
-import { ISimilarGame } from '@app/states/products/interfaces/product-properties-response.interface';
+import { IMultiplayerMode, ISimilarGame } from '@app/states/products/interfaces/product-properties-response.interface';
 import { supportsReleaseActions } from '@app/shared/release-platforms';
 import { SerialRequestComponent } from '../serial-request/serial-request.component';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -96,6 +96,7 @@ export class ProductPropertiesComponent implements OnInit {
 
   public platformId$!: Observable<number>;
   public similarGames$!: Observable<ISimilarGame[]>;
+  public multiplayer$!: Observable<IMultiplayerMode[]>;
 
   public sortedReleases$!: Observable<{
     highlighted: IReleaseItem[];
@@ -105,6 +106,11 @@ export class ProductPropertiesComponent implements OnInit {
 
   public ngOnInit(): void {
     this.platformId$ = this.params.paramMap.pipe(map((params) => Number(params.get('platform') ?? 0)));
+    this.multiplayer$ = combineLatest([this.productProperties$, this.platformId$]).pipe(
+      map(([properties, platformId]) =>
+        (properties?.multiplayer ?? []).filter((mode) => platformId > 0 && mode.platform_id === platformId),
+      ),
+    );
     this.similarGames$ = combineLatest([this.productProperties$, this.platformId$]).pipe(
       map(([properties, platformId]) =>
         (properties?.similar_games ?? []).filter(

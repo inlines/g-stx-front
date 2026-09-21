@@ -174,6 +174,10 @@ describe('ProductPropertiesComponent', () => {
     ).toEqual(['Platform 7', 'Platform 8', 'Platform 9', 'Platform 48', 'Platform 167', 'Platform 38']);
   });
   it('shows rating, per-platform players and navigable similar-game cards', () => {
+    Object.defineProperty(TestBed.inject(ActivatedRoute), 'paramMap', {
+      value: of(convertToParamMap({ platform: '48' })), configurable: true,
+    });
+    component.ngOnInit();
     const store = TestBed.inject(Store);
     store.dispatch(new ProductsActions.LoadProperties(1));
     TestBed.inject(HttpTestingController)
@@ -205,6 +209,31 @@ describe('ProductPropertiesComponent', () => {
       component.similarLink({ id: 3, name: 'Other', image_url: null, platform_ids: [48, 167] }, 167),
     ).toEqual(['/products', 3, { platform: 167 }]);
     expect(root.querySelectorAll('.similar-heading button')).toHaveLength(2);
+  });
+  it('shows only selected-platform multiplayer, excluding unspecified data on navigation', () => {
+    const params = new BehaviorSubject(convertToParamMap({ platform: '32' }));
+    Object.defineProperty(TestBed.inject(ActivatedRoute), 'paramMap', { value: params, configurable: true });
+    component.ngOnInit();
+    TestBed.inject(Store).dispatch(new ProductsActions.LoadProperties(1));
+    TestBed.inject(HttpTestingController).expectOne('/api/products/1').flush({
+      product: { id: 1, name: 'Game' }, releases: [], screenshots: [], companies: [], franschises: [],
+      multiplayer: [
+        { platform_id: 32, platform_name: 'Saturn', local_players: 2, offline_coop: true },
+        { platform_id: 7, platform_name: 'PS1', local_players: 4 },
+        { platform_id: null, platform_name: null, local_players: 8, online_players: 16 },
+      ],
+    });
+    for (const [platform, expected] of [['32', 'Saturn'], ['7', 'PS1'], ['48', null], ['', null]]) {
+      params.next(convertToParamMap(platform ? { platform } : {}));
+      fixture.detectChanges();
+      const section = fixture.nativeElement.querySelector('.game-multiplayer') as HTMLElement;
+      expect(section.querySelectorAll('.multiplayer-row')).toHaveLength(expected ? 1 : 0);
+      expect(section.textContent).toContain(expected ?? 'нет данных');
+      expect(section.textContent).not.toContain('до 8 игроков');
+      expect(section.textContent).not.toContain('до 16 игроков');
+      if (platform === '32') expect(section.textContent).toContain('Локальный кооператив');
+      else expect(section.textContent).not.toContain('Локальный кооператив');
+    }
   });
   it('filters similar games by the current platform and reacts to platform navigation', () => {
     const params = new BehaviorSubject(convertToParamMap({ platform: '48' }));

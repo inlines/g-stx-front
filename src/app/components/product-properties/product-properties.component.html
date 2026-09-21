@@ -92,7 +92,7 @@
     <div class="col-12 col-lg-8 product-content">
       <section class="game-multiplayer" aria-labelledby="multiplayer-heading">
         <h2 id="multiplayer-heading">Игроки и мультиплеер</h2>
-        @for (mode of productProperties.multiplayer ?? []; track mode.platform_id) {
+        @for (mode of (multiplayer$ | async) ?? []; track mode.platform_id) {
           <div class="multiplayer-row">
             <strong>{{mode.platform_name || (mode.platform_id ? 'Платформа ' + mode.platform_id : 'Платформа не указана')}}</strong>
             <span>Локально: {{mode.local_players ? 'до ' + mode.local_players + ' игроков' : mode.local_multiplayer ? 'есть, число игроков не указано' : 'нет данных'}}</span>
