@@ -1,5 +1,5 @@
 export type SearchMode = 'name' | 'serial';
-export const SERIAL_FORMAT = /^[A-Z]{4}-[0-9]{5}(?:[A-Z]{1,4}|(?:[-/][A-Z0-9]{1,8}){1,3})?$/;
+export const SERIAL_FORMAT = /^(?:[A-Z]{4}-[0-9]{5}(?:[A-Z]{1,4}|(?:[-/][A-Z0-9]{1,8}){1,3})?|LSP-[0-9]{6})$/;
 export const SERIAL_HINT =
   'Формат: CUSA-12345, можно без дефиса. Суффиксы /ANZ, /H/ITA или GH сохраняются. Поиск — по полному номеру.';
 export function canonicalSerial(value: string): string {
@@ -7,7 +7,8 @@ export function canonicalSerial(value: string): string {
     .replace(/\s/g, '')
     .replace(/[‐‑‒–—−]/g, '-')
     .replace(/[a-z]/g, (c) => c.toUpperCase())
-    .replace(/^([A-Z]{4})-?([0-9]{5})(.*)$/, '$1-$2$3');
+    .replace(/^([A-Z]{4})-?([0-9]{5})(.*)$/, '$1-$2$3')
+    .replace(/^LSP-?([0-9]{6})$/, 'LSP-$1');
 }
 export function validSerial(value: string): boolean {
   return SERIAL_FORMAT.test(canonicalSerial(value));

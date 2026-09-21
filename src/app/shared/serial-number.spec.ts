@@ -6,6 +6,11 @@ describe('Serial format', () => {
     for (const code of ['SLUS-20144GH', 'SLPM-65002-0', 'SCES-54330/ANZ', 'CUSA-02343/H/ITA'])
       expect(validSerial(code)).toBe(true);
   });
+  it('accepts PS1 Lightspan identifiers', () => {
+    expect(canonicalSerial('lsp990121')).toBe('LSP-990121');
+    expect(validSerial('LSP-990121')).toBe(true);
+    expect(validSerial('LSP-99012')).toBe(false);
+  });
   it('rejects partial numbers, wildcards, mixed codes and Cyrillic', () => {
     for (const code of ['', 'CUSA-1234', 'CUSA-123456', '%', 'CUSA-12345 CUSA-12346', 'СUSA-12345'])
       expect(validSerial(code)).toBe(false);

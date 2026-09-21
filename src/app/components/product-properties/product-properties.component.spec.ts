@@ -108,7 +108,7 @@ describe('ProductPropertiesComponent', () => {
     expect(fixture.nativeElement.textContent).toContain('Existing game');
   });
 
-  it('keeps dated releases on all platforms visible but only offers actions for PS2/PS3/PS4/PS5/PSP', () => {
+  it('keeps dated releases on all platforms visible but only offers actions for PS1/PS2/PS3/PS4/PS5/PSP', () => {
     const store = TestBed.inject(Store);
     store.reset({
       ...store.snapshot(),
@@ -137,7 +137,7 @@ describe('ProductPropertiesComponent', () => {
       rows
         .filter((row) => row.querySelector('.release-actions'))
         .map((row) => row.querySelector('.release-platform')?.textContent?.trim()),
-    ).toEqual(['Platform 8', 'Platform 9', 'Platform 48', 'Platform 167', 'Platform 38']);
+    ).toEqual(['Platform 7', 'Platform 8', 'Platform 9', 'Platform 48', 'Platform 167', 'Platform 38']);
   });
   it('shows rating, per-platform players and navigable similar-game cards', () => {
     const store = TestBed.inject(Store);
@@ -301,9 +301,9 @@ describe('ProductPropertiesComponent', () => {
         screenshots: [],
       });
     fixture.detectChanges();
-    expect(fixture.nativeElement.querySelectorAll('.suggest-serial')).toHaveLength(5);
+    expect(fixture.nativeElement.querySelectorAll('.suggest-serial')).toHaveLength(6);
     expect(component.canSuggestSerial({ platform_id: 8 } as any)).toBe(true);
-    expect(component.canSuggestSerial({ platform_id: 7 } as any)).toBe(false);
+    expect(component.canSuggestSerial({ platform_id: 7 } as any)).toBe(true);
     component.isAuthorised$ = of(false);
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelectorAll('.suggest-serial')).toHaveLength(0);
