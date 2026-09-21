@@ -74,3 +74,11 @@ describe('Chat history merge', () => {
     expect(merged[0].read_at).toBe(read.read_at);
   });
 });
+
+it('retains avatar availability when a websocket preview replaces HTTP history', () => {
+  const old = { companion: 'alice', last_message: 'old', last_message_time: '2026-09-21T10:00:00Z', has_avatar: false };
+  const fresh = { companion: 'alice', last_message: 'new', last_message_time: '2026-09-21T11:00:00Z' };
+  expect(mergeDialogs([fresh], [old])[0].has_avatar).toBe(false);
+  expect(mergeDialogs([old], [fresh])[0].last_message).toBe('new');
+  expect(mergeDialogs([old], [fresh])[0].has_avatar).toBe(false);
+});

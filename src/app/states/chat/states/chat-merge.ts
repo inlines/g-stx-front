@@ -42,7 +42,7 @@ export function mergeMessages(history: readonly IMessage[], incoming: readonly I
 // A delayed HTTP response must not replace a newer local dialog preview.
 // The server wins when timestamps match, as before.
 export function mergeDialogs(remote: readonly IDialog[], local: readonly IDialog[]): IDialog[] {
-  return [
+  const merged = [
     ...remote.filter(
       (item) =>
         !local.some(
@@ -60,4 +60,9 @@ export function mergeDialogs(remote: readonly IDialog[], local: readonly IDialog
         ),
     ),
   ];
+  return merged.map(dialog => {
+    const hasAvatar = remote.find(item => item.companion === dialog.companion)?.has_avatar
+      ?? local.find(item => item.companion === dialog.companion)?.has_avatar;
+    return hasAvatar === undefined ? dialog : { ...dialog, has_avatar: hasAvatar };
+  });
 }

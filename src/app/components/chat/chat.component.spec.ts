@@ -35,6 +35,32 @@ describe('Chat incoming notifications', () => {
     store.reset({ ...state, chat: { ...state.chat, isOpened: true, recepient: recipient } });
     fixture.detectChanges();
   }
+  it('does not render avatars in a closed chat or request missing avatars in an open chat', () => {
+    const state = store.snapshot();
+    store.reset({
+      ...state,
+      chat: {
+        ...state.chat,
+        dialogs: [
+          {
+            companion: 'deleted-user',
+            has_avatar: false,
+            last_message: 'History',
+            last_message_time: '2026-09-21T10:00:00Z',
+          },
+        ],
+      },
+    });
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('app-user-avatar')).toBeNull();
+    expect(TestBed.inject(ChatService).connect).toHaveBeenCalled();
+    opened(null);
+    expect(fixture.nativeElement.querySelector('app-user-avatar')).not.toBeNull();
+    expect(fixture.nativeElement.querySelector('app-user-avatar img')).toBeNull();
+    expect(fixture.nativeElement.textContent).toContain('History');
+    opened('deleted-user');
+    expect(fixture.nativeElement.querySelector('app-user-avatar img')).toBeNull();
+  });
   it('opens a closed sidebar, sounds and highlights the incoming dialog', async () => {
     store.dispatch(new ChatActions.SetMessages([incoming]));
     fixture.detectChanges();

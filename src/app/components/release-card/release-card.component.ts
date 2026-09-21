@@ -15,6 +15,7 @@ export class ReleaseCardComponent {
   @Input({ required: true }) item!: ICollectionItem;
   @Input() platform: number | null = null;
   @Input() collection = false;
+  @Input() priority = false;
   @Input() readOnly = false;
   @Input() saleMode = false;
   @Input() forSale = false;

@@ -33,6 +33,7 @@ export const appConfig: ApplicationConfig = {
         ChatState,
         CollectorsState,
       ],
+      { compatibility: { strictContentSecurityPolicy: true } },
       withNgxsStoragePlugin({
         keys: ['Auth', 'Ownership', 'Products'],
       }),

@@ -1,3 +1,4 @@
+import { GameSearchComponent } from '../game-search/game-search.component';
 import { ProductsService } from '@app/states/products/services/products.service';
 import { PageSwipeDirective } from '@app/directives/page-swipe.directive';
 import { LoadingPanelComponent } from '../loading-panel/loading-panel.component';
@@ -38,6 +39,7 @@ import { catchError, of, shareReplay, combineLatest, debounceTime, distinctUntil
 @Component({
   selector: 'app-product-list',
   imports: [
+    GameSearchComponent,
     PageSwipeDirective,
     LoadingPanelComponent,
     SerialListComponent,
@@ -64,15 +66,20 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   }
   private readonly store = inject(Store);
   genresFailed = false;
-  readonly genres$ = inject(ProductsService).genresRequest().pipe(
-    catchError(() => { this.genresFailed = true; return of([]); }),
-    shareReplay({ bufferSize: 1, refCount: true }),
-  );
+  readonly genres$ = inject(ProductsService)
+    .genresRequest()
+    .pipe(
+      catchError(() => {
+        this.genresFailed = true;
+        return of([]);
+      }),
+      shareReplay({ bufferSize: 1, refCount: true }),
+    );
   private readonly destroyRef = inject(DestroyRef);
   private readonly injector = inject(Injector);
   private pendingPageOffset: number | null = null;
   @ViewChild('results') results?: ElementRef<HTMLElement>;
-  @ViewChild('query') query?: ElementRef<HTMLInputElement>;
+  @ViewChild('query') query?: GameSearchComponent;
 
   // Match the two-column grid breakpoint; keep page size stable while browsing.
   readonly limit = window.matchMedia?.('(max-width: 575px)').matches ? 16 : CATALOG_PAGE_SIZE;
@@ -137,28 +144,31 @@ export class ProductListComponent implements OnInit, AfterViewInit {
     const availableIds = this.platformIds?.filter((id) => id !== 6);
     const preferred = saved.cat && saved.cat !== 6 ? saved.cat : 48;
     const cat = availableIds?.length && !availableIds.includes(preferred) ? availableIds[0] : preferred;
-    const params = catalogParams({
-      ...saved,
-      cat,
-      ...(cat !== saved.cat || saved.limit !== this.limit ? { offset: 0 } : {}),
-      unknown: this.unknown,
-      franchise_id: this.franchiseId,
-      company_id: this.companyId,
-      company_role: this.companyRole,
-      ...(sameCatalogContext
-        ? {}
-        : {
-            offset: 0,
-            query: '',
-            sort: 'date',
-            ignore_digital: true,
-            include_unreleased: false,
-            genre_id: undefined,
-            regions: '',
-            local_multiplayer: false,
-            online_multiplayer: false,
-          }),
-    }, this.limit);
+    const params = catalogParams(
+      {
+        ...saved,
+        cat,
+        ...(cat !== saved.cat || saved.limit !== this.limit ? { offset: 0 } : {}),
+        unknown: this.unknown,
+        franchise_id: this.franchiseId,
+        company_id: this.companyId,
+        company_role: this.companyRole,
+        ...(sameCatalogContext
+          ? {}
+          : {
+              offset: 0,
+              query: '',
+              sort: 'date',
+              ignore_digital: true,
+              include_unreleased: false,
+              genre_id: undefined,
+              regions: '',
+              local_multiplayer: false,
+              online_multiplayer: false,
+            }),
+      },
+      this.limit,
+    );
     if (params.search_mode === 'serial' && params.query && !validSerial(params.query)) params.query = '';
     if (this.isNamedCatalog) params.regions = '';
     if (this.unknown) params.ignore_digital = true;
@@ -215,7 +225,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    if (window.matchMedia?.('(hover: hover) and (pointer: fine)').matches) this.query?.nativeElement.focus();
+    if (window.matchMedia?.('(hover: hover) and (pointer: fine)').matches) this.query?.focus();
   }
 
   retry(): void {
@@ -243,22 +253,32 @@ export class ProductListComponent implements OnInit, AfterViewInit {
       regions,
     } = this.queryForm.getRawValue();
     const current = this.store.selectSnapshot(ProductsState.productsParams);
-    const next = catalogParams({
-      ...current,
-      query: searchMode === 'serial' ? canonicalSerial(query) : query,
-      search_mode: searchMode,
-      genre_id: genre ?? undefined,
-      sort,
-      cat: this.activeCategory,
-      ignore_digital: this.unknown || skipDigitalFilter,
-      include_unreleased: includeUnreleased,
-      regions: this.isNamedCatalog ? '' : regions,
-      local_multiplayer: localMultiplayer,
-      online_multiplayer: onlineMultiplayer,
-    }, this.limit);
+    const next = catalogParams(
+      {
+        ...current,
+        query: searchMode === 'serial' ? canonicalSerial(query) : query,
+        search_mode: searchMode,
+        genre_id: genre ?? undefined,
+        sort,
+        cat: this.activeCategory,
+        ignore_digital: this.unknown || skipDigitalFilter,
+        include_unreleased: includeUnreleased,
+        regions: this.isNamedCatalog ? '' : regions,
+        local_multiplayer: localMultiplayer,
+        online_multiplayer: onlineMultiplayer,
+      },
+      this.limit,
+    );
     if (!sameListParams(current, next)) {
       this.pendingPageOffset = null;
-      this.store.dispatch(new ProductsActions.SetRequestParams({ ...next, genre_id: next.genre_id, query: next.query, offset: 0 }));
+      this.store.dispatch(
+        new ProductsActions.SetRequestParams({
+          ...next,
+          genre_id: next.genre_id,
+          query: next.query,
+          offset: 0,
+        }),
+      );
     }
   }
 
@@ -268,7 +288,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
     // Emit to cancel any pending debounced search from the previous platform.
     this.queryForm.patchValue({ query: '', sort: 'date' });
     this.updateFilters();
-    if (window.matchMedia?.('(hover: hover) and (pointer: fine)').matches) this.query?.nativeElement.focus();
+    if (window.matchMedia?.('(hover: hover) and (pointer: fine)').matches) this.query?.focus();
   }
 
   swipePage(direction: number): void {

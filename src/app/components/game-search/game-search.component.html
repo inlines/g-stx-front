@@ -1,0 +1,20 @@
+<div class="search-field" [class.invalid]="invalid">
+  <select aria-label="Искать по" [value]="mode" [disabled]="disabled" (change)="changeMode($event)">
+    <option value="name">Название</option>
+    <option value="serial">Серийник</option>
+  </select>
+  <input #input type="search" [value]="value" [disabled]="disabled"
+    [attr.aria-label]="mode === 'serial' ? 'Поиск игры по серийнику' : 'Поиск игры по названию'"
+    [attr.aria-invalid]="invalid" [attr.aria-describedby]="mode === 'serial' ? helpId : null"
+    [placeholder]="mode === 'serial' ? example : 'Найти игру'"
+    [attr.autocapitalize]="mode === 'serial' ? 'characters' : 'none'"
+    [attr.spellcheck]="mode === 'serial' ? 'false' : null"
+    autocomplete="off" enterkeyhint="search"
+    (input)="inputChanged($event)" (compositionend)="inputChanged($event)" (blur)="touched()">
+</div>
+@if (mode === 'serial') {
+  <p [id]="helpId" class="search-help" [attr.role]="invalid ? 'status' : null">
+    {{ example }} · буквы и цифры, дефис добавится автоматически. Суффикс сохранится.
+    @if (invalid) { Введите полный корректный номер. }
+  </p>
+}

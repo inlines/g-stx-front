@@ -24,7 +24,7 @@
           <img
             [src]="productProperties.product.image_url"
             [alt]="productProperties.product.name"
-            class="product-cover"
+            class="product-cover" fetchpriority="high" decoding="async"
             (error)="productProperties.product.image_url = null"
             />
         } @else {

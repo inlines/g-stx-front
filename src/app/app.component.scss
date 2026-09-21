@@ -28,7 +28,8 @@ app-toast-container {
 }
 
 .ellipse {
-  position: absolute;
+  // Decorative glows follow the viewport, not asynchronous content height.
+  position: fixed;
   border-radius: 50%;
   filter: blur(60px); /* Для эффекта размытости как пятна */
   z-index: 0;

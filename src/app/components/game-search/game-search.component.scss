@@ -1,0 +1,13 @@
+:host { display: block; min-width: 0; width: 100%; }
+.search-field { display: flex; align-items: stretch; width: 100%; min-width: 0; border: 1px solid #53677a; border-radius: 10px; background: #06131d; overflow: hidden; }
+.search-field:focus-within { border-color: #c2a4ed; box-shadow: 0 0 0 2px #c2a4ed44; }
+.search-field.invalid { border-color: #e3b96a; }
+select, input { font: inherit; font-size: 16px; min-height: 48px; border: 0; border-radius: 0; color: #e4edf6; background: transparent; }
+select { flex: 0 0 122px; width: 122px; padding: 10px 8px; border-right: 1px solid #53677a; cursor: pointer; }
+select option { color: #e4edf6; background: #102231; }
+input { flex: 1 1 0; width: 0; min-width: 0; padding: 10px 12px; }
+input::placeholder { color: #9fbad1; opacity: 1; }
+input:focus, select:focus { outline: none; }
+select:focus-visible { box-shadow: inset 0 0 0 2px #c2a4ed; }
+.search-help { color: #bbccdc; margin: 6px 0 0; font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
+@media (max-width: 374px) { select { flex-basis: 112px; width: 112px; padding-inline: 5px; } input { padding-inline: 8px; } }

@@ -6,7 +6,7 @@ import { RouterLink } from '@angular/router';
   imports: [RouterLink],
   templateUrl: './footer.component.html',
   styleUrl: './footer.component.scss',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
 })
 export class FooterComponent {

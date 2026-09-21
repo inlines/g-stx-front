@@ -17,7 +17,7 @@ import { Observable } from 'rxjs';
   imports: [KudosComponent, UserAvatarComponent, RouterLink, AsyncPipe, RouterModule],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
 })
 export class HeaderComponent {

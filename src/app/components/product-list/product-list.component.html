@@ -1,3 +1,4 @@
+@let displayedParams = displayedParams$ | async;
 <div class="row products-box">
   <div class="col-12 px-0 mb-4 sticker" [class.authorised]="(isAuthorised$ | async)">
     <div>
@@ -49,17 +50,9 @@
 
             <div class="row">
               <div class="col">
-                <label class="catalog-sort">Искать по
-                  <select class="form-select" formControlName="searchMode"><option value="name">Названию</option><option value="serial">Серийнику</option></select>
-                </label>
-                <input id="query" [attr.aria-label]="queryForm.controls.searchMode.value === 'serial' ? 'Поиск игры по серийнику' : 'Поиск игры по названию'" [attr.aria-invalid]="invalidSerial" [attr.aria-describedby]="queryForm.controls.searchMode.value === 'serial' ? 'serial-search-help' : null"
-                  #query
-                  class="border-0 rounded-3 w-100"
-                  type="text"
-                  [placeholder]="queryForm.controls.searchMode.value === 'serial' ? 'CUSA-12345' : 'Название'"
-                  autocomplete="off"
-                  formControlName="query" />
-                @if (queryForm.controls.searchMode.value === 'serial') {<p id="serial-search-help" class="text-light small" [attr.role]="invalidSerial ? 'status' : null">{{serialHint}} @if(invalidSerial){Введите полный корректный номер, чтобы обновить результаты.}</p>}
+                <app-game-search #query [formControl]="queryForm.controls.query"
+                  [mode]="queryForm.controls.searchMode.value" [platform]="activeCategory"
+                  (modeChange)="queryForm.controls.searchMode.setValue($event)" />
               </div>
             </div>
           </form>
@@ -71,15 +64,15 @@
 
   @if(!(loading$ | async) && !(failed$ | async) && (productsTotalCount$ | async) === 0){<p class="text-light" role="status">По выбранным фильтрам игр не найдено. Попробуйте другую платформу или измените поиск.</p>}
   <app-loading-panel [loading]="(loading$ | async) ?? false"><div #results class="catalog-grid" pageSwipe [swipeDisabled]="(loading$ | async) ?? false" (swipePage)="swipePage($event)">
-  @for (product of products$ | async; track product.id) {
+  @for (product of products$ | async; track product.id; let cardIndex = $index) {
     <!-- Desktop / tablet: карточки -->
     <div class="catalog-cell col-xl-3 col-lg-4 col-md-4 col-sm-6 p-3">
       <div
         class="card game-card border-0 d-flex flex-column justify-content-between position-relative"
-        [routerLink]="['/products', product.id, {platform: (displayedParams$ | async)?.cat}]"
+        [routerLink]="['/products', product.id, {platform: displayedParams?.cat}]"
         style="cursor: pointer;"
         >
-        @if (product.has_serials === false && !product.digital_only && supportsReleaseActions((displayedParams$ | async)?.cat ?? activeCategory)) {
+        @if (product.has_serials === false && !product.digital_only && supportsReleaseActions(displayedParams?.cat ?? activeCategory)) {
           <span class="missing-serial" role="img" aria-label="Серийники пока не указаны. Откройте игру, чтобы дополнить их."
             title="Серийники пока не указаны. Знаете номер? Дополните на странице игры.">?</span>
         }
@@ -97,9 +90,10 @@
           @if (product.image_url) {
             <img
               [src]="product.image_url"
+              [attr.loading]="cardIndex < 2 ? 'eager' : 'lazy'" decoding="async"
+              [attr.fetchpriority]="cardIndex === 0 ? 'high' : 'auto'"
               [alt]="product.name"
               class="img-fluid"
-              style="max-height: 100%; object-fit: cover;"
               (error)="product.image_url = null"
               />
           } @else {
@@ -119,7 +113,7 @@
             <app-game-stats [game]="product" />
             @if (product.serial?.length) {
               <app-serial-list [serials]="product.serial" />
-            } @else if (product.has_serials === false && !product.digital_only && supportsReleaseActions((displayedParams$ | async)?.cat ?? activeCategory)) {
+            } @else if (product.has_serials === false && !product.digital_only && supportsReleaseActions(displayedParams?.cat ?? activeCategory)) {
               <small class="missing-serial-hint">Знаете серийник? Дополните →</small>
             }
             <div class="game-first-release text-lite-muted small">

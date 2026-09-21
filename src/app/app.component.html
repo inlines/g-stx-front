@@ -14,8 +14,10 @@
       </section>
     </article>
   </main>
+    @defer (when isAuthorized$ | async) {
     @if ((isAuthorized$ | async)) {
       <app-chat [class.invisible]="!(isChatVisible$ | async)" class="chat-sidebar open"></app-chat>
+    }
     }
   <app-footer></app-footer>
 </div>

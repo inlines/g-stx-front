@@ -48,7 +48,22 @@ import {
   ],
 })
 export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
-  @ViewChild('scrollbox') scrollbox!: ElementRef;
+  private messageBox?: ElementRef;
+  @ViewChild('scrollbox') set scrollbox(value: ElementRef | undefined) {
+    this.messageBox = value;
+    if (value)
+      afterNextRender(
+        () => {
+          if (this.messageBox !== value) return;
+          value.nativeElement.scrollTop = value.nativeElement.scrollHeight;
+          this.markVisibleRead();
+        },
+        { injector: this.injector },
+      );
+  }
+  get scrollbox(): ElementRef | undefined {
+    return this.messageBox;
+  }
 
   messages$!: Observable<IMessage[]>;
   isConnected$!: Observable<boolean>;
@@ -72,6 +87,13 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
   private typingRecipient: string | null = null;
   private lastTyping = 0;
   private readonly sentReads = new Map<number, number>();
+  readonly visible$ = this.store.select(ChatState.visible);
+  readonly recipientAvatar$ = combineLatest([
+    this.store.select(ChatState.dialogs),
+    this.store.select(ChatState.recepient),
+  ]).pipe(
+    map(([dialogs, recipient]) => dialogs.find((dialog) => dialog.companion === recipient)?.has_avatar),
+  );
   readonly unread$ = this.store.select(ChatState.unread);
   readonly unreadDialogs$ = this.store.select(ChatState.unreadDialogs);
   private readonly destroyRef = inject(DestroyRef);
@@ -163,7 +185,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
                   index = position;
               });
               const element = this.scrollbox?.nativeElement.querySelector(`[data-message-index="${index}"]`);
-              if (element) {
+              if (element && this.scrollbox) {
                 this.scrollbox.nativeElement.scrollTop = this.scrollbox.nativeElement.scrollHeight;
                 this.highlight(element);
               }

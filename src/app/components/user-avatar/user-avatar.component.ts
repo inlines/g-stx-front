@@ -5,8 +5,8 @@ import { ProfileService } from '@app/services/profile.service';
 @Component({
   selector: 'app-user-avatar',
   imports: [AsyncPipe],
-  changeDetection: ChangeDetectionStrategy.Eager,
-  template: `@if (login && !failed) {
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `@if (login && hasAvatar !== false && !failed) {
       <img [src]="profile.avatarUrl(login)" alt="" (error)="failed = true" loading="lazy" />
     } @else {
       <span aria-hidden="true">{{ login?.slice(0, 1)?.toUpperCase() || '•' }}</span>
@@ -70,6 +70,7 @@ import { ProfileService } from '@app/services/profile.service';
   ],
 })
 export class UserAvatarComponent implements OnChanges {
+  @Input() hasAvatar: boolean | undefined;
   @Input() login: string | null = null;
   readonly profile = inject(ProfileService);
   readonly badges = inject(UserBadgesService);

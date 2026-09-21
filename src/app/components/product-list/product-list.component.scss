@@ -156,8 +156,17 @@ input::placeholder {
   outline-offset: -2px;
 }
 .catalog-cover {
+  position: relative;
+  flex-shrink: 0;
   height: 214px;
   overflow: hidden;
+}
+.catalog-cover img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 .title {
   overflow-wrap: anywhere;
@@ -191,11 +200,6 @@ input::placeholder {
   .catalog-cover {
     height: auto;
     aspect-ratio: 3 / 4;
-  }
-  .catalog-cover img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain !important;
   }
   .game-content {
     padding: 12px 10px;
