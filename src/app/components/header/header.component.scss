@@ -145,3 +145,13 @@
 .header-bg {
   padding-top: env(safe-area-inset-top);
 }
+
+.navigation-collapse { background: rgba(0, 0, 0, .5); }
+@media (max-width: 767px) {
+  .navigation-collapse { display: grid; grid-template-rows: 1fr; transition: grid-template-rows 220ms ease; }
+  .navigation-collapse.collapsed { grid-template-rows: 0fr; }
+  .navigation-content { min-height: 0; overflow: hidden; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .navigation-collapse { transition: none; }
+}

@@ -37,7 +37,8 @@
     </div>
   </div>
 
-  <div style="background-color: rgba(0, 0, 0, 0.5);">
+  <div class="navigation-collapse" [class.collapsed]="navigationCollapsed()" [attr.inert]="navigationCollapsed() ? '' : null" [attr.aria-hidden]="navigationCollapsed() ? 'true' : null">
+    <div class="navigation-content">
     @if (isAuthorised$ | async;) {
       <div class="container-fluid container-lg">
         <div class="row align-items-center" style="min-height: 60px; padding: 12px 0;">
@@ -76,5 +77,6 @@
         </div>
       </div>
     }
+    </div>
   </div>
 </div>

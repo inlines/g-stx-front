@@ -173,7 +173,8 @@
 }
 .screenshot {
   display: block;
-  max-width: 100%;
+  width: 100%;
+  aspect-ratio: 16 / 9;
   max-height: 500px;
   object-fit: contain;
 }

@@ -66,6 +66,7 @@ main article > section {
   min-width: 0;
 }
 @media (max-width: 767px) {
+  .layout-wrapper { overflow-anchor: none; }
   header {
     position: relative;
   }
