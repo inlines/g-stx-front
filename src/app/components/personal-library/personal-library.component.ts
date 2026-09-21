@@ -1,3 +1,4 @@
+import { scrollToContent } from '@app/shared/scroll-to-content';
 import { GameSearchComponent } from '../game-search/game-search.component';
 import { withReleaseDate } from '@app/shared/release-date';
 import { PagerComponent } from '../pager/pager.component';
@@ -250,7 +251,7 @@ export class PersonalLibraryComponent implements OnInit, OnDestroy {
     this.view.page = value;
     this.changes.next();
     afterNextRender(
-      () => this.results?.nativeElement.scrollIntoView?.({ block: 'start', behavior: 'instant' }),
+      () => scrollToContent(this.results?.nativeElement),
       { injector: this.injector },
     );
   }

@@ -1,3 +1,4 @@
+import { scrollToContent } from '@app/shared/scroll-to-content';
 import { GameSearchComponent } from '../game-search/game-search.component';
 import { ProductsService } from '@app/states/products/services/products.service';
 import { PageSwipeDirective } from '@app/directives/page-swipe.directive';
@@ -212,7 +213,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
       if (this.pendingPageOffset !== null && params.offset === this.pendingPageOffset) {
         this.pendingPageOffset = null;
         afterNextRender(
-          () => this.results?.nativeElement.scrollIntoView?.({ block: 'start', behavior: 'instant' }),
+          () => scrollToContent(this.results?.nativeElement),
           { injector: this.injector },
         );
       }

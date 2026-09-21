@@ -1,3 +1,4 @@
+import { scrollToContent } from '@app/shared/scroll-to-content';
 import { UserBadgesService } from '@app/services/user-badges.service';
 import { GameStatsComponent } from '../game-stats/game-stats.component';
 import { ISimilarGame } from '@app/states/products/interfaces/product-properties-response.interface';
@@ -60,7 +61,7 @@ export class ProductPropertiesComponent implements OnInit {
       const id = this.store.selectSnapshot(ProductsState.productProperties)?.product.id;
       if (!heading || !id || id === this.scrolledProductId) return;
       this.scrolledProductId = id;
-      heading.scrollIntoView?.({ block: 'start', behavior: 'instant' });
+      scrollToContent(heading, 24);
     });
     this.failure$ = this.store.select(ProductsState.propertiesFailure);
     this.productProperties$ = this.store.select(ProductsState.productProperties);

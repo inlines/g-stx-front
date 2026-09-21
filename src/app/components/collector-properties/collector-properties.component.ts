@@ -1,3 +1,4 @@
+import { scrollToContent } from '@app/shared/scroll-to-content';
 import { withReleaseDate } from '@app/shared/release-date';
 import { filterCollection } from '@app/shared/collection-filter';
 import { LoadingPanelComponent } from '../loading-panel/loading-panel.component';
@@ -168,7 +169,7 @@ export class CollectorPropertiesComponent {
     this.view.page = page;
     this.changes.next();
     afterNextRender(
-      () => this.results?.nativeElement.scrollIntoView?.({ block: 'start', behavior: 'instant' }),
+      () => scrollToContent(this.results?.nativeElement),
       { injector: this.injector },
     );
   }
