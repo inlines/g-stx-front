@@ -376,3 +376,19 @@
   overflow-wrap: anywhere;
 }
 .other-platforms a:focus-visible { outline: 2px solid #c2a4ed; outline-offset: 3px; }
+
+// Keep one carousel; only its position changes with the column layout.
+.product-content { display: flex; flex-direction: column; }
+.game-multiplayer { order: 1; }
+.releases-section { order: 2; }
+.product-summary { order: 3; }
+.product-screenshots { order: 4; }
+@media (max-width: 991.98px) {
+  .product-screenshots { order: 2; margin: 0 0 24px; }
+  .releases-section { order: 3; }
+  .product-summary { order: 4; }
+}
+
+.no-serials { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.empty-serials-label { color: #c2a4ed; font-size: 14px; }
+.no-serials > * { white-space: nowrap; }

@@ -1,3 +1,4 @@
+import { BreakpointObserver } from '@angular/cdk/layout';
 import { scrollToContent } from '@app/shared/scroll-to-content';
 import { UserBadgesService } from '@app/services/user-badges.service';
 import { GameStatsComponent } from '../game-stats/game-stats.component';
@@ -47,6 +48,7 @@ import { combineLatest, map, Observable } from 'rxjs';
 export class ProductPropertiesComponent implements OnInit {
   @ViewChild('productHeading') productHeading?: ElementRef<HTMLElement>;
   private scrolledProductId?: number;
+  readonly compactLayout$ = inject(BreakpointObserver).observe('(max-width: 991.98px)').pipe(map((state) => state.matches));
 
   @ViewChild('sellersModal', { static: true }) sellersModalRef!: TemplateRef<unknown>;
 
@@ -95,6 +97,7 @@ export class ProductPropertiesComponent implements OnInit {
   readonly failure$: Observable<{ failed: boolean; notFound: boolean }>;
 
   public platformId$!: Observable<number>;
+  public releasePlatformName$!: Observable<string>;
   public similarGames$!: Observable<ISimilarGame[]>;
   public multiplayer$!: Observable<IMultiplayerMode[]>;
 
@@ -106,6 +109,13 @@ export class ProductPropertiesComponent implements OnInit {
 
   public ngOnInit(): void {
     this.platformId$ = this.params.paramMap.pipe(map((params) => Number(params.get('platform') ?? 0)));
+    this.releasePlatformName$ = combineLatest([this.productProperties$, this.platformId$]).pipe(
+      map(([properties, platformId]) => {
+        if (!platformId) return '';
+        const labels: Record<number, string> = { 32: 'Saturn', 7: 'PS1', 8: 'PS2', 9: 'PS3', 48: 'PS4', 167: 'PS5', 38: 'PSP' };
+        return labels[platformId] ?? properties?.releases.find((release) => release.platform_id === platformId)?.platform_name ?? `Платформа ${platformId}`;
+      }),
+    );
     this.multiplayer$ = combineLatest([this.productProperties$, this.platformId$]).pipe(
       map(([properties, platformId]) =>
         (properties?.multiplayer ?? []).filter((mode) => platformId > 0 && mode.platform_id === platformId),

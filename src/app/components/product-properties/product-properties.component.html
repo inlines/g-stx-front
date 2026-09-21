@@ -60,22 +60,28 @@
               }
             </div>
           }
-          <div class="mt-4 mb-1">
-            <span class="game-header">Разработчики:</span>
-            @for (developer of (productDevelopers$ | async); track developer) {
-              <div style="width:100%; max-width: 100%;">
-                <a class="catalog-link" [routerLink]="['/companies', developer.company]">{{ developer.name }}</a>
+          <ng-container *ngTemplateOutlet="companyGroup; context: { title: 'Разработчики', companies: (productDevelopers$ | async) ?? [] }" />
+          <ng-container *ngTemplateOutlet="companyGroup; context: { title: 'Издатели', companies: (productPublishers$ | async) ?? [] }" />
+          <ng-template #companyGroup let-title="title" let-companies="companies">
+            <div class="mt-4 mb-1 company-group">
+              @if (compactLayout$ | async) {
+              <details class="serials">
+                <summary>{{ title }} · {{ companies.length }}</summary>
+                <ng-container *ngTemplateOutlet="companyLinks; context: { $implicit: companies }" />
+              </details>
+              } @else {
+              <div>
+                <span class="game-header">{{ title }}:</span>
+                <ng-container *ngTemplateOutlet="companyLinks; context: { $implicit: companies }" />
               </div>
-            }
-          </div>
-          <div class="mt-4 mb-1">
-            <span class="game-header">Издатели:</span>
-            @for (publisher of (productPublishers$ | async); track publisher) {
-              <div style="width:100%; max-width: 100%;">
-                <a class="catalog-link" [routerLink]="['/companies', publisher.company]">{{ publisher.name }}</a>
-              </div>
-            }
-          </div>
+              }
+            </div>
+          </ng-template>
+          <ng-template #companyLinks let-companies>
+            @for (company of companies; track company.company) {
+              <div><a class="catalog-link" [routerLink]="['/companies', company.company]">{{ company.name }}</a></div>
+            } @empty { <p class="digital-label">Пока не указаны</p> }
+          </ng-template>
           <div class="mt-4">
             <div class="game-header">впервые выпущена:</div>
             <div>
@@ -102,8 +108,21 @@
           </div>
         } @empty { <p>нет данных о числе игроков.</p> }
       </section>
+    @if (productProperties.screenshots.length) {
+      <div class="product-screenshots">
+        <ngb-carousel [interval]="3000" [pauseOnHover]="true" [wrap]="true">
+          @for (screen of productProperties.screenshots; track screen) {
+            <ng-template ngbSlide>
+              <div class="d-flex justify-content-center">
+                <img class="screenshot" [src]="screen" [alt]="productProperties.product.name + ' — скриншот ' + ($index + 1)" loading="lazy" />
+              </div>
+            </ng-template>
+          }
+        </ngb-carousel>
+      </div>
+    }
       <div class="releases-section">
-        <h2 class="release-header">Релизы</h2>
+        <h2 class="release-header">Релизы{{ (releasePlatformName$ | async) ? ' ' + (releasePlatformName$ | async) : '' }}</h2>
         @if ((sortedReleases$ | async); as sorted) {
           <ul class="list-group list-group-flush">
             @for (release of sorted.highlighted; track release.release_id) {
@@ -128,10 +147,11 @@
         <ng-template #releaseRow let-release let-highlighted="highlighted">
           <li class="release-item" [class.owned-item]="release.owned" [class.highlighted-release]="highlighted">
             <div class="release-meta" [class.text-decoration-line-through]="release.release_status === 5">
-              <span class="release-platform">{{ release.platform_name }}</span>
+              @if (!(platformId$ | async)) { <span class="release-platform">{{ release.platform_name }}</span> }
               <span>{{ release.release_region }}</span>
               <span>{{ release.release_date ? (release.release_date | date:'dd.MM.yy':'UTC') : 'Дата не указана' }}</span>
             </div>
+            <div class="release-serials" [class.no-serials]="!release.serial?.length">
             @if (release.serial?.length) {
               <details class="serials" open>
                 <summary [ngbTooltip]="serialPreview(release)" triggers="mouseenter:mouseleave" container="body">Серийники · {{ release.serial.length }}</summary>
@@ -140,6 +160,11 @@
                 </ul>
               </details>
             }
+            @if (!release.serial?.length) { <div class="empty-serials-label">Серийники · 0</div> }
+            @if ((isAuthorised$ | async) && canSuggestSerial(release)) {
+              <button type="button" class="suggest-serial kudos-link" (click)="suggestSerial(release, isAdmin)" aria-label="Уточнить серийник" [title]="isAdmin ? 'Добавить серийник сразу в каталог' : 'Уточнить серийник · +10 Kudos после принятия заявки'"><span class="contribution-label">Уточнить</span>@if (!isAdmin) { <span class="contribution-reward" aria-hidden="true">+10 <b>K</b></span> }</button>
+            }
+            </div>
             @if (release.digital_only) { <div class="digital-label">Цифровая версия</div> }
             <ng-container *ngTemplateOutlet="releaseActions; context: { $implicit: release }" />
           </li>
@@ -147,9 +172,6 @@
       <ng-template #releaseActions let-release>
         @if ((isAuthorised$ | async) && canSuggestSerial(release)) {
           <div class="release-actions">
-            @if (canSuggestSerial(release)) {
-              <button type="button" class="suggest-serial kudos-link" (click)="suggestSerial(release, isAdmin)" aria-label="Уточнить серийник" [title]="isAdmin ? 'Добавить серийник сразу в каталог' : 'Уточнить серийник · +10 Kudos после принятия заявки'"><span class="contribution-label">Уточнить</span>@if (!isAdmin) { <span class="contribution-reward" aria-hidden="true">+10 <b>K</b></span> }</button>
-            }
             <button type="button" class="btn-blue small"
               [disabled]="release.owned || release.digital_only || release.release_status === 5 || !release.release_date || (collectionChanging$ | async)"
               [hidden]="release.owned"
@@ -182,19 +204,7 @@
       <p>{{ productProperties.product.summary || 'У нас нет описания этой игры' }}</p>
     </div>
 
-    @if (productProperties.screenshots.length) {
-      <div class="product-screenshots">
-        <ngb-carousel [interval]="3000" [pauseOnHover]="true" [wrap]="true">
-          @for (screen of productProperties.screenshots; track screen) {
-            <ng-template ngbSlide>
-              <div class="d-flex justify-content-center">
-                <img class="screenshot" [src]="screen" [alt]="productProperties.product.name + ' — скриншот ' + ($index + 1)" loading="lazy" />
-              </div>
-            </ng-template>
-          }
-        </ngb-carousel>
-      </div>
-    }
+
   </div>
   @let similarGames = (similarGames$ | async) ?? [];
   @if (similarGames.length) {

@@ -98,11 +98,13 @@ describe('ProductPropertiesComponent', () => {
     fixture.detectChanges();
     const root = fixture.nativeElement as HTMLElement;
     expect(root.querySelectorAll('.release-item')).toHaveLength(2);
-    expect(Array.from(root.querySelectorAll('.release-platform')).map(e => e.textContent)).toEqual(['PS4', 'PS4']);
+    expect(root.querySelectorAll('.release-platform')).toHaveLength(0);
+    expect(root.querySelector('.release-header')?.textContent).toBe('Релизы PS4');
     expect(root.querySelectorAll('.other-platforms a')).toHaveLength(1);
     expect(root.querySelector('.other-platforms a')?.getAttribute('href')).toBe('/products/1;platform=7');
     params.next(convertToParamMap({ platform: '7' })); fixture.detectChanges();
-    expect(Array.from(root.querySelectorAll('.release-platform')).map(e => e.textContent)).toEqual(['PS1', 'PS1']);
+    expect(root.querySelectorAll('.release-platform')).toHaveLength(0);
+    expect(root.querySelector('.release-header')?.textContent).toBe('Релизы PS1');
     expect(root.querySelector('.other-platforms a')?.textContent).toBe('PS4');
     params.next(convertToParamMap({ platform: '9' })); fixture.detectChanges();
     expect(root.querySelectorAll('.release-item')).toHaveLength(0);
