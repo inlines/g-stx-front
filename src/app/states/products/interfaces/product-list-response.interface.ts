@@ -3,6 +3,7 @@ import { IProductListItem } from './product-list-item.interface';
 
 export interface IproductListResponse {
   total_count: number;
+  region_totals?: RegionCounts | null;
   region_counts?: RegionCounts | null;
   items: IProductListItem[];
 }

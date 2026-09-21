@@ -57,6 +57,7 @@ export class ProductsState {
       })),
       productsTotalCount: action.payload.total_count,
       regionCounts: action.payload.region_counts ?? {},
+      regionTotals: action.payload.region_totals ?? {},
     });
   }
 
@@ -126,6 +127,11 @@ export class ProductsState {
       failed: state.productPropertiesRequestStatus === RequestStatus.Error,
       notFound: state.productPropertiesErrorStatus === 404,
     };
+  }
+
+  @Selector()
+  static regionTotals(state: IproductState) {
+    return state.regionTotals ?? {};
   }
 
   @Selector()

@@ -14,7 +14,7 @@
             }
           </ul>
           @if (!isNamedCatalog) {
-          <app-region-filters [unknown]="unknown" [unidentified]="(unknownRegionCounts$ | async) ?? {}" [selected]="selectedRegions" [totals]="(selectedRegionCounts$ | async) ?? {}" (regionToggle)="toggleRegion($event)"/>
+          <app-region-filters [unknown]="unknown" [unidentified]="(unknownRegionCounts$ | async) ?? {}" [selected]="selectedRegions" [totals]="((unknown ? unknownRegionTotals$ : selectedRegionCounts$) | async) ?? {}" (regionToggle)="toggleRegion($event)"/>
           }
           <fieldset class="multiplayer-filters">
             <legend>Мультиплеер на выбранной платформе</legend>
