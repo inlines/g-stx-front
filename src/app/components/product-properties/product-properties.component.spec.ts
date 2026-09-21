@@ -30,11 +30,11 @@ describe('ProductPropertiesComponent', () => {
     fixture.detectChanges();
   });
 
-  it('scrolls to the mobile heading after loading each game, not on repeated renders', async () => {
+  it.each([true, false])('scrolls to each loaded heading once (mobile=%s)', async (mobile) => {
     const previous = HTMLElement.prototype.scrollIntoView;
     const scroll = vi.fn();
     HTMLElement.prototype.scrollIntoView = scroll;
-    vi.stubGlobal('matchMedia', () => ({ matches: true }));
+    vi.stubGlobal('matchMedia', () => ({ matches: mobile }));
     try {
       const store = TestBed.inject(Store);
       const http = TestBed.inject(HttpTestingController);

@@ -212,7 +212,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
       if (this.pendingPageOffset !== null && params.offset === this.pendingPageOffset) {
         this.pendingPageOffset = null;
         afterNextRender(
-          () => this.results?.nativeElement.scrollIntoView?.({ block: 'start', behavior: 'auto' }),
+          () => this.results?.nativeElement.scrollIntoView?.({ block: 'start', behavior: 'instant' }),
           { injector: this.injector },
         );
       }

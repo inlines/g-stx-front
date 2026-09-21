@@ -60,9 +60,7 @@ export class ProductPropertiesComponent implements OnInit {
       const id = this.store.selectSnapshot(ProductsState.productProperties)?.product.id;
       if (!heading || !id || id === this.scrolledProductId) return;
       this.scrolledProductId = id;
-      if (window.matchMedia?.('(max-width: 767px)').matches) {
-        heading.scrollIntoView?.({ block: 'start', behavior: 'instant' });
-      }
+      heading.scrollIntoView?.({ block: 'start', behavior: 'instant' });
     });
     this.failure$ = this.store.select(ProductsState.propertiesFailure);
     this.productProperties$ = this.store.select(ProductsState.productProperties);

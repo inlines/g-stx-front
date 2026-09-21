@@ -17,6 +17,7 @@ import { libraryCsv, LibraryCsvDownload } from '@app/shared/library-csv';
 import { OwnershipState } from '@app/states/ownership/states/ownership.state';
 import { AsyncPipe, CurrencyPipe } from '@angular/common';
 import {
+  ElementRef,
   afterNextRender,
   ChangeDetectionStrategy,
   Component,
@@ -64,6 +65,7 @@ import { buildPages } from '../pager/pagination';
   changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class PersonalLibraryComponent implements OnInit, OnDestroy {
+  @ViewChild('results') results?: ElementRef<HTMLElement>;
   @Input({ required: true }) kind!: LibraryKind;
   @ViewChild('priceModal', { static: true }) priceModal!: TemplateRef<unknown>;
   @ViewChild('saleModal', { static: true }) saleModal!: TemplateRef<unknown>;
@@ -247,7 +249,10 @@ export class PersonalLibraryComponent implements OnInit, OnDestroy {
     if (typeof value !== 'number') return;
     this.view.page = value;
     this.changes.next();
-    window.scrollTo({ top: 0, behavior: 'instant' });
+    afterNextRender(
+      () => this.results?.nativeElement.scrollIntoView?.({ block: 'start', behavior: 'instant' }),
+      { injector: this.injector },
+    );
   }
   retry(): void {
     this.store.dispatch(

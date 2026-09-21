@@ -17,7 +17,7 @@ import { CollectorsService } from '@app/states/collectors/services/collectors.se
 import { unixMilliseconds } from '@app/shared/collection-filter';
 import { ICollectionItem } from '@app/states/collection/interfaces/collection-item.interface';
 import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { afterNextRender, ElementRef, Injector, ViewChild, ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { RequestStatus } from '@app/constants/request-status.const';
 import { LibraryViewService } from '@app/shared/library-view.service';
@@ -46,6 +46,8 @@ import { ReleaseCardComponent } from '../release-card/release-card.component';
   styleUrl: './collector-properties.component.scss',
 })
 export class CollectorPropertiesComponent {
+  @ViewChild('results') results?: ElementRef<HTMLElement>;
+  private readonly injector = inject(Injector);
   private readonly store = inject(Store);
   private readonly views = inject(LibraryViewService);
   private readonly changes = new BehaviorSubject<void>(undefined);
@@ -165,7 +167,10 @@ export class CollectorPropertiesComponent {
   page(page: number): void {
     this.view.page = page;
     this.changes.next();
-    window.scrollTo({ top: 0, behavior: 'instant' });
+    afterNextRender(
+      () => this.results?.nativeElement.scrollIntoView?.({ block: 'start', behavior: 'instant' }),
+      { injector: this.injector },
+    );
   }
   pageSize(size: string): void {
     this.view.size = Number(size);
