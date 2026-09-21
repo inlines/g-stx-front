@@ -155,8 +155,12 @@ input::placeholder {
   outline: 2px solid #c2a4ed !important;
   outline-offset: -2px;
 }
+.ownership-mark {
+  z-index: 2;
+}
 .catalog-cover {
   position: relative;
+  z-index: 0;
   flex-shrink: 0;
   height: 214px;
   overflow: hidden;
