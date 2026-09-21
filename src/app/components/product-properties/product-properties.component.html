@@ -104,8 +104,8 @@
       </section>
       <div class="releases-section">
         <h2 class="release-header">Релизы</h2>
-        <ul class="list-group list-group-flush">
-          @if ((sortedReleases$ | async); as sorted) {
+        @if ((sortedReleases$ | async); as sorted) {
+          <ul class="list-group list-group-flush">
             @for (release of sorted.highlighted; track release.release_id) {
               <ng-container *ngTemplateOutlet="releaseRow; context: { $implicit: release, highlighted: true }" />
             }
@@ -115,8 +115,16 @@
             @if (!sorted.highlighted.length && !sorted.others.length) {
               <li class="release-empty">Информация о релизах пока отсутствует.</li>
             }
+          </ul>
+          @if (sorted.otherPlatforms.length) {
+            <p class="other-platforms">
+              <span>Также выходила на:</span>
+              @for (platform of sorted.otherPlatforms; track platform.id) {
+                <a [routerLink]="['/products', productProperties.product.id, { platform: platform.id }]">{{ platform.name }}</a>
+              }
+            </p>
           }
-        </ul>
+        }
         <ng-template #releaseRow let-release let-highlighted="highlighted">
           <li class="release-item" [class.owned-item]="release.owned" [class.highlighted-release]="highlighted">
             <div class="release-meta" [class.text-decoration-line-through]="release.release_status === 5">

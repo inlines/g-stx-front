@@ -76,6 +76,40 @@ describe('ProductPropertiesComponent', () => {
     }
   });
 
+
+  it('shows only the selected platform releases and unique released alternatives, reacting to navigation', () => {
+    const params = new BehaviorSubject(convertToParamMap({ platform: '48' }));
+    Object.defineProperty(TestBed.inject(ActivatedRoute), 'paramMap', { value: params, configurable: true });
+    component.ngOnInit();
+    const store = TestBed.inject(Store);
+    store.dispatch(new ProductsActions.LoadProperties(1));
+    TestBed.inject(HttpTestingController).expectOne('/api/products/1').flush({
+      product: { id: 1, name: 'Game', image_url: null },
+      releases: [
+        { release_id: 1, platform_id: 48, platform_name: 'PS4', release_date: 1000 },
+        { release_id: 2, platform_id: 48, platform_name: 'PS4', release_date: 2000 },
+        { release_id: 3, platform_id: 7, platform_name: 'PS1', release_date: 1000 },
+        { release_id: 4, platform_id: 7, platform_name: 'PS1', release_date: 2000 },
+        { release_id: 5, platform_id: 9, platform_name: 'PS3', release_date: null },
+        { release_id: 6, platform_id: 167, platform_name: 'PS5', release_date: 1000, release_status: 5 },
+        { release_id: 7, platform_id: 38, platform_name: 'PSP', release_date: Date.now() + 86400000 },
+      ], screenshots: [], companies: [], franschises: [],
+    });
+    fixture.detectChanges();
+    const root = fixture.nativeElement as HTMLElement;
+    expect(root.querySelectorAll('.release-item')).toHaveLength(2);
+    expect(Array.from(root.querySelectorAll('.release-platform')).map(e => e.textContent)).toEqual(['PS4', 'PS4']);
+    expect(root.querySelectorAll('.other-platforms a')).toHaveLength(1);
+    expect(root.querySelector('.other-platforms a')?.getAttribute('href')).toBe('/products/1;platform=7');
+    params.next(convertToParamMap({ platform: '7' })); fixture.detectChanges();
+    expect(Array.from(root.querySelectorAll('.release-platform')).map(e => e.textContent)).toEqual(['PS1', 'PS1']);
+    expect(root.querySelector('.other-platforms a')?.textContent).toBe('PS4');
+    params.next(convertToParamMap({ platform: '9' })); fixture.detectChanges();
+    expect(root.querySelectorAll('.release-item')).toHaveLength(0);
+    expect(root.querySelector('.release-empty')).not.toBeNull();
+    expect(root.querySelectorAll('.other-platforms a')).toHaveLength(2);
+  });
+
   it('should create', () => {
     expect(component).toBeTruthy();
   });
@@ -480,7 +514,7 @@ describe('ProductPropertiesComponent', () => {
     fixture.detectChanges();
     const dispatch = vi.spyOn(store, 'dispatch').mockReturnValue(of(undefined));
     const rows = fixture.nativeElement.querySelectorAll('.release-item') as NodeListOf<HTMLElement>;
-    expect(rows).toHaveLength(2);
+    expect(rows).toHaveLength(platform ? 1 : 2);
     rows.forEach((row, i) => {
       const buttons = Array.from(row.querySelectorAll('button'));
       const collection = buttons.find((button) => button.textContent?.trim() === 'В коллекцию')!;

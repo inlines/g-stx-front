@@ -98,7 +98,11 @@ export class ProductPropertiesComponent implements OnInit {
   public platformId$!: Observable<number>;
   public similarGames$!: Observable<ISimilarGame[]>;
 
-  public sortedReleases$!: Observable<{ highlighted: IReleaseItem[]; others: IReleaseItem[] }>;
+  public sortedReleases$!: Observable<{
+    highlighted: IReleaseItem[];
+    others: IReleaseItem[];
+    otherPlatforms: { id: number; name: string }[];
+  }>;
 
   public ngOnInit(): void {
     this.platformId$ = this.params.paramMap.pipe(map((params) => Number(params.get('platform') ?? 0)));
@@ -112,13 +116,20 @@ export class ProductPropertiesComponent implements OnInit {
     this.sortedReleases$ = combineLatest([this.releases$, this.platformId$]).pipe(
       map(([releases, platformId]) => {
         if (!platformId || platformId === 0) {
-          return { highlighted: [], others: releases };
+          return { highlighted: [], others: releases, otherPlatforms: [] };
         }
 
         const highlighted = releases.filter((r) => r.platform_id === platformId);
-        const others = releases.filter((r) => r.platform_id !== platformId);
+        const otherPlatforms = Array.from(
+          new Map(
+            releases
+              .filter((r) => r.platform_id !== platformId && r.release_status !== 5 &&
+                r.release_date != null && r.release_date <= Date.now())
+              .map((r) => [r.platform_id, { id: r.platform_id, name: r.platform_name }]),
+          ).values(),
+        );
 
-        return { highlighted, others };
+        return { highlighted, others: [], otherPlatforms };
       }),
     );
 
