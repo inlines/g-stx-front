@@ -41,7 +41,7 @@ export class PlatformState {
   ) {
     ctx.patchState({
       loadPlatformsStatus: RequestStatus.Load,
-      platforms: action.payload,
+      platforms: [...action.payload].sort((a, b) => Number(b.id === 32) - Number(a.id === 32)),
     });
   }
 

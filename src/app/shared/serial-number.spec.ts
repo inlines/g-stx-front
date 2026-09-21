@@ -1,5 +1,12 @@
 import { canonicalSerial, validSerial, displaySerials } from './serial-number';
 describe('Serial format', () => {
+  it('normalizes confirmed Saturn formats without losing region suffixes', () => {
+    for (const [raw, expected] of [['gs9001','GS-9001'], ['t3101g','T-3101G'], ['mk81005-50','MK-81005-50'], ['81005','81005']]) {
+      expect(canonicalSerial(raw)).toBe(expected);
+      expect(validSerial(raw)).toBe(true);
+    }
+    for (const raw of ['GS-900', 'T-3101', 'MK-8100', 'T-3101G-5']) expect(validSerial(raw)).toBe(false);
+  });
   it('normalizes separators and case without losing edition suffixes', () => {
     expect(canonicalSerial(' cusa 02343/H/ITA ')).toBe('CUSA-02343/H/ITA');
     expect(canonicalSerial('ULES‑00718')).toBe('ULES-00718');

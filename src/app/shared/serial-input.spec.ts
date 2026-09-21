@@ -18,7 +18,7 @@ describe('serial input mask', () => {
     expect(validSerial(formatSerialInput('ßES12345'))).toBe(false);
   });
   it('provides valid examples for every active platform', () => {
-    for (const id of [7, 8, 9, 48, 167, 38]) expect(validSerial(serialExample(id))).toBe(true);
+    for (const id of [32, 7, 8, 9, 48, 167, 38]) expect(validSerial(serialExample(id))).toBe(true);
     expect(serialExample(167)).toMatch(/^PPSA-/);
   });
 });

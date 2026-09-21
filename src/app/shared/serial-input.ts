@@ -1,6 +1,8 @@
 /** Examples describe each console without rejecting valid regional prefixes or edition suffixes. */
 export function serialExample(platform: number | null | undefined): string {
   switch (platform) {
+    case 32:
+      return 'GS-9001';
     case 7:
       return 'SCES-00001';
     case 8:
@@ -23,6 +25,7 @@ export function formatSerialInput(value: string, deleting = false): string {
     .replace(/\s/g, '')
     .replace(/[‐‑‒–—−]/g, '-')
     .replace(/[a-z]/g, (letter) => letter.toUpperCase());
+  if (/^(?:T|GS|MK)\d/.test(normalized)) return normalized.replace(/^(T|GS|MK)/, '$1-');
   if (/^LSP\d/.test(normalized)) return normalized.replace(/^LSP/, 'LSP-');
   if (/^[A-Z]{4}\d/.test(normalized)) return normalized.replace(/^([A-Z]{4})/, '$1-');
   if (!deleting && /^(?:[A-Z]{4}|LSP)$/.test(normalized)) return normalized + '-';
