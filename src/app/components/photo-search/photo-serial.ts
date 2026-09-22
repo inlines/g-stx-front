@@ -16,7 +16,7 @@ export function serialPlatform(serial: string): number | null {
   if (/^PPSA-/.test(serial)) return 167;
   if (/^(?:UC|UL)/.test(serial)) return 38;
   if (/^(?:BC|BL|NP)/.test(serial)) return 9;
-  if (/^(?:GS-|MK-|T-|\d)/.test(serial)) return 32;
+  if (/^(?:GS-|MK-|T-)/.test(serial)) return 32;
   // SCES/SLES/SLPS etc. overlap between PS1 and PS2; let the user choose.
   return null;
 }

@@ -29,7 +29,9 @@ export async function decodePhoto(file: File): Promise<HTMLImageElement> {
 }
 
 export async function startOcr(progress: (value: number) => void): Promise<Worker> {
-  const { createWorker, PSM } = await import('tesseract.js');
+  const module = await import('tesseract.js');
+  // Angular's production CommonJS wrapper exposes the API on default.
+  const { createWorker, PSM } = module.default ?? module;
   const worker = await createWorker('eng', 1, {
     workerPath: '/ocr/worker.min.js',
     corePath: '/ocr/core',

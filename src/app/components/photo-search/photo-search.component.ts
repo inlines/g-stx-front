@@ -1,3 +1,4 @@
+import { NinjaSound } from './ninja-sound';
 import { Component, DestroyRef, ElementRef, ViewChild, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -25,6 +26,10 @@ interface Match {
 })
 export class PhotoSearchComponent {
   @ViewChild('preview') preview?: ElementRef<HTMLCanvasElement>;
+  @ViewChild('zoom') zoom?: ElementRef<HTMLCanvasElement>;
+  readonly selected = signal(false);
+  cropWidth = 50;
+  cropHeight = 20;
   readonly platforms = [
     { id: 32, name: 'Saturn' },
     { id: 7, name: 'PS1' },
@@ -39,13 +44,15 @@ export class PhotoSearchComponent {
   readonly hasPhoto = signal(false);
   readonly candidates = signal<string[]>([]);
   readonly matches = signal<Match[]>([]);
+  private recognizedSerial = '';
+  private readonly ninja = new NinjaSound();
   serial = '';
   platform = 0;
   private image?: HTMLImageElement;
   private worker?: Worker;
   private revision = 0;
   private destroyed = false;
-  private start?: { x: number; y: number };
+  private center?: { x: number; y: number };
   private crop?: { x: number; y: number; width: number; height: number };
   private rotation = 0;
   private readonly api = inject(ProductsService);
@@ -55,6 +62,7 @@ export class PhotoSearchComponent {
     inject(DestroyRef).onDestroy(() => {
       this.destroyed = true;
       this.cancel();
+      this.ninja.stop();
     });
   }
   cancel() {
@@ -75,6 +83,8 @@ export class PhotoSearchComponent {
     this.matches.set([]);
     this.candidates.set([]);
     this.serial = '';
+    this.recognizedSerial = '';
+    this.ninja.stop();
     this.platform = 0;
     try {
       const image = await decodePhoto(file);
@@ -82,9 +92,10 @@ export class PhotoSearchComponent {
       this.image = image;
       this.rotation = 0;
       this.crop = undefined;
+      this.selected.set(false);
       this.hasPhoto.set(true);
       this.draw();
-      this.status.set('Выделите код на фото или распознайте весь снимок.');
+      this.status.set('Нажмите «Распознать». Если нужно — коснитесь кода на фото, чтобы увеличить его.');
     } catch (e) {
       if (version === this.revision)
         this.status.set(e instanceof Error ? e.message : 'Не удалось открыть фото. Попробуйте JPEG.');
@@ -109,6 +120,24 @@ export class PhotoSearchComponent {
     ctx.drawImage(image, -w / 2, -h / 2, w, h);
     ctx.restore();
     if (this.crop) {
+      const zoom = this.zoom?.nativeElement;
+      if (zoom) {
+        zoom.width = Math.round(this.crop.width);
+        zoom.height = Math.round(this.crop.height);
+        zoom
+          .getContext('2d')!
+          .drawImage(
+            canvas,
+            this.crop.x,
+            this.crop.y,
+            this.crop.width,
+            this.crop.height,
+            0,
+            0,
+            zoom.width,
+            zoom.height,
+          );
+      }
       ctx.strokeStyle = '#c7a6ff';
       ctx.lineWidth = 5;
       ctx.strokeRect(this.crop.x, this.crop.y, this.crop.width, this.crop.height);
@@ -117,43 +146,41 @@ export class PhotoSearchComponent {
   rotate() {
     this.rotation = (this.rotation + 1) % 4;
     this.crop = undefined;
+    this.selected.set(false);
     this.draw();
   }
   resetCrop() {
     this.crop = undefined;
+    this.selected.set(false);
     this.draw();
   }
-  point(e: PointerEvent) {
-    const c = this.preview!.nativeElement;
-    const r = c.getBoundingClientRect();
-    return {
-      x: Math.max(0, Math.min(c.width, ((e.clientX - r.left) * c.width) / r.width)),
-      y: Math.max(0, Math.min(c.height, ((e.clientY - r.top) * c.height) / r.height)),
-    };
-  }
-  begin(e: PointerEvent) {
+  selectPoint(e: MouseEvent) {
     if (this.busy() || !this.image) return;
-    this.start = this.point(e);
-    this.preview!.nativeElement.setPointerCapture(e.pointerId);
-  }
-  move(e: PointerEvent) {
-    if (!this.start) return;
-    const p = this.point(e);
-    this.crop = {
-      x: Math.min(p.x, this.start.x),
-      y: Math.min(p.y, this.start.y),
-      width: Math.abs(p.x - this.start.x),
-      height: Math.abs(p.y - this.start.y),
+    const c = this.preview!.nativeElement,
+      r = c.getBoundingClientRect();
+    this.center = {
+      x: ((e.clientX - r.left) * c.width) / r.width,
+      y: ((e.clientY - r.top) * c.height) / r.height,
     };
-    this.draw();
+    this.resizeCrop();
   }
-  end() {
-    this.start = undefined;
-    if (this.crop && Math.min(this.crop.width, this.crop.height) < 20) this.crop = undefined;
+  resizeCrop() {
+    if (!this.center || this.busy()) return;
+    const c = this.preview!.nativeElement;
+    const width = (c.width * this.cropWidth) / 100,
+      height = (c.height * this.cropHeight) / 100;
+    this.crop = {
+      x: Math.max(0, Math.min(c.width - width, this.center.x - width / 2)),
+      y: Math.max(0, Math.min(c.height - height, this.center.y - height / 2)),
+      width,
+      height,
+    };
+    this.selected.set(true);
     this.draw();
   }
   choose(code: string) {
     this.serial = code;
+    this.recognizedSerial = this.candidates().includes(code) ? code : '';
     this.platform = serialPlatform(code) ?? 0;
     this.matches.set([]);
   }
@@ -163,6 +190,10 @@ export class PhotoSearchComponent {
     this.busy.set(true);
     this.status.set('Загружаем распознавание…');
     this.matches.set([]);
+    this.candidates.set([]);
+    this.serial = '';
+    this.recognizedSerial = '';
+    this.ninja.stop();
     let worker: Worker | undefined;
     try {
       const selection = this.crop;
@@ -186,17 +217,37 @@ export class PhotoSearchComponent {
       this.worker = worker;
       const result = await worker.recognize(canvas);
       if (version !== this.revision || this.destroyed) return;
-      const codes = photoSerials(result.data.text);
+      let codes = photoSerials(result.data.text);
+      // Light text on dark spines often needs the opposite polarity.
+      if (!codes.some((code) => /[A-Z]/.test(code))) {
+        const ctx = canvas.getContext('2d')!;
+        const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < pixels.data.length; i += 4) {
+          const gray =
+            255 - (pixels.data[i] * 0.299 + pixels.data[i + 1] * 0.587 + pixels.data[i + 2] * 0.114);
+          pixels.data[i] = pixels.data[i + 1] = pixels.data[i + 2] = gray;
+        }
+        ctx.putImageData(pixels, 0, 0);
+        const retry = await worker.recognize(canvas);
+        if (version !== this.revision || this.destroyed) return;
+        const extra = photoSerials(retry.data.text);
+        codes = extra.some((code) => /[A-Z]/.test(code)) ? extra : [...new Set([...codes, ...extra])];
+      }
       this.candidates.set(codes);
       if (codes.length === 1) this.choose(codes[0]);
       this.status.set(
         codes.length
-          ? 'Проверьте код по коробке перед поиском.'
-          : 'Серийник не распознан. Выделите его крупнее, поверните снимок или загрузите другое фото. Можно ввести код вручную.',
+          ? codes.every((code) => /^\d/.test(code))
+            ? 'Прочитаны только цифры. Проверьте, не пропущены ли буквы: коснитесь полного кода и повторите распознавание.'
+            : 'Проверьте код по коробке перед поиском.'
+          : 'Серийник не найден. Коснитесь кода на фото, настройте рамку и повторите. Можно повернуть снимок или ввести код вручную.',
       );
-    } catch {
+    } catch (error) {
+      console.error('Photo OCR failed', error);
       if (version === this.revision)
-        this.status.set('Не удалось распознать фото. Попробуйте ещё раз или введите код вручную.');
+        this.status.set(
+          'Ошибка запуска распознавания. Проверьте соединение и повторите попытку. Это не означает, что код на фото нечитаемый.',
+        );
     } finally {
       void worker?.terminate();
       if (version === this.revision) {
@@ -204,6 +255,11 @@ export class PhotoSearchComponent {
         this.busy.set(false);
       }
     }
+  }
+  editSerial() {
+    this.matches.set([]);
+    this.recognizedSerial = '';
+    this.ninja.stop();
   }
   async search() {
     if (this.busy()) return;
@@ -216,6 +272,7 @@ export class PhotoSearchComponent {
       this.status.set('Выберите консоль с коробки.');
       return;
     }
+    if (this.recognizedSerial === 'BLES-00072' && code === this.recognizedSerial) this.ninja.prepare();
     this.serial = code;
     const platform = this.platform;
     const version = ++this.revision;
@@ -286,6 +343,8 @@ export class PhotoSearchComponent {
         }),
       ),
     );
-    await this.router.navigate(['/products']);
+    if (this.recognizedSerial === 'BLES-00072' && canonicalSerial(this.serial) === this.recognizedSerial)
+      await this.ninja.play();
+    if (!this.destroyed) await this.router.navigate(['/products']);
   }
 }

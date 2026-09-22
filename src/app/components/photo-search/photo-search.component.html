@@ -22,13 +22,37 @@
       <div class="preview" [hidden]="!hasPhoto()">
         <canvas
           #preview
-          aria-label="Фото коробки. Проведите по коду, чтобы выделить область"
-          (pointerdown)="begin($event)"
-          (pointermove)="move($event)"
-          (pointerup)="end()"
-          (pointercancel)="end()"
+          aria-label="Фото коробки. Коснитесь серийника для увеличения"
+          (click)="selectPoint($event)"
         ></canvas>
-        <p>При необходимости обведите код пальцем или мышью. Либо распознайте снимок целиком.</p>
+        <p>
+          Распознайте снимок целиком или коснитесь серийника — рамка появится вокруг места касания. Фото можно
+          свободно прокручивать.
+        </p>
+        <div [hidden]="!selected()" class="crop-controls">
+          <label
+            >Ширина рамки<input
+              type="range"
+              min="10"
+              max="100"
+              step="1"
+              [(ngModel)]="cropWidth"
+              (ngModelChange)="resizeCrop()"
+              [disabled]="busy()"
+          /></label>
+          <label
+            >Высота рамки<input
+              type="range"
+              min="5"
+              max="100"
+              step="1"
+              [(ngModel)]="cropHeight"
+              (ngModelChange)="resizeCrop()"
+              [disabled]="busy()"
+          /></label>
+          <canvas #zoom class="zoom" aria-label="Увеличенная область распознавания"></canvas>
+          <small>В рамку должны входить все буквы и цифры с небольшим отступом.</small>
+        </div>
         <div class="actions">
           <button type="button" (click)="rotate()" [disabled]="busy()">Повернуть ↻</button
           ><button type="button" (click)="resetCrop()" [disabled]="busy()">Весь снимок</button
@@ -52,9 +76,9 @@
           id="photo-serial"
           name="serial"
           [(ngModel)]="serial"
-          (ngModelChange)="matches.set([])"
+          (ngModelChange)="editSerial()"
           [disabled]="busy()"
-          placeholder="BLES-00072"
+          placeholder="Введите серийник"
           autocomplete="off"
           autocapitalize="characters"
           spellcheck="false"

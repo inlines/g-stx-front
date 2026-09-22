@@ -1,3 +1,4 @@
+import { NinjaSound } from './ninja-sound';
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { Store } from '@ngxs/store';
@@ -36,4 +37,24 @@ describe('Photo search navigation', () => {
     expect(navigate).toHaveBeenCalledWith(['/products']);
     fixture.destroy();
   });
+});
+
+describe('Photo-only easter egg', () => {
+  for (const mode of ['photo','manual','edited'] as const) {
+    it(`handles ${mode} serial input without confusing its origin`, async () => {
+      const play=vi.spyOn(NinjaSound.prototype,'play').mockResolvedValue(undefined);
+      TestBed.configureTestingModule({providers:[
+        {provide:Store,useValue:{dispatch:()=>of(undefined)}},
+        {provide:Router,useValue:{navigate:()=>Promise.resolve(true)}},
+        {provide:ProductsService,useValue:{}},
+      ]});
+      const fixture=TestBed.createComponent(PhotoSearchComponent), component=fixture.componentInstance;
+      if(mode !== 'manual'){component.candidates.set(['BLES-00072']);component.choose('BLES-00072');}
+      else component.serial='BLES00072';
+      if(mode === 'edited')component.editSerial();
+      await component.open({name:'Ninja Gaiden Sigma',platform:9,region:'europe',group:'europe'});
+      expect(play).toHaveBeenCalledTimes(mode === 'photo' ? 1 : 0);
+      fixture.destroy();play.mockRestore();
+    });
+  }
 });

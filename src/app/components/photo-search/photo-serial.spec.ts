@@ -16,6 +16,7 @@ describe('Printed box serial recognition', () => {
   it('does not guess OCR substitutions or turn EAN digits into serials', () => {
     expect(photoSerials('BLES O0072 5021290030961')).toEqual([]);
     expect(serialPlatform('SCES-00001')).toBeNull();
+    expect(serialPlatform('00072')).toBeNull();
   });
   it('uses exact release serial and platform, never another regional row', () => {
     const rows = [
