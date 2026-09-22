@@ -48,6 +48,7 @@
             @if ((badges.admins$ | async)?.includes((currentUser$ | async) ?? '')) {
               <a class="text-white d-flex align-items-center" routerLink="/unknown" routerLinkActive="nav-active">Unknown</a>
             }
+            <a class="text-white d-flex align-items-center" routerLink="/photo-search" routerLinkActive="nav-active">По фото</a>
             <!-- Кнопка "Каталог" -->
             <a class="nav-link text-white d-flex align-items-center" routerLink="/products" routerLinkActive="nav-active" [routerLinkActiveOptions]="{exact: true}">
               Каталог

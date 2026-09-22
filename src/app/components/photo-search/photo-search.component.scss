@@ -1,0 +1,134 @@
+:host {
+  display: block;
+}
+.photo-search {
+  max-width: 1050px;
+  margin: 24px auto;
+  padding: 0 16px;
+  color: #d6e3ef;
+}
+.layout {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(0, 1.7fr);
+  gap: 32px;
+  margin-top: 24px;
+}
+.controls,
+aside {
+  min-width: 0;
+}
+aside {
+  background: #0b1c29;
+  padding: 20px;
+  border-radius: 12px;
+  align-self: start;
+}
+.hint,
+small {
+  color: #abc4d8;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+.hint {
+  margin-top: 16px;
+}
+.upload {
+  display: block;
+  border: 1px dashed #bba0e4;
+  border-radius: 8px;
+  padding: 16px;
+}
+input[type='file'] {
+  display: block;
+  margin-top: 12px;
+  max-width: 100%;
+  font-size: 0.85rem;
+}
+.preview {
+  margin-top: 20px;
+}
+.preview canvas {
+  display: block;
+  max-width: 100%;
+  max-height: 440px;
+  width: auto;
+  height: auto;
+  margin: auto;
+  touch-action: none;
+  border: 1px solid #5c7385;
+}
+.preview p {
+  font-size: 0.9rem;
+  margin-top: 10px;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+button,
+input,
+select {
+  font: inherit;
+}
+button {
+  padding: 10px 14px;
+  border: 1px solid #697b91;
+  border-radius: 8px;
+  background: #142938;
+  color: #e4eaf2;
+  min-height: 44px;
+  cursor: pointer;
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+.primary {
+  background: #68a9ef;
+  color: #081722;
+  border-color: #68a9ef;
+}
+form {
+  display: grid;
+  gap: 10px;
+  margin-top: 20px;
+}
+form input,
+select {
+  min-width: 0;
+  width: 100%;
+  padding: 12px;
+  background: #081722;
+  color: #e4eaf2;
+  border: 1px solid #697b91;
+  border-radius: 8px;
+}
+form button {
+  margin-top: 4px;
+}
+.match {
+  display: block;
+  width: 100%;
+  text-align: left;
+  margin-top: 12px;
+  overflow-wrap: anywhere;
+}
+[hidden] {
+  display: none !important;
+}
+@media (max-width: 650px) {
+  .layout {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .photo-search {
+    padding: 0 12px;
+  }
+  aside {
+    padding: 12px;
+  }
+  .preview canvas {
+    max-height: 380px;
+  }
+}

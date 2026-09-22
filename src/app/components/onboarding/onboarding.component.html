@@ -37,6 +37,7 @@
         ><small>ДЕМОНСТРАЦИЯ</small>
       </div>
       <div class="scene">
+        @if(scene() === 10){<app-spine-guide/>}
         @if(scene() === 8 || scene() === 9){<app-onboarding-catalog [mode]="scene() === 8 ? 'filters' : 'paging'" [phase]="phase()" (effect)="sound($event)"/>}
         @if(scene() === 0){<app-onboarding-catalog mode="search" [phase]="phase()"/>}
         @if (scene() > 0 && scene() < 5 && scene() !== 2) {

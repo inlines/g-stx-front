@@ -1,3 +1,4 @@
+import { SpineGuideComponent } from '../photo-search/spine-guide.component';
 import { OnboardingCatalogComponent } from '../onboarding-catalog/onboarding-catalog.component';
 import {
   ChangeDetectionStrategy,
@@ -16,7 +17,7 @@ import { ICollectionItem } from '@app/states/collection/interfaces/collection-it
 @Component({
   selector: 'app-onboarding',
   standalone: true,
-  imports: [OnboardingCatalogComponent, ReleaseCardComponent],
+  imports: [SpineGuideComponent,OnboardingCatalogComponent, ReleaseCardComponent],
   templateUrl: './onboarding.component.html',
   styleUrl: './onboarding.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -111,6 +112,7 @@ export class OnboardingComponent implements OnInit, OnDestroy {
         'Новая страница и её номер появляются вместе. Свайп не открывает карточку, а вертикальное движение прокручивает список.',
       scene: 9,
     },
+    { name: 'По фото', title: 'Найдите игру по торцу коробки', text: 'Откройте «По фото». Снимите напечатанный серийник прямо, крупно и без бликов. Загрузите фото, при необходимости поверните его и выделите код. Нажмите «Распознать», проверьте буквы и цифры и выберите консоль. Если текст не читается — загрузите другой снимок или введите код вручную.', action: 'Найти по коду', result: 'Каталог откроется с названием найденной игры, консолью и регионом её релиза — можно сразу открыть карточку. При нескольких совпадениях сначала выберите подходящий регион. Штрихкод без напечатанного серийника не используется.', scene: 10 },
     ...this.originalSteps.slice(1).map((step, i) => ({ ...step, scene: i + 1 })),
   ];
   scene() {

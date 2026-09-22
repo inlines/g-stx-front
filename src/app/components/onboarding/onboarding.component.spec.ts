@@ -26,6 +26,7 @@ describe('Safe interactive tutorial', () => {
       'Каталог',
       'Фильтры',
       'Листание',
+      'По фото',
       'Коллекция',
       'Заявки',
       'Вишлист',
@@ -56,7 +57,7 @@ describe('Safe interactive tutorial', () => {
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('app-onboarding-catalog a')).toBeNull();
     const component = fixture.componentInstance;
-    component.select(4);
+    component.select(5);
     component.chooseRequest('name');
     component.demonstrate();
     fixture.detectChanges();
@@ -67,7 +68,7 @@ describe('Safe interactive tutorial', () => {
     fixture.detectChanges();
     expect(fixture.nativeElement.textContent).toContain('CUSA-01234');
     component.select(-1);
-    expect(component.index()).toBe(4);
+    expect(component.index()).toBe(5);
   });
   it('plays navigation feedback only when changing the slide', () => {
     const fixture = TestBed.createComponent(OnboardingComponent);
@@ -80,7 +81,7 @@ describe('Safe interactive tutorial', () => {
     expect(component.playNavigationSound).not.toHaveBeenCalled();
     component.next();
     component.select(0);
-    component.select(9);
+    component.select(10);
     expect(component.playNavigationSound).toHaveBeenCalledTimes(3);
     component.next();
     expect(component.playNavigationSound).toHaveBeenCalledTimes(3);

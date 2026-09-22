@@ -1,0 +1,89 @@
+<section class="photo-search">
+  <h1>Поиск по фото</h1>
+  <p>
+    Сфотографируйте серийник на торце коробки. Мы прочитаем код и найдём игру, платформу и регион в каталоге.
+  </p>
+  <div class="layout">
+    <aside>
+      <app-spine-guide />
+      <p class="hint">
+        Распознаётся напечатанный серийник, а не штрихкод. Если код стёрт или закрыт наклейкой, сделайте фото
+        другого места, где он указан.
+      </p>
+    </aside>
+    <div class="controls">
+      <label class="upload"
+        >Сделать фото или выбрать файл<input
+          type="file"
+          accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif"
+          (change)="upload($event)"
+      /></label>
+      <small>JPEG, PNG, WebP, HEIC · до 20 МБ. Фото обрабатывается на вашем устройстве.</small>
+      <div class="preview" [hidden]="!hasPhoto()">
+        <canvas
+          #preview
+          aria-label="Фото коробки. Проведите по коду, чтобы выделить область"
+          (pointerdown)="begin($event)"
+          (pointermove)="move($event)"
+          (pointerup)="end()"
+          (pointercancel)="end()"
+        ></canvas>
+        <p>При необходимости обведите код пальцем или мышью. Либо распознайте снимок целиком.</p>
+        <div class="actions">
+          <button type="button" (click)="rotate()" [disabled]="busy()">Повернуть ↻</button
+          ><button type="button" (click)="resetCrop()" [disabled]="busy()">Весь снимок</button
+          ><button type="button" class="primary" (click)="recognize()" [disabled]="busy()">Распознать</button>
+        </div>
+      </div>
+      <p role="status" aria-live="polite">{{ status() }}</p>
+      @if (busy()) {
+        <button type="button" (click)="cancel()">Отменить</button>
+      }
+      @if (candidates().length > 1) {
+        <div class="actions">
+          @for (code of candidates(); track code) {
+            <button type="button" (click)="choose(code)" [disabled]="busy()">{{ code }}</button>
+          }
+        </div>
+      }
+      <form (ngSubmit)="search()">
+        <label for="photo-serial">Серийник — проверьте по коробке</label>
+        <input
+          id="photo-serial"
+          name="serial"
+          [(ngModel)]="serial"
+          (ngModelChange)="matches.set([])"
+          [disabled]="busy()"
+          placeholder="BLES-00072"
+          autocomplete="off"
+          autocapitalize="characters"
+          spellcheck="false"
+          maxlength="40"
+        />
+        <label for="photo-platform">Консоль</label>
+        <select
+          id="photo-platform"
+          name="platform"
+          [(ngModel)]="platform"
+          (ngModelChange)="matches.set([])"
+          [disabled]="busy()"
+        >
+          <option [ngValue]="0">Выберите консоль</option>
+          @for (p of platforms; track p.id) {
+            <option [ngValue]="p.id">{{ p.name }}</option>
+          }
+        </select>
+        <button class="primary" type="submit" [disabled]="busy()">Найти в каталоге</button>
+      </form>
+      @for (match of matches(); track $index) {
+        <button type="button" class="match" (click)="open(match)">
+          {{ match.name }} · {{ match.region }}
+        </button>
+      }
+      <p class="hint">
+        Каталог откроется с названием игры, консолью и регионом найденного релиза. Если совпадений несколько,
+        выберите свой. Worldwide попадёт в группу «Другие».
+      </p>
+    </div>
+  </div>
+</section>

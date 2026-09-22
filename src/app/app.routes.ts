@@ -5,6 +5,7 @@ import { ProductPropertiesResolver } from '@app/resolvers/product-properties.res
 import { CollectorPropertiesResolver } from './resolvers/collector-properties.resolver';
 
 export const routes: Routes = [
+  { path: 'photo-search', loadComponent: () => import('./components/photo-search/photo-search.component').then(m => m.PhotoSearchComponent) },
   { path: 'unknown', canActivate: [authGuard, adminGuard], loadComponent: () => import('./components/unknown/unknown.component').then(m => m.UnknownComponent) },
   {
     path: 'kudos-challenge',

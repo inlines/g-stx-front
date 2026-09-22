@@ -20,20 +20,46 @@
             "outputPath": "dist/game-stockx",
             "index": "src/index.html",
             "browser": "src/main.ts",
-            "polyfills": ["zone.js", "@angular/localize/init"],
+            "polyfills": [
+              "zone.js",
+              "@angular/localize/init"
+            ],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "worker.min.js*",
+                "input": "node_modules/tesseract.js/dist",
+                "output": "ocr"
+              },
+              {
+                "glob": "*.wasm*",
+                "input": "node_modules/tesseract.js-core",
+                "output": "ocr/core"
+              },
+              {
+                "glob": "eng.traineddata.gz",
+                "input": "node_modules/@tesseract.js-data/eng/4.0.0",
+                "output": "ocr/lang"
               }
             ],
-            "styles": ["src/styles/bootstrap.scss", "src/styles.scss"],
+            "styles": [
+              "src/styles/bootstrap.scss",
+              "src/styles.scss"
+            ],
             "scripts": [],
             "stylePreprocessorOptions": {
               "sass": {
-                "silenceDeprecations": ["import", "global-builtin", "color-functions", "if-function"]
+                "silenceDeprecations": [
+                  "import",
+                  "global-builtin",
+                  "color-functions",
+                  "if-function"
+                ]
               }
             }
           },
@@ -76,8 +102,14 @@
               "aot": false,
               "optimization": false,
               "extractLicenses": false,
-              "styles": ["src/styles.scss"],
-              "polyfills": ["zone.js", "zone.js/testing", "@angular/localize/init"]
+              "styles": [
+                "src/styles.scss"
+              ],
+              "polyfills": [
+                "zone.js",
+                "zone.js/testing",
+                "@angular/localize/init"
+              ]
             }
           },
           "defaultConfiguration": "production"
