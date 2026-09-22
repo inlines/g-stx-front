@@ -84,13 +84,14 @@
             </svg>
           </span>
         }
+        <!-- Load every cover on this bounded page, including rows below the viewport. -->
         <div
           class="catalog-cover"
           >
           @if (product.image_url) {
             <img
               [src]="product.image_url"
-              [attr.loading]="cardIndex < 2 ? 'eager' : 'lazy'" decoding="async"
+              loading="eager" decoding="sync"
               [attr.fetchpriority]="cardIndex === 0 ? 'high' : 'auto'"
               [alt]="product.name"
               class="img-fluid"

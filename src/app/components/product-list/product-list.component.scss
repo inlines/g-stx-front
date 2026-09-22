@@ -158,8 +158,7 @@ input::placeholder {
 .ownership-mark {
   z-index: 2;
 }
-// Keep the image in normal flow: a clipped, positioned stacking layer can
-// leave already-loaded lazy images unpainted until the card is hovered.
+// Reserve cover space independently of image dimensions and loading state.
 .catalog-cover {
   display: grid;
   grid-template: minmax(0, 1fr) / minmax(0, 1fr);
