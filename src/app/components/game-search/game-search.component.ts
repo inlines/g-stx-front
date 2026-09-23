@@ -49,7 +49,7 @@ export class GameSearchComponent implements ControlValueAccessor {
     this.focus();
   }
   focus(): void {
-    this.input?.nativeElement.focus();
+    this.input?.nativeElement.focus({ preventScroll: true });
   }
   writeValue(value: string | null): void {
     this.value = value ?? '';

@@ -1,3 +1,4 @@
+import { ListScrollService } from '@app/shared/list-scroll.service';
 import { LibraryPageService, LibraryPage } from '@app/shared/library-page.service';
 import { HorizontalFiltersDirective } from '@app/directives/horizontal-filters.directive';
 import { scrollToContent } from '@app/shared/scroll-to-content';
@@ -20,7 +21,7 @@ import { CollectorsService } from '@app/states/collectors/services/collectors.se
 import { unixMilliseconds } from '@app/shared/collection-filter';
 import { ICollectionItem } from '@app/states/collection/interfaces/collection-item.interface';
 import { AsyncPipe } from '@angular/common';
-import { afterNextRender, ElementRef, Injector, ViewChild, ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { afterNextRender, DestroyRef, ElementRef, Injector, ViewChild, ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { RequestStatus } from '@app/constants/request-status.const';
 import { LibraryViewService } from '@app/shared/library-view.service';
@@ -55,15 +56,17 @@ export class CollectorPropertiesComponent {
   private readonly views = inject(LibraryViewService);
   private readonly changes = new BehaviorSubject<void>(undefined);
   private readonly service = inject(LibraryPageService);
+  private readonly restoreScroll = inject(ListScrollService).attach(inject(DestroyRef), this.injector);
   private pendingScroll=false;
   private contextKey='';
   private lastPage:LibraryPage={items:[],total_count:0,unfiltered_total:0,platform_ids:[],owned_regions:{}};
-  private readonly selectedTab = new BehaviorSubject<'collection' | 'wts'>('collection');
+  private readonly selectedTab = new BehaviorSubject<'collection' | 'wts'>(this.views.collectorTabs.get(this.store.selectSnapshot(CollectorsState.collectionPropertiesLogin) ?? '') ?? 'collection');
   private readonly reload = new BehaviorSubject(0);
   get tab() {
     return this.selectedTab.value;
   }
   selectTab(tab: 'collection' | 'wts'): void {
+    this.views.collectorTabs.set(this.store.selectSnapshot(CollectorsState.collectionPropertiesLogin) ?? '', tab);
     if (this.tab !== tab) this.selectedTab.next(tab);
   }
   readonly vm$=combineLatest([this.store.select(CollectorsState.collectionPropertiesLogin),this.selectedTab,this.changes,this.reload,this.store.select(PlatformState.loadedPlatforms)]).pipe(
@@ -88,7 +91,7 @@ export class CollectorPropertiesComponent {
         regions:view.regions,sort:view.sort,regionTotals:platformRegionCounts(platforms.find(p=>p.id===view.platform)),ownedRegions:data.owned_regions,
         offset:(view.page-1)*view.size,page:view.page,size:view.size,items:data.items.map(item=>({...item,platformId:item.platform_id??null})),loading,failed};
     }),
-    tap(vm=>{if(!vm.loading&&!vm.failed&&this.pendingScroll){this.pendingScroll=false;afterNextRender(()=>scrollToContent(this.results?.nativeElement),{injector:this.injector});}}),
+    tap(vm=>{if(!vm.loading&&!vm.failed&&this.restoreScroll()){this.pendingScroll=false;return;}if(!vm.loading&&!vm.failed&&this.pendingScroll){this.pendingScroll=false;afterNextRender(()=>scrollToContent(this.results?.nativeElement),{injector:this.injector});}}),
     shareReplay({bufferSize:1,refCount:true}),
   );
   sort(value: string): void {

@@ -14,6 +14,7 @@ export interface LibraryView {
 }
 @Injectable({ providedIn: 'root' })
 export class LibraryViewService {
+  readonly collectorTabs = new Map<string, 'collection' | 'wts'>();
   private views = new Map<string, LibraryView>();
   get(kind: LibraryKind | `collector:${string}` | `collector-wts:${string}`): LibraryView {
     if (!this.views.has(kind))

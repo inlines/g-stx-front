@@ -1,3 +1,4 @@
+import { ListScrollService } from '@app/shared/list-scroll.service';
 import { GameCardComponent } from '../game-card/game-card.component';
 import { HorizontalFiltersDirective } from '@app/directives/horizontal-filters.directive';
 import { scrollToContent } from '@app/shared/scroll-to-content';
@@ -76,6 +77,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
     );
   private readonly destroyRef = inject(DestroyRef);
   private readonly injector = inject(Injector);
+  private readonly restoreScroll = inject(ListScrollService).attach(this.destroyRef, this.injector);
   private pendingPageOffset: number | null = null;
   @ViewChild('results') results?: ElementRef<HTMLElement>;
   @ViewChild('query') query?: GameSearchComponent;
@@ -223,6 +225,12 @@ export class ProductListComponent implements OnInit, AfterViewInit {
         this.queryForm.controls.skipDigitalFilter.setValue(this.unknown || (params.ignore_digital ?? true), {emitEvent:false});
         this.queryForm.controls.includeUnreleased.setValue(params.include_unreleased ?? false, {emitEvent:false});
         this.store.dispatch(new ProductsActions.LoadList());
+      });
+    combineLatest([this.loading$, this.failed$, this.displayedParams$])
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(([loading, failed, displayed]) => {
+        if (!loading && !failed && sameListParams(displayed, this.store.selectSnapshot(ProductsState.productsParams)))
+          this.restoreScroll();
       });
   }
 

@@ -1,3 +1,4 @@
+import { ListScrollService } from '@app/shared/list-scroll.service';
 import { LibraryPageService, LibraryPage, LibraryRequest } from '@app/shared/library-page.service';
 import { HorizontalFiltersDirective } from '@app/directives/horizontal-filters.directive';
 import { scrollToContent } from '@app/shared/scroll-to-content';
@@ -102,7 +103,7 @@ export class PersonalLibraryComponent implements OnInit, OnDestroy {
   readonly busy$ = this.store.select(CollectionState.collectionChanging);
   editing: ICollectionItem | null = null;
   vm$!: ReturnType<PersonalLibraryComponent['createView']>;
-  private restoring = true;
+  private readonly restoreScroll = inject(ListScrollService).attach(this.destroyRef, this.injector);
   private snowOpening = false;
   private snowDialog?: ReturnType<NgbModal['open']>;
   ngOnInit(): void {
@@ -137,9 +138,11 @@ export class PersonalLibraryComponent implements OnInit, OnDestroy {
           start:(this.view.page-1)*this.view.size,pages,page:this.view.page,pageItems:buildPages(pages,this.view.page,1),loading,failed,ready:!loading&&!failed};
       }),
       tap(vm=>{
-        if(vm.ready&&(this.restoring||this.pendingScroll)){
-          const restoring=this.restoring;this.restoring=false;this.pendingScroll=false;
-          afterNextRender(()=>restoring?window.scrollTo({top:this.view.scroll}):scrollToContent(this.results?.nativeElement),{injector:this.injector});
+        if(vm.ready){
+          if (this.restoreScroll()) { this.pendingScroll=false; return; }
+          if (!this.pendingScroll) return;
+          this.pendingScroll=false;
+          afterNextRender(()=>scrollToContent(this.results?.nativeElement),{injector:this.injector});
         }
       }),shareReplay({bufferSize:1,refCount:true}),
     );
@@ -297,7 +300,6 @@ export class PersonalLibraryComponent implements OnInit, OnDestroy {
   }
   ngOnDestroy(): void {
     this.snowDialog?.close();
-    if (this.view) this.view.scroll = window.scrollY;
     this.modal.dismissAll();
   }
 }
