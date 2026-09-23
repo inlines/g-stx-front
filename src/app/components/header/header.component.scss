@@ -117,7 +117,7 @@ summary:focus-visible, .nav-submenu a:focus-visible, .nav-submenu button:focus-v
 @media (max-width:767px) {
   .header-top { min-height:64px; padding:10px 0; }
   .main-navigation { position:fixed; z-index:1040; bottom:0; left:0; right:0; border-top:1px solid #405266; padding-bottom:env(safe-area-inset-bottom); background:#0b1b29f5; }
-  .nav-items { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:0; min-height:64px; padding:0 4px; }
+  .nav-items { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:0; min-height:64px; padding:0 4px; }
   .nav-items > a, summary { flex-direction:column; justify-content:center; gap:4px; min-height:64px; font-size:11px; line-height:1.2; padding:8px 2px; border-radius:10px; }
   .nav-items > a app-nav-icon, summary app-nav-icon { display:inline-flex; }
   .nav-items > .desktop-extra, .chevron { display:none; }
@@ -126,4 +126,19 @@ summary:focus-visible, .nav-submenu a:focus-visible, .nav-submenu button:focus-v
   .nav-folder[open] summary, .nav-items > .nav-active { background:#2b2640; color:#cdb5f5; }
   .nav-submenu { position:absolute; top:auto; bottom:calc(100% + 8px); right:8px; left:8px; max-height:60dvh; overflow:auto; border-radius:18px; }
   :host-context(.photo-mode) .header-top { display:none !important; }
+}
+
+@media(min-width:768px) {
+  .nav-folder { height:48px; margin:0; padding:0; align-self:center; }
+  .nav-folder summary { height:48px; margin:0; padding:0; line-height:20px; box-sizing:border-box; }
+  .nav-submenu { top:calc(100% + 8px); z-index:1; }
+}
+
+.mobile-chat { display:none; }
+@media(max-width:767px) {
+  .chat-entry { display:none; }
+  .mobile-chat { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; padding:8px 2px; min-height:64px; min-width:0; border:0; border-radius:10px; background:transparent; color:#e4edf6; font-size:11px; line-height:1.2; }
+  .mobile-chat:focus-visible { outline:2px solid #c2a4ed; outline-offset:-3px; }
+  .mobile-chat-icon { position:relative; display:flex; }
+  .mobile-chat-badge { position:absolute; top:-5px; left:16px; padding:1px 4px; min-width:16px; border-radius:10px; background:#c2a4ed; color:#102231; font-size:10px; line-height:14px; font-weight:700; }
 }

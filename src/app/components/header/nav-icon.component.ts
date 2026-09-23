@@ -24,6 +24,7 @@ export class NavIconComponent {
     players:
       'M10 7a3 3 0 1 1-6 0 3 3 0 0 1 6 0 M20 7a3 3 0 1 1-6 0 3 3 0 0 1 6 0 M1 21v-3a6 6 0 0 1 12 0v3 M15 13a6 6 0 0 1 8 5v3',
     mine: 'M4 4h16v17H4z M8 1v6 M16 1v6 M8 12h8 M8 16h5',
+    chat: 'M21 11a9 8 0 0 1-9 8c-1.5 0-3-.3-4.3-.9L3 21l1.2-5A7.4 7.4 0 0 1 3 11a9 8 0 1 1 18 0z',
     more: 'M4 11h2v2H4z M11 11h2v2h-2z M18 11h2v2h-2z',
   };
 }

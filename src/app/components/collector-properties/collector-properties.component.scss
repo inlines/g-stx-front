@@ -15,3 +15,8 @@
 .platform-filters { flex-wrap: wrap; }
 
 .release-grid { scroll-margin-top: 12px; }
+
+@media(max-width:767px) {
+  .platform-filters { flex-wrap:nowrap; overflow-x:auto; overscroll-behavior-x:contain; scrollbar-width:thin; padding:3px 0 6px; }
+  .platform-filters button { flex:0 0 auto; white-space:nowrap; }
+}

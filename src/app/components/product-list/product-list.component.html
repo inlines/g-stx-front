@@ -5,7 +5,7 @@
       <div class="px-3">
         <div #stickerContent class="stickerContent">
           <form [formGroup]="queryForm" class="position-relative">
-          <ul class="catalog-platforms" aria-label="Платформы">
+          <ul horizontalFilters class="catalog-platforms" aria-label="Платформы">
             @for (cat of (categories$ | async); track cat.id) {
               <li><button type="button" class="btn-pink" [class.active]="activeCategory === cat.id"
                 [attr.aria-pressed]="activeCategory === cat.id" (click)="setActiveCategory(cat.id)">
@@ -17,7 +17,7 @@
           <app-region-filters [unknown]="unknown" [unidentified]="(unknownRegionCounts$ | async) ?? {}" [selected]="selectedRegions" [totals]="((unknown ? unknownRegionTotals$ : selectedRegionCounts$) | async) ?? {}" (regionToggle)="toggleRegion($event)"/>
           }
           <details class="extra-filters">
-            <summary>Мультиплеер и жанр <span class="filter-count" aria-live="polite">Выбрано: {{ (queryForm.controls.localMultiplayer.value ? 1 : 0) + (queryForm.controls.onlineMultiplayer.value ? 1 : 0) + (queryForm.controls.genre.value ? 1 : 0) }}</span></summary>
+            <summary>Фильтры · <span class="filter-count" aria-live="polite"> {{ (queryForm.controls.localMultiplayer.value ? 1 : 0) + (queryForm.controls.onlineMultiplayer.value ? 1 : 0) + (queryForm.controls.genre.value ? 1 : 0) + (!unknown && queryForm.controls.skipDigitalFilter.value ? 1 : 0) + (queryForm.controls.includeUnreleased.value ? 1 : 0) }}</span></summary>
             <div class="extra-filter-content">
               <fieldset class="multiplayer-filters">
                 <legend>Мультиплеер на выбранной платформе</legend>
@@ -30,10 +30,6 @@
                   @for (genre of genres$ | async; track genre.id) { <option [ngValue]="genre.id">{{ genre.name }}</option> }
                 </select>
               </label>
-              @if (genresFailed) { <span class="text-warning" role="status">Не удалось загрузить жанры. Обновите страницу, чтобы повторить.</span> }
-            </div>
-          </details>
-          <div class="catalog-options">
             @if (!unknown) {
             <label class="digital-option" for="onlyDigitalSwitch">
               <input type="checkbox" id="onlyDigitalSwitch" formControlName="skipDigitalFilter" />
@@ -41,10 +37,14 @@
             </label>
             }
             <label class="digital-option">
-              <input type="checkbox" formControlName="includeUnreleased" aria-describedby="release-filter-help" />
+              <input type="checkbox" formControlName="includeUnreleased" />
               <span>Показывать невышедшие игры</span>
             </label>
-            <label class="catalog-sort">Сортировка
+              @if (genresFailed) { <span class="text-warning" role="status">Не удалось загрузить жанры. Обновите страницу, чтобы повторить.</span> }
+            </div>
+          </details>
+          <div class="catalog-options">
+            <label class="catalog-sort sort-compact"><span>Сортировка</span>
               <select class="form-select" formControlName="sort">
                 <option value="name">По названию</option><option value="date">По дате</option><option value="rating">По рейтингу ↓</option>
               </select>

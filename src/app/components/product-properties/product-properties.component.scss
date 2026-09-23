@@ -133,10 +133,12 @@
   max-width: 100%;
   min-height: 44px;
   box-sizing: border-box;
-  padding: 12px 0;
+  padding: 0;
+  align-content: center;
+  border-radius: 6px;
   color: #c2a4ed;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 13px;
 }
 .serials ul {
   display: grid;
@@ -302,7 +304,6 @@
   }
 }
 
-.names-heading { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; justify-content: space-between; }
 .kudos-link {
   display: inline-flex;
   align-items: center;
@@ -337,7 +338,6 @@
 .game-multiplayer {margin-bottom:24px;color:#c5daed}
 .game-multiplayer h2,.similar-heading h2 {font-size:22px;color:#fff;margin:0 0 12px}
 .multiplayer-row {display:flex;gap:8px 18px;flex-wrap:wrap;padding:12px 0;border-bottom:1px solid #314155;font-size:14px}
-.multiplayer-row strong {flex-basis:100%}
 .similar-section {min-width:0;margin-top:24px;color:#a9bbce}
 .similar-heading {display:flex;align-items:center;justify-content:space-between;gap:12px}
 .similar-heading button {width:44px;min-height:44px;margin-left:6px;border:1px solid #6a5690;border-radius:8px;background:#272237;color:#e4d4ff;font-size:22px;cursor:pointer}

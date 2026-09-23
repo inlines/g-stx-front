@@ -291,3 +291,8 @@ input::placeholder {
 .library-heading .collection-secret { min-width: 44px; padding: 0 8px; background: transparent; border: 0; color: #c7abea; font-size: 25px; vertical-align: baseline; }
 
 .release-grid { scroll-margin-top: 12px; }
+
+@media(max-width:767px) {
+  .platforms { flex-wrap:nowrap; overflow-x:auto; overscroll-behavior-x:contain; scrollbar-width:thin; padding:3px 0 6px; }
+  .platforms button { flex:0 0 auto; white-space:nowrap; }
+}

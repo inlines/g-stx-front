@@ -1,3 +1,4 @@
+import { MobilePageLockDirective } from './directives/mobile-page-lock.directive';
 import { OnboardingService } from './services/onboarding.service';
 import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
@@ -18,6 +19,7 @@ import { PlatformsActions } from './states/platforms/states/platforms-actions';
   selector: 'app-root',
   imports: [
     RouterOutlet,
+    MobilePageLockDirective,
     HeaderComponent,
     ToastContainerComponent,
     FooterComponent,

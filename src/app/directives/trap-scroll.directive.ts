@@ -45,7 +45,7 @@ export class TrapScrollDirective implements OnInit, OnChanges, OnDestroy {
 
   ngOnInit(): void {
     this.zone.runOutsideAngular(() => {
-      this.element.addEventListener('wheel', this.handleEvent, false);
+      this.element.addEventListener('wheel', this.handleEvent, { passive: false });
       this.element.addEventListener('keydown', this.handleEvent, false);
       this.element.addEventListener('touchstart', this.handleTouchStart, false);
       this.element.addEventListener('touchmove', this.handleTouchMove, { passive: false });
@@ -58,7 +58,8 @@ export class TrapScrollDirective implements OnInit, OnChanges, OnDestroy {
   };
 
   private handleTouchMove = (event: TouchEvent): void => {
-    if (!this.trapScroll) return;
+    if (!this.trapScroll || event.touches.length !== 1) return;
+    if ((event.target as HTMLElement).closest?.('input[type=range]')) return;
 
     const touchY = event.touches[0].clientY;
     const deltaY = touchY - this.touchStartY;
@@ -145,10 +146,7 @@ export class TrapScrollDirective implements OnInit, OnChanges, OnDestroy {
   }
 
   private isScrollableElement(element: HTMLElement): boolean {
-    if (getComputedStyle(element).overflowY === 'hidden') {
-      return false;
-    }
-    return element.scrollHeight !== element.clientHeight;
+    return /^(auto|scroll|overlay)$/.test(getComputedStyle(element).overflowY) && element.scrollHeight > element.clientHeight + 1;
   }
 
   private isScrolledInMaxDirection(element: HTMLElement, direction: Direction): boolean {
@@ -159,11 +157,11 @@ export class TrapScrollDirective implements OnInit, OnChanges, OnDestroy {
   }
 
   private isScrolledToTheBottom(element: HTMLElement): boolean {
-    return element.clientHeight + element.scrollTop >= element.scrollHeight;
+    return element.clientHeight + element.scrollTop >= element.scrollHeight - 1;
   }
 
   private isScrolledToTheTop(element: HTMLElement): boolean {
-    return !element.scrollTop;
+    return element.scrollTop <= 1;
   }
 
   private isTrappingEvent(event: WheelEvent | KeyboardEvent): boolean {

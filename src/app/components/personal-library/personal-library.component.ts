@@ -1,3 +1,4 @@
+import { HorizontalFiltersDirective } from '@app/directives/horizontal-filters.directive';
 import { scrollToContent } from '@app/shared/scroll-to-content';
 import { GameSearchComponent } from '../game-search/game-search.component';
 import { withReleaseDate } from '@app/shared/release-date';
@@ -48,7 +49,7 @@ import { ReleaseCardComponent } from '../release-card/release-card.component';
 import { buildPages } from '../pager/pagination';
 @Component({
   selector: 'app-personal-library',
-  imports: [
+  imports: [HorizontalFiltersDirective,
     GameSearchComponent,
     PageSwipeDirective,
     LoadingPanelComponent,

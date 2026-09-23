@@ -4,11 +4,14 @@ import { AppComponent } from './app.component';
 
 describe('AppComponent', () => {
   beforeEach(async () => {
+    vi.stubGlobal('matchMedia', vi.fn(() => ({matches:false, addEventListener:vi.fn(), removeEventListener:vi.fn()})));
     await TestBed.configureTestingModule({
       providers: TEST_PROVIDERS,
       imports: [AppComponent],
     }).compileComponents();
   });
+
+  afterEach(() => vi.unstubAllGlobals());
 
   it('should create the app', () => {
     const fixture = TestBed.createComponent(AppComponent);

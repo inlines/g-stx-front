@@ -344,3 +344,5 @@
     opacity: 1;
   }
 }
+
+.chat-container, .messages-wrapper, .dialogs-wrapper { overscroll-behavior:contain; }

@@ -1,11 +1,13 @@
+import { HorizontalFiltersDirective } from '@app/directives/horizontal-filters.directive';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { REGION_GROUPS, RegionCounts, RegionGroup } from '@app/shared/region-filter';
 @Component({
   selector: 'app-region-filters',
+  imports: [HorizontalFiltersDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section aria-label="Регионы релизов">
-      <div class="regions" role="group" aria-label="Фильтр по регионам">
+      <div horizontalFilters class="regions" role="group" aria-label="Фильтр по регионам">
         @for (region of groups; track region) {
           <button type="button" [class.selected]="selected.includes(region)" [attr.aria-pressed]="selected.includes(region)" (click)="regionToggle.emit(region)">
             {{ labels[region] }} <span>@if(unknown){ {{unidentified[region] ?? '—'}} / }@else if(owned){ {{owned[region] ?? '—'}} / }{{ totals[region] ?? '—' }}</span>
@@ -22,6 +24,7 @@ import { REGION_GROUPS, RegionCounts, RegionGroup } from '@app/shared/region-fil
     button:focus-visible{outline:2px solid #c2a4ed;outline-offset:3px}
     span{font-size:.85em;font-variant-numeric:tabular-nums;color:#b9cbe2}
     small{display:block;margin-top:6px;color:#a3b8cb;font-size:12px;line-height:1.4}
+    @media(max-width:767px){.regions{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin;padding:3px 0 6px}button{flex:0 0 auto;white-space:nowrap}}
     @media(max-width:400px){button{padding:9px 10px;font-size:14px;gap:6px}}
   `,
 })

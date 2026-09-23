@@ -2,7 +2,7 @@
   <div class="container-fluid container-lg">
     <div class="header-top d-flex align-items-center">
 
-      <svg width="176" height="33" viewBox="0 0 176 33" fill="none" xmlns="http://www.w3.org/2000/svg" routerLink="/products" style="cursor: pointer"><use href="/icons.svg#brand"/></svg>
+      <svg width="176" height="33" viewBox="0 0 176 33" fill="none" xmlns="http://www.w3.org/2000/svg" routerLink="/products" (click)="resetCatalogFilters()" style="cursor: pointer"><use href="/icons.svg#brand"/></svg>
       <span class="mx-4 d-none d-md-block" style="font-size: 34px;">|</span>
       <span class="d-none d-md-block">GameStockx</span>
 
@@ -44,7 +44,7 @@
         @if ((badges.admins$ | async)?.includes((currentUser$ | async) ?? '')) {
           <a class="desktop-extra" routerLink="/unknown" routerLinkActive="nav-active">Unknown</a>
         }
-        <a routerLink="/products" routerLinkActive="nav-active"><app-nav-icon name="catalog"/><span>Каталог</span></a>
+        <a routerLink="/products" (click)="resetCatalogFilters()" routerLinkActive="nav-active"><app-nav-icon name="catalog"/><span>Каталог</span></a>
         <a routerLink="/photo-search" routerLinkActive="nav-active"><app-nav-icon name="photo"/><span>По фото</span></a>
         <a routerLink="/collectors" routerLinkActive="nav-active"><app-nav-icon name="players"/><span>Игроки</span></a>
         <details class="nav-folder" routerLinkActive="nav-active">
@@ -55,6 +55,13 @@
             <a routerLink="/wts" routerLinkActive="nav-active">Хочу продать</a>
           </div>
         </details>
+        <button type="button" class="mobile-chat" (click)="closeMenus(); toggleChat()"
+          [class.nav-active]="isChatVisible$ | async" [attr.aria-expanded]="isChatVisible$ | async"
+          [attr.aria-label]="'Чат. Непрочитанных сообщений: ' + ((unreadCount$ | async) ?? 0)">
+          <span class="mobile-chat-icon"><app-nav-icon name="chat"/>
+            @if (unreadCount$ | async; as count) {<span class="mobile-chat-badge">{{count > 99 ? '99+' : count}}</span>}
+          </span><span>Чат</span>
+        </button>
         <details class="nav-folder mobile-more" routerLinkActive="nav-active">
           <summary><app-nav-icon name="more"/><span>Ещё</span></summary>
           <div class="nav-submenu" aria-label="Другие разделы">
@@ -63,7 +70,6 @@
               <a routerLink="/unknown" routerLinkActive="nav-active">Unknown</a>
             }
             <a routerLink="/profile" routerLinkActive="nav-active">Мой профиль</a>
-            <button type="button" (click)="closeMenus(); toggleChat()">Чат @if (unreadCount$ | async; as count) {<span>{{count}}</span>}</button>
             <button type="button" (click)="closeMenus(); logout()">Выйти</button>
           </div>
         </details>

@@ -4,7 +4,7 @@
   <header><div class="collector-identity"><app-user-avatar class="collector-avatar" [login]="vm.login"/><div class="collector-description"><h1 id="collector-heading">Коллекция {{vm.login}}</h1><p>Игровая библиотека коллекционера</p><a routerLink="/kudos-challenge" aria-label="Kudos Challenge"><app-kudos [login]="vm.login"/></a></div></div><button type="button" (click)="startChatWith()" [disabled]="!vm.login">Написать</button></header>
   <nav class="library-tabs" aria-label="Раздел профиля"><button type="button" [class.selected]="vm.tab === 'collection'" [attr.aria-pressed]="vm.tab === 'collection'" (click)="selectTab('collection')">Коллекция</button><button type="button" [class.selected]="vm.tab === 'wts'" [attr.aria-pressed]="vm.tab === 'wts'" (click)="selectTab('wts')">Хочет продать</button></nav>
   @if(vm.tab === 'collection' && vm.platforms.length){
-    <nav class="library-tabs platform-filters" aria-label="Платформа коллекции">
+    <nav horizontalFilters class="library-tabs platform-filters" aria-label="Платформа коллекции">
       <button type="button" [class.selected]="vm.selectedPlatform === null" [attr.aria-pressed]="vm.selectedPlatform === null" (click)="selectPlatform(null)">Все платформы</button>
       @for(platform of vm.platforms;track platform.id){<button type="button" [class.selected]="platform.id === vm.selectedPlatform" [attr.aria-pressed]="platform.id === vm.selectedPlatform" (click)="selectPlatform(platform.id)">{{platform.abbreviation || platform.name}}</button>}
     </nav>

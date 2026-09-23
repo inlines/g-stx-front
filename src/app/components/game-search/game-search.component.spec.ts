@@ -17,6 +17,18 @@ describe('GameSearchComponent', () => {
     expect(changed).toHaveBeenCalledExactlyOnceWith('BLES-12345/ANZ');
     expect(input.placeholder).toBe('BLES-00001');
   });
+  it('clears a restored search value and emits the empty query', () => {
+    const fixture = TestBed.createComponent(GameSearchComponent);
+    const changed = vi.fn();
+    fixture.componentInstance.registerOnChange(changed);
+    fixture.componentInstance.writeValue('Metal Gear Solid');
+    fixture.detectChanges();
+    fixture.nativeElement.querySelector('.clear-search').click();
+    fixture.detectChanges();
+    expect(changed).toHaveBeenCalledExactlyOnceWith('');
+    expect(fixture.nativeElement.querySelector('input').value).toBe('');
+    expect(fixture.nativeElement.querySelector('.clear-search')).toBeNull();
+  });
   it('does not alter names and exposes the mode switch and disabled state', () => {
     const fixture = TestBed.createComponent(GameSearchComponent);
     const changed = vi.fn();

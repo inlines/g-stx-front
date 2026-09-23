@@ -30,7 +30,7 @@ describe('Photo search navigation', () => {
       regions: 'europe',
       offset: 0,
       unknown: false,
-      ignore_digital: false,
+      ignore_digital: true,
       local_multiplayer: false,
       online_multiplayer: false,
     });

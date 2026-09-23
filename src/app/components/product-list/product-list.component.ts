@@ -1,3 +1,4 @@
+import { HorizontalFiltersDirective } from '@app/directives/horizontal-filters.directive';
 import { scrollToContent } from '@app/shared/scroll-to-content';
 import { GameSearchComponent } from '../game-search/game-search.component';
 import { ProductsService } from '@app/states/products/services/products.service';
@@ -40,6 +41,7 @@ import { catchError, of, shareReplay, combineLatest, debounceTime, distinctUntil
 @Component({
   selector: 'app-product-list',
   imports: [
+    HorizontalFiltersDirective,
     GameSearchComponent,
     PageSwipeDirective,
     LoadingPanelComponent,
@@ -221,7 +223,9 @@ export class ProductListComponent implements OnInit, AfterViewInit {
     });
     this.productParams$
       .pipe(distinctUntilChanged(sameListParams), takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
+      .subscribe((params) => {
+        this.queryForm.controls.skipDigitalFilter.setValue(this.unknown || (params.ignore_digital ?? true), {emitEvent:false});
+        this.queryForm.controls.includeUnreleased.setValue(params.include_unreleased ?? false, {emitEvent:false});
         this.store.dispatch(new ProductsActions.LoadList());
       });
   }

@@ -41,6 +41,13 @@ export class GameSearchComponent implements ControlValueAccessor {
   get invalid(): boolean {
     return this.mode === 'serial' && !!this.value && !validSerial(this.value);
   }
+  clear(): void {
+    if (this.disabled) return;
+    this.value = '';
+    this.changed('');
+    this.touched();
+    this.focus();
+  }
   focus(): void {
     this.input?.nativeElement.focus();
   }

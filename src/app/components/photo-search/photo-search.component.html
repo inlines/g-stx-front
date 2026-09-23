@@ -1,4 +1,4 @@
-<section class="photo-search" [attr.aria-busy]="busy()">
+<section trapScroll class="photo-search" [attr.aria-busy]="busy()">
   <header class="flow-header">
     <button class="back icon-button" type="button" (click)="back()" aria-label="Назад к предыдущему шагу">←</button>
     <div><h1>Поиск по фото</h1><span class="step-label">{{ step() === 'intro' ? 'Как это работает' : step() === 'upload' ? '1 / 3 · Снимок' : step() === 'crop' ? '2 / 3 · Выделение кода' : '3 / 3 · Распознавание' }}</span></div>

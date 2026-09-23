@@ -47,7 +47,7 @@ export class ChatState implements NgxsAfterBootstrap, OnDestroy {
             if (count > 0) {
               this.toast.show({
                 header: 'Непрочитанные сообщения',
-                body: `В чатах вас ждут сообщения: ${count}. Откройте чат в шапке сайта.`,
+                body: `В чатах вас ждут сообщения: ${count}. Откройте чат в меню сайта.`,
                 delay: 12000,
               });
               ctx.dispatch(new ChatActions.EnableWarning());

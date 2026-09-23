@@ -11,6 +11,7 @@
     [attr.spellcheck]="mode === 'serial' ? 'false' : null"
     autocomplete="off" enterkeyhint="search"
     (input)="inputChanged($event)" (compositionend)="inputChanged($event)" (blur)="touched()">
+  @if (value) {<button type="button" class="clear-search" aria-label="Очистить поиск" (click)="clear()" [disabled]="disabled">×</button>}
 </div>
 @if (mode === 'serial') {
   <p [id]="helpId" class="search-help" [attr.role]="invalid ? 'status' : null">

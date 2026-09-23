@@ -1,3 +1,4 @@
+import { HorizontalFiltersDirective } from '@app/directives/horizontal-filters.directive';
 import { scrollToContent } from '@app/shared/scroll-to-content';
 import { withReleaseDate } from '@app/shared/release-date';
 import { filterCollection } from '@app/shared/collection-filter';
@@ -31,7 +32,7 @@ import { PagerComponent } from '../pager/pager.component';
 import { ReleaseCardComponent } from '../release-card/release-card.component';
 @Component({
   selector: 'app-collector-properties',
-  imports: [
+  imports: [HorizontalFiltersDirective,
     PageSwipeDirective,
     LoadingPanelComponent,
     RegionFiltersComponent,

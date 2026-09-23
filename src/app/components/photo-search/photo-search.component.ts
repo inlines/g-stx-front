@@ -19,6 +19,7 @@ import { ProductsActions } from '@app/states/products/states/products.actions';
 import { canonicalSerial, validSerial } from '@app/shared/serial-number';
 import { RegionGroup } from '@app/shared/region-filter';
 import { matchingPhotoReleases, photoSerials, releaseRegionGroup, serialPlatform } from './photo-serial';
+import { TrapScrollDirective } from '@app/directives/trap-scroll.directive';
 import { SpineGuideComponent } from './spine-guide.component';
 import { decodePhoto, startOcr } from './photo-ocr';
 export const PHOTO_PROCESSOR = new InjectionToken('Photo processor', {
@@ -33,7 +34,7 @@ interface Match {
 }
 @Component({
   selector: 'app-photo-search',
-  imports: [FormsModule, SpineGuideComponent],
+  imports: [FormsModule, SpineGuideComponent, TrapScrollDirective],
   templateUrl: './photo-search.component.html',
   styleUrl: './photo-search.component.scss',
 })
@@ -91,6 +92,7 @@ export class PhotoSearchComponent {
     afterNextRender(() => {
       const viewport = window.visualViewport;
       const resize = () => {
+        if (viewport && viewport.scale !== 1) return;
         host.style.setProperty('--photo-height', `${viewport?.height ?? window.innerHeight}px`);
         host.style.setProperty('--photo-top', `${viewport?.offsetTop ?? 0}px`);
       };
@@ -407,8 +409,8 @@ export class PhotoSearchComponent {
           genre_id: undefined,
           local_multiplayer: false,
           online_multiplayer: false,
-          ignore_digital: false,
-          include_unreleased: true,
+          ignore_digital: true,
+          include_unreleased: false,
         }),
       ),
     );

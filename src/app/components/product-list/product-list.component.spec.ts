@@ -47,14 +47,14 @@ describe('Catalog filters', () => {
     fixture.detectChanges();
     const details = fixture.nativeElement.querySelector('.extra-filters') as HTMLDetailsElement;
     expect(details.open).toBe(false);
-    expect(details.querySelector('summary')?.textContent).toContain('Выбрано: 3');
+    expect(details.querySelector('.filter-count')?.textContent?.trim()).toBe('4');
     details.open = true; details.open = false;
     expect(component.queryForm.controls.genre.value).toBe(5);
     expect(component.queryForm.controls.localMultiplayer.value).toBe(true);
     component.queryForm.patchValue({genre:null,localMultiplayer:false,onlineMultiplayer:false});
     vi.advanceTimersByTime(300);
     nextRequest().flush({items:[],total_count:100}); fixture.detectChanges();
-    expect(details.querySelector('summary')?.textContent).toContain('Выбрано: 0');
+    expect(details.querySelector('.filter-count')?.textContent?.trim()).toBe('1');
   });
 
   it('filters by genre, resets paging and restores all genres', () => {

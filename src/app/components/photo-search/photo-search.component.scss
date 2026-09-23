@@ -72,3 +72,11 @@ form input, select { background:#081722; color:#e4edf6; border:1px solid #526c83
   .upload-art { display:none; }
   .crop-tools { height:94px; }
 }
+
+@media(max-width:767px) {
+  .flow-body { overflow:hidden; }
+  .tutorial, .upload-step { min-height:0; overflow-y:auto; overscroll-behavior:contain; }
+  .photo-stage { touch-action:none; }
+  .photo-stage canvas { touch-action:none; }
+  .review-step { overscroll-behavior:contain; }
+}

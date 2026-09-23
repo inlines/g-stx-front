@@ -225,12 +225,14 @@ describe('ProductPropertiesComponent', () => {
         { platform_id: null, platform_name: null, local_players: 8, online_players: 16 },
       ],
     });
-    for (const [platform, expected] of [['32', 'Saturn'], ['7', 'PS1'], ['48', null], ['', null]]) {
+    for (const [platform, expected] of [['32', 'до 2 игроков'], ['7', 'до 4 игроков'], ['48', null], ['', null]]) {
       params.next(convertToParamMap(platform ? { platform } : {}));
       fixture.detectChanges();
       const section = fixture.nativeElement.querySelector('.game-multiplayer') as HTMLElement;
       expect(section.querySelectorAll('.multiplayer-row')).toHaveLength(expected ? 1 : 0);
       expect(section.textContent).toContain(expected ?? 'нет данных');
+      expect(section.textContent).not.toContain('Saturn');
+      expect(section.textContent).not.toContain('PS1');
       expect(section.textContent).not.toContain('до 8 игроков');
       expect(section.textContent).not.toContain('до 16 игроков');
       if (platform === '32') expect(section.textContent).toContain('Локальный кооператив');

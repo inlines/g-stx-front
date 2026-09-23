@@ -5,6 +5,7 @@ import { UserAvatarComponent } from '../user-avatar/user-avatar.component';
 import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Router, RouterLink, RouterModule } from '@angular/router';
+import { ProductsActions } from '@app/states/products/states/products.actions';
 import { AuthActions } from '@app/states/auth/states/auth-actions';
 import { AuthState } from '@app/states/auth/states/auth.state';
 import { ChatActions } from '@app/states/chat/states/chat-actions';
@@ -51,6 +52,7 @@ export class HeaderComponent {
     this.currentUser$ = this.store.select(AuthState.login);
     this.isAuthorised$ = this.store.select(AuthState.isAuthorised);
     this.unreadCount$ = this.store.select(ChatState.unreadCount);
+    this.isChatVisible$ = this.store.select(ChatState.visible);
     this.isConnected$ = this.store.select(ChatState.isConnected);
   }
 
@@ -58,8 +60,12 @@ export class HeaderComponent {
   public readonly isAuthorised$: Observable<boolean>;
   public readonly unreadCount$: Observable<number>;
 
+  public readonly isChatVisible$: Observable<boolean>;
   public readonly isConnected$: Observable<boolean>;
 
+  resetCatalogFilters(): void {
+    this.store.dispatch(new ProductsActions.SetRequestParams({ignore_digital:true, include_unreleased:false, offset:0}));
+  }
   public logout(): void {
     this.store.dispatch(new AuthActions.Logout());
   }
