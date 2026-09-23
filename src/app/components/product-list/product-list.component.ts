@@ -1,16 +1,15 @@
+import { GameCardComponent } from '../game-card/game-card.component';
 import { HorizontalFiltersDirective } from '@app/directives/horizontal-filters.directive';
 import { scrollToContent } from '@app/shared/scroll-to-content';
 import { GameSearchComponent } from '../game-search/game-search.component';
 import { ProductsService } from '@app/states/products/services/products.service';
 import { PageSwipeDirective } from '@app/directives/page-swipe.directive';
 import { LoadingPanelComponent } from '../loading-panel/loading-panel.component';
-import { SerialListComponent } from '../serial-list/serial-list.component';
 import { canonicalSerial, validSerial, SERIAL_HINT, SearchMode } from '@app/shared/serial-number';
 import { RegionFiltersComponent } from '../region-filters/region-filters.component';
 import { normalizeRegions, platformRegionCounts, RegionGroup, toggleRegion } from '@app/shared/region-filter';
-import { GameStatsComponent } from '../game-stats/game-stats.component';
 import { supportsReleaseActions } from '@app/shared/release-platforms';
-import { AsyncPipe, DatePipe } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import {
   afterNextRender,
   Injector,
@@ -40,16 +39,13 @@ import { catchError, of, shareReplay, combineLatest, debounceTime, distinctUntil
 
 @Component({
   selector: 'app-product-list',
-  imports: [
+  imports: [GameCardComponent,
     HorizontalFiltersDirective,
     GameSearchComponent,
     PageSwipeDirective,
     LoadingPanelComponent,
-    SerialListComponent,
     RegionFiltersComponent,
-    GameStatsComponent,
     AsyncPipe,
-    DatePipe,
     RouterModule,
     ReactiveFormsModule,
     PagerComponent,

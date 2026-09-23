@@ -48,6 +48,10 @@ export class CollectionService {
     return this.http.post<void>(this.addToCollectionPath, payload);
   }
 
+  public setCopy(payload: {release_id:number; selected_serial:string|null; cib:boolean|null}): Observable<void> {
+    return this.http.post<void>(`${this.environment.apiUrl}/collection-copy`,payload);
+  }
+
   public setReleasePrice(payload: IEditCollectionPayload): Observable<void> {
     return this.http.post<void>(this.setReleasePricePath, payload);
   }

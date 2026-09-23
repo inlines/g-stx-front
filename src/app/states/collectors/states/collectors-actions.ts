@@ -4,6 +4,8 @@ import { CollectorsActionList } from './collectors-action-list.const';
 import { ICollectionItem } from '@app/states/collection/interfaces/collection-item.interface';
 
 export namespace CollectorsActions {
+  export class SelectCollector { static readonly type='[Collectors] Select paged library'; constructor(public payload:string){} }
+
   export class GetCollectorsRequest {
     public static readonly type = CollectorsActionList.GET_COLLECTORS;
   }

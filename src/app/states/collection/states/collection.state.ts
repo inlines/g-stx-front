@@ -47,6 +47,11 @@ export class CollectionState {
     );
   }
 
+  @Action(CollectionActions.SetCopyRequest)
+  setCopy(ctx: StateContext<ICollectionState>, action: CollectionActions.SetCopyRequest) {
+    return this.mutation(ctx, this.service.setCopy(action.payload),new CollectionActions.SetCopySuccess(),new CollectionActions.SetCopyFail());
+  }
+
   @Action(CollectionActions.SetPriceRequest)
   setReleasePrice(ctx: StateContext<ICollectionState>, action: CollectionActions.SetPriceRequest) {
     return this.mutation(
@@ -113,6 +118,7 @@ export class CollectionState {
   @Action([
     CollectionActions.AddToCollectionSuccess,
     CollectionActions.SetPriceSuccess,
+    CollectionActions.SetCopySuccess,
     CollectionActions.AddWishSuccess,
     CollectionActions.AddWtsSuccess,
     CollectionActions.RemoveFromCollectionSuccess,
@@ -124,6 +130,7 @@ export class CollectionState {
     const messages: Record<string, string> = {
       [CollectionActions.AddToCollectionSuccess.type]: 'Успешное добавление в коллекцию',
       [CollectionActions.SetPriceSuccess.type]: 'Цена сохранена',
+      [CollectionActions.SetCopySuccess.type]: 'Данные экземпляра сохранены',
       [CollectionActions.AddWishSuccess.type]: 'Успешное добавление в вишлист',
       [CollectionActions.AddWtsSuccess.type]: 'Успешное добавление в лист продаж',
       [CollectionActions.RemoveFromCollectionSuccess.type]: 'Успешное удаление из коллекции',
@@ -142,6 +149,7 @@ export class CollectionState {
   @Action([
     CollectionActions.AddToCollectionFail,
     CollectionActions.SetPriceFail,
+    CollectionActions.SetCopyFail,
     CollectionActions.AddWishFail,
     CollectionActions.AddWtsFail,
     CollectionActions.RemoveFromCollectionFail,

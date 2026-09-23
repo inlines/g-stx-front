@@ -262,3 +262,23 @@ summary:focus-visible {
   html { scroll-padding-bottom:calc(88px + env(safe-area-inset-bottom)); }
   app-pager { display:block; padding-bottom:calc(80px + env(safe-area-inset-bottom)); }
 }
+
+/* Draw disclosure markers rather than relying on a platform's symbol/emoji font. */
+details > summary {
+  list-style: none;
+}
+details > summary::-webkit-details-marker { display: none; }
+details > summary::marker { content: ''; }
+details:not(.nav-folder) > summary::before {
+  content: '';
+  display: inline-block;
+  width: 0;
+  height: 0;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  border-left: 6px solid currentColor;
+  margin-right: 7px;
+  vertical-align: 0;
+  transform-origin: 3px 4px;
+}
+details[open]:not(.nav-folder) > summary::before { transform: rotate(90deg); }

@@ -18,6 +18,10 @@ import { IcollectorsState } from './collectors.state.interface';
 export class CollectorsState {
   constructor(private service: CollectorsService) {}
 
+  @Action(CollectorsActions.SelectCollector)
+  selectCollector(ctx:StateContext<IcollectorsState>, action:CollectorsActions.SelectCollector){
+    ctx.patchState({collectionPropertiesLogin:action.payload,loadedCollection:[],collectionTotalCount:0});
+  }
   @Action(CollectorsActions.GetCollectorsRequest)
   public getCollectors(ctx: StateContext<IcollectorsState>) {
     ctx.patchState({

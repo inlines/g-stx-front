@@ -1,35 +1,23 @@
-<article class="release-card">
-  <div class="release-main">
-    <a class="cover" [routerLink]="productLink" [attr.aria-label]="item.product_name">
-      @if (item.image_url) {
-        <img [src]="item.image_url" [alt]="item.product_name" [attr.loading]="priority ? 'eager' : 'lazy'" [attr.fetchpriority]="priority ? 'high' : 'auto'" decoding="async" (error)="item.image_url = null">
-      } @else { <span class="no-cover">Нет<br>обложки</span> }
-    </a>
-    <div class="release-copy">
-      <a class="release-title" [routerLink]="productLink">{{item.product_name}}</a>
-      <div class="metadata"><span>{{item.platform_name}}</span>@if (item.region_name) { <span class="region">{{item.region_name}}</span> }</div>
-      @if(collection && forSale){<span class="sale-status">Готова к продаже</span>}
-      @if (collection || (readOnly && !saleMode)) {
-        <div class="release-date">{{item.release_date === null ? 'Дата релиза не указана' : (item.release_date | date:'dd.MM.yyyy':'UTC')}}</div>
-      }
-    </div>
-  </div>
-  @if ((collection || (readOnly && !saleMode)) && item.serial?.length) {
-    <app-serial-list [serials]="item.serial" />
-  }
-  @if (!readOnly || saleMode) {
-  <footer>
-    @if (collection) {
-      <div class="price"><small>Цена покупки</small>@if (item.price !== null) { {{item.price | currency:'RUB':'symbol-narrow':'1.0-2'}} } @else { <span class="muted">Не указана</span> }</div>
-    } @else if (saleMode) {
-      <div class="price"><small>Цена продажи</small>@if(item.price !== null){ {{item.price | currency:'RUB':'symbol-narrow':'1.0-2'}} }@else{<span class="muted">Не указана</span>}<small>{{item.cib ? 'CIB · Полный комплект' : 'Полный комплект не отмечен'}}</small></div>
-    } @else { <span class="muted">{{saleMode ? 'Готова к продаже' : 'В списке желаемого'}}</span> }
-    @if(!readOnly){<div class="actions" [class.collection-actions]="collection">
-      @if(saleMode){<button type="button" [disabled]="busy" (click)="editSale.emit(item)">Изменить</button>}
-      @if (collection) { <button type="button" [disabled]="busy" (click)="editPrice.emit(item)">{{item.price === null ? 'Задать цену' : 'Изменить цену'}}</button> }
-      @if(collection) { <span class="sale-action"><button type="button" [disabled]="busy" [class.selling]="forSale" [attr.aria-pressed]="forSale" (click)="toggleSale.emit(item)">{{forSale ? 'Снять с продажи' : 'Выставить на продажу'}}</button></span> }
-      <button type="button" class="remove" [class.sale-remove]="saleMode" [disabled]="busy" (click)="removeRelease.emit(item.release_id)" [attr.aria-label]="saleMode ? 'Снять с продажи ' + item.product_name : 'Удалить ' + item.product_name + (collection ? ' из коллекции' : ' из вишлиста')" [ngbTooltip]="saleMode ? 'Снять с продажи' : 'Удалить'" container="body">@if(saleMode){Снять с продажи}@else{<span aria-hidden="true">×</span>}</button>
+<div [mobilePageLock]="menuOpen" class="release-card" [class.editable]="!readOnly" (pointerdown)="beginHold($event)" (pointermove)="moveHold($event)" (pointerup)="cancelHold()" (pointercancel)="cancelHold()" (contextmenu)="context($event)" (keydown.escape)="closeMenu()">
+  <app-game-card [game]="game" [link]="productLink" [priority]="priority">
+    @if(!readOnly){<div card-badges class="card-tools" (click)="$event.stopPropagation()">
+      @if(collection && incomplete){<button class="incomplete" type="button" aria-label="Дополнить данные экземпляра" title="Укажите комплектность и серийник экземпляра" [disabled]="busy" (click)="editCopy.emit(item)">!</button>}
+      <button #editButton class="edit-button" type="button" aria-label="Действия с игрой" [attr.aria-expanded]="menuOpen" [disabled]="busy" (click)="openMenu()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m16 3 5 5-13 13H3v-5zM13 6l5 5"/></svg></button>
     </div>}
-  </footer>
+    <div class="metadata">{{item.region_name || 'Регион не указан'}} · {{item.platform_name}}</div>
+    @if(collection && forSale){<div class="sale-status">Готова к продаже</div>}
+    @if(collection || saleMode || readOnly){<div class="copy-status">{{item.cib === true ? 'CIB · Полный комплект' : item.cib === false ? 'Неполный комплект' : 'Комплектность не указана'}}</div>}
+    @if(!readOnly && (collection || saleMode)){<div class="price"><small>Куплено за</small> {{purchasePrice != null ? (purchasePrice | currency:'RUB':'symbol-narrow':'1.0-2') : 'не указано'}}</div>}
+    @if(saleMode){<div class="price"><small>Цена продажи</small> {{item.price != null ? (item.price | currency:'RUB':'symbol-narrow':'1.0-2') : 'не указана'}}</div>}
+  </app-game-card>
+  @if(menuOpen && !readOnly){
+    <div class="menu-backdrop" (click)="closeMenu()"></div>
+    <section cdkTrapFocus [cdkTrapFocusAutoCapture]="true" class="context-menu" role="dialog" aria-label="Действия с игрой">
+      <header>{{item.product_name}}<button type="button" (click)="closeMenu()" aria-label="Закрыть меню">×</button></header>
+      @if(collection || saleMode){<button type="button" [disabled]="busy" (click)="closeMenu(); editCopy.emit(item)">Комплектность и серийник</button>}
+      @if(collection){<button type="button" [disabled]="busy" (click)="closeMenu(); editPrice.emit(item)">{{item.price == null ? 'Задать цену покупки' : 'Изменить цену покупки'}}</button><button type="button" [disabled]="busy" (click)="closeMenu(); toggleSale.emit(item)">{{forSale ? 'Снять с продажи' : 'Выставить на продажу'}}</button>}
+      @if(saleMode){<button type="button" [disabled]="busy" (click)="closeMenu(); editSale.emit(item)">Изменить условия продажи</button>}
+      <button type="button" class="remove" [disabled]="busy" (click)="closeMenu(); removeRelease.emit(item.release_id)">{{saleMode ? 'Снять с продажи' : collection ? 'Удалить из коллекции' : 'Удалить из вишлиста'}}</button>
+    </section>
   }
-</article>
+</div>

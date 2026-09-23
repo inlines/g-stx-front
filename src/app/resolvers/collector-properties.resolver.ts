@@ -13,7 +13,7 @@ export class CollectorPropertiesResolver implements Resolve<boolean> {
 
   resolve(route: ActivatedRouteSnapshot): Observable<boolean> {
     return this.store
-      .dispatch(new CollectorsActions.GetCollectorsPropertiesRequest(route.paramMap.get('id') ?? ''))
+      .dispatch(new CollectorsActions.SelectCollector(route.paramMap.get('id') ?? ''))
       .pipe(map(() => this.store.selectSnapshot(CollectorsState.collectorPropertiesLoaded)));
   }
 }

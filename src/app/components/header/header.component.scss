@@ -109,7 +109,7 @@ summary::-webkit-details-marker { display:none; }
 summary:focus-visible, .nav-submenu a:focus-visible, .nav-submenu button:focus-visible { outline:2px solid #c2a4ed; outline-offset:3px; }
 .nav-folder { position:relative; }
 .nav-folder.nav-active summary { color:#bda7ea; }
-.chevron { font-size:18px; }
+.chevron { display:block; flex:0 0 12px; align-self:center; }
 .nav-submenu { position:absolute; top:100%; right:0; min-width:230px; border:1px solid #53647c; background:#102332; padding:8px; border-radius:14px; box-shadow:0 12px 40px #0008; }
 .nav-submenu a, .nav-submenu button { display:flex; align-items:center; justify-content:space-between; gap:8px; width:100%; padding:12px; min-height:48px; border:0; border-radius:8px; background:transparent; color:#e4edf6; text-decoration:none; text-align:left; }
 .nav-submenu a:hover, .nav-submenu button:hover { background:#24394b; }

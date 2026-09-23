@@ -8,6 +8,7 @@ export class MobilePageLockDirective implements OnInit, OnChanges, OnDestroy {
   private restore?: () => void;
 
   ngOnInit(): void {
+    if (typeof window.matchMedia !== 'function') return;
     this.media = window.matchMedia('(max-width: 767px)');
     this.media.addEventListener('change', this.update);
     this.update();

@@ -4,6 +4,12 @@ import { IEditCollectionPayload } from '../interfaces/edit-collection-payload.in
 import { CollectionActionList } from './collection-action-list.const';
 
 export namespace CollectionActions {
+  export class SetCopyRequest {
+    static readonly type = '[Collection] Set copy details';
+    constructor(public payload: {release_id:number; selected_serial:string|null; cib:boolean|null}) {}
+  }
+  export class SetCopySuccess { static readonly type = '[Collection] Set copy details success'; }
+  export class SetCopyFail { static readonly type = '[Collection] Set copy details failure'; }
   export class AddToCollectionRequest {
     public static readonly type = CollectionActionList.ADD_REQUEST;
 

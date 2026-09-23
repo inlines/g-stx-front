@@ -44,11 +44,15 @@
             </div>
           </details>
           <div class="catalog-options">
-            <label class="catalog-sort sort-compact"><span>Сортировка</span>
-              <select class="form-select" formControlName="sort">
-                <option value="name">По названию</option><option value="date">По дате</option><option value="rating">По рейтингу ↓</option>
-              </select>
-            </label>
+            <details class="sort-disclosure" #sortMenu (keydown.escape)="sortMenu.open = false; sortSummary.focus()">
+              <summary #sortSummary aria-label="Сортировка">{{ queryForm.controls.sort.value === 'name' ? 'По названию' : queryForm.controls.sort.value === 'rating' ? 'По рейтингу ↓' : 'По дате' }}</summary>
+              <fieldset class="sort-options">
+                <legend class="visually-hidden">Сортировка</legend>
+                <label><input type="radio" formControlName="sort" value="name" (change)="sortMenu.open = false; sortSummary.focus()">По названию</label>
+                <label><input type="radio" formControlName="sort" value="date" (change)="sortMenu.open = false; sortSummary.focus()">По дате</label>
+                <label><input type="radio" formControlName="sort" value="rating" (change)="sortMenu.open = false; sortSummary.focus()">По рейтингу ↓</label>
+              </fieldset>
+            </details>
           </div>
 
             <div class="row">
@@ -70,66 +74,9 @@
   @for (product of products$ | async; track product.id; let cardIndex = $index) {
     <!-- Desktop / tablet: карточки -->
     <div class="catalog-cell col-xl-3 col-lg-4 col-md-4 col-sm-6 p-3">
-      <div
-        class="card game-card border-0 d-flex flex-column justify-content-between position-relative"
-        [routerLink]="['/products', product.id, {platform: displayedParams?.cat}]"
-        style="cursor: pointer;"
-        >
-        @if (product.has_serials === false && !product.digital_only && supportsReleaseActions(displayedParams?.cat ?? activeCategory)) {
-          <span class="missing-serial" role="img" aria-label="Серийники пока не указаны. Откройте игру, чтобы дополнить их."
-            title="Серийники пока не указаны. Знаете номер? Дополните на странице игры.">?</span>
-        }
-        @if (product.owned) {
-          <span class="ownership-mark position-absolute" role="img" aria-label="В вашей коллекции на выбранной платформе" style="top: 8px; left: 8px; zoom: 1.5;">
-            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="28" height="28" rx="4" fill="#BDA7EA"/>
-            <path d="M21.1564 8.07556C21.0572 7.9724 20.9391 7.89052 20.8091 7.83464C20.679 7.77877 20.5395 7.75 20.3986 7.75C20.2577 7.75 20.1182 7.77877 19.9881 7.83464C19.8581 7.89052 19.74 7.9724 19.6408 8.07556L11.6892 16.2861L8.34852 12.8302C8.2455 12.7276 8.12389 12.6469 7.99063 12.5927C7.85737 12.5386 7.71507 12.512 7.57185 12.5146C7.42864 12.5171 7.28732 12.5487 7.15595 12.6076C7.02459 12.6665 6.90575 12.7515 6.80624 12.8577C6.70672 12.9639 6.62847 13.0894 6.57596 13.2268C6.52344 13.3642 6.49769 13.5109 6.50016 13.6586C6.50264 13.8063 6.5333 13.952 6.5904 14.0875C6.64749 14.2229 6.7299 14.3455 6.83292 14.4481L10.9314 18.6744C11.0307 18.7776 11.1487 18.8595 11.2788 18.9154C11.4088 18.9712 11.5483 19 11.6892 19C11.8301 19 11.9696 18.9712 12.0997 18.9154C12.2298 18.8595 12.3478 18.7776 12.447 18.6744L21.1564 9.69346C21.2647 9.59039 21.3512 9.46531 21.4103 9.32608C21.4695 9.18685 21.5 9.0365 21.5 8.88451C21.5 8.73251 21.4695 8.58216 21.4103 8.44294C21.3512 8.30371 21.2647 8.17862 21.1564 8.07556Z" fill="#5B399D"/>
-            </svg>
-          </span>
-        }
-        <!-- Load every cover on this bounded page, including rows below the viewport. -->
-        <div
-          class="catalog-cover"
-          >
-          @if (product.image_url) {
-            <img
-              [src]="product.image_url"
-              loading="eager" decoding="sync"
-              [attr.fetchpriority]="cardIndex === 0 ? 'high' : 'auto'"
-              [alt]="product.name"
-              class="img-fluid"
-              (error)="product.image_url = null"
-              />
-          } @else {
-            <div class="d-flex flex-column align-items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor"
-                class="bi bi-image" viewBox="0 0 16 16">
-                <path d="M14.002 3a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2.002a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h12zM2.002 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H2.002z"/>
-                <path d="M10.648 8.646a.5.5 0 0 1 .704 0l2.25 2.25V12H2.398v-.316l3.85-3.85a.5.5 0 0 1 .704 0l2.15 2.15 1.546-1.548z"/>
-              </svg>
-              <small class="mt-1">Нет изображения</small>
-            </div>
-          }
-        </div>
-        <div class="d-flex flex-column justify-content-between">
-          <div class="game-content">
-            <div class="title">{{ product.name }}</div>
-            <app-game-stats [game]="product" />
-            @if (product.serial?.length) {
-              <app-serial-list [serials]="product.serial" />
-            } @else if (product.has_serials === false && !product.digital_only && supportsReleaseActions(displayedParams?.cat ?? activeCategory)) {
-              <small class="missing-serial-hint">Знаете серийник? Дополните →</small>
-            }
-            <div class="game-first-release text-lite-muted small">
-              @if (product.release_date) {
-                c {{ product.release_date | date: 'dd.MM.yy' : 'UTC' }}
-              } @else {
-                Дата выхода не указана
-              }
-            </div>
-          </div>
-        </div>
-      </div>
+      <app-game-card [game]="product" [link]="['/products', product.id, {platform: displayedParams?.cat}]"
+        [priority]="cardIndex === 0" [owned]="product.owned"
+        [missing]="product.has_serials === false && !product.digital_only && supportsReleaseActions(displayedParams?.cat ?? activeCategory)" />
     </div>
   }
 

@@ -14,5 +14,12 @@ export interface ICollectionItem {
   product_id: number;
   serial: string[];
   price: number | null;
-  cib?: boolean;
+  cib?: boolean | null;
+  selected_serial?: string | null;
+  purchase_price?: number | null;
+  total_rating?: number | null;
+  local_players?: number | null;
+  online_players?: number | null;
+  local_multiplayer?: boolean | null;
+  online_multiplayer?: boolean | null;
 }

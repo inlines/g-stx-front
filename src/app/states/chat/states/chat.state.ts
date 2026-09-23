@@ -148,9 +148,10 @@ export class ChatState implements NgxsAfterBootstrap, OnDestroy {
         dialogs: mergeDialogs([dialog], state.dialogs),
       });
       if (own || duplicate || message.read) continue;
+      const mobile = window.matchMedia?.('(max-width: 767px)').matches ?? window.innerWidth <= 767;
       ctx.patchState({
-        isOpened: true,
-        recepient: state.isOpened ? state.recepient : null,
+        isOpened: state.isOpened || !mobile,
+        recepient: state.isOpened || mobile ? state.recepient : null,
         unread: message.id
           ? state.unread
           : { ...state.unread, [companion]: (state.unread[companion] ?? 0) + 1 },

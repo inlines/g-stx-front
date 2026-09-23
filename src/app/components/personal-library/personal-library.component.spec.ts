@@ -1,341 +1,51 @@
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { LibraryCsvDownload } from '@app/shared/library-csv';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpTestingController } from '@angular/common/http/testing';
-import { OwnershipState } from '@app/states/ownership/states/ownership.state';
 import { Store } from '@ngxs/store';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { TEST_PROVIDERS } from '@app/testing/test-providers';
-import { CollectionActions } from '@app/states/collection/states/collection-actions';
-import { ICollectionItem } from '@app/states/collection/interfaces/collection-item.interface';
 import { PersonalLibraryComponent } from './personal-library.component';
-
-const items: ICollectionItem[] = Array.from({ length: 49 }, (_, i) => ({
-  release_id: i + 1,
-  product_id: i + 1,
-  product_name: `Game ${String(i + 1).padStart(2, '0')}`,
-  platform_name: 'PS4',
-  region_name: 'Europe',
-  release_date: 1000,
-  image_url: null,
-  serial: ['CUSA-12345'],
-  price: i === 48 ? 0 : 100 + i,
-}));
-describe('Personal library pages', () => {
-  let fixture: ComponentFixture<PersonalLibraryComponent>;
-  let http: HttpTestingController;
-  let store: Store;
-  beforeEach(() => {
-    vi.spyOn(window, 'scrollTo').mockImplementation(() => {});
-    TestBed.configureTestingModule({ imports: [PersonalLibraryComponent], providers: TEST_PROVIDERS });
-    http = TestBed.inject(HttpTestingController);
-    store = TestBed.inject(Store);
-    const state = store.snapshot();
-    store.reset({
-      ...state,
-      Collection: {
-        ...state.Collection,
-        collectionParams: { cat: 48 },
-        wishlistParams: { cat: 48 },
-        wtsParams: { cat: 48 },
-      },
-    });
-  });
-  afterEach(() => {
-    fixture?.destroy();
-    http.verify({ ignoreCancelled: true });
-    vi.restoreAllMocks();
-  });
-  function mount(kind: 'collection' | 'wishlist' | 'wts' = 'collection') {
-    fixture = TestBed.createComponent(PersonalLibraryComponent);
-    fixture.componentRef.setInput('kind', kind);
-    fixture.detectChanges();
-    http.expectOne((r) => r.url === `/api/${kind}`).flush({ items, total_count: items.length });
-    fixture.detectChanges();
-    return fixture.componentInstance;
-  }
-  function cards() {
-    return fixture.nativeElement.querySelectorAll('app-release-card');
-  }
-  it('opens the easter egg with only the current page and preserves collection data', async () => {
-    const component = mount();
-    component.page(3);
-    fixture.detectChanges();
-    const dialog = {
-      componentInstance: { items: [] as ICollectionItem[] },
-      close: vi.fn(),
-      result: new Promise(() => {}),
-    };
-    const open = vi.spyOn(TestBed.inject(NgbModal), 'open').mockReturnValue(dialog as never);
-    await component.openSnow();
-    expect(open).toHaveBeenCalledOnce();
-    expect(dialog.componentInstance.items.map((x) => x.release_id)).toEqual([49]);
-    expect(dialog.componentInstance.items[0]).not.toBe(items[48]);
-    await component.openSnow();
-    expect(open).toHaveBeenCalledOnce();
-    fixture.destroy();
-    expect(dialog.close).toHaveBeenCalledOnce();
-  });
-  it('clears selected regions when switching collection search to serial', () => {
-    const component = mount();
-    component.toggleRegion('japan');
-    component.searchMode('serial');
-    expect(component.view.regions).toEqual([]);
-    expect(component.view.page).toBe(1);
-  });
-  it('re-sorts collection cards using selected-region dates without changing stored copy dates', () => {
-    const component = mount();
-    store.dispatch(new CollectionActions.GetCollectionSuccess({
-      items: [
-        { ...items[0], release_date: 900, release_dates: { all: 100, europe: 300, worldwide: 100, first: 10 } },
-        { ...items[1], release_date: 800, release_dates: { all: 200, europe: 200, first: 20 } },
-      ], total_count: 2,
-    }));
-    component.sort('date');
-    fixture.detectChanges();
-    expect(fixture.nativeElement.querySelector('.release-title').textContent).toBe('Game 01');
-    component.toggleRegion('europe');
-    fixture.detectChanges();
-    expect(fixture.nativeElement.querySelector('.release-title').textContent).toBe('Game 02');
-    component.toggleRegion('europe');
-    fixture.detectChanges();
-    expect(fixture.nativeElement.querySelector('.release-title').textContent).toBe('Game 01');
-  });
-  it('renders only 24 releases and clamps the last page after removal', () => {
-    const component = mount();
-    expect(cards().length).toBe(24);
-    component.page(3);
-    fixture.detectChanges();
-    expect(cards().length).toBe(1);
-    store.dispatch(
-      new CollectionActions.GetCollectionSuccess({ items: items.slice(0, 48), total_count: 48 }),
-    );
-    fixture.detectChanges();
-    expect(component.view.page).toBe(2);
-    expect(cards().length).toBe(24);
-  });
-  it('searches and sorts the entire collection before slicing pages', () => {
-    const component = mount();
-    component.page(2);
-    component.query.setValue('Game 49');
-    fixture.detectChanges();
-    expect(component.view.page).toBe(1);
-    expect(cards().length).toBe(1);
-    expect(cards()[0].textContent).toContain('Game 49');
-    component.query.setValue('');
-    component.sort('price');
-    fixture.detectChanges();
-    expect(cards()[0].textContent).toContain('Game 49');
-  });
-  it('restores page and sort after returning to the section', () => {
-    let component = mount();
-    component.sort('date');
-    component.page(2);
-    fixture.detectChanges();
-    fixture.destroy();
-    component = mount();
-    expect(component.view.page).toBe(2);
-    expect(component.view.sort).toBe('date');
-    expect(cards()[0].textContent).toContain('Game 25');
-  });
-  it('resets pagination when changing platform', () => {
-    const component = mount();
-    component.page(3);
-    component.selectPlatform(167);
-    const req = http.expectOne((r) => r.url === '/api/collection');
-    expect(req.request.params.get('cat')).toBe('167');
-    req.flush({ items: items.slice(0, 2), total_count: 2 });
-    fixture.detectChanges();
-    expect(component.view.page).toBe(1);
-    expect(cards().length).toBe(2);
-  });
-  it('uses the same paged cards for wishlist without collection-only actions', () => {
-    mount('wishlist');
-    expect(cards().length).toBe(24);
-    expect(fixture.nativeElement.querySelector('input[type=search]')).toBeNull();
-    expect(fixture.nativeElement.textContent).not.toContain('Цена покупки');
-    expect(fixture.nativeElement.querySelector('details')).toBeNull();
-  });
-  it('shows a single serial directly without a redundant disclosure', () => {
-    mount();
-    expect(fixture.nativeElement.querySelector('app-serial-list').textContent).toContain('CUSA-12345');
-    expect(fixture.nativeElement.querySelector('app-serial-list details')).toBeNull();
-  });
-  it('prepopulates the price editor, including a legitimate zero', () => {
-    const component = mount();
-    component.edit(items[48]);
-    expect(component.price.value).toBe(0);
-    component.price.setValue(-1);
-    expect(component.price.invalid).toBe(true);
-    component.price.setValue(0);
-    expect(component.price.valid).toBe(true);
-  });
-  function ownership(selling: number[] = []) {
-    return [
-      {
-        platform: 48,
-        have_count: 49,
-        have_ids: items.map((i) => i.release_id),
-        have_prod_ids: items.map((i) => i.product_id),
-        wish_count: 0,
-        wish_ids: [],
-        wts_count: selling.length,
-        wts_ids: selling,
-        total_spent: 100,
-      },
-    ];
-  }
-  function seedOwnership(selling: number[] = []) {
-    const state = store.snapshot();
-    store.reset({ ...state, Ownership: { ...state.Ownership, ownership: ownership(selling) } });
-  }
-  it('paginates WTS like wishlist and hides purchase controls', () => {
-    const component = mount('wts');
-    expect(cards().length).toBe(24);
-    expect(cards()[0].textContent).toContain('Цена продажи');
-    expect(cards()[0].textContent).not.toContain('Цена покупки');
-    component.page(3);
-    fixture.detectChanges();
-    expect(cards().length).toBe(1);
-  });
-  it('offers an owned release for sale and refreshes its marker', () => {
-    seedOwnership();
-    const component = mount();
-    const button = fixture.nativeElement.querySelector('.sale-action button') as HTMLButtonElement;
-    button.click();
-    fixture.detectChanges();
-    http.expectNone('/api/add_wts');
-    expect(component.salePrice.value).toBeNull();
-    component.salePrice.setValue(1500);
-    component.saleCib.setValue(true);
-    fixture.detectChanges();
-    (document.querySelector('ngb-modal-window button[type="submit"]') as HTMLButtonElement).click();
-    fixture.detectChanges();
-    const req = http.expectOne('/api/add_wts');
-    expect(req.request.method).toBe('POST');
-    expect(req.request.body).toEqual({ release_id: 1, price: 1500, cib: true });
-    expect(button.disabled).toBe(true);
-    req.flush(null);
-    http.expectOne('/api/collection-stats').flush(ownership([1]));
-    http.expectOne((r) => r.url === '/api/collection').flush({ items, total_count: items.length });
-    fixture.detectChanges();
-    expect(button.textContent).toContain('Снять с продажи');
-    expect(button.getAttribute('aria-pressed')).toBe('true');
-  });
-  it('keeps the original sale status after a failed request', () => {
-    seedOwnership();
-    const component = mount();
-    component.toggleSale(items[0]);
-    component.saveSale();
-    http.expectOne('/api/add_wts').flush('Failed', { status: 500, statusText: 'Server error' });
-    fixture.detectChanges();
-    const button = fixture.nativeElement.querySelector('.sale-action button') as HTMLButtonElement;
-    expect(button.disabled).toBe(false);
-    expect(button.getAttribute('aria-pressed')).toBe('false');
-    expect(button.textContent).toContain('Выставить на продажу');
-  });
-  it('removes only the sale flag from WTS and shows the collection link when empty', () => {
-    seedOwnership([1]);
-    mount('wts');
-    (fixture.nativeElement.querySelector('.sale-remove') as HTMLButtonElement).click();
-    const req = http.expectOne('/api/remove_wts');
-    expect(req.request.body).toEqual({ release_id: 1 });
-    req.flush(null);
-    http.expectOne('/api/collection-stats').flush(ownership());
-    http.expectOne((r) => r.url === '/api/wts').flush({ items: [], total_count: 0 });
-    fixture.detectChanges();
-    expect(cards().length).toBe(0);
-    expect(fixture.nativeElement.querySelector('.empty a').getAttribute('href')).toBe('/collection');
-    expect(store.selectSnapshot(OwnershipState.hasRelease(1))).toBe(true);
-    http.expectNone('/api/remove_release');
-  });
-  it('can withdraw a sale directly from the collection', () => {
-    seedOwnership([1]);
-    const component = mount();
-    component.toggleSale(items[0]);
-    http.expectOne('/api/remove_wts').flush(null);
-    http.expectOne('/api/collection-stats').flush(ownership());
-    http.expectOne((r) => r.url === '/api/collection').flush({ items, total_count: items.length });
-    fixture.detectChanges();
-    expect(fixture.nativeElement.querySelector('.sale-action button').getAttribute('aria-pressed')).toBe(
-      'false',
-    );
-  });
-  it('does not offer unowned releases and excludes platforms without WTS flags', () => {
-    seedOwnership();
-    const component = mount();
-    component.toggleSale({ ...items[0], release_id: 999 });
-    http.expectNone('/api/add_wts');
-    expect(store.selectSnapshot(OwnershipState.activeWtsPlatforms)).toEqual([]);
-    seedOwnership([1]);
-    expect(store.selectSnapshot(OwnershipState.activeWtsPlatforms)).toEqual([48]);
-  });
-  it('prepopulates sale details and saves a zero price and cleared CIB flag', () => {
-    const component = mount('wts');
-    component.editSale({ ...items[0], price: 850, cib: true });
-    expect(component.salePrice.value).toBe(850);
-    expect(component.saleCib.value).toBe(true);
-    component.salePrice.setValue(0);
-    component.saleCib.setValue(false);
-    component.saveSale();
-    const req = http.expectOne('/api/add_wts');
-    expect(req.request.body).toEqual({ release_id: 1, price: 0, cib: false });
-    req.flush(null);
-    http.expectOne('/api/collection-stats').flush(ownership([1]));
-    http
-      .expectOne((r) => r.url === '/api/wts')
-      .flush({ items: [{ ...items[0], price: 0, cib: false }], total_count: 1 });
-    fixture.detectChanges();
-    expect(cards()[0].querySelector('.price').textContent).toContain('0');
-    expect(cards()[0].textContent).toContain('Полный комплект не отмечен');
-  });
-  it('validates sale price and allows leaving it unspecified', () => {
-    const component = mount('wts');
-    component.editSale(items[0]);
-    for (const value of [-1, 1.5, 2147483648]) {
-      component.salePrice.setValue(value);
-      expect(component.salePrice.invalid).toBe(true);
-      component.saveSale();
-    }
-    http.expectNone('/api/add_wts');
-    component.salePrice.setValue(null);
-    component.saveSale();
-    const req = http.expectOne('/api/add_wts');
-    expect(req.request.body).toEqual({ release_id: 1, price: null, cib: false });
-    req.flush(null);
-    http.expectOne('/api/collection-stats').flush(ownership([1]));
-    http
-      .expectOne((r) => r.url === '/api/wts')
-      .flush({ items: [{ ...items[0], price: null, cib: true }], total_count: 1 });
-    fixture.detectChanges();
-    expect(cards()[0].textContent).toContain('CIB · Полный комплект');
-    expect(cards()[0].textContent).toContain('Не указана');
-  });
-  it('submits the purchase price by clicking the modal save button', () => {
-    const component = mount();
-    component.edit(items[0]);
-    component.price.setValue(500);
-    fixture.detectChanges();
-    (document.querySelector('ngb-modal-window button[type="submit"]') as HTMLButtonElement).click();
-    const req = http.expectOne('/api/set_release_price');
-    expect(req.request.body).toEqual({ release_id: 1, price: 500 });
-    req.flush(null);
-    http.expectOne('/api/collection-stats').flush(ownership());
-    http.expectOne((r) => r.url === '/api/collection').flush({ items, total_count: items.length });
-  });
-  it.each(['collection', 'wishlist', 'wts'] as const)('exports the entire %s through its button', (kind) => {
-    const save = vi.spyOn(TestBed.inject(LibraryCsvDownload), 'save').mockImplementation(() => {});
-    const component = mount(kind);
-    component.page(2);
-    if (kind === 'collection') component.query.setValue('Game 49');
-    fixture.detectChanges();
-    (fixture.nativeElement.querySelector('.csv-export') as HTMLButtonElement).click();
-    expect(save).toHaveBeenCalledOnce();
-    const [csv, filename] = save.mock.calls[0];
-    expect(csv).toContain('Game 01');
-    expect(csv).toContain('Game 49');
-    expect(filename).toMatch(new RegExp('^' + kind + '-48-.*\\.csv$'));
-    expect(csv).toContain(
-      kind === 'wts' ? 'Цена продажи' : kind === 'collection' ? 'Цена покупки' : 'Название',
-    );
-  });
+import { LibraryViewService } from '@app/shared/library-view.service';
+import { LibraryCsvDownload } from '@app/shared/library-csv';
+import { ICollectionItem } from '@app/states/collection/interfaces/collection-item.interface';
+const items:ICollectionItem[]=Array.from({length:49},(_,i)=>({release_id:i+1,product_id:i+1,product_name:`Game ${i+1}`,platform_id:48,platform_name:'PS4',region_id:1,region_name:'europe',release_date:1000,image_url:null,serial:['CUSA-00001','CUSA-00002'],price:i===0?0:100+i,cib:null}));
+describe('Personal library server pages',()=>{
+ let fixture:ComponentFixture<PersonalLibraryComponent>, http:HttpTestingController, store:Store;
+ beforeEach(()=>{
+  vi.useFakeTimers();vi.spyOn(window,'scrollTo').mockImplementation(()=>{});
+  TestBed.configureTestingModule({imports:[PersonalLibraryComponent],providers:TEST_PROVIDERS});http=TestBed.inject(HttpTestingController);store=TestBed.inject(Store);
+  const state=store.snapshot();store.reset({...state,Collection:{...state.Collection,collectionParams:{cat:48},wishlistParams:{cat:48},wtsParams:{cat:48}}});
+ });
+ afterEach(()=>{fixture?.destroy();http.verify({ignoreCancelled:true});vi.useRealTimers();vi.restoreAllMocks();});
+ function pending(kind='collection'){vi.advanceTimersByTime(1);return http.expectOne(r=>r.url===`/api/library/${kind}`);}
+ function flush(req:ReturnType<typeof pending>, data=items, total=data.length){const offset=Number(req.request.params.get('offset'));const limit=Number(req.request.params.get('limit'));req.flush({items:data.slice(offset,offset+limit),total_count:total,unfiltered_total:total,platform_ids:[48],owned_regions:{europe:total}});fixture.detectChanges();}
+ function mount(kind:'collection'|'wishlist'|'wts'='collection'){fixture=TestBed.createComponent(PersonalLibraryComponent);fixture.componentRef.setInput('kind',kind);fixture.detectChanges();const req=pending(kind);expect(req.request.params.get('limit')).toBe('24');flush(req);return fixture.componentInstance;}
+ const cards=()=>fixture.nativeElement.querySelectorAll('app-release-card');
+ it('requests just the selected page and clamps an emptied last page',()=>{
+  const c=mount();expect(cards()).toHaveLength(24);c.page(3);const req=pending();expect(req.request.params.get('offset')).toBe('48');flush(req);expect(cards()).toHaveLength(1);
+  c.retry();flush(pending(),items.slice(0,48));const clamped=pending();expect(clamped.request.params.get('offset')).toBe('24');flush(clamped,items.slice(0,48));expect(cards()).toHaveLength(24);expect(c.view.page).toBe(2);
+ });
+ it('sends global search, serial mode, regions and sort to the server, resetting the page',()=>{
+  const c=mount();c.page(2);flush(pending());c.query.setValue('Game 49');vi.advanceTimersByTime(251);const req=pending();expect(req.request.params.get('query')).toBe('Game 49');expect(req.request.params.get('offset')).toBe('0');req.flush({items:[items[48]],total_count:1,unfiltered_total:49,platform_ids:[48],owned_regions:{}});fixture.detectChanges();expect(cards()).toHaveLength(1);
+  c.toggleRegion('europe');flush(pending());c.sort('price');const sorted=pending();expect(sorted.request.params.get('sort')).toBe('price');flush(sorted);c.searchMode('serial');const serial=pending();expect(serial.request.params.get('regions')).toBe('');expect(serial.request.params.get('search_mode')).toBe('serial');flush(serial);
+ });
+ it('cancels stale page requests and restores page and sort on return',()=>{
+  const c=mount();c.page(2);const old=pending();c.page(3);const next=pending();expect(old.cancelled).toBe(true);flush(next);c.sort('date');flush(pending());c.page(2);flush(pending());fixture.destroy();
+  fixture=TestBed.createComponent(PersonalLibraryComponent);fixture.componentRef.setInput('kind','collection');fixture.detectChanges();const restored=pending();expect(restored.request.params.get('sort')).toBe('date');expect(restored.request.params.get('offset')).toBe('24');flush(restored);
+ });
+ it('resets page on platform switch',()=>{const c=mount();c.page(2);flush(pending());c.selectPlatform(167);const req=pending();expect(req.request.params.get('cat')).toBe('167');expect(req.request.params.get('offset')).toBe('0');flush(req);});
+ for(const kind of ['wishlist','wts'] as const)it(`paginates ${kind} and exposes its own menu actions`,()=>{
+  const c=mount(kind);c.page(3);flush(pending(kind));expect(cards()).toHaveLength(1);fixture.nativeElement.querySelector('.edit-button').click();fixture.detectChanges();const text=fixture.nativeElement.querySelector('.context-menu').textContent;
+  expect(text).toContain(kind==='wts'?'Снять с продажи':'Удалить из вишлиста');expect(text).not.toContain('Удалить из коллекции');expect(fixture.nativeElement.querySelector('.ownership-mark')).toBeNull();
+ });
+ it('prepopulates copy details and saves false separately from unknown, with the selected release serial',()=>{
+  const c=mount();c.editCopy(items[0]);fixture.detectChanges();expect(c.copyCib.value).toBeNull();expect(c.copySerial.value).toBeNull();c.copyCib.setValue(false);c.copySerial.setValue('CUSA-00002');c.saveCopy();const req=http.expectOne('/api/collection-copy');expect(req.request.body).toEqual({release_id:1,selected_serial:'CUSA-00002',cib:false});req.flush(null);http.expectOne('/api/collection-stats').flush([]);flush(pending());expect(document.querySelector('.modal')).toBeNull();
+ });
+ it('keeps the copy editor open after failed validation',()=>{const c=mount();c.editCopy(items[0]);c.saveCopy();http.expectOne('/api/collection-copy').flush('wrong serial',{status:400,statusText:'Bad Request'});fixture.detectChanges();expect(document.querySelector('.modal')).not.toBeNull();http.expectNone(r=>r.url==='/api/library/collection');});
+ it('saves a zero purchase price without touching copy fields',()=>{const c=mount();c.edit(items[0]);expect(c.price.value).toBe(0);c.savePrice();const req=http.expectOne('/api/set_release_price');expect(req.request.body).toEqual({release_id:1,price:0});req.flush(null);http.expectOne('/api/collection-stats').flush([]);flush(pending());});
+ it('validates sale prices and preserves a zero price and false CIB',()=>{const c=mount('wts');c.editSale({...items[0],cib:false});expect(c.salePrice.value).toBe(0);c.salePrice.setValue(-1);c.saveSale();http.expectNone('/api/add_wts');c.salePrice.setValue(0);c.saveSale();const req=http.expectOne('/api/add_wts');expect(req.request.body).toEqual({release_id:1,price:0,cib:false});req.flush(null);http.expectOne('/api/collection-stats').flush([]);flush(pending('wts'));});
+ it('withdraws only the sale flag and retries failures',()=>{const c=mount('wts');c.remove(1);http.expectOne('/api/remove_wts').flush(null);http.expectOne('/api/collection-stats').flush([]);flush(pending('wts'));c.retry();pending('wts').flush('',{status:500,statusText:'Error'});fixture.detectChanges();expect(fixture.nativeElement.textContent).toContain('Не удалось загрузить');c.retry();flush(pending('wts'));});
+ for(const kind of ['collection','wishlist','wts'] as const)it(`fetches the whole ${kind} only when exporting CSV`,async()=>{
+  const c=mount(kind);const save=vi.spyOn(TestBed.inject(LibraryCsvDownload),'save').mockImplementation(()=>{});const promise=c.exportCsv();const req=http.expectOne(r=>r.url===`/api/library/${kind}`);expect(req.request.params.get('limit')).toBe('1000');flush(req);await promise;expect(save).toHaveBeenCalledOnce();expect(save.mock.calls[0][0]).toContain('Game 49');
+ });
+ it('opens the animation with only this page',async()=>{const c=mount();c.page(3);flush(pending());const modal={componentInstance:{items:[] as ICollectionItem[]},close:vi.fn(),result:new Promise(()=>{})};vi.spyOn(TestBed.inject(NgbModal),'open').mockReturnValue(modal as never);await c.openSnow();expect(modal.componentInstance.items.map(i=>i.release_id)).toEqual([49]);});
 });

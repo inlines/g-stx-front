@@ -61,6 +61,29 @@ describe('Chat incoming notifications', () => {
     opened('deleted-user');
     expect(fixture.nativeElement.querySelector('app-user-avatar img')).toBeNull();
   });
+  it('keeps mobile chat closed, preserving its dialog while sounding and updating unread count', async () => {
+    vi.spyOn(window, 'innerWidth', 'get').mockReturnValue(375);
+    const state = store.snapshot();
+    store.reset({ ...state, chat: { ...state.chat, isOpened: false, recepient: 'bob' } });
+    store.dispatch(new ChatActions.SetMessages([incoming]));
+    fixture.detectChanges();
+    await fixture.whenStable();
+    expect(store.selectSnapshot(ChatState.visible)).toBe(false);
+    expect(store.selectSnapshot(ChatState.recepient)).toBe('bob');
+    expect(store.selectSnapshot(ChatState.unreadCount)).toBe(1);
+    expect(play).toHaveBeenCalledOnce();
+    expect(fixture.nativeElement.querySelector('.chat-container')).toBeNull();
+  });
+  it('does not close an already open mobile chat on an incoming message', async () => {
+    vi.spyOn(window, 'innerWidth', 'get').mockReturnValue(375);
+    opened('alice');
+    store.dispatch(new ChatActions.SetMessages([incoming]));
+    fixture.detectChanges();
+    await fixture.whenStable();
+    expect(store.selectSnapshot(ChatState.visible)).toBe(true);
+    expect(store.selectSnapshot(ChatState.recepient)).toBe('alice');
+    expect(fixture.nativeElement.textContent).toContain('Hello');
+  });
   it('opens a closed sidebar, sounds and highlights the incoming dialog', async () => {
     store.dispatch(new ChatActions.SetMessages([incoming]));
     fixture.detectChanges();

@@ -43,7 +43,9 @@ export class PersonalListController {
   activeCategory: number | null = null;
   totalSpent = 0;
 
-  connect(kind: keyof typeof LISTS): void {
+  private paged = false;
+  connect(kind: keyof typeof LISTS, paged = false): void {
+    this.paged = paged;
     this.config = LISTS[kind];
     this.items$ = this.store
       .select(this.config.items)
@@ -87,7 +89,7 @@ export class PersonalListController {
       )
       .subscribe((params) => {
         this.activeCategory = params.cat!;
-        this.store.dispatch(new this.config.load());
+        if (!this.paged) this.store.dispatch(new this.config.load());
       });
     this.platforms$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((platforms) => {
       if (platforms.length && !platforms.some((platform) => platform.id === this.activeCategory))
@@ -112,8 +114,8 @@ export class PersonalListController {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         if (this.store.selectSnapshot(CollectionState.changeStatus) !== RequestStatus.Load) return;
-        if (this.activeCategory === previousCategory && this.activeCategory)
-          this.store.dispatch(new this.config.load());
+        if (!this.paged && this.activeCategory === previousCategory && this.activeCategory)
+          if (!this.paged) this.store.dispatch(new this.config.load());
         onSuccess?.();
       });
   }
