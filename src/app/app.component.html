@@ -1,4 +1,4 @@
-<div class="layout-wrapper d-flex flex-column min-vh-100">
+<div [class.photo-mode]="photoMode()" [class.has-mobile-nav]="isAuthorized$ | async" class="layout-wrapper d-flex flex-column min-vh-100">
   <header>
     <app-header></app-header>
   </header>

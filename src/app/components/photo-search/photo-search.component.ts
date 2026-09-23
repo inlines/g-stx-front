@@ -1,5 +1,14 @@
 import { NinjaSound } from './ninja-sound';
-import { Component, DestroyRef, ElementRef, ViewChild, inject, signal } from '@angular/core';
+import {
+  afterNextRender,
+  Component,
+  DestroyRef,
+  ElementRef,
+  InjectionToken,
+  ViewChild,
+  inject,
+  signal,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Store } from '@ngxs/store';
@@ -12,6 +21,10 @@ import { RegionGroup } from '@app/shared/region-filter';
 import { matchingPhotoReleases, photoSerials, releaseRegionGroup, serialPlatform } from './photo-serial';
 import { SpineGuideComponent } from './spine-guide.component';
 import { decodePhoto, startOcr } from './photo-ocr';
+export const PHOTO_PROCESSOR = new InjectionToken('Photo processor', {
+  providedIn: 'root',
+  factory: () => ({ decodePhoto, startOcr }),
+});
 interface Match {
   name: string;
   platform: number;
@@ -26,6 +39,11 @@ interface Match {
 })
 export class PhotoSearchComponent {
   @ViewChild('preview') preview?: ElementRef<HTMLCanvasElement>;
+  @ViewChild('result') result?: ElementRef<HTMLCanvasElement>;
+  readonly step = signal<'intro' | 'upload' | 'crop' | 'review'>('upload');
+  readonly slide = signal(0);
+  readonly ocrDone = signal(false);
+  private touchStart = 0;
   @ViewChild('zoom') zoom?: ElementRef<HTMLCanvasElement>;
   readonly selected = signal(false);
   cropWidth = 50;
@@ -55,15 +73,69 @@ export class PhotoSearchComponent {
   private center?: { x: number; y: number };
   private crop?: { x: number; y: number; width: number; height: number };
   private rotation = 0;
+  private readonly processor = inject(PHOTO_PROCESSOR);
   private readonly api = inject(ProductsService);
   private readonly router = inject(Router);
   private readonly store = inject(Store);
   constructor() {
+    try {
+      const raw = Number(localStorage.getItem('gstx.photo-search.visits.v1') ?? 0);
+      const visits = Number.isFinite(raw) && raw >= 0 ? Math.floor(raw) : 0;
+      if (visits < 5) this.step.set('intro');
+      localStorage.setItem('gstx.photo-search.visits.v1', String(Math.min(visits + 1, 5)));
+    } catch {
+      this.step.set('intro');
+    }
+    const host = inject(ElementRef<HTMLElement>).nativeElement;
+    const destroyRef = inject(DestroyRef);
+    afterNextRender(() => {
+      const viewport = window.visualViewport;
+      const resize = () => {
+        host.style.setProperty('--photo-height', `${viewport?.height ?? window.innerHeight}px`);
+        host.style.setProperty('--photo-top', `${viewport?.offsetTop ?? 0}px`);
+      };
+      resize();
+      viewport?.addEventListener('resize', resize);
+      viewport?.addEventListener('scroll', resize);
+      destroyRef.onDestroy(() => {
+        viewport?.removeEventListener('resize', resize);
+        viewport?.removeEventListener('scroll', resize);
+      });
+    });
     inject(DestroyRef).onDestroy(() => {
       this.destroyed = true;
       this.cancel();
       this.ninja.stop();
     });
+  }
+  finishIntro() {
+    this.step.set('upload');
+  }
+  help() {
+    this.slide.set(0);
+    this.step.set('intro');
+  }
+  tutorialTouchStart(event: TouchEvent) {
+    this.touchStart = event.changedTouches[0].clientX;
+  }
+  tutorialTouchEnd(event: TouchEvent) {
+    const delta = event.changedTouches[0].clientX - this.touchStart;
+    if (Math.abs(delta) > 40) this.slide.set(Math.max(0, Math.min(2, this.slide() + (delta < 0 ? 1 : -1))));
+  }
+  back() {
+    this.cancel();
+    this.status.set('');
+    if (this.step() === 'review') this.step.set('crop');
+    else if (this.step() === 'crop' || this.step() === 'intro') this.step.set('upload');
+    else void this.router.navigate(['/products']);
+  }
+  next() {
+    this.status.set('');
+    this.step.set('review');
+    this.draw();
+  }
+  manualEntry() {
+    this.ocrDone.set(true);
   }
   cancel() {
     this.revision++;
@@ -87,15 +159,18 @@ export class PhotoSearchComponent {
     this.ninja.stop();
     this.platform = 0;
     try {
-      const image = await decodePhoto(file);
+      const image = await this.processor.decodePhoto(file);
       if (this.destroyed || version !== this.revision) return;
       this.image = image;
       this.rotation = 0;
       this.crop = undefined;
+      this.center = undefined;
+      this.ocrDone.set(false);
+      this.step.set('crop');
       this.selected.set(false);
       this.hasPhoto.set(true);
       this.draw();
-      this.status.set('Нажмите «Распознать». Если нужно — коснитесь кода на фото, чтобы увеличить его.');
+      this.status.set('');
     } catch (e) {
       if (version === this.revision)
         this.status.set(e instanceof Error ? e.message : 'Не удалось открыть фото. Попробуйте JPEG.');
@@ -119,37 +194,30 @@ export class PhotoSearchComponent {
     ctx.rotate((this.rotation * Math.PI) / 2);
     ctx.drawImage(image, -w / 2, -h / 2, w, h);
     ctx.restore();
+    const box = this.crop ?? { x: 0, y: 0, width: canvas.width, height: canvas.height };
+    for (const output of [this.zoom?.nativeElement, this.result?.nativeElement]) {
+      if (!output) continue;
+      output.width = Math.max(1, Math.round(box.width));
+      output.height = Math.max(1, Math.round(box.height));
+      output
+        .getContext('2d')!
+        .drawImage(canvas, box.x, box.y, box.width, box.height, 0, 0, output.width, output.height);
+    }
     if (this.crop) {
-      const zoom = this.zoom?.nativeElement;
-      if (zoom) {
-        zoom.width = Math.round(this.crop.width);
-        zoom.height = Math.round(this.crop.height);
-        zoom
-          .getContext('2d')!
-          .drawImage(
-            canvas,
-            this.crop.x,
-            this.crop.y,
-            this.crop.width,
-            this.crop.height,
-            0,
-            0,
-            zoom.width,
-            zoom.height,
-          );
-      }
       ctx.strokeStyle = '#c7a6ff';
       ctx.lineWidth = 5;
       ctx.strokeRect(this.crop.x, this.crop.y, this.crop.width, this.crop.height);
     }
   }
   rotate() {
+    this.center = undefined;
     this.rotation = (this.rotation + 1) % 4;
     this.crop = undefined;
     this.selected.set(false);
     this.draw();
   }
   resetCrop() {
+    this.center = undefined;
     this.crop = undefined;
     this.selected.set(false);
     this.draw();
@@ -210,7 +278,7 @@ export class PhotoSearchComponent {
         .getContext('2d')!
         .drawImage(source, box.x, box.y, box.width, box.height, 0, 0, canvas.width, canvas.height);
       this.draw();
-      worker = await startOcr((p) => {
+      worker = await this.processor.startOcr((p) => {
         if (version === this.revision) this.status.set(`Распознаём: ${Math.round(p * 100)}%`);
       });
       if (version !== this.revision || this.destroyed) return;
@@ -233,14 +301,15 @@ export class PhotoSearchComponent {
         const extra = photoSerials(retry.data.text);
         codes = extra.some((code) => /[A-Z]/.test(code)) ? extra : [...new Set([...codes, ...extra])];
       }
+      this.ocrDone.set(true);
       this.candidates.set(codes);
       if (codes.length === 1) this.choose(codes[0]);
       this.status.set(
         codes.length
           ? codes.every((code) => /^\d/.test(code))
             ? 'Прочитаны только цифры. Проверьте, не пропущены ли буквы: коснитесь полного кода и повторите распознавание.'
-            : 'Проверьте код по коробке перед поиском.'
-          : 'Серийник не найден. Коснитесь кода на фото, настройте рамку и повторите. Можно повернуть снимок или ввести код вручную.',
+            : 'Проверьте код по коробке.'
+          : 'Код не найден. Вернитесь к рамке или введите серийник вручную.',
       );
     } catch (error) {
       console.error('Photo OCR failed', error);

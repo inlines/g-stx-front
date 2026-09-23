@@ -1,5 +1,5 @@
 import { UserBadgesService } from '@app/services/user-badges.service';
-import { afterNextRender, DestroyRef, ElementRef, inject, NgZone, signal } from '@angular/core';
+import { DestroyRef, ElementRef, HostListener, inject } from '@angular/core';
 import { KudosComponent } from '../kudos/kudos.component';
 import { UserAvatarComponent } from '../user-avatar/user-avatar.component';
 import { AsyncPipe } from '@angular/common';
@@ -11,10 +11,13 @@ import { ChatActions } from '@app/states/chat/states/chat-actions';
 import { ChatState } from '@app/states/chat/states/chat.state';
 import { Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NavigationEnd } from '@angular/router';
+import { NavIconComponent } from './nav-icon.component';
 
 @Component({
   selector: 'app-header',
-  imports: [KudosComponent, UserAvatarComponent, RouterLink, AsyncPipe, RouterModule],
+  imports: [KudosComponent, UserAvatarComponent, RouterLink, AsyncPipe, RouterModule, NavIconComponent],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -22,51 +25,28 @@ import { Observable } from 'rxjs';
 })
 export class HeaderComponent {
   readonly badges = inject(UserBadgesService);
-  readonly navigationCollapsed = signal(false);
   private readonly host: ElementRef<HTMLElement> = inject(ElementRef);
-  private readonly zone = inject(NgZone);
   private readonly destroyRef = inject(DestroyRef);
-
+  @HostListener('document:click', ['$event'])
+  closeOutside(event: MouseEvent) {
+    for (const menu of this.host.nativeElement.querySelectorAll<HTMLDetailsElement>('details[open]')) {
+      if (!menu.contains(event.target as Node)) menu.open = false;
+    }
+  }
+  @HostListener('document:keydown.escape')
+  onEscape() { this.closeMenus(true); }
+  closeMenus(restoreFocus = false) {
+    for (const menu of this.host.nativeElement.querySelectorAll<HTMLDetailsElement>('details[open]')) {
+      menu.open = false;
+      if (restoreFocus) menu.querySelector('summary')?.focus();
+    }
+  }
   constructor(
     private readonly store: Store,
     private router: Router,
   ) {
-    afterNextRender(() => {
-      const mobile = window.matchMedia('(max-width: 767px)');
-      const update = () => {
-        if (!mobile.matches || window.scrollY <= 1) {
-          this.navigationCollapsed.set(false);
-        } else if (!this.navigationCollapsed() && window.scrollY > 24) {
-          const navigation = this.host.nativeElement.querySelector<HTMLElement>('.navigation-content');
-          // Avoid collapsing a short page back to scrollY=0 and immediately reopening it.
-          const remainingScroll = document.documentElement.scrollHeight - window.innerHeight - (navigation?.scrollHeight ?? 0);
-          if (remainingScroll > 24) this.navigationCollapsed.set(true);
-        }
-      };
-      const collapseForContent = () => {
-        if (!mobile.matches) return;
-        const navigation = this.host.nativeElement.querySelector<HTMLElement>('.navigation-collapse');
-        if (!navigation) return;
-        this.navigationCollapsed.set(true);
-        // Finish the height change before the caller measures its scroll target.
-        navigation.style.transition = 'none';
-        navigation.classList.add('collapsed');
-        navigation.setAttribute('inert', '');
-        navigation.setAttribute('aria-hidden', 'true');
-        navigation.getBoundingClientRect();
-        navigation.style.removeProperty('transition');
-      };
-      this.zone.runOutsideAngular(() => {
-        window.addEventListener('gstx:content-scroll', collapseForContent);
-        window.addEventListener('scroll', update, { passive: true });
-        window.addEventListener('resize', update, { passive: true });
-        update();
-      });
-      this.destroyRef.onDestroy(() => {
-        window.removeEventListener('gstx:content-scroll', collapseForContent);
-        window.removeEventListener('scroll', update);
-        window.removeEventListener('resize', update);
-      });
+    this.router.events.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((event) => {
+      if (event instanceof NavigationEnd) this.closeMenus();
     });
     this.currentUser$ = this.store.select(AuthState.login);
     this.isAuthorised$ = this.store.select(AuthState.isAuthorised);

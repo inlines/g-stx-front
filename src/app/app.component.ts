@@ -1,9 +1,11 @@
 import { OnboardingService } from './services/onboarding.service';
 import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { Store } from '@ngxs/store';
-import { Observable } from 'rxjs';
+import { Observable, filter, map, startWith } from 'rxjs';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { inject } from '@angular/core';
 import { ChatComponent } from './components/chat/chat.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { HeaderComponent } from './components/header/header.component';
@@ -27,12 +29,24 @@ import { PlatformsActions } from './states/platforms/states/platforms-actions';
   styleUrl: './app.component.scss',
 })
 export class AppComponent implements OnInit {
+  private readonly router = inject(Router);
+  readonly photoMode = toSignal(
+    this.router.events.pipe(
+      filter((e) => e instanceof NavigationEnd),
+      startWith(null),
+      map(() => this.router.url.split('?')[0] === '/photo-search'),
+    ),
+    { initialValue: false },
+  );
   title = 'game-stockx';
 
   public isChatVisible$!: Observable<boolean>;
   public isAuthorized$!: Observable<boolean>;
 
-  constructor(private store: Store, private onboarding: OnboardingService) {}
+  constructor(
+    private store: Store,
+    private onboarding: OnboardingService,
+  ) {}
 
   public ngOnInit(): void {
     this.onboarding.start();

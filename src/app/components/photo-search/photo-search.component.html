@@ -1,113 +1,70 @@
-<section class="photo-search">
-  <h1>Поиск по фото</h1>
-  <p>
-    Сфотографируйте серийник на торце коробки. Мы прочитаем код и найдём игру, платформу и регион в каталоге.
-  </p>
-  <div class="layout">
-    <aside>
-      <app-spine-guide />
-      <p class="hint">
-        Распознаётся напечатанный серийник, а не штрихкод. Если код стёрт или закрыт наклейкой, сделайте фото
-        другого места, где он указан.
-      </p>
-    </aside>
-    <div class="controls">
-      <label class="upload"
-        >Сделать фото или выбрать файл<input
-          type="file"
-          accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif"
-          (change)="upload($event)"
-      /></label>
-      <small>JPEG, PNG, WebP, HEIC · до 20 МБ. Фото обрабатывается на вашем устройстве.</small>
-      <div class="preview" [hidden]="!hasPhoto()">
-        <canvas
-          #preview
-          aria-label="Фото коробки. Коснитесь серийника для увеличения"
-          (click)="selectPoint($event)"
-        ></canvas>
-        <p>
-          Распознайте снимок целиком или коснитесь серийника — рамка появится вокруг места касания. Фото можно
-          свободно прокручивать.
-        </p>
-        <div [hidden]="!selected()" class="crop-controls">
-          <label
-            >Ширина рамки<input
-              type="range"
-              min="10"
-              max="100"
-              step="1"
-              [(ngModel)]="cropWidth"
-              (ngModelChange)="resizeCrop()"
-              [disabled]="busy()"
-          /></label>
-          <label
-            >Высота рамки<input
-              type="range"
-              min="5"
-              max="100"
-              step="1"
-              [(ngModel)]="cropHeight"
-              (ngModelChange)="resizeCrop()"
-              [disabled]="busy()"
-          /></label>
-          <canvas #zoom class="zoom" aria-label="Увеличенная область распознавания"></canvas>
-          <small>В рамку должны входить все буквы и цифры с небольшим отступом.</small>
+<section class="photo-search" [attr.aria-busy]="busy()">
+  <header class="flow-header">
+    <button class="back icon-button" type="button" (click)="back()" aria-label="Назад к предыдущему шагу">←</button>
+    <div><h1>Поиск по фото</h1><span class="step-label">{{ step() === 'intro' ? 'Как это работает' : step() === 'upload' ? '1 / 3 · Снимок' : step() === 'crop' ? '2 / 3 · Выделение кода' : '3 / 3 · Распознавание' }}</span></div>
+    <button type="button" class="icon-button" (click)="help()" [disabled]="busy()" aria-label="Как пользоваться поиском по фото">?</button>
+  </header>
+  <div class="flow-body">
+    @if (step() === 'intro') {
+      <section class="tutorial" (touchstart)="tutorialTouchStart($event)" (touchend)="tutorialTouchEnd($event)" aria-label="Обучение поиску по фото">
+        @if (slide() === 0) {
+          <app-spine-guide />
+          <h2>Серийник — ключ к игре</h2>
+          <p>Сфотографируйте буквы и цифры на торце коробки. Нужен напечатанный код, не штрихкод.</p>
+        } @else if (slide() === 1) {
+          <div class="guide-crop" aria-hidden="true"><span>BLES<br>00072</span><i></i></div>
+          <h2>Одно касание по коду</h2>
+          <p>Коснитесь серийника на фото. Ползунками подгоните рамку, чтобы поместились все буквы и цифры. Проверьте превью и нажмите «Далее».</p>
+        } @else {
+          <div class="guide-result" aria-hidden="true">BLES-00072 <span>✓</span></div>
+          <h2>Узнайте игру и регион</h2>
+          <p>Нажмите «Распознать», проверьте код и перейдите в каталог. Консоль, регион и название будут выбраны автоматически.</p>
+          <small>Фото обрабатывается на вашем устройстве.</small>
+        }
+        <div class="tutorial-dots" aria-label="Слайды обучения">
+          @for (n of [0, 1, 2]; track n) {<button type="button" [class.active]="slide() === n" [attr.aria-label]="'Слайд ' + (n + 1)" [attr.aria-pressed]="slide() === n" (click)="slide.set(n)"><span></span></button>}
         </div>
-        <div class="actions">
-          <button type="button" (click)="rotate()" [disabled]="busy()">Повернуть ↻</button
-          ><button type="button" (click)="resetCrop()" [disabled]="busy()">Весь снимок</button
-          ><button type="button" class="primary" (click)="recognize()" [disabled]="busy()">Распознать</button>
+        <button type="button" class="primary" (click)="slide() < 2 ? slide.set(slide() + 1) : finishIntro()">{{ slide() < 2 ? 'Далее' : 'Понятно, начнём' }}</button>
+      </section>
+    }
+    <section class="upload-step" [hidden]="step() !== 'upload'">
+      <div class="upload-art" aria-hidden="true">＋</div>
+      <h2>Найдём игру по коробке</h2>
+      <p>Снимите серийник крупно, прямо и без бликов.</p>
+      <label class="file-button primary">Сфотографировать<input type="file" capture="environment" accept="image/*,.heic,.heif" (change)="upload($event)" [disabled]="busy()" /></label>
+      <label class="file-button">Выбрать фото<input type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif" (change)="upload($event)" [disabled]="busy()" /></label>
+      <small>JPEG, PNG, WebP, HEIC · до 20 МБ<br>Фото остаётся на вашем устройстве</small>
+    </section>
+    <section class="crop-step" [hidden]="step() !== 'crop'">
+      <div class="photo-stage"><canvas #preview aria-label="Фото коробки. Коснитесь серийника для выделения" (click)="selectPoint($event)"></canvas></div>
+      <p class="caption">{{ selected() ? 'Все буквы и цифры должны быть внутри рамки' : 'Коснитесь серийника на фото' }}</p>
+      <div class="crop-tools" [hidden]="!selected()">
+        <div class="crop-zoom"><canvas #zoom aria-label="Предпросмотр выбранного серийника"></canvas></div>
+        <div class="sliders">
+          <label>Ширина<input type="range" min="5" max="100" step="1" [(ngModel)]="cropWidth" (ngModelChange)="resizeCrop()" [disabled]="busy()" /></label>
+          <label>Высота<input type="range" min="3" max="100" step="1" [(ngModel)]="cropHeight" (ngModelChange)="resizeCrop()" [disabled]="busy()" /></label>
         </div>
       </div>
-      <p role="status" aria-live="polite">{{ status() }}</p>
-      @if (busy()) {
-        <button type="button" (click)="cancel()">Отменить</button>
-      }
+      <div class="crop-actions"><button type="button" (click)="rotate()" [disabled]="busy()">Повернуть ↻</button><button type="button" (click)="resetCrop()" [disabled]="busy()">Весь снимок</button><button type="button" class="primary" (click)="next()" [disabled]="busy()">Далее →</button></div>
+    </section>
+    <section class="review-step" [hidden]="step() !== 'review'">
+      <div class="result-stage"><canvas #result aria-label="Участок фото для распознавания"></canvas></div>
+      <button type="button" [class.primary]="!ocrDone()" (click)="recognize()" [disabled]="busy()">{{ ocrDone() ? 'Распознать ещё раз' : 'Распознать' }}</button>
       @if (candidates().length > 1) {
-        <div class="actions">
-          @for (code of candidates(); track code) {
-            <button type="button" (click)="choose(code)" [disabled]="busy()">{{ code }}</button>
-          }
-        </div>
+        <div class="candidate-list" aria-label="Выберите распознанный серийник">@for (code of candidates(); track code) {<button type="button" (click)="choose(code)" [disabled]="busy()">{{code}}</button>}</div>
       }
-      <form (ngSubmit)="search()">
-        <label for="photo-serial">Серийник — проверьте по коробке</label>
-        <input
-          id="photo-serial"
-          name="serial"
-          [(ngModel)]="serial"
-          (ngModelChange)="editSerial()"
-          [disabled]="busy()"
-          placeholder="Введите серийник"
-          autocomplete="off"
-          autocapitalize="characters"
-          spellcheck="false"
-          maxlength="40"
-        />
-        <label for="photo-platform">Консоль</label>
-        <select
-          id="photo-platform"
-          name="platform"
-          [(ngModel)]="platform"
-          (ngModelChange)="matches.set([])"
-          [disabled]="busy()"
-        >
-          <option [ngValue]="0">Выберите консоль</option>
-          @for (p of platforms; track p.id) {
-            <option [ngValue]="p.id">{{ p.name }}</option>
-          }
-        </select>
-        <button class="primary" type="submit" [disabled]="busy()">Найти в каталоге</button>
-      </form>
-      @for (match of matches(); track $index) {
-        <button type="button" class="match" (click)="open(match)">
-          {{ match.name }} · {{ match.region }}
-        </button>
-      }
-      <p class="hint">
-        Каталог откроется с названием игры, консолью и регионом найденного релиза. Если совпадений несколько,
-        выберите свой. Worldwide попадёт в группу «Другие».
-      </p>
-    </div>
+      @if (ocrDone()) {
+        <form (ngSubmit)="search()">
+          <label for="photo-serial">Проверьте серийник</label>
+          <input id="photo-serial" name="serial" [(ngModel)]="serial" (ngModelChange)="editSerial()" [disabled]="busy()" placeholder="Введите серийник" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="40" />
+          <label class="platform-field" for="photo-platform">Консоль<select id="photo-platform" name="platform" [(ngModel)]="platform" (ngModelChange)="matches.set([])" [disabled]="busy()"><option [ngValue]="0">Выберите консоль</option>@for (p of platforms; track p.id) {<option [ngValue]="p.id">{{p.name}}</option>}</select></label>
+          <button class="primary" type="submit" [disabled]="busy() || !serial.trim()">Перейти в каталог →</button>
+        </form>
+      } @else {<button type="button" class="text-button" (click)="manualEntry()" [disabled]="busy()">Ввести код вручную</button>}
+      @for (match of matches(); track $index) {<button type="button" class="match" (click)="open(match)" [disabled]="busy()">{{ match.name }} · {{ match.region }}</button>}
+    </section>
   </div>
+  @if (status() || busy()) {
+    <footer class="flow-status"><p role="status" aria-live="polite">{{status()}}</p>@if (busy()) {<button type="button" (click)="cancel(); status.set('Операция отменена. Можно повторить.')">Отменить</button>}</footer>
+  }
 </section>

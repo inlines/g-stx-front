@@ -280,3 +280,10 @@ app-loading-panel { padding:0; width:100%; }
 .catalog-grid{scroll-margin-top:170px}@media(max-width:767px){.catalog-grid{scroll-margin-top:12px}}
 
 .catalog-grid { scroll-margin-top: 12px; }
+
+.extra-filters { border:1px solid #40556c; border-radius:12px; margin:12px 0; }
+.extra-filters summary { cursor:pointer; padding:12px 14px; min-height:48px; }
+.filter-count { display:inline-block; margin-left:8px; font-size:12px; background:#302940; color:#d2bced; padding:3px 8px; border-radius:20px; }
+.extra-filter-content { padding:0 14px 14px; display:flex; flex-wrap:wrap; align-items:center; gap:16px; }
+.extra-filter-content .multiplayer-filters { margin:0; }
+.extra-filter-content .catalog-sort { max-width:100%; }

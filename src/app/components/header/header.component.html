@@ -37,47 +37,37 @@
     </div>
   </div>
 
-  <div class="navigation-collapse" [class.collapsed]="navigationCollapsed()" [attr.inert]="navigationCollapsed() ? '' : null" [attr.aria-hidden]="navigationCollapsed() ? 'true' : null">
-    <div class="navigation-content">
-    @if (isAuthorised$ | async;) {
-      <div class="container-fluid container-lg">
-        <div class="row align-items-center" style="min-height: 60px; padding: 12px 0;">
-          <!-- Лого и кнопки -->
-          <div class="col primary-navigation">
+  @if (isAuthorised$ | async) {
+    <nav class="main-navigation" aria-label="Основная навигация">
+      <div class="nav-items container-fluid container-lg">
+        <a class="desktop-extra kudos-challenge-link" routerLink="/kudos-challenge" routerLinkActive="nav-active">Kudos Challenge <app-kudos [login]="currentUser$ | async" [compact]="true"/></a>
+        @if ((badges.admins$ | async)?.includes((currentUser$ | async) ?? '')) {
+          <a class="desktop-extra" routerLink="/unknown" routerLinkActive="nav-active">Unknown</a>
+        }
+        <a routerLink="/products" routerLinkActive="nav-active"><app-nav-icon name="catalog"/><span>Каталог</span></a>
+        <a routerLink="/photo-search" routerLinkActive="nav-active"><app-nav-icon name="photo"/><span>По фото</span></a>
+        <a routerLink="/collectors" routerLinkActive="nav-active"><app-nav-icon name="players"/><span>Игроки</span></a>
+        <details class="nav-folder" routerLinkActive="nav-active">
+          <summary><app-nav-icon name="mine"/><span>Моё</span><span class="chevron" aria-hidden="true">⌄</span></summary>
+          <div class="nav-submenu" aria-label="Моё">
+            <a routerLink="/collection" routerLinkActive="nav-active">Моя коллекция</a>
+            <a routerLink="/wishlist" routerLinkActive="nav-active">Вишлист</a>
+            <a routerLink="/wts" routerLinkActive="nav-active">Хочу продать</a>
+          </div>
+        </details>
+        <details class="nav-folder mobile-more" routerLinkActive="nav-active">
+          <summary><app-nav-icon name="more"/><span>Ещё</span></summary>
+          <div class="nav-submenu" aria-label="Другие разделы">
             <a class="kudos-challenge-link" routerLink="/kudos-challenge" routerLinkActive="nav-active">Kudos Challenge <app-kudos [login]="currentUser$ | async" [compact]="true"/></a>
             @if ((badges.admins$ | async)?.includes((currentUser$ | async) ?? '')) {
-              <a class="text-white d-flex align-items-center" routerLink="/unknown" routerLinkActive="nav-active">Unknown</a>
+              <a routerLink="/unknown" routerLinkActive="nav-active">Unknown</a>
             }
-            <a class="text-white d-flex align-items-center" routerLink="/photo-search" routerLinkActive="nav-active">По фото</a>
-            <!-- Кнопка "Каталог" -->
-            <a class="nav-link text-white d-flex align-items-center" routerLink="/products" routerLinkActive="nav-active" [routerLinkActiveOptions]="{exact: true}">
-              Каталог
-            </a>
-
-
-            <a class="text-white d-flex align-items-center" routerLink="/collectors" routerLinkActive="nav-active" [routerLinkActiveOptions]="{exact: true}">
-              Игроки
-            </a>
-
-            <a class="text-white align-items-center d-none d-md-flex" routerLink="/collection" routerLinkActive="nav-active" [routerLinkActiveOptions]="{exact: true}">
-              Моя коллекция
-            </a>
-
-            <a class="text-white d-flex align-items-center d-md-none" routerLink="/collection" routerLinkActive="nav-active" [routerLinkActiveOptions]="{exact: true}">
-              Мое
-            </a>
-
-            <a class="text-white d-flex align-items-center" routerLink="/wishlist" routerLinkActive="nav-active" [routerLinkActiveOptions]="{exact: true}">
-              Вишлист
-            </a>
-
-            <a class="text-white d-flex align-items-center" routerLink="/wts" routerLinkActive="nav-active" [routerLinkActiveOptions]="{exact: true}">
-              Хочу продать
-            </a>
+            <a routerLink="/profile" routerLinkActive="nav-active">Мой профиль</a>
+            <button type="button" (click)="closeMenus(); toggleChat()">Чат @if (unreadCount$ | async; as count) {<span>{{count}}</span>}</button>
+            <button type="button" (click)="closeMenus(); logout()">Выйти</button>
           </div>
-        </div>
+        </details>
       </div>
-    }
-    </div>
-  </div>
+    </nav>
+  }
 </div>

@@ -37,6 +37,26 @@ describe('Catalog filters', () => {
     nextRequest().flush({ items: [], total_count: 100 });
   }
 
+  it('keeps advanced filters collapsed while showing restored selections and retaining their request values', () => {
+    store.dispatch(new ProductsActions.SetRequestParams({genre_id:5,local_multiplayer:true,online_multiplayer:true}));
+    const component = mount();
+    http.expectOne('/api/genres').flush([{id:5,name:'Shooter'}]);
+    const request = nextRequest();
+    expect(request.request.params.get('genre_id')).toBe('5');
+    request.flush({items:[],total_count:0});
+    fixture.detectChanges();
+    const details = fixture.nativeElement.querySelector('.extra-filters') as HTMLDetailsElement;
+    expect(details.open).toBe(false);
+    expect(details.querySelector('summary')?.textContent).toContain('Выбрано: 3');
+    details.open = true; details.open = false;
+    expect(component.queryForm.controls.genre.value).toBe(5);
+    expect(component.queryForm.controls.localMultiplayer.value).toBe(true);
+    component.queryForm.patchValue({genre:null,localMultiplayer:false,onlineMultiplayer:false});
+    vi.advanceTimersByTime(300);
+    nextRequest().flush({items:[],total_count:100}); fixture.detectChanges();
+    expect(details.querySelector('summary')?.textContent).toContain('Выбрано: 0');
+  });
+
   it('filters by genre, resets paging and restores all genres', () => {
     const component = mount();
     http.expectOne('/api/genres').flush([{id: 5, name: 'Shooter'}]);

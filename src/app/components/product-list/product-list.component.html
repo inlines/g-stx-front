@@ -16,21 +16,24 @@
           @if (!isNamedCatalog) {
           <app-region-filters [unknown]="unknown" [unidentified]="(unknownRegionCounts$ | async) ?? {}" [selected]="selectedRegions" [totals]="((unknown ? unknownRegionTotals$ : selectedRegionCounts$) | async) ?? {}" (regionToggle)="toggleRegion($event)"/>
           }
-          <fieldset class="multiplayer-filters">
-            <legend>Мультиплеер на выбранной платформе</legend>
-            <label><input type="checkbox" formControlName="localMultiplayer"> Локально · 2+ игрока</label>
-            <label><input type="checkbox" formControlName="onlineMultiplayer"> Онлайн · 2+ игрока</label>
-          </fieldset>
+          <details class="extra-filters">
+            <summary>Мультиплеер и жанр <span class="filter-count" aria-live="polite">Выбрано: {{ (queryForm.controls.localMultiplayer.value ? 1 : 0) + (queryForm.controls.onlineMultiplayer.value ? 1 : 0) + (queryForm.controls.genre.value ? 1 : 0) }}</span></summary>
+            <div class="extra-filter-content">
+              <fieldset class="multiplayer-filters">
+                <legend>Мультиплеер на выбранной платформе</legend>
+                <label><input type="checkbox" formControlName="localMultiplayer"> Локально · 2+ игрока</label>
+                <label><input type="checkbox" formControlName="onlineMultiplayer"> Онлайн · 2+ игрока</label>
+              </fieldset>
+              <label class="catalog-sort">Жанр
+                <select class="form-select" formControlName="genre">
+                  <option [ngValue]="null">Все жанры</option>
+                  @for (genre of genres$ | async; track genre.id) { <option [ngValue]="genre.id">{{ genre.name }}</option> }
+                </select>
+              </label>
+              @if (genresFailed) { <span class="text-warning" role="status">Не удалось загрузить жанры. Обновите страницу, чтобы повторить.</span> }
+            </div>
+          </details>
           <div class="catalog-options">
-            <label class="catalog-sort">Жанр
-              <select class="form-select" formControlName="genre">
-                <option [ngValue]="null">Все жанры</option>
-                @for (genre of genres$ | async; track genre.id) {
-                  <option [ngValue]="genre.id">{{ genre.name }}</option>
-                }
-              </select>
-            </label>
-            @if (genresFailed) { <span class="text-warning" role="status">Не удалось загрузить жанры. Обновите страницу, чтобы повторить.</span> }
             @if (!unknown) {
             <label class="digital-option" for="onlyDigitalSwitch">
               <input type="checkbox" id="onlyDigitalSwitch" formControlName="skipDigitalFilter" />

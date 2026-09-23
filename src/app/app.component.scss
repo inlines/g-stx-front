@@ -81,3 +81,10 @@ app-toast-container {
   z-index: 1060;
   max-width: 100%;
 }
+
+@media (max-width:767px) {
+  .has-mobile-nav { --mobile-nav-space:calc(64px + env(safe-area-inset-bottom)); padding-bottom:calc(80px + env(safe-area-inset-bottom)); }
+  .photo-mode { height:100dvh; min-height:0 !important; overflow:hidden; }
+  .photo-mode app-footer { display:none; }
+  .has-mobile-nav app-toast-container { bottom:calc(72px + env(safe-area-inset-bottom)); }
+}

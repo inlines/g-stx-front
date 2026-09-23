@@ -257,3 +257,8 @@ summary:focus-visible {
 @media (hover: none) and (pointer: coarse) {
   body::before, body::after { animation: none; }
 }
+
+@media (max-width:767px) {
+  html { scroll-padding-bottom:calc(88px + env(safe-area-inset-bottom)); }
+  app-pager { display:block; padding-bottom:calc(80px + env(safe-area-inset-bottom)); }
+}
