@@ -29,6 +29,7 @@ export class OnboardingComponent implements OnInit, OnDestroy {
   @ViewChild('content') private content?: ElementRef<HTMLElement>;
   readonly index = signal(0);
   readonly phase = signal(0);
+  readonly photoSlide = signal(0);
   readonly requestKind = signal<'serial' | 'name'>('serial');
   private timers: ReturnType<typeof setTimeout>[] = [];
   private readonly originalSteps = [
@@ -63,7 +64,7 @@ export class OnboardingComponent implements OnInit, OnDestroy {
     {
       name: 'Продажа',
       title: 'Дайте игре нового владельца',
-      text: 'У игры в своей коллекции нажмите «Выставить на продажу». Укажите цену и отметьте CIB, если это полный комплект.',
+      text: 'Откройте меню карточки в своей коллекции: удерживайте её на телефоне или нажмите карандаш на компьютере. Выберите «Выставить на продажу». Укажите цену и отметьте CIB, если это полный комплект.',
       action: 'Выставить на продажу',
       result:
         'Игра появилась в «Моё → Хочу продать». Её увидят другие коллекционеры; цену и комплектность можно изменить.',
@@ -113,7 +114,15 @@ export class OnboardingComponent implements OnInit, OnDestroy {
       scene: 9,
     },
     { name: 'По фото', title: 'Найдите игру по торцу коробки', text: 'Откройте «По фото» в меню, на телефоне — значком камеры снизу. Снимите серийник прямо и без бликов. Коснитесь кода, настройте рамку и нажмите «Далее». На следующем экране нажмите «Распознать», проверьте код и перейдите в каталог. Стрелка сверху возвращает на предыдущий шаг. Если текст не читается — измените область, загрузите другое фото или введите код вручную.', action: 'Найти по коду', result: 'Каталог откроется с названием найденной игры, консолью и регионом её релиза — можно сразу открыть карточку. При нескольких совпадениях сначала выберите подходящий регион. Штрихкод без напечатанного серийника не используется.', scene: 10 },
-    ...this.originalSteps.slice(1).map((step, i) => ({ ...step, scene: i + 1 })),
+    { ...this.originalSteps[1], scene: 1 },
+    {
+      name: 'Мой экземпляр', title: 'Уточните данные своей игры',
+      text: 'Откройте «Моё → Моя коллекция» и меню нужной карточки. Выберите «Комплектность и серийник»: укажите, полный ли комплект (CIB), и код именно вашей коробки, если у релиза их несколько. Значок «!» напоминает о незаполненных данных.',
+      action: 'Показать сохранённый экземпляр',
+      result: 'На карточке видны выбранный серийник и комплектность. В том же меню можно изменить цену покупки, выставить игру на продажу или удалить её из коллекции. Эти сведения относятся только к вашему экземпляру.',
+      scene: 11,
+    },
+    ...this.originalSteps.slice(2).map((step, i) => ({ ...step, scene: i + 2 })),
   ];
   scene() {
     return this.step.scene;
@@ -158,6 +167,7 @@ export class OnboardingComponent implements OnInit, OnDestroy {
     this.replay();
   }
   replay() {
+    this.photoSlide.set(0);
     this.clearTimers();
     // Reduced-motion visitors see the completed example immediately.
     if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {

@@ -29,6 +29,10 @@
       <span class="eyebrow">ВАША КОЛЛЕКЦИЯ НАЧИНАЕТСЯ ЗДЕСЬ</span>
       <h1 id="onboarding-title">{{ step.title }}</h1>
       <p>{{ step.text }}</p>
+      @if(scene() === 11){
+        <p class="copy-mobile-instruction"><strong>На телефоне</strong> нажмите на карточку и удерживайте палец, пока не откроется меню.</p>
+        <p class="copy-desktop-instruction"><strong>На компьютере</strong> нажмите значок карандаша в правом верхнем углу карточки.</p>
+      }
       <small>Это учебный пример. Ваши игры, заявки и сообщения не изменяются.</small>
     </div>
     <div class="demo" [class.acted]="phase() === 2" [class.kudos-demo]="scene() === 7">
@@ -37,7 +41,49 @@
         ><small>ДЕМОНСТРАЦИЯ</small>
       </div>
       <div class="scene">
-        @if(scene() === 10){<app-spine-guide/>}
+        @if(scene() === 11){
+          <div class="copy-demo" [class.menu-shown]="phase() > 0">
+            <div class="copy-demo-card">
+              <img src="/tutorial-cover.svg" width="120" height="160" alt="Пример обложки Night Circuit">
+              <svg class="copy-pencil" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-label="Карандаш — меню карточки"><path d="m16 3 5 5-13 13H3v-5zM13 6l5 5"/></svg>
+              <span class="copy-hold" aria-hidden="true"></span>
+              <strong>Night Circuit</strong>
+              <small>{{phase() === 2 ? 'Серийник · CUSA-01234' : 'Серийники · 2'}}</small>
+              <small>{{phase() === 2 ? 'CIB · Полный комплект' : '! Дополните данные экземпляра'}}</small>
+              <small>Куплено за 1 500 ₽</small>
+            </div>
+            <div class="copy-demo-menu" [class.visible]="phase() > 0">
+              <strong>Меню карточки</strong>
+              <button type="button" (click)="demonstrate()">Комплектность и серийник</button>
+              <span>Изменить цену покупки</span>
+              <span>Выставить на продажу</span>
+              <span>Удалить из коллекции</span>
+            </div>
+          </div>
+          @if(phase() === 2){<p class="copy-saved" role="status">Сохранено: полный комплект · CUSA-01234</p>}
+          <button type="button" class="demo-action" (click)="demonstrate()">{{step.action}}</button>
+        }
+        @if(scene() === 10){
+          <div class="photo-lesson">
+            @if(photoSlide() === 0){
+              <app-spine-guide/>
+              <h2>Серийник — ключ к игре</h2>
+              <p>Сфотографируйте буквы и цифры на торце коробки крупно, прямо и без бликов. Нужен напечатанный код, не штрихкод.</p>
+            } @else if(photoSlide() === 1){
+              <div class="photo-code-frame" aria-label="Рамка вокруг всего серийника">BLES<br>00072</div>
+              <h2>Одно касание по коду</h2>
+              <p>Коснитесь серийника на фото. Ползунками подгоните рамку, чтобы поместились все буквы и цифры. Проверьте превью и нажмите «Далее».</p>
+            } @else {
+              <div class="photo-code-result">BLES-00072</div>
+              <h2>Узнайте игру и регион</h2>
+              <p>Нажмите «Распознать», проверьте код и перейдите в каталог. Консоль, регион и название будут выбраны автоматически. Если код не читается, измените область или попробуйте другое фото.</p>
+              <small>Фото обрабатывается на вашем устройстве.</small>
+            }
+            <nav class="photo-lesson-pages" aria-label="Шаги поиска по фото">
+              @for(n of [0,1,2];track n){<button type="button" [attr.aria-label]="'По фото: шаг ' + (n+1)" [attr.aria-pressed]="photoSlide() === n" (click)="photoSlide.set(n)">{{n+1}}</button>}
+            </nav>
+          </div>
+        }
         @if(scene() === 8 || scene() === 9){<app-onboarding-catalog [mode]="scene() === 8 ? 'filters' : 'paging'" [phase]="phase()" (effect)="sound($event)"/>}
         @if(scene() === 0){<app-onboarding-catalog mode="search" [phase]="phase()"/>}
         @if (scene() > 0 && scene() < 5 && scene() !== 2) {

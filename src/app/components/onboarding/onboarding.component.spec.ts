@@ -18,7 +18,7 @@ describe('Safe interactive tutorial', () => {
     vi.useRealTimers();
     vi.unstubAllGlobals();
   });
-  it('walks through all ten steps, cleans up timers and finishes explicitly', () => {
+  it('walks through all tutorial steps, cleans up timers and finishes explicitly', () => {
     const fixture = TestBed.createComponent(OnboardingComponent);
     fixture.detectChanges();
     const component = fixture.componentInstance;
@@ -28,6 +28,7 @@ describe('Safe interactive tutorial', () => {
       'Листание',
       'По фото',
       'Коллекция',
+      'Мой экземпляр',
       'Заявки',
       'Вишлист',
       'Продажа',
@@ -57,7 +58,7 @@ describe('Safe interactive tutorial', () => {
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('app-onboarding-catalog a')).toBeNull();
     const component = fixture.componentInstance;
-    component.select(5);
+    component.select(component.steps.findIndex(s=>s.name==='Заявки'));
     component.chooseRequest('name');
     component.demonstrate();
     fixture.detectChanges();
@@ -68,7 +69,7 @@ describe('Safe interactive tutorial', () => {
     fixture.detectChanges();
     expect(fixture.nativeElement.textContent).toContain('CUSA-01234');
     component.select(-1);
-    expect(component.index()).toBe(5);
+    expect(component.step.name).toBe('Заявки');
   });
   it('plays navigation feedback only when changing the slide', () => {
     const fixture = TestBed.createComponent(OnboardingComponent);
@@ -81,7 +82,7 @@ describe('Safe interactive tutorial', () => {
     expect(component.playNavigationSound).not.toHaveBeenCalled();
     component.next();
     component.select(0);
-    component.select(10);
+    component.select(component.steps.length - 1);
     expect(component.playNavigationSound).toHaveBeenCalledTimes(3);
     component.next();
     expect(component.playNavigationSound).toHaveBeenCalledTimes(3);

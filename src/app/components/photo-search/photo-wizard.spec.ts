@@ -31,18 +31,12 @@ describe('Photo wizard', () => {
     vi.restoreAllMocks();
     localStorage.clear();
   });
-  it('shows the tutorial for exactly the first five visits, and can reopen help later', () => {
-    for (let visit = 1; visit <= 6; visit++) {
-      const fixture = TestBed.createComponent(PhotoSearchComponent);
-      expect(fixture.componentInstance.step()).toBe(visit <= 5 ? 'intro' : 'upload');
-      fixture.componentInstance.finishIntro();
-      expect(fixture.componentInstance.step()).toBe('upload');
-      fixture.destroy();
-    }
-    const fixture = TestBed.createComponent(PhotoSearchComponent);
-    fixture.componentInstance.help();
-    expect(fixture.componentInstance.step()).toBe('intro');
-    expect(localStorage.getItem('gstx.photo-search.visits.v1')).toBe('5');
+  it('opens upload immediately without reading or updating tutorial visits', () => {
+    const read=vi.spyOn(Storage.prototype,'getItem');
+    const write=vi.spyOn(Storage.prototype,'setItem');
+    const fixture=TestBed.createComponent(PhotoSearchComponent);
+    expect(fixture.componentInstance.step()).toBe('upload');
+    expect(read).not.toHaveBeenCalled();expect(write).not.toHaveBeenCalled();
     fixture.destroy();
   });
   it('continues working if browser storage is unavailable', () => {
@@ -50,8 +44,6 @@ describe('Photo wizard', () => {
       throw Error('denied');
     });
     const fixture = TestBed.createComponent(PhotoSearchComponent);
-    expect(fixture.componentInstance.step()).toBe('intro');
-    fixture.componentInstance.finishIntro();
     expect(fixture.componentInstance.step()).toBe('upload');
     fixture.destroy();
   });
@@ -86,7 +78,6 @@ describe('Photo wizard', () => {
     vi.mocked(decodePhoto).mockReturnValue(new Promise((r) => (resolve = r)));
     const fixture = TestBed.createComponent(PhotoSearchComponent),
       c = fixture.componentInstance;
-    c.finishIntro();
     const upload = c.upload({
       target: { files: [new File(['x'], 'test.jpg')], value: '' },
     } as unknown as Event);

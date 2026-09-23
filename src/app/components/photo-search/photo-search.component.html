@@ -1,32 +1,9 @@
 <section trapScroll class="photo-search" [attr.aria-busy]="busy()">
   <header class="flow-header">
     <button class="back icon-button" type="button" (click)="back()" aria-label="Назад к предыдущему шагу">←</button>
-    <div><h1>Поиск по фото</h1><span class="step-label">{{ step() === 'intro' ? 'Как это работает' : step() === 'upload' ? '1 / 3 · Снимок' : step() === 'crop' ? '2 / 3 · Выделение кода' : '3 / 3 · Распознавание' }}</span></div>
-    <button type="button" class="icon-button" (click)="help()" [disabled]="busy()" aria-label="Как пользоваться поиском по фото">?</button>
+    <div><h1>Поиск по фото</h1><span class="step-label">{{ step() === 'upload' ? '1 / 3 · Снимок' : step() === 'crop' ? '2 / 3 · Выделение кода' : '3 / 3 · Распознавание' }}</span></div>
   </header>
   <div class="flow-body">
-    @if (step() === 'intro') {
-      <section class="tutorial" (touchstart)="tutorialTouchStart($event)" (touchend)="tutorialTouchEnd($event)" aria-label="Обучение поиску по фото">
-        @if (slide() === 0) {
-          <app-spine-guide />
-          <h2>Серийник — ключ к игре</h2>
-          <p>Сфотографируйте буквы и цифры на торце коробки. Нужен напечатанный код, не штрихкод.</p>
-        } @else if (slide() === 1) {
-          <div class="guide-crop" aria-hidden="true"><span>BLES<br>00072</span><i></i></div>
-          <h2>Одно касание по коду</h2>
-          <p>Коснитесь серийника на фото. Ползунками подгоните рамку, чтобы поместились все буквы и цифры. Проверьте превью и нажмите «Далее».</p>
-        } @else {
-          <div class="guide-result" aria-hidden="true">BLES-00072 <span>✓</span></div>
-          <h2>Узнайте игру и регион</h2>
-          <p>Нажмите «Распознать», проверьте код и перейдите в каталог. Консоль, регион и название будут выбраны автоматически.</p>
-          <small>Фото обрабатывается на вашем устройстве.</small>
-        }
-        <div class="tutorial-dots" aria-label="Слайды обучения">
-          @for (n of [0, 1, 2]; track n) {<button type="button" [class.active]="slide() === n" [attr.aria-label]="'Слайд ' + (n + 1)" [attr.aria-pressed]="slide() === n" (click)="slide.set(n)"><span></span></button>}
-        </div>
-        <button type="button" class="primary" (click)="slide() < 2 ? slide.set(slide() + 1) : finishIntro()">{{ slide() < 2 ? 'Далее' : 'Понятно, начнём' }}</button>
-      </section>
-    }
     <section class="upload-step" [hidden]="step() !== 'upload'">
       <div class="upload-art" aria-hidden="true">＋</div>
       <h2>Найдём игру по коробке</h2>

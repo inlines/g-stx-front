@@ -20,7 +20,6 @@ import { canonicalSerial, validSerial } from '@app/shared/serial-number';
 import { RegionGroup } from '@app/shared/region-filter';
 import { matchingPhotoReleases, photoSerials, releaseRegionGroup, serialPlatform } from './photo-serial';
 import { TrapScrollDirective } from '@app/directives/trap-scroll.directive';
-import { SpineGuideComponent } from './spine-guide.component';
 import { decodePhoto, startOcr } from './photo-ocr';
 export const PHOTO_PROCESSOR = new InjectionToken('Photo processor', {
   providedIn: 'root',
@@ -34,17 +33,15 @@ interface Match {
 }
 @Component({
   selector: 'app-photo-search',
-  imports: [FormsModule, SpineGuideComponent, TrapScrollDirective],
+  imports: [FormsModule, TrapScrollDirective],
   templateUrl: './photo-search.component.html',
   styleUrl: './photo-search.component.scss',
 })
 export class PhotoSearchComponent {
   @ViewChild('preview') preview?: ElementRef<HTMLCanvasElement>;
   @ViewChild('result') result?: ElementRef<HTMLCanvasElement>;
-  readonly step = signal<'intro' | 'upload' | 'crop' | 'review'>('upload');
-  readonly slide = signal(0);
+  readonly step = signal<'upload' | 'crop' | 'review'>('upload');
   readonly ocrDone = signal(false);
-  private touchStart = 0;
   @ViewChild('zoom') zoom?: ElementRef<HTMLCanvasElement>;
   readonly selected = signal(false);
   cropWidth = 50;
@@ -79,14 +76,6 @@ export class PhotoSearchComponent {
   private readonly router = inject(Router);
   private readonly store = inject(Store);
   constructor() {
-    try {
-      const raw = Number(localStorage.getItem('gstx.photo-search.visits.v1') ?? 0);
-      const visits = Number.isFinite(raw) && raw >= 0 ? Math.floor(raw) : 0;
-      if (visits < 5) this.step.set('intro');
-      localStorage.setItem('gstx.photo-search.visits.v1', String(Math.min(visits + 1, 5)));
-    } catch {
-      this.step.set('intro');
-    }
     const host = inject(ElementRef<HTMLElement>).nativeElement;
     const destroyRef = inject(DestroyRef);
     afterNextRender(() => {
@@ -110,25 +99,11 @@ export class PhotoSearchComponent {
       this.ninja.stop();
     });
   }
-  finishIntro() {
-    this.step.set('upload');
-  }
-  help() {
-    this.slide.set(0);
-    this.step.set('intro');
-  }
-  tutorialTouchStart(event: TouchEvent) {
-    this.touchStart = event.changedTouches[0].clientX;
-  }
-  tutorialTouchEnd(event: TouchEvent) {
-    const delta = event.changedTouches[0].clientX - this.touchStart;
-    if (Math.abs(delta) > 40) this.slide.set(Math.max(0, Math.min(2, this.slide() + (delta < 0 ? 1 : -1))));
-  }
   back() {
     this.cancel();
     this.status.set('');
     if (this.step() === 'review') this.step.set('crop');
-    else if (this.step() === 'crop' || this.step() === 'intro') this.step.set('upload');
+    else if (this.step() === 'crop') this.step.set('upload');
     else void this.router.navigate(['/products']);
   }
   next() {
