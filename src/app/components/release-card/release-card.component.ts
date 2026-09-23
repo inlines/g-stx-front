@@ -1,7 +1,7 @@
 import { CdkTrapFocus } from '@angular/cdk/a11y';
 import { MobilePageLockDirective } from '@app/directives/mobile-page-lock.directive';
 import { CurrencyPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ElementRef, ViewChild, inject, DestroyRef, signal } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, Output, ElementRef, ViewChild, inject, DestroyRef, signal } from '@angular/core';
 import { ICollectionItem } from '@app/states/collection/interfaces/collection-item.interface';
 import { GameCardComponent } from '../game-card/game-card.component';
 @Component({selector:'app-release-card',imports:[GameCardComponent,CurrencyPipe,CdkTrapFocus,MobilePageLockDirective],templateUrl:'./release-card.component.html',styleUrl:'./release-card.component.scss',changeDetection:ChangeDetectionStrategy.OnPush})
@@ -21,6 +21,7 @@ export class ReleaseCardComponent {
  @Output() removeRelease=new EventEmitter<number>();
  @ViewChild('editButton') editButton?:ElementRef<HTMLButtonElement>;
  private readonly host=inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
+ private readonly changeDetector=inject(ChangeDetectorRef);
  private readonly opened=signal(false);
  get menuOpen(){return this.opened();}
  private timer?:ReturnType<typeof setTimeout>;
@@ -32,11 +33,16 @@ export class ReleaseCardComponent {
    inject(DestroyRef).onDestroy(()=>{this.cancelHold();this.host.removeEventListener('click',click,true);});
  }
  get productLink(){const platform=this.item.platform_id??this.platform;return platform==null?['/products',this.item.product_id]:['/products',this.item.product_id,{platform}];}
- get game(){return {...this.item,id:this.item.product_id,name:this.item.product_name,first_release_date:null,alternative_names:this.item.alternative_names??null,serial:this.item.selected_serial?[this.item.selected_serial]:this.item.serial};}
+ get game(){return {...this.item,image_url:this.item.image_url?.replace('/static/covers-thumb/','/static/covers-full/')??null,id:this.item.product_id,name:this.item.product_name,first_release_date:null,alternative_names:this.item.alternative_names??null,serial:this.item.selected_serial?[this.item.selected_serial]:this.item.serial};}
  get purchasePrice(){return this.item.purchase_price!==undefined?this.item.purchase_price:this.collection?this.item.price:null;}
  get incomplete(){return this.item.cib==null || (!this.item.digital_only && (this.item.serial?.length??0)>1 && !this.item.selected_serial);}
  openMenu(){if(!this.readOnly&&!this.busy)this.opened.set(true);}
- closeMenu(){this.opened.set(false);this.editButton?.nativeElement.focus({preventScroll:true});}
+ closeMenu(){
+   this.opened.set(false);
+   // Release the menu's body lock before an action opens an NgbModal.
+   // Otherwise NgbModal remembers overflow:hidden and restores it on close.
+   this.changeDetector.detectChanges();
+   this.editButton?.nativeElement.focus({preventScroll:true});}
  beginHold(e:PointerEvent){this.suppress=false;this.cancelHold();if(this.readOnly||this.busy||e.pointerType==='mouse'||!e.isPrimary||(e.target as HTMLElement).closest('button,summary,input,select'))return;this.start={x:e.clientX,y:e.clientY};this.timer=setTimeout(()=>{this.suppress=true;this.openMenu();},550);}
  moveHold(e:PointerEvent){if(this.start&&Math.hypot(e.clientX-this.start.x,e.clientY-this.start.y)>10)this.cancelHold();}
  cancelHold(){clearTimeout(this.timer);this.timer=undefined;this.start=undefined;}

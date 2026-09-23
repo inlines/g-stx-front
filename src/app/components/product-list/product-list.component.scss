@@ -5,7 +5,7 @@ a {
 
 .sticker {
   position: relative;
-  z-index: 1;
+  z-index: 3;
 }
 
 .game-card {
@@ -39,6 +39,11 @@ a {
     opacity 0.3s ease;
   height: auto;
   opacity: 1;
+}
+
+// Expanded filters must not clip the sorting popover over the result grid.
+.stickerContent:not(.hidden) {
+  overflow: visible;
 }
 
 .stickerContent.hidden {

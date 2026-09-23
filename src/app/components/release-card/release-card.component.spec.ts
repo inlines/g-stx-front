@@ -4,7 +4,7 @@ import { ReleaseCardComponent } from './release-card.component';
 const item={release_id:1,product_id:1,product_name:'Game',platform_id:48,platform_name:'PS4',region_name:'europe',release_date:null,image_url:null,serial:['CUSA-00001','CUSA-00002'],selected_serial:null,cib:null,price:0,purchase_price:0};
 describe('Release card gestures and copy data',()=>{
  beforeEach(()=>{vi.useFakeTimers();TestBed.configureTestingModule({imports:[ReleaseCardComponent],providers:TEST_PROVIDERS});});
- afterEach(()=>{vi.useRealTimers();});
+ afterEach(()=>{vi.useRealTimers();vi.unstubAllGlobals();});
  function setup(readOnly=false){const f=TestBed.createComponent(ReleaseCardComponent);f.componentRef.setInput('item',{...item});f.componentRef.setInput('collection',true);f.componentRef.setInput('readOnly',readOnly);f.detectChanges();return f;}
  function down(target:HTMLElement){return {pointerType:'touch',isPrimary:true,clientX:10,clientY:10,target} as unknown as PointerEvent;}
  it('opens on a stationary long press, cancels on movement and suppresses only the resulting click',()=>{
@@ -13,4 +13,24 @@ describe('Release card gestures and copy data',()=>{
  });
  it('does not expose any editing or ownership mark on someone else’s card',()=>{const f=setup(true);f.componentInstance.beginHold(down(f.nativeElement));vi.advanceTimersByTime(1000);f.detectChanges();expect(f.componentInstance.menuOpen).toBe(false);expect(f.nativeElement.querySelector('.edit-button,.incomplete,.ownership-mark')).toBeNull();f.destroy();});
  it('shows a selected serial and zero purchase price; false CIB is known data',()=>{const f=setup();expect(f.nativeElement.querySelector('.incomplete')).not.toBeNull();f.componentRef.setInput('item',{...item,selected_serial:'CUSA-00002',cib:false});f.detectChanges();expect(f.nativeElement.querySelector('.incomplete')).toBeNull();expect(f.nativeElement.textContent).toContain('CUSA-00002');expect(f.nativeElement.textContent).not.toContain('CUSA-00001');expect(f.nativeElement.textContent).toContain('Неполный комплект');expect(f.nativeElement.querySelector('.price').textContent).toContain('0');f.destroy();});
+ it('uses full-resolution covers for library cards',()=>{
+  const f=setup();f.componentRef.setInput('item',{...item,image_url:'//89.104.66.193/static/covers-thumb/42.jpg'});f.detectChanges();
+  expect(f.nativeElement.querySelector('img').getAttribute('src')).toBe('//89.104.66.193/static/covers-full/42.jpg');f.destroy();
+ });
+ it('releases the mobile menu lock before emitting the modal action',()=>{
+  vi.stubGlobal('matchMedia',vi.fn(()=>({matches:true,addEventListener:vi.fn(),removeEventListener:vi.fn()})));
+  vi.stubGlobal('scrollTo',vi.fn());
+  const f=setup();f.componentInstance.openMenu();f.detectChanges();
+  expect(document.body.style.overflow).toBe('hidden');
+  let called=false;
+  f.componentInstance.editCopy.subscribe(()=>{
+   called=true;
+   expect(document.body.style.position).toBe('');
+   expect(document.body.style.overflow).toBe('');
+   expect(document.documentElement.style.overflow).toBe('');
+  });
+  const action=Array.from(f.nativeElement.querySelectorAll('.context-menu button')).find((b:any)=>b.textContent.includes('Комплектность')) as HTMLButtonElement;
+  action.click();expect(called).toBe(true);f.destroy();
+ });
+
 });
