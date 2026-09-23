@@ -1,3 +1,5 @@
+import { HostListener } from '@angular/core';
+import { mobileLibraryPager, normalizeLibraryPageSize } from '@app/shared/library-view.service';
 import { ListScrollService } from '@app/shared/list-scroll.service';
 import { LibraryPageService, LibraryPage } from '@app/shared/library-page.service';
 import { HorizontalFiltersDirective } from '@app/directives/horizontal-filters.directive';
@@ -57,6 +59,11 @@ export class CollectorPropertiesComponent {
   private readonly changes = new BehaviorSubject<void>(undefined);
   private readonly service = inject(LibraryPageService);
   private readonly restoreScroll = inject(ListScrollService).attach(inject(DestroyRef), this.injector);
+  get mobilePager(): boolean { return mobileLibraryPager(); }
+  @HostListener('window:resize')
+  resizePager(): void {
+    if (this.view && normalizeLibraryPageSize(this.view)) this.changes.next();
+  }
   private pendingScroll=false;
   private contextKey='';
   private lastPage:LibraryPage={items:[],total_count:0,unfiltered_total:0,platform_ids:[],owned_regions:{}};
@@ -73,6 +80,7 @@ export class CollectorPropertiesComponent {
     debounceTime(0),
     switchMap(([login,tab,,,platforms])=>{
       const view=this.views.get(tab==='wts'?`collector-wts:${login}`:`collector:${login}`);
+      normalizeLibraryPageSize(view);
       const key=`${login}:${tab}:${view.platform}`;
       if(this.contextKey!==key){this.contextKey=key;this.lastPage={items:[],total_count:0,unfiltered_total:0,platform_ids:[],owned_regions:{}};}
       const request={login:login??undefined,cat:view.platform,regions:view.regions.join(','),sort:view.sort,limit:view.size,offset:(view.page-1)*view.size};
@@ -118,7 +126,7 @@ export class CollectorPropertiesComponent {
 
   }
   pageSize(size: string): void {
-    this.view.size = Number(size);
+    this.view.size = this.mobilePager ? Math.min(48, Number(size)) : Number(size);
     this.view.page = 1;
     this.changes.next();
   }

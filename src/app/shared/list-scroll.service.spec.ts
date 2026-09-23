@@ -40,6 +40,21 @@ describe('List return scroll', () => {
     expect(again.componentInstance.ready()).toBe(true); again.detectChanges(); again.destroy();
   });
 
+  it('cancels queued list restoration as soon as a game navigation starts', () => {
+    const first = TestBed.createComponent(ListHost); first.detectChanges();
+    vi.spyOn(window, 'scrollY', 'get').mockReturnValue(1800);
+    events.next(new NavigationStart(2, '/products/42')); first.destroy();
+    events.next(new NavigationEnd(2, '/products/42', '/products/42'));
+    events.next(new NavigationStart(3, '/collection', 'popstate', { navigationId: 1 }));
+    const returned = TestBed.createComponent(ListHost);
+    expect(returned.componentInstance.ready()).toBe(true);
+    // A resolver can leave the list alive while navigation is already underway.
+    events.next(new NavigationStart(4, '/products/43'));
+    returned.detectChanges();
+    expect(window.scrollTo).not.toHaveBeenCalled();
+    returned.destroy();
+  });
+
   it('does not restore an old position when opening a list through the menu', () => {
     const first = TestBed.createComponent(ListHost);
     events.next(new NavigationStart(2, '/products/42')); first.destroy();

@@ -10,12 +10,14 @@ export class ListScrollService {
   private entry = this.router.getCurrentNavigation()?.id ?? history.state?.navigationId ?? 0;
   private active: object | null = null;
   private pending: number | undefined;
+  private navigationVersion = 0;
 
   constructor() {
     // Native restoration runs before asynchronously loaded grids regain their height.
     if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
     this.router.events.pipe(takeUntilDestroyed()).subscribe(event => {
       if (event instanceof NavigationStart) {
+        this.navigationVersion++;
         if (this.active) this.positions.set(this.entry, window.scrollY);
         this.pending = event.restoredState
           ? this.positions.get(event.restoredState.navigationId) : undefined;
@@ -36,9 +38,10 @@ export class ListScrollService {
     return () => {
       if (position === undefined) return false;
       const top = position;
+      const navigationVersion = this.navigationVersion;
       position = undefined;
       afterNextRender(() => {
-        if (!destroyRef.destroyed && this.active === token)
+        if (!destroyRef.destroyed && this.active === token && navigationVersion === this.navigationVersion)
           window.scrollTo({ top, behavior: 'instant' });
       }, { injector });
       return true;

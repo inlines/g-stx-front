@@ -48,6 +48,7 @@ import { combineLatest, map, Observable } from 'rxjs';
 export class ProductPropertiesComponent implements OnInit {
   @ViewChild('productHeading') productHeading?: ElementRef<HTMLElement>;
   private scrolledProductId?: number;
+  private headingScrollFrame = 0;
   readonly compactLayout$ = inject(BreakpointObserver).observe('(max-width: 991.98px)').pipe(map((state) => state.matches));
 
   @ViewChild('sellersModal', { static: true }) sellersModalRef!: TemplateRef<unknown>;
@@ -58,12 +59,21 @@ export class ProductPropertiesComponent implements OnInit {
     private readonly params: ActivatedRoute,
     private location: Location,
   ) {
+    const destroyRef = inject(DestroyRef);
+    destroyRef.onDestroy(() => cancelAnimationFrame(this.headingScrollFrame));
     afterEveryRender(() => {
       const heading = this.productHeading?.nativeElement;
       const id = this.store.selectSnapshot(ProductsState.productProperties)?.product.id;
       if (!heading || !id || id === this.scrolledProductId) return;
       this.scrolledProductId = id;
-      scrollToContent(heading, 24);
+      cancelAnimationFrame(this.headingScrollFrame);
+      // Let route teardown, focus restoration and browser layout finish first.
+      // Re-read the current heading instead of retaining the outgoing page's geometry.
+      this.headingScrollFrame = requestAnimationFrame(() => {
+        this.headingScrollFrame = requestAnimationFrame(() => {
+          if (!destroyRef.destroyed) scrollToContent(this.productHeading?.nativeElement, 24);
+        });
+      });
     });
     this.failure$ = this.store.select(ProductsState.propertiesFailure);
     this.productProperties$ = this.store.select(ProductsState.productProperties);

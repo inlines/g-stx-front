@@ -22,3 +22,15 @@ export class LibraryViewService {
     return this.views.get(kind)!;
   }
 }
+
+export function mobileLibraryPager(): boolean {
+  return window.innerWidth <= 767;
+}
+
+export function normalizeLibraryPageSize(view: LibraryView): boolean {
+  if (!mobileLibraryPager() || view.size <= 48) return false;
+  const offset = (view.page - 1) * view.size;
+  view.size = 48;
+  view.page = Math.floor(offset / view.size) + 1;
+  return true;
+}

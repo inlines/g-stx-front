@@ -1,3 +1,5 @@
+import { HostListener } from '@angular/core';
+import { mobileLibraryPager, normalizeLibraryPageSize } from '@app/shared/library-view.service';
 import { ListScrollService } from '@app/shared/list-scroll.service';
 import { LibraryPageService, LibraryPage, LibraryRequest } from '@app/shared/library-page.service';
 import { HorizontalFiltersDirective } from '@app/directives/horizontal-filters.directive';
@@ -104,10 +106,16 @@ export class PersonalLibraryComponent implements OnInit, OnDestroy {
   editing: ICollectionItem | null = null;
   vm$!: ReturnType<PersonalLibraryComponent['createView']>;
   private readonly restoreScroll = inject(ListScrollService).attach(this.destroyRef, this.injector);
+  get mobilePager(): boolean { return mobileLibraryPager(); }
+  @HostListener('window:resize')
+  resizePager(): void {
+    if (this.view && normalizeLibraryPageSize(this.view)) this.changes.next();
+  }
   private snowOpening = false;
   private snowDialog?: ReturnType<NgbModal['open']>;
   ngOnInit(): void {
     this.view = this.views.get(this.kind);
+    normalizeLibraryPageSize(this.view);
     this.query.setValue(this.view.query, { emitEvent: false });
     this.list.connect(this.kind, true);
     this.vm$ = this.createView();
@@ -214,7 +222,7 @@ export class PersonalLibraryComponent implements OnInit, OnDestroy {
     this.changes.next();
   }
   pageSize(value: string): void {
-    this.view.size = Number(value);
+    this.view.size = this.mobilePager ? Math.min(48, Number(value)) : Number(value);
     this.view.page = 1;
     this.changes.next();
   }

@@ -33,6 +33,8 @@ describe('ProductPropertiesComponent', () => {
   it.each([true, false])('scrolls to each loaded heading once (mobile=%s)', async (mobile) => {
     const previous = HTMLElement.prototype.scrollIntoView;
     const scroll = vi.fn();
+    const frames: FrameRequestCallback[] = [];
+    vi.spyOn(window, 'requestAnimationFrame').mockImplementation(callback => { frames.push(callback); return frames.length; });
     HTMLElement.prototype.scrollIntoView = scroll;
     vi.stubGlobal('matchMedia', () => ({ matches: mobile }));
     try {
@@ -49,6 +51,11 @@ describe('ProductPropertiesComponent', () => {
         });
         fixture.detectChanges();
         await fixture.whenStable();
+        expect(scroll).toHaveBeenCalledTimes(id - 1);
+        // Two frames separate heading alignment from outgoing-list teardown.
+        frames.shift()!(0);
+        expect(scroll).toHaveBeenCalledTimes(id - 1);
+        frames.shift()!(16);
         expect(scroll).toHaveBeenCalledTimes(id);
         expect(scroll.mock.instances[id - 1]).toBe(fixture.nativeElement.querySelector('.product-heading'));
         fixture.detectChanges();
@@ -58,6 +65,7 @@ describe('ProductPropertiesComponent', () => {
     } finally {
       HTMLElement.prototype.scrollIntoView = previous;
       vi.unstubAllGlobals();
+      vi.restoreAllMocks();
     }
   });
 
