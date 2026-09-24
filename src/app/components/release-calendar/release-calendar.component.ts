@@ -1,14 +1,24 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, HostListener, inject } from '@angular/core';
+import { ListScrollService } from '@app/shared/list-scroll.service';
+import { CalendarViewService } from './calendar-view.service';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  HostListener,
+  Injector,
+  inject,
+} from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ENVIRONMENT } from '@app/environments/environment.token';
+import { PageSwipeDirective } from '@app/directives/page-swipe.directive';
 import { calendarDays, CalendarResponse, CalendarDay, CalendarGame } from './calendar-model';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-release-calendar',
-  imports: [RouterLink],
+  imports: [RouterLink, PageSwipeDirective],
   templateUrl: './release-calendar.component.html',
   styleUrl: './release-calendar.component.scss',
 })
@@ -17,11 +27,13 @@ export class ReleaseCalendarComponent {
   private http = inject(HttpClient);
   private env = inject(ENVIRONMENT);
   private destroy = inject(DestroyRef);
+  private view = inject(CalendarViewService);
+  private restoreScroll = inject(ListScrollService).attach(this.destroy, inject(Injector));
   data: CalendarResponse | null = null;
   loading = false;
   failed = false;
   month = 0;
-  platform: number | null = null;
+  platform: number | null = this.view.platform;
   open: CalendarDay | null = null;
   left = 0;
   top = 0;
@@ -48,7 +60,14 @@ export class ReleaseCalendarComponent {
       .subscribe({
         next: (data) => {
           this.data = data;
+          if (this.view.month) {
+            const [year, month] = this.view.month.split('-').map(Number);
+            const [baseYear, baseMonth] = data.start.split('-').map(Number);
+            this.month = Math.max(0, Math.min(2, (year - baseYear) * 12 + month - baseMonth));
+          }
+          this.saveView();
           this.loading = false;
+          this.restoreScroll();
         },
         error: () => {
           this.loading = false;
@@ -69,12 +88,27 @@ export class ReleaseCalendarComponent {
   get count() {
     return this.days.reduce((n, d) => n + (d?.games.length ?? 0), 0);
   }
+  stepMonth(delta: number) {
+    const next = this.month + delta;
+    if (next < 0 || next > 2) return;
+    this.cancelHold();
+    this.chooseMonth(next);
+  }
+  private saveView() {
+    this.view.platform = this.platform;
+    if (this.data) {
+      const [year, month] = this.data.start.split('-').map(Number);
+      this.view.month = new Date(Date.UTC(year, month - 1 + this.month, 1)).toISOString().slice(0, 10);
+    }
+  }
   chooseMonth(n: number) {
     this.month = n;
+    this.saveView();
     this.close();
   }
   choosePlatform(n: number | null) {
     this.platform = n;
+    this.saveView();
     this.close();
   }
   show(day: CalendarDay, el: HTMLElement) {

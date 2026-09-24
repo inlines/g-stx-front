@@ -14,12 +14,35 @@
     </p>
   } @else if (data) {
     <nav class="months" aria-label="Месяц">
-      @for (n of [0, 1, 2]; track n) {
-        <button [class.active]="month === n" [attr.aria-pressed]="month === n" (click)="chooseMonth(n)">
-          {{ monthName(n) }}
-        </button>
-      }
+      <button type="button" aria-label="Предыдущий месяц" [disabled]="month === 0" (click)="stepMonth(-1)">
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          aria-hidden="true"
+        >
+          <path d="m15 5-7 7 7 7" />
+        </svg>
+      </button>
+      <strong aria-live="polite">{{ monthName(month) }}</strong>
+      <button type="button" aria-label="Следующий месяц" [disabled]="month === 2" (click)="stepMonth(1)">
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          aria-hidden="true"
+        >
+          <path d="m9 5 7 7-7 7" />
+        </svg>
+      </button>
     </nav>
+    <p class="swipe-hint">Листайте месяцы свайпом влево или вправо.</p>
     <div class="calendar-tools">
       <div class="platforms" aria-label="Платформы">
         @for (p of [null, 48, 167]; track p) {
@@ -41,7 +64,7 @@
     @if (!count) {
       <p role="status">На этот месяц пока нет объявленных релизов для выбранных платформ.</p>
     }
-    <div class="calendar-grid">
+    <div class="calendar-grid" pageSwipe [swipeDisabled]="open !== null" (swipePage)="stepMonth($event)">
       @for (label of weekdays; track label) {
         <div class="weekday">{{ label }}</div>
       }
@@ -55,7 +78,9 @@
             (pointerenter)="hover(day, cell)"
             (pointerleave)="leave()"
           >
-            <time [attr.datetime]="day.key">{{ day.number }}</time>
+            <time [attr.datetime]="day.key" [attr.aria-current]="day.key === today ? 'date' : null">
+              {{ day.number }}<span class="day-weekday"> ({{ weekdays[$index % 7].toLowerCase() }})</span>
+            </time>
             @if (day.games.length) {
               @let game = day.games[0];
               <div
