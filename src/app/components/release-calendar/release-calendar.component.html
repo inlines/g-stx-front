@@ -1,0 +1,138 @@
+<section class="release-calendar">
+  <header>
+    <div>
+      <p class="eyebrow">Календарь релизов · PS4 / PS5</p>
+      <h1>Выходящие игры</h1>
+      <p>Уже вышли и ожидаются в ближайшие три месяца. Даты могут меняться.</p>
+    </div>
+  </header>
+  @if (loading) {
+    <p role="status">Загружаем календарь…</p>
+  } @else if (failed) {
+    <p role="alert">
+      Не удалось загрузить релизы. <button class="btn-pink" (click)="load()">Повторить</button>
+    </p>
+  } @else if (data) {
+    <nav class="months" aria-label="Месяц">
+      @for (n of [0, 1, 2]; track n) {
+        <button [class.active]="month === n" [attr.aria-pressed]="month === n" (click)="chooseMonth(n)">
+          {{ monthName(n) }}
+        </button>
+      }
+    </nav>
+    <div class="calendar-tools">
+      <div class="platforms" aria-label="Платформы">
+        @for (p of [null, 48, 167]; track p) {
+          <button
+            [class.active]="platform === p"
+            [attr.aria-pressed]="platform === p"
+            (click)="choosePlatform(p)"
+          >
+            {{ p === null ? 'Все' : p === 48 ? 'PS4' : 'PS5' }}
+          </button>
+        }
+      </div>
+      <span>{{ count }} релизов</span>
+    </div>
+    <p class="hint">
+      Несколько игр в день: наведите на стопку или удерживайте её на телефоне. Кнопка с количеством также
+      откроет список.
+    </p>
+    @if (!count) {
+      <p role="status">На этот месяц пока нет объявленных релизов для выбранных платформ.</p>
+    }
+    <div class="calendar-grid">
+      @for (label of weekdays; track label) {
+        <div class="weekday">{{ label }}</div>
+      }
+      @for (day of days; track $index) {
+        @if (day) {
+          <article
+            class="day"
+            [class.today]="day.key === today"
+            [class.past]="day.key < today"
+            #cell
+            (pointerenter)="hover(day, cell)"
+            (pointerleave)="leave()"
+          >
+            <time [attr.datetime]="day.key">{{ day.number }}</time>
+            @if (day.games.length) {
+              @let game = day.games[0];
+              <div
+                class="stack"
+                [class.multiple]="day.games.length > 1"
+                (pointerdown)="press($event, day, cell)"
+                (pointermove)="move($event)"
+                (pointerup)="cancelHold()"
+                (pointercancel)="cancelHold()"
+                (contextmenu)="day.games.length > 1 ? $event.preventDefault() : null"
+              >
+                <a
+                  [href]="gameLink(game)"
+                  (click)="go($event, game)"
+                  [attr.aria-label]="game.name + ' — ' + (game.platform === 48 ? 'PS4' : 'PS5')"
+                >
+                  @if (game.image_url) {
+                    <img
+                      [src]="game.image_url"
+                      alt=""
+                      loading="lazy"
+                      draggable="false"
+                      (error)="$any($event.target).style.display = 'none'"
+                    />
+                  }
+                  <span class="game-name">{{ game.name }}</span
+                  ><span class="platform">{{ game.platform === 48 ? 'PS4' : 'PS5' }}</span></a
+                >
+              </div>
+              @if (day.games.length > 1) {
+                <button
+                  class="count"
+                  [attr.aria-label]="'Все релизы за ' + day.key + ': ' + day.games.length"
+                  [attr.aria-expanded]="open?.key === day.key"
+                  (click)="show(day, cell)"
+                >
+                  +{{ day.games.length - 1 }}
+                </button>
+              }
+            }
+          </article>
+        } @else {
+          <div class="day empty" aria-hidden="true"></div>
+        }
+      }
+    </div>
+  }
+</section>
+@if (open) {
+  @if (mobile) {
+    <div class="dismiss" (click)="close()" aria-hidden="true"></div>
+  }
+  <aside
+    class="day-menu"
+    role="dialog"
+    aria-label="Игры выбранного дня"
+    [class.mobile]="mobile"
+    [style.left.px]="mobile ? null : left"
+    [style.top.px]="mobile ? null : top"
+    (pointerenter)="keepOpen()"
+    (pointerleave)="!mobile && leave()"
+  >
+    <div class="menu-heading">
+      <strong>{{ open.key.split('-').reverse().join('.') }}</strong
+      ><button aria-label="Закрыть список" (click)="close()">×</button>
+    </div>
+    <div class="menu-games">
+      @for (game of open.games; track game.id + ':' + game.platform) {
+        <a [routerLink]="['/products', game.id, { platform: game.platform }]" (click)="close()">
+          @if (game.image_url) {
+            <img [src]="game.image_url" alt="" loading="lazy" />
+          }
+          <span
+            >{{ game.name }}<small>{{ game.platform === 48 ? 'PS4' : 'PS5' }}</small></span
+          ></a
+        >
+      }
+    </div>
+  </aside>
+}

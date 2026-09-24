@@ -47,6 +47,7 @@
         <a routerLink="/products" (click)="resetCatalogFilters()" routerLinkActive="nav-active"><app-nav-icon name="catalog"/><span>Каталог</span></a>
         <a routerLink="/photo-search" routerLinkActive="nav-active"><app-nav-icon name="photo"/><span>По фото</span></a>
         <a routerLink="/collectors" routerLinkActive="nav-active"><app-nav-icon name="players"/><span>Игроки</span></a>
+        <a class="desktop-extra" routerLink="/release-calendar" routerLinkActive="nav-active">Выходящие игры</a>
         <details class="nav-folder" routerLinkActive="nav-active">
           <summary><app-nav-icon name="mine"/><span>Моё</span><svg class="chevron" aria-hidden="true" width="12" height="12" viewBox="0 0 12 12" fill="none" focusable="false"><path d="m3 4.5 3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
           <div class="nav-submenu" aria-label="Моё">
@@ -65,6 +66,7 @@
         <details class="nav-folder mobile-more" routerLinkActive="nav-active">
           <summary><app-nav-icon name="more"/><span>Ещё</span></summary>
           <div class="nav-submenu" aria-label="Другие разделы">
+            <a routerLink="/release-calendar" routerLinkActive="nav-active">Выходящие игры</a>
             <a class="kudos-challenge-link" routerLink="/kudos-challenge" routerLinkActive="nav-active">Kudos Challenge <app-kudos [login]="currentUser$ | async" [compact]="true"/></a>
             @if ((badges.admins$ | async)?.includes((currentUser$ | async) ?? '')) {
               <a routerLink="/unknown" routerLinkActive="nav-active">Unknown</a>
