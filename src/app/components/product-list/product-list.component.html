@@ -35,11 +35,11 @@
               <input type="checkbox" id="onlyDigitalSwitch" formControlName="skipDigitalFilter" />
               <span>Пропустить цифровые</span>
             </label>
-            }
             <label class="digital-option">
               <input type="checkbox" formControlName="includeUnreleased" />
               <span>Показывать невышедшие игры</span>
             </label>
+            }
               @if (genresFailed) { <span class="text-warning" role="status">Не удалось загрузить жанры. Обновите страницу, чтобы повторить.</span> }
             </div>
           </details>
@@ -76,7 +76,7 @@
     <div class="catalog-cell col-xl-3 col-lg-4 col-md-4 col-sm-6 p-3">
       <app-game-card [game]="product" [link]="['/products', product.id, {platform: displayedParams?.cat}]"
         [priority]="cardIndex === 0" [owned]="product.owned"
-        [missing]="product.has_serials === false && !product.digital_only && supportsReleaseActions(displayedParams?.cat ?? activeCategory)" />
+        [missing]="isReleased(product) && product.has_serials === false && !product.digital_only && supportsReleaseActions(displayedParams?.cat ?? activeCategory)" />
     </div>
   }
 

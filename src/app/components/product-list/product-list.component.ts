@@ -133,6 +133,9 @@ export class ProductListComponent implements OnInit, AfterViewInit {
     regions: new FormControl('', { nonNullable: true }),
     skipDigitalFilter: new FormControl(true, { nonNullable: true }),
   });
+  isReleased(product: {is_released?: boolean; release_date?: number | null}): boolean {
+    return product.is_released ?? (product.release_date != null && product.release_date <= Date.now());
+  }
   activeCategory = 48;
   readonly supportsReleaseActions = supportsReleaseActions;
 
@@ -223,7 +226,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
       .pipe(distinctUntilChanged(sameListParams), takeUntilDestroyed(this.destroyRef))
       .subscribe((params) => {
         this.queryForm.controls.skipDigitalFilter.setValue(this.unknown || (params.ignore_digital ?? true), {emitEvent:false});
-        this.queryForm.controls.includeUnreleased.setValue(params.include_unreleased ?? false, {emitEvent:false});
+        this.queryForm.controls.includeUnreleased.setValue(!this.unknown && (params.include_unreleased ?? false), {emitEvent:false});
         this.store.dispatch(new ProductsActions.LoadList());
       });
     combineLatest([this.loading$, this.failed$, this.displayedParams$])
@@ -272,7 +275,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
         sort,
         cat: this.activeCategory,
         ignore_digital: this.unknown || skipDigitalFilter,
-        include_unreleased: includeUnreleased,
+        include_unreleased: !this.unknown && includeUnreleased,
         regions: this.isNamedCatalog ? '' : regions,
         local_multiplayer: localMultiplayer,
         online_multiplayer: onlineMultiplayer,

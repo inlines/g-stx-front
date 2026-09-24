@@ -9,6 +9,7 @@ export interface IProductListItem {
   online_multiplayer?: boolean | null;
   /** Absent on older API versions: do not treat unknown as missing. */
   has_serials?: boolean;
+  is_released?: boolean;
   /** Digital-only status on the requested platform. */
   digital_only?: boolean;
   name: string;

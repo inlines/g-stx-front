@@ -26,6 +26,7 @@ export function normalizeListParams(params: IProductListRequest): IProductListRe
   if (typeof params.ignore_digital === 'boolean') result.ignore_digital = params.ignore_digital;
   if (typeof params.local_multiplayer === 'boolean') result.local_multiplayer = params.local_multiplayer;
   if (typeof params.online_multiplayer === 'boolean') result.online_multiplayer = params.online_multiplayer;
+  if (result.unknown) result.include_unreleased = false;
   return result;
 }
 

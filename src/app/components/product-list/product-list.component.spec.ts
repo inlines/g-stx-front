@@ -155,6 +155,8 @@ describe('Catalog filters', () => {
     fixture.detectChanges();
     const initial = nextRequest();
     expect(initial.request.params.get('unknown')).toBe('true');
+    expect(initial.request.params.get('include_unreleased')).toBe('false');
+    expect(fixture.nativeElement.querySelector('[formControlName=includeUnreleased]')).toBeNull();
     expect(initial.request.params.get('ignore_digital')).toBe('true');
     expect(fixture.nativeElement.querySelector('#onlyDigitalSwitch')).toBeNull();
     initial.flush({
@@ -230,7 +232,10 @@ describe('Catalog filters', () => {
     mount();
     nextRequest().flush({
       items: [
-        { id: 1, name: 'Missing', has_serials: false },
+        { id: 1, name: 'Missing', has_serials: false, is_released: true },
+        { id: 5, name: 'Cancelled', has_serials: false, is_released: false, release_date: 1500000000 },
+        { id: 6, name: 'Undated', has_serials: false, release_date: null },
+        { id: 7, name: 'Future', has_serials: false, release_date: 2100000000 },
         { id: 2, name: 'Known', has_serials: true },
         { id: 3, name: 'Old API' },
         { id: 4, name: 'Digital only', has_serials: false, digital_only: true },
@@ -427,7 +432,7 @@ describe('Catalog filters', () => {
     const response = {
       items: [
         { id: 1, name: 'Known', has_serials: true, serial: ['CUSA-12345', 'CUSA-23456'] },
-        { id: 2, name: 'Unknown', has_serials: false },
+        { id: 2, name: 'Unknown', has_serials: false, is_released: true },
       ],
       total_count: 2,
     };

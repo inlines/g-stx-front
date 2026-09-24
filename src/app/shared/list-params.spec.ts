@@ -36,3 +36,9 @@ describe('List query contract', () => {
     expect(sameListParams({ ignore_digital: false }, { ignore_digital: true })).toBe(false);
   });
 });
+
+ describe('Unknown release visibility', () => {
+  it('overrides a saved or explicitly requested unreleased filter', () => {
+    expect(listHttpParams({unknown: true, include_unreleased: true})['include_unreleased']).toBe(false);
+  });
+});
