@@ -10,7 +10,7 @@ describe('calendar interactions', () => {
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
   });
-  it('opens a long-pressed stack without navigating, and cancels on scrolling', () => {
+  it('opens a multi-release day on tap while a single release navigates', () => {
     vi.useFakeTimers();
     vi.stubGlobal('matchMedia', vi.fn().mockReturnValue({ matches: true }));
     TestBed.configureTestingModule({ imports: [ReleaseCalendarComponent], providers: TEST_PROVIDERS });
@@ -30,19 +30,16 @@ describe('calendar interactions', () => {
     const day = c.days.find((d) => d?.games.length === 2)!;
     const el = f.nativeElement.querySelector('article');
     const nav = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
-    c.press({ pointerType: 'touch', clientX: 0, clientY: 0 } as PointerEvent, day, el);
-    vi.advanceTimersByTime(500);
-    expect(c.open?.games.length).toBe(2);
     const click = new MouseEvent('click', { cancelable: true });
-    c.go(click, day.games[0]);
+    c.go(click, day.games[0], day, el);
+    expect(c.open?.games.length).toBe(2);
     expect(click.defaultPrevented).toBe(true);
     expect(nav).not.toHaveBeenCalled();
     c.close();
-    c.press({ pointerType: 'touch', clientX: 0, clientY: 0 } as PointerEvent, day, el);
-    c.move({ clientX: 25, clientY: 0 } as PointerEvent);
-    vi.advanceTimersByTime(500);
-    expect(c.open).toBeNull();
-    c.go(new MouseEvent('click', { cancelable: true }), day.games[0]);
+    c.tapDay(day, el);
+    expect(c.open?.games.length).toBe(2);
+    c.close();
+    c.go(new MouseEvent('click', { cancelable: true }), day.games[0], { ...day, games: [day.games[0]] }, el);
     expect(nav).toHaveBeenCalledWith('/products/1;platform=48');
     f.destroy();
     TestBed.inject(HttpTestingController).verify();

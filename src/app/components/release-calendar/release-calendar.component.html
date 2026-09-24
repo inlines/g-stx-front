@@ -58,7 +58,7 @@
       <span>{{ count }} релизов</span>
     </div>
     <p class="hint">
-      Несколько игр в день: наведите на стопку или удерживайте её на телефоне. Кнопка с количеством также
+      Несколько игр в день: наведите на стопку или нажмите на день на телефоне. Кнопка с количеством также
       откроет список.
     </p>
     @if (!count) {
@@ -77,24 +77,17 @@
             #cell
             (pointerenter)="hover(day, cell)"
             (pointerleave)="leave()"
+            (click)="tapDay(day, cell)"
           >
             <time [attr.datetime]="day.key" [attr.aria-current]="day.key === today ? 'date' : null">
               {{ day.number }}<span class="day-weekday"> ({{ weekdays[$index % 7].toLowerCase() }})</span>
             </time>
             @if (day.games.length) {
               @let game = day.games[0];
-              <div
-                class="stack"
-                [class.multiple]="day.games.length > 1"
-                (pointerdown)="press($event, day, cell)"
-                (pointermove)="move($event)"
-                (pointerup)="cancelHold()"
-                (pointercancel)="cancelHold()"
-                (contextmenu)="day.games.length > 1 ? $event.preventDefault() : null"
-              >
+              <div class="stack" [class.multiple]="day.games.length > 1">
                 <a
                   [href]="gameLink(game)"
-                  (click)="go($event, game)"
+                  (click)="go($event, game, day, cell)"
                   [attr.aria-label]="game.name + ' — ' + (game.platform === 48 ? 'PS4' : 'PS5')"
                 >
                   @if (game.image_url) {
@@ -136,6 +129,9 @@
   <aside
     class="day-menu"
     role="dialog"
+    [attr.aria-modal]="mobile ? true : null"
+    [cdkTrapFocus]="mobile"
+    [cdkTrapFocusAutoCapture]="mobile"
     aria-label="Игры выбранного дня"
     [class.mobile]="mobile"
     [style.left.px]="mobile ? null : left"
@@ -145,7 +141,7 @@
   >
     <div class="menu-heading">
       <strong>{{ open.key.split('-').reverse().join('.') }}</strong
-      ><button aria-label="Закрыть список" (click)="close()">×</button>
+      ><button cdkFocusInitial aria-label="Закрыть список" (click)="close()">×</button>
     </div>
     <div class="menu-games">
       @for (game of open.games; track game.id + ':' + game.platform) {

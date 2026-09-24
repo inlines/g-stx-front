@@ -1,3 +1,4 @@
+import { CdkTrapFocus } from '@angular/cdk/a11y';
 import { ListScrollService } from '@app/shared/list-scroll.service';
 import { CalendarViewService } from './calendar-view.service';
 import {
@@ -18,7 +19,7 @@ import { calendarDays, CalendarResponse, CalendarDay, CalendarGame } from './cal
 @Component({
   changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-release-calendar',
-  imports: [RouterLink, PageSwipeDirective],
+  imports: [RouterLink, PageSwipeDirective, CdkTrapFocus],
   templateUrl: './release-calendar.component.html',
   styleUrl: './release-calendar.component.scss',
 })
@@ -38,16 +39,12 @@ export class ReleaseCalendarComponent {
   left = 0;
   top = 0;
   mobile = false;
-  private hold?: ReturnType<typeof setTimeout>;
   private closeTimer?: ReturnType<typeof setTimeout>;
-  private origin = { x: 0, y: 0 };
-  private suppressClick = false;
   readonly weekdays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
   readonly today = new Date().toISOString().slice(0, 10);
   constructor() {
     this.load();
     this.destroy.onDestroy(() => {
-      this.cancelHold();
       this.keepOpen();
     });
   }
@@ -91,7 +88,6 @@ export class ReleaseCalendarComponent {
   stepMonth(delta: number) {
     const next = this.month + delta;
     if (next < 0 || next > 2) return;
-    this.cancelHold();
     this.chooseMonth(next);
   }
   private saveView() {
@@ -135,31 +131,19 @@ export class ReleaseCalendarComponent {
     this.keepOpen();
     this.open = null;
   }
-  press(e: PointerEvent, day: CalendarDay, el: HTMLElement) {
-    this.cancelHold();
-    this.suppressClick = false;
-    if (e.pointerType === 'mouse' || day.games.length < 2) return;
-    this.origin = { x: e.clientX, y: e.clientY };
-    this.hold = setTimeout(() => {
-      this.suppressClick = true;
-      this.show(day, el);
-    }, 500);
-  }
-  move(e: PointerEvent) {
-    if (Math.hypot(e.clientX - this.origin.x, e.clientY - this.origin.y) > 10) this.cancelHold();
-  }
-  cancelHold() {
-    clearTimeout(this.hold);
+  tapDay(day: CalendarDay, el: HTMLElement) {
+    if (window.matchMedia('(max-width:767px)').matches && day.games.length > 1) this.show(day, el);
   }
   gameLink(game: CalendarGame) {
     return this.router.serializeUrl(
       this.router.createUrlTree(['/products', game.id, { platform: game.platform }]),
     );
   }
-  go(e: MouseEvent, game: CalendarGame) {
-    if (this.suppressClick) {
+  go(e: MouseEvent, game: CalendarGame, day?: CalendarDay, el?: HTMLElement) {
+    if (day && el && day.games.length > 1 && window.matchMedia('(max-width:767px)').matches) {
       e.preventDefault();
-      this.suppressClick = false;
+      e.stopPropagation();
+      this.show(day, el);
       return;
     }
     if (!e.ctrlKey && !e.metaKey && !e.shiftKey && !e.altKey) {
