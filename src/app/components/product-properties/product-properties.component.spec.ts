@@ -575,6 +575,33 @@ describe('ProductPropertiesComponent', () => {
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('.release-actions')).toBeNull();
   });
+  it.each([
+    { release_date: Date.now() + 86400000, release_status: 0 },
+    { release_date: 1000, release_status: 5 },
+  ])('blocks collection but allows wishlist for an unreleased release (%j)', (dates) => {
+    component.ngOnInit();
+    component.isAuthorised$ = of(true);
+    const store = TestBed.inject(Store);
+    store.dispatch(new ProductsActions.LoadProperties(1));
+    TestBed.inject(HttpTestingController).expectOne('/api/products/1').flush({
+      product: { id: 1, name: 'Game', image_url: null, first_release_date: null },
+      releases: [{ release_id: -10, platform_id: 48, platform_name: 'PS4',
+        release_region: 'Europe', ...dates, digital_only: false, serial: [], seller_logins: [] }],
+      companies: [], franschises: [], screenshots: [],
+    });
+    fixture.detectChanges();
+    const dispatch = vi.spyOn(store, 'dispatch').mockReturnValue(of(undefined));
+    const buttons = Array.from(fixture.nativeElement.querySelectorAll('.release-actions button')) as HTMLButtonElement[];
+    const collection = buttons.find(b => b.textContent?.trim() === 'В коллекцию')!;
+    const wishlist = buttons.find(b => b.textContent?.trim() === 'В вишлист')!;
+    expect(collection.disabled).toBe(true);
+    collection.click();
+    expect(dispatch).not.toHaveBeenCalled();
+    expect(wishlist.disabled).toBe(false);
+    wishlist.click();
+    expect(dispatch).toHaveBeenCalledWith(new CollectionActions.AddWishRequest({ release_id: -10 }));
+    dispatch.mockRestore();
+  });
   it('offers owned releases for sale with price and CIB, then withdraws the sale', () => {
     const store = TestBed.inject(Store);
     const http = TestBed.inject(HttpTestingController);

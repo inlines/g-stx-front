@@ -182,7 +182,7 @@
         @if ((isAuthorised$ | async) && canSuggestSerial(release)) {
           <div class="release-actions">
             <button type="button" class="btn-blue small"
-              [disabled]="release.owned || release.digital_only || release.release_status === 5 || !release.release_date || (collectionChanging$ | async)"
+              [disabled]="release.owned || release.digital_only || !isReleased(release) || (collectionChanging$ | async)"
               [hidden]="release.owned"
               (click)="addToCollection(release.release_id, productProperties.product.id)">
               В коллекцию
@@ -194,7 +194,7 @@
               </button>
             }
             <button type="button" class="btn-blue small"
-              [disabled]="release.wished || release.release_status === 5 || !release.release_date || (collectionChanging$ | async)"
+              [disabled]="release.wished || (collectionChanging$ | async)"
               [hidden]="release.wished"
               (click)="addWish(release.release_id)">
               В вишлист
