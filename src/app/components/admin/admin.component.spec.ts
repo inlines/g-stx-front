@@ -17,7 +17,9 @@ describe('Admin users', () => {
   });
   afterEach(() => {
     TestBed.inject(NgbModal).dismissAll();
-    TestBed.inject(HttpTestingController).verify();
+    const avatarHttp = TestBed.inject(HttpTestingController);
+    avatarHttp.match(r => r.url.startsWith('/api/avatars/')).forEach(r => { if (!r.cancelled) r.flush(null, { status: 404, statusText: 'Not Found' }); });
+    avatarHttp.verify();
   });
   function setup() {
     const fixture = TestBed.createComponent(AdminComponent);

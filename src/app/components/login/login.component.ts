@@ -1,5 +1,5 @@
 import { NgClass } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { afterNextRender, ChangeDetectionStrategy, Component } from '@angular/core';
 import {
   FormBuilder,
   FormControl,
@@ -25,6 +25,7 @@ export class LoginComponent {
     private readonly fb: FormBuilder,
     private readonly store: Store,
   ) {
+    afterNextRender(() => window.scrollTo({ top: 0, left: 0, behavior: 'instant' }));
     this.form = this.fb.group({
       user_login: new FormControl('', [Validators.required]),
       password: new FormControl('', Validators.required),

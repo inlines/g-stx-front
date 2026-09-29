@@ -10,7 +10,11 @@ describe('Administrator avatar crowns', () => {
     TestBed.configureTestingModule({ imports: [UserAvatarComponent], providers: TEST_PROVIDERS });
     TestBed.overrideProvider(UserBadgesService, { useFactory: () => new UserBadgesService() });
   });
-  afterEach(() => TestBed.inject(HttpTestingController).verify());
+  afterEach(() => {
+    const http = TestBed.inject(HttpTestingController);
+    http.match(r => r.url.startsWith('/api/avatars/')).forEach(r => { if (!r.cancelled) r.flush(null, { status: 404, statusText: 'Not Found' }); });
+    http.verify();
+  });
   function avatar(login: string) {
     const fixture = TestBed.createComponent(UserAvatarComponent);
     fixture.componentRef.setInput('login', login);

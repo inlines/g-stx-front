@@ -5,11 +5,11 @@ import { ProductPropertiesResolver } from '@app/resolvers/product-properties.res
 import { CollectorPropertiesResolver } from './resolvers/collector-properties.resolver';
 
 export const routes: Routes = [
-  { path: 'release-calendar', loadComponent: () => import('./components/release-calendar/release-calendar.component').then(m => m.ReleaseCalendarComponent) },
-  { path: 'photo-search', loadComponent: () => import('./components/photo-search/photo-search.component').then(m => m.PhotoSearchComponent) },
+  { path: 'release-calendar', canActivate: [authGuard], loadComponent: () => import('./components/release-calendar/release-calendar.component').then(m => m.ReleaseCalendarComponent) },
+  { path: 'photo-search', canActivate: [authGuard], loadComponent: () => import('./components/photo-search/photo-search.component').then(m => m.PhotoSearchComponent) },
   { path: 'unknown', canActivate: [authGuard, adminGuard], loadComponent: () => import('./components/unknown/unknown.component').then(m => m.UnknownComponent) },
   {
-    path: 'kudos-challenge',
+    path: 'kudos-challenge', canActivate: [authGuard],
     loadComponent: () =>
       import('./components/kudos-challenge/kudos-challenge.component').then((m) => m.KudosChallengeComponent),
   },
@@ -24,18 +24,18 @@ export const routes: Routes = [
       import('@app/components/product-list/product-list.component').then((m) => m.ProductListComponent),
   },
   {
-    path: 'companies/:id',
+    path: 'companies/:id', canActivate: [authGuard],
     data: { catalogKind: 'company' },
     loadComponent: () =>
       import('./components/catalog-group/catalog-group.component').then((m) => m.CatalogGroupComponent),
   },
   {
-    path: 'franchises/:id',
+    path: 'franchises/:id', canActivate: [authGuard],
     loadComponent: () =>
       import('./components/catalog-group/catalog-group.component').then((m) => m.CatalogGroupComponent),
   },
   {
-    path: 'products/:id',
+    path: 'products/:id', canActivate: [authGuard],
     loadComponent: () =>
       import('@app/components/product-properties/product-properties.component').then(
         (m) => m.ProductPropertiesComponent,
@@ -45,12 +45,12 @@ export const routes: Routes = [
     },
   },
   {
-    path: 'collectors',
+    path: 'collectors', canActivate: [authGuard],
     loadComponent: () =>
       import('./components/collectors/collectors.component').then((m) => m.CollectorsComponent),
   },
   {
-    path: 'collectors/:id',
+    path: 'collectors/:id', canActivate: [authGuard],
     loadComponent: () =>
       import('./components/collector-properties/collector-properties.component').then(
         (m) => m.CollectorPropertiesComponent,
@@ -69,11 +69,11 @@ export const routes: Routes = [
     loadComponent: () => import('@app/components/login/login.component').then((m) => m.LoginComponent),
   },
   {
-    path: 'about',
+    path: 'about', canActivate: [authGuard],
     loadComponent: () => import('@app/components/about/about.component').then((m) => m.AboutComponent),
   },
   {
-    path: 'faq',
+    path: 'faq', canActivate: [authGuard],
     loadComponent: () => import('@app/components/faq/faq.component').then((m) => m.FaqComponent),
   },
   {
@@ -101,7 +101,7 @@ export const routes: Routes = [
     ],
   },
   {
-    path: '**',
+    path: '**', canActivate: [authGuard],
     loadComponent: () =>
       import('@app/components/not-found/not-found.component').then((m) => m.NotFoundComponent),
   },

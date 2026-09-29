@@ -8,7 +8,11 @@ describe('Kudos Challenge', () => {
     TestBed.configureTestingModule({ imports: [KudosChallengeComponent], providers: TEST_PROVIDERS });
     TestBed.overrideProvider(KudosService, { useFactory: () => new KudosService() });
   });
-  afterEach(() => TestBed.inject(HttpTestingController).verify());
+  afterEach(() => {
+    const http = TestBed.inject(HttpTestingController);
+    http.match(r => r.url.startsWith('/api/avatars/')).forEach(r => { if (!r.cancelled) r.flush(null, { status: 404, statusText: 'Not Found' }); });
+    http.verify();
+  });
   it('renders the server ranking, links to collectors and does not request scores per row', () => {
     const fixture = TestBed.createComponent(KudosChallengeComponent);
     fixture.detectChanges();

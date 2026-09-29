@@ -1,13 +1,14 @@
+import { AuthenticatedAvatarDirective } from '@app/directives/authenticated-avatar.directive';
 import { AsyncPipe } from '@angular/common';
 import { UserBadgesService } from '@app/services/user-badges.service';
 import { ChangeDetectionStrategy, Component, Input, OnChanges, effect, inject } from '@angular/core';
 import { ProfileService } from '@app/services/profile.service';
 @Component({
   selector: 'app-user-avatar',
-  imports: [AsyncPipe],
+  imports: [AsyncPipe, AuthenticatedAvatarDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `@if (login && hasAvatar !== false && !failed) {
-      <img [src]="profile.avatarUrl(login)" alt="" (error)="failed = true" loading="lazy" />
+      <img [authenticatedAvatar]="profile.avatarUrl(login)" alt="" (error)="failed = true" loading="lazy" />
     } @else {
       <span aria-hidden="true">{{ login?.slice(0, 1)?.toUpperCase() || '•' }}</span>
     }
