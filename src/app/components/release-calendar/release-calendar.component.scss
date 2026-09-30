@@ -229,10 +229,29 @@ button {
 .menu-games a:focus-visible {
   background: #2b334b;
 }
-.menu-games img {
+.menu-cover {
+  display: grid;
+  place-items: center;
+  flex: 0 0 42px;
   width: 42px;
   height: 56px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: #243747;
+  color: #9aaebe;
+}
+.menu-cover img {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
+}
+.menu-cover svg {
+  width: 24px;
+  height: 24px;
+}
+.menu-game-title {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 .menu-games small {
   display: block;

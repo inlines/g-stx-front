@@ -33,6 +33,7 @@ export class ReleaseCalendarComponent {
   data: CalendarResponse | null = null;
   loading = false;
   failed = false;
+  readonly failedCoverUrls = new Set<string>();
   month = 0;
   platform: number | null = this.view.platform;
   open: CalendarDay | null = null;
