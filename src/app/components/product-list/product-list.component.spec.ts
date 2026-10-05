@@ -1,3 +1,4 @@
+import {responsivePageSize} from '@app/shared/responsive-page-size';
 import { HttpTestingController } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ProductsActions } from '@app/states/products/states/products.actions';
@@ -36,6 +37,14 @@ describe('Catalog filters', () => {
   function flushInitial() {
     nextRequest().flush({ items: [], total_count: 100 });
   }
+
+  it('dismisses sorting on outside click without changing the sort', () => {
+    const component = mount();flushInitial();fixture.detectChanges();
+    const menu=fixture.nativeElement.querySelector('.sort-disclosure') as HTMLDetailsElement;
+    menu.open=true;const before=component.queryForm.controls.sort.value;
+    document.body.click();fixture.detectChanges();
+    expect(menu.open).toBe(false);expect(component.queryForm.controls.sort.value).toBe(before);
+  });
 
   it('keeps advanced filters collapsed while showing restored selections and retaining their request values', () => {
     store.dispatch(new ProductsActions.SetRequestParams({genre_id:5,local_multiplayer:true,online_multiplayer:true}));
@@ -76,25 +85,26 @@ describe('Catalog filters', () => {
     all.flush({ items: [], total_count: 100 });
   });
 
-  it('uses 16 cards on the two-column mobile grid through paging, swipes and filters', () => {
+  it('fits complete rows on the two-column mobile grid through paging, swipes and filters', () => {
+    vi.stubGlobal('innerWidth',390);vi.stubGlobal('innerHeight',844);
     vi.stubGlobal('matchMedia', (query: string) => ({ matches: query === '(max-width: 575px)' }));
     store.dispatch(new ProductsActions.SetRequestParams({ cat: 48, limit: 15, offset: 45 }));
     const component = mount();
     const initial = nextRequest();
-    expect(initial.request.params.get('limit')).toBe('16');
+    expect(initial.request.params.get('limit')).toBe(String(component.limit));
     expect(initial.request.params.get('offset')).toBe('0');
     initial.flush({ items: [], total_count: 100 });
     component.pageChanged(2);
     const second = nextRequest();
-    expect(second.request.params.get('offset')).toBe('16');
+    expect(second.request.params.get('offset')).toBe(String(component.limit));
     second.flush({ items: [], total_count: 100 });
     component.swipePage(1);
     const third = nextRequest();
-    expect(third.request.params.get('offset')).toBe('32');
+    expect(third.request.params.get('offset')).toBe(String(component.limit*2));
     third.flush({ items: [], total_count: 100 });
     component.setActiveCategory(167);
     const filtered = nextRequest();
-    expect(filtered.request.params.get('limit')).toBe('16');
+    expect(filtered.request.params.get('limit')).toBe(String(component.limit));
     expect(filtered.request.params.get('offset')).toBe('0');
     filtered.flush({ items: [], total_count: 0 });
   });
@@ -302,10 +312,10 @@ describe('Catalog filters', () => {
   });
 
   it('restores the saved page with a single initial request', () => {
-    store.dispatch(new ProductsActions.SetRequestParams({ cat: 8, offset: 45, query: 'Mario' }));
+    store.dispatch(new ProductsActions.SetRequestParams({ cat: 8, limit: responsivePageSize(window.innerWidth,window.innerHeight,20), offset: responsivePageSize(window.innerWidth,window.innerHeight,20)*3, query: 'Mario' }));
     mount();
     const req = nextRequest();
-    expect(req.request.params.get('offset')).toBe('45');
+    expect(req.request.params.get('offset')).toBe(String(responsivePageSize(window.innerWidth,window.innerHeight,20)*3));
     expect(req.request.params.get('cat')).toBe('8');
     req.flush({ items: [], total_count: 100 });
     vi.advanceTimersByTime(400);
@@ -386,7 +396,7 @@ describe('Catalog filters', () => {
     fixture.componentInstance.pageChanged(2);
     req = nextRequest();
     expect(req.request.params.get('franchise_id')).toBe('42');
-    expect(req.request.params.get('offset')).toBe('15');
+    expect(req.request.params.get('offset')).toBe(String(fixture.componentInstance.limit));
     req.flush({ items: [], total_count: 100 });
     fixture.componentInstance.setActiveCategory(167);
     req = nextRequest();
@@ -411,7 +421,7 @@ describe('Catalog filters', () => {
     let req = nextRequest();
     expect(req.request.params.get('company_role')).toBe('publisher');
     expect(req.request.params.get('company_id')).toBe('42');
-    expect(req.request.params.get('offset')).toBe('15');
+    expect(req.request.params.get('offset')).toBe(String(fixture.componentInstance.limit));
     req.flush({ items: [], total_count: 50 });
     fixture.destroy();
     mount();

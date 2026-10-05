@@ -14,7 +14,7 @@ import { SerialListComponent } from '../serial-list/serial-list.component';
      @else{<span class="no-cover">Нет изображения</span>}
    </a>
    <div class="game-content">
-     <a class="title" [routerLink]="link">{{game.name}}</a>
+     <a class="title" [title]="game.name" [routerLink]="link">{{game.name}}</a>
      <app-game-stats [game]="game"/>
      @if(game.serial?.length){<app-serial-list [serials]="game.serial"/>}
      @else if(missing){<a class="missing-hint" [routerLink]="link">Знаете серийник? Дополните →</a>}

@@ -1,3 +1,4 @@
+import { responsivePageSize } from './responsive-page-size';
 import { RegionGroup } from './region-filter';
 import { Injectable } from '@angular/core';
 import { CollectionSort } from './collection-filter';
@@ -28,9 +29,10 @@ export function mobileLibraryPager(): boolean {
 }
 
 export function normalizeLibraryPageSize(view: LibraryView): boolean {
-  if (!mobileLibraryPager() || view.size <= 48) return false;
+  const size = responsivePageSize();
+  if (view.size === size) return false;
   const offset = (view.page - 1) * view.size;
-  view.size = 48;
-  view.page = Math.floor(offset / view.size) + 1;
+  view.size = size;
+  view.page = Math.floor(offset / size) + 1;
   return true;
 }

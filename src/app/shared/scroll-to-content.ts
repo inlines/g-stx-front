@@ -7,6 +7,7 @@ export function scrollToContent(target: HTMLElement | undefined, gap = 12): void
   const height = header && (position === 'sticky' || position === 'fixed')
     ? header.getBoundingClientRect().height
     : 0;
-  target.style.scrollMarginTop = `${height + gap}px`;
+  const context = document.querySelector('app-region-filters');
+  target.style.scrollMarginTop = `${(context ? 44 : height) + gap}px`;
   target.scrollIntoView?.({ block: 'start', behavior: 'instant' });
 }

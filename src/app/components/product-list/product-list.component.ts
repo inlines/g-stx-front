@@ -1,3 +1,5 @@
+import { HostListener } from '@angular/core';
+import { responsivePageSize } from '@app/shared/responsive-page-size';
 import { ListScrollService } from '@app/shared/list-scroll.service';
 import { GameCardComponent } from '../game-card/game-card.component';
 import { HorizontalFiltersDirective } from '@app/directives/horizontal-filters.directive';
@@ -83,7 +85,24 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   @ViewChild('query') query?: GameSearchComponent;
 
   // Match the two-column grid breakpoint; keep page size stable while browsing.
-  readonly limit = window.matchMedia?.('(max-width: 575px)').matches ? 16 : CATALOG_PAGE_SIZE;
+  limit = this.viewportLimit();
+  private viewportLimit(): number {
+    return responsivePageSize(window.innerWidth, window.innerHeight, this.store.selectSnapshot(AuthState.isAuthorised) ? 96 : 20);
+  }
+  @ViewChild('sortMenu') sortMenu?: ElementRef<HTMLDetailsElement>;
+  @HostListener('document:click', ['$event'])
+  closeSortOutside(event: MouseEvent): void {
+    const menu = this.sortMenu?.nativeElement;
+    if (menu?.open && event.target instanceof Node && !menu.contains(event.target)) menu.open = false;
+  }
+  @HostListener('window:resize')
+  resizePage(): void {
+    const size = this.viewportLimit();
+    if (size === this.limit) return;
+    const old = this.store.selectSnapshot(ProductsState.productsParams);
+    this.limit = size;
+    this.store.dispatch(new ProductsActions.SetRequestParams({limit:size, offset:Math.floor((old.offset ?? 0)/size)*size}));
+  }
   readonly productParams$ = this.store.select(ProductsState.productsParams);
   readonly displayedParams$ = this.store.select(ProductsState.displayedParams);
   readonly offset$ = this.displayedParams$.pipe(map((params) => params.offset ?? 0));

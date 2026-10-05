@@ -11,7 +11,7 @@ const items:ICollectionItem[]=Array.from({length:49},(_,i)=>({release_id:i+1,pro
 describe('Personal library server pages',()=>{
  let fixture:ComponentFixture<PersonalLibraryComponent>, http:HttpTestingController, store:Store;
  beforeEach(()=>{
-  vi.useFakeTimers();vi.spyOn(window,'scrollTo').mockImplementation(()=>{});
+  vi.useFakeTimers();vi.spyOn(window,'innerWidth','get').mockReturnValue(992);vi.spyOn(window,'innerHeight','get').mockReturnValue(3000);vi.spyOn(window,'scrollTo').mockImplementation(()=>{});
   TestBed.configureTestingModule({imports:[PersonalLibraryComponent],providers:TEST_PROVIDERS});http=TestBed.inject(HttpTestingController);store=TestBed.inject(Store);
   const state=store.snapshot();store.reset({...state,Collection:{...state.Collection,collectionParams:{cat:48},wishlistParams:{cat:48},wtsParams:{cat:48}}});
  });
