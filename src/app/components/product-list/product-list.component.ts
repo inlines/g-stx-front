@@ -116,7 +116,6 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   readonly selectedRegionCounts$ = combineLatest([this.categories$, this.productParams$]).pipe(
     map(([platforms, params]) => platformRegionCounts(platforms.find((p) => p.id === params.cat))),
   );
-  readonly unknownRegionTotals$ = this.store.select(ProductsState.regionTotals);
   readonly unknownRegionCounts$ = this.store.select(ProductsState.regionCounts);
   get selectedRegions() {
     return normalizeRegions(this.queryForm.controls.regions.value);

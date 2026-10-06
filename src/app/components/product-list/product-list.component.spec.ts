@@ -180,10 +180,10 @@ describe('Catalog filters', () => {
       (button: any) => button.textContent.replace(/\s+/g, ' ').trim(),
     );
     expect(regionButtons).toEqual([
-      'Европа 12 / 90',
-      'Америка 15 / 180',
-      'Япония 9 / 270',
-      'Другие 14 / 360',
+      'Европа 12 / 100',
+      'Америка 15 / 200',
+      'Япония 9 / 300',
+      'Другие 14 / 400',
     ]);
     expect(fixture.nativeElement.querySelector('app-region-filters').textContent).toContain(
       'Неидентифицированные',

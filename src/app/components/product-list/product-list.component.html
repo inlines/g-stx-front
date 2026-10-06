@@ -14,7 +14,7 @@
             }
           </ul>
           @if (!isNamedCatalog) {
-          <app-region-filters [platformId]="activeCategory" [unknown]="unknown" [unidentified]="(unknownRegionCounts$ | async) ?? {}" [selected]="selectedRegions" [totals]="((unknown ? unknownRegionTotals$ : selectedRegionCounts$) | async) ?? {}" (regionToggle)="toggleRegion($event)"/>
+          <app-region-filters [platformId]="activeCategory" [unknown]="unknown" [unidentified]="(unknownRegionCounts$ | async) ?? {}" [selected]="selectedRegions" [totals]="(selectedRegionCounts$ | async) ?? {}" (regionToggle)="toggleRegion($event)"/>
           }
           <details class="extra-filters">
             <summary>Фильтры · <span class="filter-count" aria-live="polite"> {{ (queryForm.controls.localMultiplayer.value ? 1 : 0) + (queryForm.controls.onlineMultiplayer.value ? 1 : 0) + (queryForm.controls.genre.value ? 1 : 0) + (!unknown && queryForm.controls.skipDigitalFilter.value ? 1 : 0) + (queryForm.controls.includeUnreleased.value ? 1 : 0) }}</span></summary>
