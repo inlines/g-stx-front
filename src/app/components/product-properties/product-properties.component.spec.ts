@@ -584,7 +584,7 @@ describe('ProductPropertiesComponent', () => {
   it.each([
     { release_date: Date.now() + 86400000, release_status: 0 },
     { release_date: null, release_status: null },
-  ])('blocks collection but allows wishlist for an unreleased release (%j)', (dates) => {
+  ])('allows unknown dates but blocks future releases in collection (%j)', (dates) => {
     component.ngOnInit();
     component.isAuthorised$ = of(true);
     const store = TestBed.inject(Store);
@@ -600,9 +600,10 @@ describe('ProductPropertiesComponent', () => {
     const buttons = Array.from(fixture.nativeElement.querySelectorAll('.release-actions button')) as HTMLButtonElement[];
     const collection = buttons.find(b => b.textContent?.trim() === 'В коллекцию')!;
     const wishlist = buttons.find(b => b.textContent?.trim() === 'В вишлист')!;
-    expect(collection.disabled).toBe(true);
+    expect(collection.disabled).toBe(dates.release_date !== null);
     collection.click();
-    expect(dispatch).not.toHaveBeenCalled();
+    if (dates.release_date === null) expect(dispatch).toHaveBeenCalledWith(new CollectionActions.AddToCollectionRequest({release_id: -10, product_id: 1}));
+    else expect(dispatch).not.toHaveBeenCalled();
     expect(wishlist.disabled).toBe(false);
     wishlist.click();
     expect(dispatch).toHaveBeenCalledWith(new CollectionActions.AddWishRequest({ release_id: -10 }));

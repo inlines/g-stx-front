@@ -186,7 +186,7 @@ export class ProductPropertiesComponent implements OnInit {
   public releases$: Observable<IReleaseItem[]>;
 
   public isReleased(release: IReleaseItem): boolean {
-    return release.release_status !== 5 && release.release_date != null && release.release_date <= Date.now();
+    return release.release_status !== 5 && (release.release_date == null || release.release_date <= Date.now());
   }
 
   public addToCollection(release_id: number, product_id: number): void {
