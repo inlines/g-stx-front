@@ -1,6 +1,9 @@
 :host { display: inline-flex; vertical-align: middle; }
-button { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; min-width: 44px; min-height: 44px; border: 1px solid #38556a; border-radius: 10px; background: #122838; color: #e8f0f6; cursor: pointer; }
-button:hover:not(:disabled), button[aria-pressed="true"] { background: #44345e; border-color: #bfa2eb; }
+button { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; min-width: 44px; min-height: 44px; border: 1px solid #38556a; border-radius: 10px; background: #122838; color: #e8f0f6; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+button[aria-pressed="true"] { background: #44345e; border-color: #bfa2eb; }
+@media (hover: hover) and (pointer: fine) {
+  button:hover:not(:disabled) { background: #44345e; border-color: #bfa2eb; }
+}
 button:focus-visible { outline: 2px solid #c7adf1; outline-offset: 3px; }
 button:disabled { opacity: .4; cursor: default; }
 svg { width: 22px; height: 22px; fill: currentColor; }

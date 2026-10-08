@@ -27,6 +27,16 @@ describe('Demo browsing', () => {
     http.expectOne(`/api/products/${id}`).flush({product:{id, name:`Game ${id}`, image_url:null}, releases:[], screenshots:[], companies:[], franschises:[]});
     fixture.detectChanges();
   }
+  it('opens on the first toggle click and shows only the active mode as pressed', () => {
+    const buttons = fixture.nativeElement.querySelectorAll('.view-toggle button') as NodeListOf<HTMLButtonElement>;
+    buttons[1].click();
+    fixture.detectChanges();
+    expect(demo.active).toBe(true);
+    expect(document.querySelector('.game-demo-window')).not.toBeNull();
+    expect(buttons[0].getAttribute('aria-pressed')).toBe('false');
+    expect(buttons[1].getAttribute('aria-pressed')).toBe('true');
+    loaded(11);
+  });
   it('starts as grid, opens first game on the current page and ignores input until loaded', () => {
     expect(demo.active).toBe(false);
     demo.open();
