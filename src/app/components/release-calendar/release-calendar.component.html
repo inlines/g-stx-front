@@ -90,15 +90,7 @@
                   (click)="go($event, game, day, cell)"
                   [attr.aria-label]="game.name + ' — ' + (game.platform === 48 ? 'PS4' : 'PS5')"
                 >
-                  @if (game.image_url) {
-                    <img
-                      [src]="game.image_url"
-                      alt=""
-                      loading="lazy"
-                      draggable="false"
-                      (error)="$any($event.target).style.display = 'none'"
-                    />
-                  }
+                  <app-game-cover class="calendar-cover" [src]="game.image_url" [name]="game.name" [platform]="game.platform"/>
                   <span class="game-name">{{ game.name }}</span
                   ><span class="platform">{{ game.platform === 48 ? 'PS4' : 'PS5' }}</span></a
                 >
@@ -147,20 +139,7 @@
       @for (game of open.games; track game.id + ':' + game.platform) {
         <a [routerLink]="['/products', game.id, { platform: game.platform }]" (click)="close()">
           <span class="menu-cover" aria-hidden="true">
-            @if (game.image_url && !failedCoverUrls.has(game.image_url)) {
-              <img
-                [src]="game.image_url"
-                alt=""
-                loading="lazy"
-                (error)="failedCoverUrls.add(game.image_url)"
-              />
-            } @else {
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <rect x="3" y="3" width="18" height="18" rx="2" />
-                <circle cx="8" cy="8" r="1.5" />
-                <path d="m3 17 5-5 4 4 4-6 5 7" />
-              </svg>
-            }
+            <app-game-cover [src]="game.image_url" [name]="game.name" [platform]="game.platform"/>
           </span>
           <span class="menu-game-title"
             >{{ game.name }}<small>{{ game.platform === 48 ? 'PS4' : 'PS5' }}</small></span

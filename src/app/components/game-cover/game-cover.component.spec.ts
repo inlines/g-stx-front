@@ -10,6 +10,6 @@ describe('Game cover',()=>{
  f.nativeElement.querySelector('img').dispatchEvent(new Event('error'));f.detectChanges();
  expect(f.nativeElement.querySelector('.empty')).not.toBeNull();expect(f.nativeElement.querySelector('.box')).not.toBeNull();
  f.componentRef.setInput('src','two.jpg');f.detectChanges();expect(f.nativeElement.querySelector('img').getAttribute('src')).toBe('two.jpg');
- f.componentRef.setInput('platform',38);f.detectChanges();expect(f.nativeElement.querySelector('.brand')).toBeNull();
+ f.componentRef.setInput('platform',999);f.detectChanges();expect(f.nativeElement.querySelector('.brand')).toBeNull();
  });
 });

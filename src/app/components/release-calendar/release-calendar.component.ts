@@ -1,3 +1,4 @@
+import {GameCoverComponent} from '../game-cover/game-cover.component';
 import { CdkTrapFocus } from '@angular/cdk/a11y';
 import { ListScrollService } from '@app/shared/list-scroll.service';
 import { CalendarViewService } from './calendar-view.service';
@@ -19,7 +20,7 @@ import { calendarDays, CalendarResponse, CalendarDay, CalendarGame } from './cal
 @Component({
   changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-release-calendar',
-  imports: [RouterLink, PageSwipeDirective, CdkTrapFocus],
+  imports: [GameCoverComponent, RouterLink, PageSwipeDirective, CdkTrapFocus],
   templateUrl: './release-calendar.component.html',
   styleUrl: './release-calendar.component.scss',
 })
