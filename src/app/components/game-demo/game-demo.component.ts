@@ -11,7 +11,7 @@ import { ProductsActions } from '@app/states/products/states/products.actions';
 import { ProductsState } from '@app/states/products/states/products.state';
 import { ProductPropertiesComponent } from '../product-properties/product-properties.component';
 
-export interface DemoItem { id?: number; product_id?: number; platform_id?: number; release_id?: number; }
+export interface DemoItem { id?: number; product_id?: number; platform_id?: number; release_id?: number; region_id?: number|null; region_name?: string|null; release_date?: number|null; }
 
 @Component({
   selector: 'app-game-demo',
@@ -22,6 +22,7 @@ export interface DemoItem { id?: number; product_id?: number; platform_id?: numb
 export class GameDemoComponent implements OnChanges {
   @Input() items: readonly DemoItem[] | null = [];
   @Input() platform: number | null | undefined;
+  @Input() region: string|number|null|undefined;
   @Input() offset = 0;
   @Input() limit = 1;
   @Input() total = 0;

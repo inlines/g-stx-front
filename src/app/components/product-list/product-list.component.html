@@ -44,7 +44,7 @@
             </div>
           </details>
           <div class="catalog-options">
-            <app-game-demo [items]="products$ | async" [platform]="displayedParams?.cat" [offset]="(offset$ | async) ?? 0" [limit]="limit" [total]="(productsTotalCount$ | async) ?? 0" [busy]="(loading$ | async) ?? false" [failed]="(failed$ | async) ?? false" (pageChange)="pageChanged($event)" (activeChange)="demoOpen = $event" (closed)="demoClosed()"/>
+            <app-game-demo [region]="displayedParams?.regions" [items]="products$ | async" [platform]="displayedParams?.cat" [offset]="(offset$ | async) ?? 0" [limit]="limit" [total]="(productsTotalCount$ | async) ?? 0" [busy]="(loading$ | async) ?? false" [failed]="(failed$ | async) ?? false" (pageChange)="pageChanged($event)" (activeChange)="demoOpen = $event" (closed)="demoClosed()"/>
             <details class="sort-disclosure" #sortMenu (keydown.escape)="sortMenu.open = false; sortSummary.focus()">
               <summary #sortSummary aria-label="Сортировка">{{ queryForm.controls.sort.value === 'name' ? 'По названию' : queryForm.controls.sort.value === 'rating' ? 'По рейтингу ↓' : 'По дате' }}</summary>
               <fieldset class="sort-options">
@@ -75,7 +75,7 @@
   @for (product of products$ | async; track product.id; let cardIndex = $index) {
     <!-- Desktop / tablet: карточки -->
     <div class="catalog-cell col-xl-3 col-lg-4 col-md-4 col-sm-6 p-3">
-      <app-game-card [game]="product" [link]="['/products', product.id, {platform: displayedParams?.cat}]"
+      <app-game-card [region]="displayedParams?.regions" [game]="product" [link]="['/products', product.id, {platform: displayedParams?.cat, region: displayedParams?.regions || ''}]"
         [priority]="cardIndex === 0" [owned]="product.owned"
         [missing]="isReleased(product) && product.has_serials === false && !product.digital_only && supportsReleaseActions(displayedParams?.cat ?? activeCategory)" />
     </div>

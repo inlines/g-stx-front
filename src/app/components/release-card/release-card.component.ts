@@ -32,7 +32,7 @@ export class ReleaseCardComponent {
    this.host.addEventListener('click',click,true);
    inject(DestroyRef).onDestroy(()=>{this.cancelHold();this.host.removeEventListener('click',click,true);});
  }
- get productLink(){const platform=this.item.platform_id??this.platform;return platform==null?['/products',this.item.product_id]:['/products',this.item.product_id,{platform}];}
+ get productLink(){const platform=this.item.platform_id??this.platform;return platform==null?['/products',this.item.product_id]:['/products',this.item.product_id,{platform,region:this.item.region_id ?? this.item.region_name ?? ''}];}
  get game(){return {...this.item,image_url:this.item.image_url?.replace('/static/covers-thumb/','/static/covers-full/')??null,id:this.item.product_id,name:this.item.product_name,first_release_date:null,alternative_names:this.item.alternative_names??null,serial:this.item.selected_serial?[this.item.selected_serial]:this.item.serial};}
  get purchasePrice(){return this.item.purchase_price!==undefined?this.item.purchase_price:this.collection?this.item.price:null;}
  get incomplete(){return this.item.cib==null || (!this.item.digital_only && (this.item.serial?.length??0)>1 && !this.item.selected_serial);}

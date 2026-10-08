@@ -16,7 +16,7 @@
       @if (current) {
 
         @if ((failure$ | async)?.failed) { <p class="error" role="alert">Не удалось загрузить игру. <button type="button" (click)="load()">Повторить</button></p> }
-        <app-product-properties [embedded]="true" [demoPlatform]="currentPlatform"/>
+        <app-product-properties [embedded]="true" [coverRegion]="current?.region_id ?? current?.region_name ?? region" [coverDate]="current?.release_date" [demoPlatform]="currentPlatform"/>
       } @else { <p role="status">На этой странице больше нет игр.</p> }
       </app-loading-panel>
     </div>

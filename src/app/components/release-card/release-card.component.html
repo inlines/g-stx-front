@@ -1,5 +1,5 @@
 <div [mobilePageLock]="menuOpen" class="release-card" [class.editable]="!readOnly" (pointerdown)="beginHold($event)" (pointermove)="moveHold($event)" (pointerup)="cancelHold()" (pointercancel)="cancelHold()" (contextmenu)="context($event)" (keydown.escape)="closeMenu()">
-  <app-game-card [game]="game" [link]="productLink" [priority]="priority">
+  <app-game-card [region]="item.region_id ?? item.region_name" [game]="game" [link]="productLink" [priority]="priority">
     @if(!readOnly){<div card-badges class="card-tools" (click)="$event.stopPropagation()">
       @if(collection && incomplete){<button class="incomplete" type="button" aria-label="Дополнить данные экземпляра" title="Укажите комплектность и серийник экземпляра" [disabled]="busy" (click)="editCopy.emit(item)">!</button>}
       <button #editButton class="edit-button" type="button" aria-label="Действия с игрой" [attr.aria-expanded]="menuOpen" [disabled]="busy" (click)="openMenu()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m16 3 5 5-13 13H3v-5zM13 6l5 5"/></svg></button>

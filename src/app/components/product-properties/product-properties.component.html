@@ -78,25 +78,8 @@
     </div>
     <div class="col-12 col-lg-4 product-sidebar">
       <div class="text-white product-info">
-        @if (productProperties.product.image_url) {
-          <img
-            [src]="productProperties.product.image_url"
-            [alt]="productProperties.product.name"
-            class="product-cover" fetchpriority="high" decoding="async"
-            (error)="productProperties.product.image_url = null"
-            />
-        } @else {
-          <div class="no-cover">
-            <div class=" text-center">
-              <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor"
-                class="bi bi-image mb-2" viewBox="0 0 16 16">
-                <path d="M14.002 3a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2.002a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h12zM2.002 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H2.002z"/>
-                <path d="M10.648 8.646a.5.5 0 0 1 .704 0l2.25 2.25V12H2.398v-.316l3.85-3.85a.5.5 0 0 1 .704 0l2.15 2.15 1.546-1.548z"/>
-              </svg>
-              <div>Нет изображения</div>
-            </div>
-          </div>
-        }
+        @let cover = coverContext(productProperties.releases, (platformId$ | async) || 0);
+        <app-game-cover class="detail-case" [src]="productProperties.product.image_url" [name]="productProperties.product.name" [platform]="(platformId$ | async) || 0" [region]="cover.region" [date]="cover.date" [digital]="cover.digital" [priority]="true"/>
         @if (!(compactLayout$ | async)) {
           <ng-container *ngTemplateOutlet="productMetadata" />
         }
@@ -225,8 +208,7 @@
       <div #similarTrack class="similar-track" tabindex="0" aria-label="Похожие игры, горизонтальная прокрутка">
         @for (game of similarGames; track game.id) {
           <a class="similar-card" [routerLink]="similarLink(game, (platformId$ | async) || 0)">
-            @if (game.image_url) { <img [src]="game.image_url" [alt]="game.name" loading="lazy" (error)="game.image_url = null" /> }
-            @else { <span class="similar-placeholder">Нет обложки</span> }
+            <app-game-cover class="similar-case" [src]="game.image_url" [name]="game.name" [platform]="game.platform_ids.includes((platformId$ | async) || 0) ? (platformId$ | async) : null"/>
             <strong>{{game.name}}</strong>
           </a>
         }

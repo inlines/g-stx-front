@@ -1,3 +1,5 @@
+import {caseRegion} from '../../shared/ps3-case';
+import { GameCoverComponent } from '../game-cover/game-cover.component';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { scrollToContent } from '@app/shared/scroll-to-content';
 import { UserBadgesService } from '@app/services/user-badges.service';
@@ -30,6 +32,7 @@ import { BehaviorSubject, combineLatest, map, Observable } from 'rxjs';
 @Component({
   selector: 'app-product-properties',
   imports: [
+    GameCoverComponent,
     GameStatsComponent,
     ReactiveFormsModule,
     RouterLink,
@@ -47,6 +50,16 @@ import { BehaviorSubject, combineLatest, map, Observable } from 'rxjs';
 })
 export class ProductPropertiesComponent implements OnInit {
   @Input() embedded = false;
+  @Input() coverRegion: string|number|null|undefined;
+  @Input() coverDate: number|null|undefined;
+  coverContext(releases: IReleaseItem[], platform: number) {
+    const chosen=this.coverRegion ?? this.params.snapshot.paramMap.get('region');
+    const rows=releases.filter(r=>r.platform_id===platform && r.release_status!==5 && (caseRegion(chosen)==='unknown' || caseRegion(r.release_region)===caseRegion(chosen)));
+    const regions=[...new Set(rows.map(r=>r.release_region))];
+    const dates=rows.map(r=>r.release_date).filter((d):d is number=>d!=null);
+    return {region:chosen || (regions.length===1 ? regions[0] : null),date:this.coverDate !== undefined ? this.coverDate : dates.length ? Math.min(...dates) : null,digital:rows.length>0 && rows.every(r=>r.digital_only)};
+  }
+
   private readonly demoPlatform$ = new BehaviorSubject(0);
   @Input() set demoPlatform(value: number) { this.demoPlatform$.next(value); }
   @ViewChild('productHeading') productHeading?: ElementRef<HTMLElement>;
