@@ -7,7 +7,7 @@
 .game-first-release{color:#8aacc9;font-size:12px;line-height:1.4;margin-top:12px}
 .missing-hint{display:block;margin-top:8px;color:#f5d783;font-size:12px}
 .ownership-mark,.missing-serial{position:absolute;z-index:2;top:8px;display:grid;place-items:center;width:32px;height:32px}
-.ownership-mark{left:8px;background:#bda7ea;color:#5b399d;border-radius:5px;font-size:25px}
+.ownership-mark{right:8px;background:#bda7ea;color:#5b399d;border-radius:5px;font-size:25px}
 .missing-serial{right:8px;border:2px solid #f5d783;border-radius:50%;background:#302744;color:#ffe49a;font-size:22px}
 @media(hover:hover){.game-card:hover{box-shadow:0 10px 20px #0004}.title:hover{color:#c2a4ed}}
 @media(max-width:575px){.catalog-cover{height:auto;aspect-ratio:3/4}.game-content{padding:12px 10px}.title{font-size:15px}.game-first-release{margin-top:8px}}
