@@ -6,7 +6,7 @@ import { displaySerials } from '@app/shared/serial-number';
   imports: [NgbTooltipModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `@if (values.length === 1) {
-      <small class="single">Серийник · {{ values[0] }}</small>
+      <small class="single" [attr.aria-label]="'Серийник: ' + values[0]">{{ values[0] }}</small>
     } @else if (values.length > 1) {
       <details class="serials" (click)="$event.stopPropagation()">
         <summary
