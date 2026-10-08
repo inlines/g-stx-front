@@ -17,6 +17,8 @@ export function ps3CaseStyle(platform:number|null|undefined,region:string|number
  const ms=date<100000000000 ? date*1000 : date;
  // Conservative visual transition. Late old-brand releases are explicit exceptions.
  const lateOld=['rogue warrior','tony hawk: ride','tony hawk ride','call of duty: modern warfare 2'];
- const old=ms<Date.UTC(2009,8,1) || (ms<Date.UTC(2010,0,1) && market!=='japan' && lateOld.includes(name.toLowerCase())) || (market==='europe' && name.toLowerCase()==='uncharted 2: among thieves');
+ // PAL European September releases retain the early shelf style.
+ const transition=market==='europe' ? Date.UTC(2009,9,1) : Date.UTC(2009,8,1);
+ const old=ms<transition || (ms<Date.UTC(2010,0,1) && market!=='japan' && lateOld.includes(name.toLowerCase())) || (market==='europe' && name.trim().toLowerCase()==='uncharted 2: among thieves');
  return old?'legacy':'black';
 }
