@@ -1,3 +1,5 @@
+import { By } from '@angular/platform-browser';
+import { GameDemoComponent } from '../game-demo/game-demo.component';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpTestingController } from '@angular/common/http/testing';
 import { Store } from '@ngxs/store';
@@ -20,6 +22,18 @@ describe('Personal library server pages',()=>{
  function flush(req:ReturnType<typeof pending>, data=items, total=data.length){const offset=Number(req.request.params.get('offset'));const limit=Number(req.request.params.get('limit'));req.flush({items:data.slice(offset,offset+limit),total_count:total,unfiltered_total:total,platform_ids:[48],owned_regions:{europe:total}});fixture.detectChanges();}
  function mount(kind:'collection'|'wishlist'|'wts'='collection'){fixture=TestBed.createComponent(PersonalLibraryComponent);fixture.componentRef.setInput('kind',kind);fixture.detectChanges();const req=pending(kind);expect(req.request.params.get('limit')).toBe('24');flush(req);return fixture.componentInstance;}
  const cards=()=>fixture.nativeElement.querySelectorAll('app-release-card');
+ it('demo changes the real collection page, keeps filters and restores its pager',()=>{
+  mount();
+  fixture.componentInstance.toggleRegion('europe');flush(pending());
+  const demo=fixture.debugElement.query(By.directive(GameDemoComponent)).componentInstance as GameDemoComponent;
+  const details=(id:number)=>http.expectOne(`/api/products/${id}`).flush({product:{id,name:`Game ${id}`,image_url:null},releases:[],screenshots:[],companies:[],franschises:[]});
+  demo.open();details(1);fixture.detectChanges();demo.index=23;demo.move(1);
+  const req=pending();expect(req.request.params.get('offset')).toBe('24');expect(req.request.params.get('regions')).toBe('europe');
+  flush(req);details(25);fixture.detectChanges();expect(demo.position).toBe(25);
+  demo.close();vi.advanceTimersByTime(500);fixture.detectChanges();
+  expect(fixture.nativeElement.querySelector('app-pager [aria-current="page"]')?.textContent).toContain('2');
+  expect(fixture.nativeElement.querySelector('app-release-card').textContent).toContain('25');
+ });
  it('requests just the selected page and clamps an emptied last page',()=>{
   const c=mount();expect(cards()).toHaveLength(24);c.page(3);const req=pending();expect(req.request.params.get('offset')).toBe('48');flush(req);expect(cards()).toHaveLength(1);
   c.retry();flush(pending(),items.slice(0,48));const clamped=pending();expect(clamped.request.params.get('offset')).toBe('24');flush(clamped,items.slice(0,48));expect(cards()).toHaveLength(24);expect(c.view.page).toBe(2);

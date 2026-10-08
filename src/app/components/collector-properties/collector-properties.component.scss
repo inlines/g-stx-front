@@ -25,3 +25,5 @@
 @media(min-width:576px){.release-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(min-width:992px){.release-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(min-width:1200px){.release-grid{grid-template-columns:repeat(5,minmax(0,1fr))}}
+
+.demo-options { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin: 16px 0; }

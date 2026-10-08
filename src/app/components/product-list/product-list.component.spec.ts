@@ -1,3 +1,5 @@
+import { By } from '@angular/platform-browser';
+import { GameDemoComponent } from '../game-demo/game-demo.component';
 import {responsivePageSize} from '@app/shared/responsive-page-size';
 import { HttpTestingController } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
@@ -37,6 +39,31 @@ describe('Catalog filters', () => {
   function flushInitial() {
     nextRequest().flush({ items: [], total_count: 100 });
   }
+
+  it.each([false, true])('keeps the real pager and filters when demo crosses pages (unknown=%s)', (unknown) => {
+    fixture = TestBed.createComponent(ProductListComponent);
+    fixture.componentRef.setInput('unknown', unknown);
+    fixture.detectChanges();
+    const list = fixture.componentInstance;
+    const item = (id:number) => ({id, name:`Game ${id}`, image_url:null, first_release_date:null});
+    nextRequest().flush({items:Array.from({length:list.limit}, (_,i)=>item(i+1)),total_count:100});
+    fixture.detectChanges();
+    const demo = fixture.debugElement.query(By.directive(GameDemoComponent)).componentInstance as GameDemoComponent;
+    demo.open();
+    const details = (id:number) => http.expectOne(`/api/products/${id}`).flush({product:item(id),releases:[],screenshots:[],companies:[],franschises:[]});
+    details(1); fixture.detectChanges();
+    demo.index = list.limit - 1;
+    demo.move(1);
+    const request=nextRequest();
+    expect(request.request.params.get('offset')).toBe(String(list.limit));
+    expect(request.request.params.get('unknown')).toBe(String(unknown));
+    request.flush({items:[item(101)],total_count:100}); fixture.detectChanges();
+    details(101); fixture.detectChanges();
+    expect(demo.shownOffset).toBe(list.limit);
+    demo.close(); fixture.detectChanges();
+    expect(store.selectSnapshot(ProductsState.displayedParams).offset).toBe(list.limit);
+    expect(fixture.nativeElement.querySelector('app-pager [aria-current="page"]')?.textContent).toContain('2');
+  });
 
   it('dismisses sorting on outside click without changing the sort', () => {
     const component = mount();flushInitial();fixture.detectChanges();

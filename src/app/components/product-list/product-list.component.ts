@@ -1,3 +1,4 @@
+import { GameDemoComponent } from '../game-demo/game-demo.component';
 import { HostListener } from '@angular/core';
 import { responsivePageSize } from '@app/shared/responsive-page-size';
 import { ListScrollService } from '@app/shared/list-scroll.service';
@@ -42,7 +43,7 @@ import { catchError, of, shareReplay, combineLatest, debounceTime, distinctUntil
 
 @Component({
   selector: 'app-product-list',
-  imports: [GameCardComponent,
+  imports: [GameDemoComponent, GameCardComponent,
     HorizontalFiltersDirective,
     GameSearchComponent,
     PageSwipeDirective,
@@ -85,6 +86,8 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   @ViewChild('query') query?: GameSearchComponent;
 
   // Match the two-column grid breakpoint; keep page size stable while browsing.
+  demoOpen = false;
+  demoClosed(): void { scrollToContent(this.results?.nativeElement); }
   limit = this.viewportLimit();
   private viewportLimit(): number {
     return responsivePageSize(window.innerWidth, window.innerHeight, this.store.selectSnapshot(AuthState.isAuthorised) ? 96 : 20);
@@ -97,6 +100,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   }
   @HostListener('window:resize')
   resizePage(): void {
+    if (this.demoOpen) return;
     const size = this.viewportLimit();
     if (size === this.limit) return;
     const old = this.store.selectSnapshot(ProductsState.productsParams);
@@ -331,6 +335,10 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   pageChanged(page: number): void {
     if (this.invalidSerial || this.store.selectSnapshot(ProductsState.listLoading)) return;
     this.pendingPageOffset = (page - 1) * this.limit;
+    if (this.store.selectSnapshot(ProductsState.listFailed) && this.store.selectSnapshot(ProductsState.productsParams).offset === this.pendingPageOffset) {
+      this.retry();
+      return;
+    }
     this.store.dispatch(new ProductsActions.SetRequestParams({ offset: this.pendingPageOffset }));
   }
 }

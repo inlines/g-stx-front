@@ -1,0 +1,28 @@
+<div class="view-toggle" role="group" aria-label="Режим просмотра">
+  <button type="button" aria-label="Сетка" title="Сетка" [attr.aria-pressed]="!active" (click)="close()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h7v7H3zm11 0h7v7h-7zM3 14h7v7H3zm11 0h7v7h-7z"/></svg></button>
+  <button type="button" aria-label="Демо-режим" title="Демо-режим" [attr.aria-pressed]="active" [disabled]="busy || failed || !items?.length" (click)="open()"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"/></svg></button>
+</div>
+<ng-template #dialog>
+  <div class="demo-shell">
+    <header class="demo-toolbar">
+      <h2 id="game-demo-title">Демо-режим</h2>
+      <span aria-live="polite">{{position}} / {{total}} · Страница {{ pageNumber }}</span>
+      <button type="button" class="return-grid" aria-label="Вернуться к сетке" title="Вернуться к сетке" (click)="close()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h7v7H3zm11 0h7v7h-7zM3 14h7v7H3zm11 0h7v7h-7z"/></svg></button>
+      <button type="button" aria-label="Закрыть демо-режим" (click)="close()">×</button>
+    </header>
+    <div #content class="demo-content" pageSwipe [swipeDisabled]="blocked" (swipePage)="move($event)" [attr.aria-busy]="blocked">
+      <app-loading-panel [loading]="blocked">
+      @if (pageError) { <p class="error" role="alert">Не удалось загрузить страницу. Попробуйте переключить ещё раз.</p> }
+      @if (current) {
+
+        @if ((failure$ | async)?.failed) { <p class="error" role="alert">Не удалось загрузить игру. <button type="button" (click)="load()">Повторить</button></p> }
+        <app-product-properties [embedded]="true" [demoPlatform]="currentPlatform"/>
+      } @else { <p role="status">На этой странице больше нет игр.</p> }
+      </app-loading-panel>
+    </div>
+    <nav class="demo-navigation" aria-label="Переключение игр">
+      <button type="button" aria-label="Предыдущая игра" [disabled]="blocked || position <= 1" (click)="move(-1)">← <span>Предыдущая</span></button>
+      <button type="button" aria-label="Следующая игра" [disabled]="blocked || position >= total" (click)="move(1)"><span>Следующая</span> →</button>
+    </nav>
+  </div>
+</ng-template>

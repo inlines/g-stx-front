@@ -1,3 +1,4 @@
+import { GameDemoComponent } from '../game-demo/game-demo.component';
 import { HostListener } from '@angular/core';
 import { mobileLibraryPager, normalizeLibraryPageSize } from '@app/shared/library-view.service';
 import { ListScrollService } from '@app/shared/list-scroll.service';
@@ -53,7 +54,7 @@ import { ReleaseCardComponent } from '../release-card/release-card.component';
 import { buildPages } from '../pager/pagination';
 @Component({
   selector: 'app-personal-library',
-  imports: [HorizontalFiltersDirective,
+  imports: [GameDemoComponent, HorizontalFiltersDirective,
     GameSearchComponent,
     PageSwipeDirective,
     LoadingPanelComponent,
@@ -71,6 +72,8 @@ import { buildPages } from '../pager/pagination';
   changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class PersonalLibraryComponent implements OnInit, OnDestroy {
+  demoOpen = false;
+  demoClosed(): void { scrollToContent(this.results?.nativeElement); }
   @ViewChild('results') results?: ElementRef<HTMLElement>;
   @Input({ required: true }) kind!: LibraryKind;
   @ViewChild('copyModal', { static: true }) copyModal!: TemplateRef<unknown>;
@@ -109,7 +112,7 @@ export class PersonalLibraryComponent implements OnInit, OnDestroy {
   get mobilePager(): boolean { return mobileLibraryPager(); }
   @HostListener('window:resize')
   resizePager(): void {
-    if (this.view && normalizeLibraryPageSize(this.view)) this.changes.next();
+    if (!this.demoOpen && this.view && normalizeLibraryPageSize(this.view)) this.changes.next();
   }
   private snowOpening = false;
   private snowDialog?: ReturnType<NgbModal['open']>;

@@ -1,3 +1,5 @@
+import { By } from '@angular/platform-browser';
+import { GameDemoComponent } from '../game-demo/game-demo.component';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpTestingController } from '@angular/common/http/testing';
 import { Store } from '@ngxs/store';
@@ -11,6 +13,18 @@ describe('Collector server pages',()=>{
  afterEach(()=>{fixture.destroy();http.verify({ignoreCancelled:true});vi.useRealTimers();vi.restoreAllMocks();});
  function pending(kind='collection'){vi.advanceTimersByTime(1);return http.expectOne(r=>r.url===`/api/library/${kind}`);}
  function flush(req:ReturnType<typeof pending>,data=items){req.flush({items:data.slice(Number(req.request.params.get('offset')),Number(req.request.params.get('offset'))+Number(req.request.params.get('limit'))),total_count:data.length,unfiltered_total:data.length,platform_ids:[48],owned_regions:{europe:49}});fixture.detectChanges();}
+ it('demo changes the real collection page, keeps filters and restores its pager',()=>{
+  flush(pending());
+  fixture.componentInstance.toggleRegion('europe');flush(pending());
+  const demo=fixture.debugElement.query(By.directive(GameDemoComponent)).componentInstance as GameDemoComponent;
+  const details=(id:number)=>http.expectOne(`/api/products/${id}`).flush({product:{id,name:`Game ${id}`,image_url:null},releases:[],screenshots:[],companies:[],franschises:[]});
+  demo.open();details(1);fixture.detectChanges();demo.index=23;demo.move(1);
+  const req=pending();expect(req.request.params.get('offset')).toBe('24');expect(req.request.params.get('regions')).toBe('europe');
+  flush(req);details(25);fixture.detectChanges();expect(demo.position).toBe(25);
+  demo.close();vi.advanceTimersByTime(500);fixture.detectChanges();
+  expect(fixture.nativeElement.querySelector('app-pager [aria-current="page"]')?.textContent).toContain('2');
+  expect(fixture.nativeElement.querySelector('app-release-card').textContent).toContain('25');
+ });
  it('requests only 24 read-only cards and shows the selected serial',()=>{const req=pending();expect(req.request.params.get('login')).toBe('alice');expect(req.request.params.get('limit')).toBe('24');flush(req);expect(fixture.nativeElement.querySelectorAll('app-release-card')).toHaveLength(24);expect(fixture.nativeElement.querySelector('.edit-button')).toBeNull();expect(fixture.nativeElement.querySelector('.incomplete')).toBeNull();expect(fixture.nativeElement.querySelector('app-release-card').textContent).toContain('CUSA-00002');expect(fixture.nativeElement.textContent).not.toContain('Куплено за');fixture.componentInstance.page(3);const page=pending();expect(page.request.params.get('offset')).toBe('48');flush(page);expect(fixture.nativeElement.querySelectorAll('app-release-card')).toHaveLength(1);});
  it('preserves release-specific navigation and keeps all unselected serials accessible',()=>{flush(pending());const cards=fixture.nativeElement.querySelectorAll('app-release-card');expect(cards[0].querySelector('a').getAttribute('href')).toBe('/products/1;platform=48');expect(cards[1].querySelector('details')).not.toBeNull();cards[1].querySelector('summary').click();expect(cards[1].textContent).toContain('CUSA-00002');});
  it('cancels a pending request on collector change and keeps independent pages',()=>{flush(pending());fixture.componentInstance.page(3);flush(pending());fixture.componentInstance.retry();const stale=pending();store.dispatch(new CollectorsActions.SelectCollector('bob'));const bob=pending();expect(stale.cancelled).toBe(true);expect(bob.request.params.get('login')).toBe('bob');expect(bob.request.params.get('offset')).toBe('0');flush(bob);store.dispatch(new CollectorsActions.SelectCollector('alice'));const alice=pending();expect(alice.request.params.get('offset')).toBe('48');flush(alice);});

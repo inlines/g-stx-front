@@ -12,7 +12,7 @@ import { afterEveryRender, DestroyRef, ElementRef, inject } from '@angular/core'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ICompanyItem } from '@app/states/products/interfaces/company-item.interface';
 import { AsyncPipe, DatePipe, Location, NgTemplateOutlet } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CopyToClipboardDirective } from '@app/directives/copy-to-clipboard.directive';
 import { AuthState } from '@app/states/auth/states/auth.state';
@@ -25,7 +25,7 @@ import { IReleaseItem } from '@app/states/products/interfaces/release-item.inter
 import { ProductsState } from '@app/states/products/states/products.state';
 import { NgbCarouselModule, NgbModal, NgbModalRef, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngxs/store';
-import { combineLatest, map, Observable } from 'rxjs';
+import { BehaviorSubject, combineLatest, map, Observable } from 'rxjs';
 
 @Component({
   selector: 'app-product-properties',
@@ -46,6 +46,9 @@ import { combineLatest, map, Observable } from 'rxjs';
   standalone: true,
 })
 export class ProductPropertiesComponent implements OnInit {
+  @Input() embedded = false;
+  private readonly demoPlatform$ = new BehaviorSubject(0);
+  @Input() set demoPlatform(value: number) { this.demoPlatform$.next(value); }
   @ViewChild('productHeading') productHeading?: ElementRef<HTMLElement>;
   private scrolledProductId?: number;
   private headingScrollFrame = 0;
@@ -62,6 +65,7 @@ export class ProductPropertiesComponent implements OnInit {
     const destroyRef = inject(DestroyRef);
     destroyRef.onDestroy(() => cancelAnimationFrame(this.headingScrollFrame));
     afterEveryRender(() => {
+      if (this.embedded) return;
       const heading = this.productHeading?.nativeElement;
       const id = this.store.selectSnapshot(ProductsState.productProperties)?.product.id;
       if (!heading || !id || id === this.scrolledProductId) return;
@@ -118,7 +122,7 @@ export class ProductPropertiesComponent implements OnInit {
   }>;
 
   public ngOnInit(): void {
-    this.platformId$ = this.params.paramMap.pipe(map((params) => Number(params.get('platform') ?? 0)));
+    this.platformId$ = this.embedded ? this.demoPlatform$ : this.params.paramMap.pipe(map((params) => Number(params.get('platform') ?? 0)));
     this.releasePlatformName$ = combineLatest([this.productProperties$, this.platformId$]).pipe(
       map(([properties, platformId]) => {
         if (!platformId) return '';
@@ -198,6 +202,7 @@ export class ProductPropertiesComponent implements OnInit {
   readonly salePrice = new FormControl<number | null>(null, { validators: [priceValidator] });
   readonly saleCib = new FormControl(false, { nonNullable: true });
   sellingRelease: IReleaseItem | null = null;
+  private saleDialog?: NgbModalRef;
 
   toggleSale(release: IReleaseItem): void {
     if (this.store.selectSnapshot(CollectionState.collectionChanging)) return;
@@ -210,7 +215,7 @@ export class ProductPropertiesComponent implements OnInit {
     this.sellingRelease = release;
     this.salePrice.reset(null);
     this.saleCib.reset(false);
-    this.modalService.open(this.saleModal, { centered: true, ariaLabelledBy: 'product-sale-title' });
+    this.saleDialog = this.modalService.open(this.saleModal, { centered: true, ariaLabelledBy: 'product-sale-title' });
   }
 
   saveSale(): void {
@@ -231,7 +236,7 @@ export class ProductPropertiesComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         if (this.store.selectSnapshot(CollectionState.changeStatus) === RequestStatus.Load)
-          this.modalService.dismissAll();
+          this.saleDialog?.close();
       });
   }
 

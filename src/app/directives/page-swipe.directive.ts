@@ -15,7 +15,7 @@ export class PageSwipeDirective {
       this.suppressClickUntil = 0;
       if (this.swipeDisabled || event.touches.length !== 1) return;
       let target = event.target as HTMLElement | null;
-      if (target?.closest('button,input,select,textarea,summary,[contenteditable]')) return;
+      if (target?.closest('button,input,select,textarea,summary,[contenteditable],ngb-carousel')) return;
       // Nested horizontal scrollers (serial lists/carousels) own their gestures.
       while (target && target !== this.host) {
         const style = getComputedStyle(target);

@@ -31,7 +31,7 @@ export namespace ProductsActions {
   export class LoadProperties {
     public static readonly type = ProductsActionList.LOAD_PROPERTIES;
 
-    constructor(public id: number | string) {}
+    constructor(public id: number | string, public retainPrevious = false) {}
   }
 
   export class LoadPropertiesSuccess {

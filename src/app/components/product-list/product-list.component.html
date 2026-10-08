@@ -44,6 +44,7 @@
             </div>
           </details>
           <div class="catalog-options">
+            <app-game-demo [items]="products$ | async" [platform]="displayedParams?.cat" [offset]="(offset$ | async) ?? 0" [limit]="limit" [total]="(productsTotalCount$ | async) ?? 0" [busy]="(loading$ | async) ?? false" [failed]="(failed$ | async) ?? false" (pageChange)="pageChanged($event)" (activeChange)="demoOpen = $event" (closed)="demoClosed()"/>
             <details class="sort-disclosure" #sortMenu (keydown.escape)="sortMenu.open = false; sortSummary.focus()">
               <summary #sortSummary aria-label="Сортировка">{{ queryForm.controls.sort.value === 'name' ? 'По названию' : queryForm.controls.sort.value === 'rating' ? 'По рейтингу ↓' : 'По дате' }}</summary>
               <fieldset class="sort-options">

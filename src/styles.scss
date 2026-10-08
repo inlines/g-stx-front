@@ -301,3 +301,7 @@ html { scrollbar-gutter:stable; }
   section.container-fluid:has(app-personal-library),
   section.container-fluid:has(app-collector-properties) { padding-inline:clamp(12px,3vw,48px); }
 }
+
+/* The demo viewer owns scrolling; generic mobile dialog margins must not apply. */
+.game-demo-window .modal-dialog { margin: 0; width: 100%; max-width: none; height: 100%; }
+.game-demo-window .modal-content { height: 100%; overflow: hidden; }

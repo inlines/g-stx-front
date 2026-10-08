@@ -1,3 +1,4 @@
+import { GameDemoComponent } from '../game-demo/game-demo.component';
 import { HostListener } from '@angular/core';
 import { mobileLibraryPager, normalizeLibraryPageSize } from '@app/shared/library-view.service';
 import { ListScrollService } from '@app/shared/list-scroll.service';
@@ -36,7 +37,7 @@ import { PagerComponent } from '../pager/pager.component';
 import { ReleaseCardComponent } from '../release-card/release-card.component';
 @Component({
   selector: 'app-collector-properties',
-  imports: [HorizontalFiltersDirective,
+  imports: [GameDemoComponent, HorizontalFiltersDirective,
     PageSwipeDirective,
     LoadingPanelComponent,
     RegionFiltersComponent,
@@ -52,6 +53,8 @@ import { ReleaseCardComponent } from '../release-card/release-card.component';
   styleUrl: './collector-properties.component.scss',
 })
 export class CollectorPropertiesComponent {
+  demoOpen = false;
+  demoClosed(): void { scrollToContent(this.results?.nativeElement); }
   @ViewChild('results') results?: ElementRef<HTMLElement>;
   private readonly injector = inject(Injector);
   private readonly store = inject(Store);
@@ -62,7 +65,7 @@ export class CollectorPropertiesComponent {
   get mobilePager(): boolean { return mobileLibraryPager(); }
   @HostListener('window:resize')
   resizePager(): void {
-    if (this.view && normalizeLibraryPageSize(this.view)) this.changes.next();
+    if (!this.demoOpen && this.view && normalizeLibraryPageSize(this.view)) this.changes.next();
   }
   private pendingScroll=false;
   private contextKey='';
@@ -80,7 +83,7 @@ export class CollectorPropertiesComponent {
     debounceTime(0),
     switchMap(([login,tab,,,platforms])=>{
       const view=this.views.get(tab==='wts'?`collector-wts:${login}`:`collector:${login}`);
-      normalizeLibraryPageSize(view);
+      if (!this.demoOpen) normalizeLibraryPageSize(view);
       const key=`${login}:${tab}:${view.platform}`;
       if(this.contextKey!==key){this.contextKey=key;this.lastPage={items:[],total_count:0,unfiltered_total:0,platform_ids:[],owned_regions:{}};}
       const request={login:login??undefined,cat:view.platform,regions:view.regions.join(','),sort:view.sort,limit:view.size,offset:(view.page-1)*view.size};

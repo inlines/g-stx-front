@@ -66,7 +66,7 @@ export class ProductsState {
     ctx.patchState({
       productPropertiesRequestStatus: RequestStatus.Pending,
       productPropertiesErrorStatus: null,
-      productProperties: null,
+      productProperties: action.retainPrevious ? ctx.getState().productProperties : null,
     });
     return this.service.productPropertiesRequest(action.id).pipe(
       tap((response) => {
