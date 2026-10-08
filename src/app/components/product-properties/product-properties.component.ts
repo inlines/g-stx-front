@@ -92,7 +92,7 @@ export class ProductPropertiesComponent implements OnInit {
         const wish = new Set(ownership.flatMap((item) => item.wish_ids ?? []));
         const sales = new Set(ownership.flatMap((item) => item.wts_ids ?? []));
         return (properties?.releases ?? [])
-          .filter((release) => release.release_date != null)
+          .filter((release) => release.release_status !== 5)
           .map((release) => ({
             ...release,
             owned: have.has(release.release_id),

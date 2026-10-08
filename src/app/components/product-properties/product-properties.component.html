@@ -155,10 +155,10 @@
         }
         <ng-template #releaseRow let-release let-highlighted="highlighted">
           <li class="release-item" [class.owned-item]="release.owned" [class.highlighted-release]="highlighted">
-            <div class="release-meta" [class.text-decoration-line-through]="release.release_status === 5">
+            <div class="release-meta">
               @if (!(platformId$ | async)) { <span class="release-platform">{{ release.platform_name }}</span> }
               <span>{{ release.release_region }}</span>
-              <span>{{ release.release_date ? (release.release_date | date:'dd.MM.yy':'UTC') : 'Дата не указана' }}</span>
+              <span>{{ release.release_date ? (release.release_date | date:'dd.MM.yy':'UTC') : 'Дата неизвестна' }}</span>
             </div>
             <div class="release-serials" [class.no-serials]="!release.serial?.length">
             @if (release.serial?.length) {

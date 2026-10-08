@@ -115,8 +115,9 @@ describe('ProductPropertiesComponent', () => {
     expect(root.querySelector('.release-header')?.textContent).toBe('Релизы PS1');
     expect(root.querySelector('.other-platforms a')?.textContent).toBe('PS4');
     params.next(convertToParamMap({ platform: '9' })); fixture.detectChanges();
-    expect(root.querySelectorAll('.release-item')).toHaveLength(0);
-    expect(root.querySelector('.release-empty')).not.toBeNull();
+    expect(root.querySelectorAll('.release-item')).toHaveLength(1);
+    expect(root.querySelector('.release-empty')).toBeNull();
+    expect(root.querySelector('.release-item')?.textContent).toContain('Дата неизвестна');
     expect(root.querySelectorAll('.other-platforms a')).toHaveLength(2);
   });
 
@@ -443,7 +444,10 @@ describe('ProductPropertiesComponent', () => {
     expect(links[0].textContent).toContain('Studio');
     expect(fixture.nativeElement.querySelector('a[href="/companies/999"]')).toBeNull();
   });
-  it('hides undated releases while keeping dated release serials and game metadata', () => {
+  it.each([false, true])('shows undated releases and hides cancelled ones (demo=%s)', (embedded) => {
+    component.embedded = embedded;
+    component.demoPlatform = 0;
+    component.ngOnInit();
     const serials = Array.from({ length: 60 }, (_, index) => `CUSA-${index}`);
     TestBed.inject(Store).dispatch(new ProductsActions.LoadProperties(1));
     TestBed.inject(HttpTestingController)
@@ -498,7 +502,9 @@ describe('ProductPropertiesComponent', () => {
       });
     fixture.detectChanges();
     const root: HTMLElement = fixture.nativeElement;
-    expect(root.querySelectorAll('.release-item')).toHaveLength(1);
+    expect(root.querySelectorAll('.release-item')).toHaveLength(2);
+    expect(root.textContent).toContain('Дата неизвестна');
+    expect(root.textContent).not.toContain('Xbox');
     const lists = root.querySelectorAll<HTMLDetailsElement>('.release-item details.serials');
     expect(lists).toHaveLength(1);
     expect(lists[0].open).toBe(true);
@@ -577,7 +583,7 @@ describe('ProductPropertiesComponent', () => {
   });
   it.each([
     { release_date: Date.now() + 86400000, release_status: 0 },
-    { release_date: 1000, release_status: 5 },
+    { release_date: null, release_status: null },
   ])('blocks collection but allows wishlist for an unreleased release (%j)', (dates) => {
     component.ngOnInit();
     component.isAuthorised$ = of(true);
