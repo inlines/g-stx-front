@@ -11,3 +11,8 @@
 .missing-serial{right:8px;border:2px solid #f5d783;border-radius:50%;background:#302744;color:#ffe49a;font-size:22px}
 @media(hover:hover){.game-card:hover{box-shadow:0 10px 20px #0004}.title:hover{color:#c2a4ed}}
 @media(max-width:575px){.catalog-cover{height:auto;aspect-ratio:3/4}.game-content{padding:12px 10px}.title{font-size:15px}.game-first-release{margin-top:8px}}
+
+.game-card.unreleased{isolation:isolate;overflow:hidden}
+.unreleased .catalog-cover,.unreleased .game-content{filter:grayscale(1)}
+.unreleased-shade{position:absolute;inset:0;z-index:3;pointer-events:none;background:rgba(80,85,90,.46);display:grid;place-items:center;border-radius:inherit;overflow:hidden}
+.unreleased-shade span{transform:rotate(-32deg);font-size:clamp(17px,2vw,30px);font-weight:900;letter-spacing:.09em;color:#fff;text-shadow:0 2px 4px #000;background:#35383bcc;padding:.35em 2em;border-block:1px solid #ffffff70}

@@ -6,7 +6,8 @@ import { IProductListItem } from '@app/states/products/interfaces/product-list-i
 import { GameStatsComponent } from '../game-stats/game-stats.component';
 import { SerialListComponent } from '../serial-list/serial-list.component';
 @Component({selector:'app-game-card',imports:[GameCoverComponent,RouterLink,DatePipe,GameStatsComponent,SerialListComponent],changeDetection:ChangeDetectionStrategy.OnPush,
- template:`<article class="game-card" [routerLink]="link">
+ template:`<article class="game-card" [class.unreleased]="game.is_released === false" [routerLink]="link">
+   @if(game.is_released === false){<div class="unreleased-shade" aria-label="Игра не вышла"><span>UNRELEASED</span></div>}
    <ng-content select="[card-badges]"/>
    @if(owned){<span class="ownership-mark" role="img" aria-label="В вашей коллекции"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg></span>}
    @if(missing){<span class="missing-serial" aria-label="Серийники пока не указаны">?</span>}
