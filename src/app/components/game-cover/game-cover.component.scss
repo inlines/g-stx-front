@@ -42,7 +42,8 @@
 [data-case^=ps2] .spine-logo,
 [data-case^=psp] .spine-logo,
 [data-case=ps4] .spine-logo,
-[data-case=ps5] .spine-logo {
+[data-case=ps5] .spine-logo,
+[data-case^=saturn]:not(.jewel) .spine-logo {
   writing-mode:vertical-rl;
   text-orientation:sideways;
 }
