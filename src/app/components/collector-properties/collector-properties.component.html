@@ -8,7 +8,7 @@
       <button type="button" [class.selected]="vm.selectedPlatform === null" [attr.aria-pressed]="vm.selectedPlatform === null" (click)="selectPlatform(null)">Все платформы</button>
       @for(platform of vm.platforms;track platform.id){<button type="button" [class.selected]="platform.id === vm.selectedPlatform" [attr.aria-pressed]="platform.id === vm.selectedPlatform" (click)="selectPlatform(platform.id)">{{platform.abbreviation || platform.name}}</button>}
     </nav>
-    @if(vm.selectedPlatform){<app-region-filters [platformId]="vm.selectedPlatform" [selected]="vm.regions" [totals]="vm.regionTotals" [owned]="vm.ownedRegions" (regionToggle)="toggleRegion($event)"/>}
+    @if(vm.selectedPlatform){<app-region-filters [contextLabel]="vm.login || ''" [platformId]="vm.selectedPlatform" [selected]="vm.regions" [totals]="vm.regionTotals" [owned]="vm.ownedRegions" (regionToggle)="toggleRegion($event)"/>}
   }
   <div class="demo-options">@if(vm.tab === 'collection'){<label>Сортировка<select [value]="vm.sort" (change)="sort($any($event.target).value)"><option value="name">По названию</option><option value="date">По дате релиза</option></select></label>}<app-game-demo [items]="vm.items" [platform]="vm.selectedPlatform" [offset]="vm.offset" [limit]="vm.size" [total]="vm.total" [busy]="vm.loading" [failed]="vm.failed" (pageChange)="page($event)" (activeChange)="demoOpen = $event" (closed)="demoClosed()"/></div>
   @if(vm.failed){<div class="status" role="alert">Не удалось загрузить список. <button type="button" (click)="retry()">Повторить</button></div>}

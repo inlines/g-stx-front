@@ -5,10 +5,13 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, HostLi
 import { REGION_GROUPS, RegionCounts, RegionGroup } from '@app/shared/region-filter';
 @Component({
   selector: 'app-region-filters',
+  host: {'[class.breadcrumb-visible]': 'pastSelector()'},
   imports: [HorizontalFiltersDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    @if(pastSelector()) {<nav class="region-breadcrumb" aria-label="Текущая платформа и регион">{{platformName}} / {{regionName}}</nav>}
+    @if(pastSelector()) {<nav class="region-breadcrumb" aria-label="Текущая платформа и регион"><div class="breadcrumb-path">@if(contextLabel){ {{contextLabel}} / }{{platformName}} / {{regionName}}</div>
+      @if(includeUnreleased || includeDigital){<div class="breadcrumb-options">@if(includeUnreleased){Включая невышедшее}@if(includeUnreleased && includeDigital){ / }@if(includeDigital){Включая цифровое}</div>}
+    </nav>}
     <section aria-label="Регионы релизов">
       <div horizontalFilters class="regions" role="group" aria-label="Фильтр по регионам">
         @for (region of groups; track region) {
@@ -21,8 +24,11 @@ import { REGION_GROUPS, RegionCounts, RegionGroup } from '@app/shared/region-fil
       @if(unknown){<small>Неидентифицированные / всего вышедших коробочных игр в регионе. Обе цифры учитывают фильтры.</small>}
     </section>`,
   styles: `
-    .region-breadcrumb{position:fixed;top:0;left:0;right:0;z-index:1041;height:44px;padding:0 16px;display:flex;align-items:center;background:#0b1b29;border-bottom:1px solid #405266;color:#e4edf6;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .region-breadcrumb{position:fixed;top:0;left:0;right:0;z-index:1045;height:44px;padding:0 16px;display:flex;flex-direction:column;justify-content:center;align-items:stretch;box-sizing:border-box;background:#0b1b29;border-bottom:1px solid #405266;color:#e4edf6;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .breadcrumb-path{overflow:hidden;text-overflow:ellipsis;line-height:18px}
+    .breadcrumb-options{font-size:12px;line-height:16px;color:#b9cbe2;overflow:hidden;text-overflow:ellipsis}
     :host{display:block;position:relative;z-index:1;margin:12px 0 20px}
+    :host(.breadcrumb-visible){z-index:1045}
     .regions{display:flex;flex-wrap:wrap;gap:8px}
     button{display:flex;align-items:center;gap:8px;min-height:44px;padding:10px 14px;border:1px solid #556078;border-radius:9px;background:#101c2d;color:#c5d4e7;font:inherit;cursor:pointer}
     button.selected{border-color:#c2a4ed;background:#322b4c;color:#fff}
@@ -34,6 +40,9 @@ import { REGION_GROUPS, RegionCounts, RegionGroup } from '@app/shared/region-fil
   `,
 })
 export class RegionFiltersComponent {
+  @Input() contextLabel = '';
+  @Input() includeUnreleased = false;
+  @Input() includeDigital = false;
   @Input() platformId: number | null = null;
   private readonly element = inject(ElementRef<HTMLElement>);
   private readonly platforms = inject(Store).selectSignal(PlatformState.loadedPlatforms);
