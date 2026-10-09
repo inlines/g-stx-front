@@ -17,6 +17,8 @@ export function itemRegion(item: ICollectionItem): RegionGroup {
   return name === 'europe' ? 'europe' : name === 'north_america' ? 'america' : name === 'japan' ? 'japan' : 'other';
 }
 export function matchesRegion(item: ICollectionItem, selected: readonly RegionGroup[]): boolean {
+  if (item.region_id !== undefined && (item.region_id === null || ![1, 2, 5, 8].includes(item.region_id))) return false;
+  if (item.region_id === undefined && !['europe', 'north_america', 'japan', 'worldwide'].includes(item.region_name?.trim().toLowerCase().replaceAll(' ', '_') ?? '')) return false;
   return !selected.length || item.region_id === 8 || (item.region_id === undefined && item.region_name?.trim().toLowerCase() === 'worldwide') || selected.includes(itemRegion(item));
 }
 export function ownedRegionCounts(items: readonly ICollectionItem[]): RegionCounts {

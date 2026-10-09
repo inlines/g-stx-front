@@ -8,7 +8,7 @@ const item = (product_id: number, region_id: number | null, digital_only = false
 });
 
 describe('Regional collection filters', () => {
-  it('groups only North America as America, including Brazil and unknown in Other', () => {
+  it('retains group labels while hidden regions are excluded by matchesRegion', () => {
     expect([1, 2, 5, 8, 10, null].map(id => itemRegion(item(1, id))))
       .toEqual(['europe', 'america', 'japan', 'other', 'other', 'other']);
   });
@@ -16,13 +16,20 @@ describe('Regional collection filters', () => {
     expect(ownedRegionCounts([
       item(1, 1), item(1, 1), item(1, 2), item(2, 10),
       item(2, 5), item(3, null), item(4, 1, true),
-    ])).toEqual({ europe: 1, america: 1, japan: 1, other: 2 });
+    ])).toEqual({ europe: 1, america: 1, japan: 1, other: 0 });
   });
   it('uses a union of regions and restores all records when selection is cleared', () => {
     const items = [item(1, 1), item(2, 2), item(3, 10)];
-    expect(items.filter(i => matchesRegion(i, ['europe', 'other'])).map(i => i.product_id)).toEqual([1, 3]);
-    expect(items.filter(i => matchesRegion(i, []))).toEqual(items);
+    expect(items.filter(i => matchesRegion(i, ['europe', 'other'])).map(i => i.product_id)).toEqual([1]);
+    expect(items.filter(i => matchesRegion(i, []))).toEqual(items.slice(0, 2));
     expect(toggleRegion(toggleRegion([], 'america'), 'america')).toEqual([]);
+  });
+  it('excludes hidden regions even with no region selected', () => {
+    for (const id of [3, 4, 6, 7, 9, 10, null]) {
+      expect(matchesRegion(item(1, id), [])).toBe(false);
+      expect(matchesRegion(item(1, id), ['other'])).toBe(false);
+    }
+    expect(matchesRegion(item(1, 8), ['other'])).toBe(true);
   });
   it('canonicalizes persisted filters and does not report unknown totals as zero', () => {
     expect(normalizeRegions('other, europe,other,invalid')).toEqual(['europe', 'other']);
