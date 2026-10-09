@@ -19,7 +19,7 @@ describe('ProductPropertiesComponent', () => {
     await TestBed.configureTestingModule({
       providers: [
         ...TEST_PROVIDERS,
-        { provide: ActivatedRoute, useValue: { paramMap: of(convertToParamMap({})) } },
+        { provide: ActivatedRoute, useValue: { snapshot: {paramMap: convertToParamMap({})}, paramMap: of(convertToParamMap({})) } },
       ],
       imports: [ProductPropertiesComponent],
     }).compileComponents();
@@ -184,6 +184,29 @@ describe('ProductPropertiesComponent', () => {
         .map((row) => row.querySelector('.release-platform')?.textContent?.trim()),
     ).toEqual(['Platform 7', 'Platform 8', 'Platform 9', 'Platform 48', 'Platform 167', 'Platform 38']);
   });
+  it('shows bundle contents and DLCs as separate platform-specific carousels', () => {
+    const params = new BehaviorSubject(convertToParamMap({platform:'9'}));
+    Object.defineProperty(TestBed.inject(ActivatedRoute), 'paramMap', {value:params,configurable:true});
+    component.ngOnInit();
+    TestBed.inject(Store).dispatch(new ProductsActions.LoadProperties(1));
+    TestBed.inject(HttpTestingController).expectOne('/api/products/1').flush({
+      product:{id:1,name:'Bundle'},releases:[],screenshots:[],companies:[],franschises:[],
+      bundle_games:[{id:2,name:'Included',image_url:null,platform_ids:[9]},{id:3,name:'Other platform',image_url:null,platform_ids:[48]}],
+      dlcs:[{id:4,name:'Expansion',image_url:null,platform_ids:[9],digital_platform_ids:[9]}],
+    });
+    fixture.detectChanges();
+    const root=fixture.nativeElement as HTMLElement;
+    expect(root.querySelectorAll('.similar-section')).toHaveLength(2);
+    expect(root.textContent).toContain('Игры в комплекте / сборнике');
+    expect(root.textContent).toContain('Дополнения');
+    expect(root.textContent).not.toContain('Other platform');
+    expect(root.querySelector('app-game-cover .digital-label')?.textContent).toBe('digital_only');
+    expect(root.querySelectorAll('.similar-heading button')).toHaveLength(4);
+    params.next(convertToParamMap({platform:'48'}));fixture.detectChanges();
+    expect(root.querySelectorAll('.similar-section')).toHaveLength(1);
+    expect(root.textContent).toContain('Other platform');
+  });
+
   it('shows rating, per-platform players and navigable similar-game cards', () => {
     Object.defineProperty(TestBed.inject(ActivatedRoute), 'paramMap', {
       value: of(convertToParamMap({ platform: '48' })), configurable: true,

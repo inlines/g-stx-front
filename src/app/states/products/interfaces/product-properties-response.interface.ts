@@ -9,6 +9,8 @@ export interface IProductPropertiesResponse {
   genres?: Genre[];
   product: IProductDetails;
   multiplayer?: IMultiplayerMode[];
+  bundle_games?: ISimilarGame[];
+  dlcs?: ISimilarGame[];
   similar_games?: ISimilarGame[];
   companies: ICompanyItem[];
   releases: IReleaseItem[];
@@ -33,4 +35,5 @@ export interface ISimilarGame {
   name: string;
   image_url: string | null;
   platform_ids: number[];
+  digital_platform_ids?: number[];
 }

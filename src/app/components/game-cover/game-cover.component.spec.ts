@@ -13,3 +13,17 @@ describe('Game cover',()=>{
  f.componentRef.setInput('platform',999);f.detectChanges();expect(f.nativeElement.querySelector('.brand')).toBeNull();
  });
 });
+
+describe('Digital cover',()=>{
+ it('replaces the physical case with a labelled translucent cover',async()=>{
+  await TestBed.configureTestingModule({imports:[GameCoverComponent]}).compileComponents();
+  const f=TestBed.createComponent(GameCoverComponent);
+  f.componentRef.setInput('platform',9);f.componentRef.setInput('digital',true);f.componentRef.setInput('src','digital.jpg');f.detectChanges();
+  expect(f.nativeElement.querySelector('.box')).toBeNull();
+  expect(f.nativeElement.querySelector('.spine')).toBeNull();
+  expect(f.nativeElement.querySelector('.digital-label').textContent).toBe('digital_only');
+  expect(f.nativeElement.querySelector('img').getAttribute('src')).toBe('digital.jpg');
+  f.componentRef.setInput('digital',false);f.detectChanges();
+  expect(f.nativeElement.querySelector('.box')).not.toBeNull();
+ });
+});

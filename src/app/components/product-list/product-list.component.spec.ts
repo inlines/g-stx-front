@@ -280,7 +280,8 @@ describe('Catalog filters', () => {
       total_count: 4,
     });
     fixture.detectChanges();
-    expect(fixture.nativeElement.querySelectorAll('.missing-serial').length).toBe(1);
+    expect(fixture.nativeElement.querySelectorAll('.missing-serial').length).toBe(2);
+    expect(Array.from(fixture.nativeElement.querySelectorAll('.missing-serial'), (badge: any) => badge.closest('.game-card').textContent).join(' ')).toContain('Undated');
     expect(
       fixture.nativeElement.querySelector('.missing-serial').closest('.game-card').textContent,
     ).toContain('Missing');

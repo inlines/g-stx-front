@@ -125,6 +125,7 @@ export class ProductPropertiesComponent implements OnInit {
 
   public platformId$!: Observable<number>;
   public releasePlatformName$!: Observable<string>;
+  public relatedSections$!: Observable<{title:string; games:ISimilarGame[]}[]>;
   public similarGames$!: Observable<ISimilarGame[]>;
   public multiplayer$!: Observable<IMultiplayerMode[]>;
 
@@ -148,6 +149,10 @@ export class ProductPropertiesComponent implements OnInit {
         (properties?.multiplayer ?? []).filter((mode) => platformId > 0 && mode.platform_id === platformId),
       ),
     );
+    this.relatedSections$ = combineLatest([this.productProperties$, this.platformId$]).pipe(map(([properties, platformId]) => [
+      {title:'Игры в комплекте / сборнике', games:properties?.bundle_games ?? []},
+      {title:'Дополнения', games:properties?.dlcs ?? []},
+    ].map(section => ({...section,games:section.games.filter(game => !platformId || game.platform_ids.includes(platformId))})).filter(section => section.games.length > 0)));
     this.similarGames$ = combineLatest([this.productProperties$, this.platformId$]).pipe(
       map(([properties, platformId]) =>
         (properties?.similar_games ?? []).filter(

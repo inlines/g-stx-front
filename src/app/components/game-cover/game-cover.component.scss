@@ -27,3 +27,9 @@
 [data-case=ps5] .brand,[data-case=ps5] .spine-logo{background:#f5f5f5;color:#161616}
 [data-case=ps5] .spine{background:#eee}[data-case=ps5] .spine-title{color:#161616}
 [data-case=ps4] .rim,[data-case=ps5] .rim{color:#c1dafa}
+
+/* A dedicated paint layer prevents loaded covers remaining blank after pagination. */
+.art{position:relative;isolation:isolate;transform:translateZ(0)}
+.digital{padding:5%;border:1px solid #b3bce64d;border-radius:10px;background:linear-gradient(145deg,#b9c4ee22,#718aaa0c)}
+.digital .art{opacity:.65}
+.digital-label{position:absolute;z-index:2;bottom:8%;left:0;right:0;text-align:center;padding:.5em;background:#142132b8;color:#eff3ff;font:600 6cqw system-ui;letter-spacing:.04em}

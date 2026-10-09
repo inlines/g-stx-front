@@ -16,3 +16,14 @@ describe('Unreleased game cards',()=>{
   expect(f.nativeElement.textContent).toContain('Дата неизвестна');
  });
 });
+
+describe('Regional serial badge',()=>{
+ it('uses displayed serials and suppresses digital and unreleased badges',async()=>{
+  await TestBed.configureTestingModule({imports:[GameCardComponent],providers:[provideRouter([])]}).compileComponents();
+  const f=TestBed.createComponent(GameCardComponent);f.componentRef.setInput('link',['/products',1]);
+  const game={id:1,name:'Regional',has_serials:true,serial:[],is_released:true};
+  f.componentRef.setInput('game',game);f.detectChanges();expect(f.nativeElement.querySelector('.missing-serial')).not.toBeNull();
+  f.componentRef.setInput('game',{...game,digital_only:true});f.detectChanges();expect(f.nativeElement.querySelector('.missing-serial')).toBeNull();
+  f.componentRef.setInput('game',{...game,is_released:false});f.detectChanges();expect(f.nativeElement.querySelector('.missing-serial')).toBeNull();
+ });
+});

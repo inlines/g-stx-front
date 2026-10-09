@@ -198,6 +198,22 @@
 
 
   </div>
+  @for (section of (relatedSections$ | async) ?? []; track section.title) {
+    <section class="col-12 similar-section" [attr.aria-label]="section.title">
+      <div class="similar-heading"><h2>{{section.title}}</h2><div>
+        <button type="button" [attr.aria-label]="'Назад: ' + section.title" (click)="scrollSimilar(relatedTrack, -1)">←</button>
+        <button type="button" [attr.aria-label]="'Вперёд: ' + section.title" (click)="scrollSimilar(relatedTrack, 1)">→</button>
+      </div></div>
+      <div #relatedTrack class="similar-track" tabindex="0" [attr.aria-label]="section.title">
+        @for (game of section.games; track game.id) {
+          <a class="similar-card" [routerLink]="similarLink(game, (platformId$ | async) || 0)">
+            <app-game-cover class="similar-case" [src]="game.image_url" [name]="game.name" [digital]="game.digital_platform_ids?.includes((platformId$ | async) || 0) ?? false" [platform]="(platformId$ | async)"/>
+            <strong>{{game.name}}</strong>
+          </a>
+        }
+      </div>
+    </section>
+  }
   @let similarGames = (similarGames$ | async) ?? [];
   @if (similarGames.length) {
     <section class="col-12 similar-section" aria-labelledby="similar-heading">
@@ -208,7 +224,7 @@
       <div #similarTrack class="similar-track" tabindex="0" aria-label="Похожие игры, горизонтальная прокрутка">
         @for (game of similarGames; track game.id) {
           <a class="similar-card" [routerLink]="similarLink(game, (platformId$ | async) || 0)">
-            <app-game-cover class="similar-case" [src]="game.image_url" [name]="game.name" [platform]="game.platform_ids.includes((platformId$ | async) || 0) ? (platformId$ | async) : null"/>
+            <app-game-cover class="similar-case" [src]="game.image_url" [name]="game.name" [digital]="game.digital_platform_ids?.includes((platformId$ | async) || 0) ?? false" [platform]="game.platform_ids.includes((platformId$ | async) || 0) ? (platformId$ | async) : null"/>
             <strong>{{game.name}}</strong>
           </a>
         }
