@@ -48,7 +48,7 @@ export class CollectionService {
     return this.http.post<void>(this.addToCollectionPath, payload);
   }
 
-  public setCopy(payload: {release_id:number; selected_serial:string|null; cib:boolean|null}): Observable<void> {
+  public setCopy(payload: {release_id:number; selected_serial:string|null; cib:boolean|null; selected_edition?:string|null}): Observable<void> {
     return this.http.post<void>(`${this.environment.apiUrl}/collection-copy`,payload);
   }
 

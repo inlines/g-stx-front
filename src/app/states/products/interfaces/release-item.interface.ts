@@ -11,4 +11,5 @@ export interface IReleaseItem {
   seller_logins: string[];
   digital_only: boolean;
   serial: string[] | null;
+  serial_editions?: {serial: string; edition: 'standard' | 'platinum' | 'essentials'}[];
 }

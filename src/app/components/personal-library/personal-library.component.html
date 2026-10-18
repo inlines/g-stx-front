@@ -35,6 +35,7 @@
 <form class="price-dialog" (submit)="$event.preventDefault();saveCopy()">
 <header><h2 id="library-copy-title">Мой экземпляр</h2><button type="button" aria-label="Закрыть" (click)="modal.dismiss()">×</button></header>
 <p>{{copyItem?.product_name}} · {{copyItem?.region_name}}</p>
+<label>Издание экземпляра<select [formControl]="copyEdition"><option [ngValue]="null">Не указано</option><option value="standard">Обычное</option><option value="platinum">Platinum</option><option value="essentials">Essentials</option></select></label>
 <label>Комплектность<select [formControl]="copyCib"><option [ngValue]="null">Не указано</option><option [ngValue]="true">CIB · Полный комплект</option><option [ngValue]="false">Неполный комплект</option></select></label>
 <label>Серийник экземпляра<select [formControl]="copySerial"><option [ngValue]="null">Не выбран</option>@for(serial of copyItem?.serial??[];track serial){<option [ngValue]="serial">{{serial}}</option>}</select></label>
 @if(!copyItem?.serial?.length){<p>Для этого релиза серийники пока не известны. Их можно предложить на странице игры.</p>}

@@ -314,6 +314,11 @@ export class ProductPropertiesComponent implements OnInit {
     dialog.componentInstance.existingNames = product.alternative_names ?? [];
   }
 
+  editionsFor(release: IReleaseItem, serial: string): string[] {
+    const labels = {standard: 'Обычное', platinum: 'Platinum', essentials: 'Essentials'};
+    return [...new Set((release.serial_editions ?? []).filter(e => e.serial === serial).map(e => labels[e.edition]))];
+  }
+
   serialPreview(release: IReleaseItem): string {
     return (release.serial ?? []).slice(0, 3).join(' · ') + ((release.serial?.length ?? 0) > 3 ? ' · …' : '');
   }

@@ -6,7 +6,7 @@ import { CollectionActionList } from './collection-action-list.const';
 export namespace CollectionActions {
   export class SetCopyRequest {
     static readonly type = '[Collection] Set copy details';
-    constructor(public payload: {release_id:number; selected_serial:string|null; cib:boolean|null}) {}
+    constructor(public payload: {release_id:number; selected_serial:string|null; cib:boolean|null; selected_edition?:string|null}) {}
   }
   export class SetCopySuccess { static readonly type = '[Collection] Set copy details success'; }
   export class SetCopyFail { static readonly type = '[Collection] Set copy details failure'; }

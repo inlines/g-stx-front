@@ -149,7 +149,7 @@
               <details class="serials" open>
                 <summary [ngbTooltip]="serialPreview(release)" triggers="mouseenter:mouseleave" container="body">Серийники · {{ release.serial.length }}</summary>
                 <ul aria-label="Все серийники">
-                  @for (serial of release.serial; track $index) { <li><button type="button" class="serial-copy" [class.owned-serial]="ownsSerial(productProperties.product.id, release.platform_id, serial)" appCopyToClipboard [attr.aria-label]="'Скопировать серийник ' + serial" title="Скопировать серийник">{{ serial }}</button></li> }
+                  @for (serial of release.serial; track $index) { <li><button type="button" class="serial-copy" [class.owned-serial]="ownsSerial(productProperties.product.id, release.platform_id, serial)" appCopyToClipboard [attr.aria-label]="'Скопировать серийник ' + serial" title="Скопировать серийник">{{ serial }}</button>@for (edition of editionsFor(release, serial); track edition) { <span class="edition-badge genre-badge" aria-label="Подтверждённое издание">{{ edition }}</span> }</li> }
                 </ul>
               </details>
             }

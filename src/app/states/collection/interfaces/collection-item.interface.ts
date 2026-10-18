@@ -16,6 +16,7 @@ export interface ICollectionItem {
   price: number | null;
   cib?: boolean | null;
   selected_serial?: string | null;
+  selected_edition?: string | null;
   purchase_price?: number | null;
   total_rating?: number | null;
   local_players?: number | null;

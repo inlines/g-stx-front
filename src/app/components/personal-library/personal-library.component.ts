@@ -77,6 +77,7 @@ export class PersonalLibraryComponent implements OnInit, OnDestroy {
   @ViewChild('results') results?: ElementRef<HTMLElement>;
   @Input({ required: true }) kind!: LibraryKind;
   @ViewChild('copyModal', { static: true }) copyModal!: TemplateRef<unknown>;
+  readonly copyEdition = new FormControl<string|null>(null);
   readonly copyCib = new FormControl<boolean|null>(null);
   readonly copySerial = new FormControl<string|null>(null);
   copyItem: ICollectionItem|null = null;
@@ -285,13 +286,14 @@ export class PersonalLibraryComponent implements OnInit, OnDestroy {
 
   editCopy(item:ICollectionItem):void {
     this.copyItem=item;
+    this.copyEdition.setValue(item.selected_edition??null);
     this.copyCib.setValue(item.cib??null);
     this.copySerial.setValue(item.selected_serial??(item.serial?.length===1?item.serial[0]:null));
     this.modal.open(this.copyModal,{centered:true,ariaLabelledBy:'library-copy-title'});
   }
   saveCopy():void {
     if(!this.copyItem||this.store.selectSnapshot(CollectionState.collectionChanging))return;
-    this.mutate(new CollectionActions.SetCopyRequest({release_id:this.copyItem.release_id,selected_serial:this.copySerial.value,cib:this.copyCib.value}),()=>this.modal.dismissAll());
+    this.mutate(new CollectionActions.SetCopyRequest({release_id:this.copyItem.release_id,selected_serial:this.copySerial.value,cib:this.copyCib.value,selected_edition:this.copyEdition.value}),()=>this.modal.dismissAll());
   }
   edit(item: ICollectionItem): void {
     this.editing = item;

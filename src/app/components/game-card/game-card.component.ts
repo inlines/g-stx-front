@@ -18,7 +18,7 @@ import { SerialListComponent } from '../serial-list/serial-list.component';
    <div class="game-content">
      <a class="title" [title]="game.name" [routerLink]="link">{{game.name}}</a>
      <app-game-stats [game]="game"/>
-     @if(game.serial?.length){<app-serial-list [serials]="game.serial" [ownedSerials]="ownedSerials.forGame(game.id, platform ?? link?.[2]?.platform)"/>}
+     @if(game.serial?.length){<app-serial-list [serials]="game.serial" [editions]="game.serial_editions ?? []" [ownedSerials]="ownedSerials.forGame(game.id, platform ?? link?.[2]?.platform)"/>}
      @else if(showMissing){<a class="missing-hint" [routerLink]="link">Знаете серийник? Дополните →</a>}
      <div class="game-first-release">{{game.release_date != null ? 'с ' + (game.release_date | date:'dd.MM.yy':'UTC') : 'Дата неизвестна'}}</div>
      <ng-content/>

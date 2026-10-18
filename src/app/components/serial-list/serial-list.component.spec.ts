@@ -1,6 +1,21 @@
 import { TestBed } from '@angular/core/testing';
 import { SerialListComponent } from './serial-list.component';
 describe('Serial disclosure', () => {
+  it('discloses several editions for one code without duplicating the serial or inventing a standard edition', () => {
+    const fixture = TestBed.createComponent(SerialListComponent);
+    fixture.componentRef.setInput('serials', ['BLES-01093']);
+    fixture.componentRef.setInput('editions', [{serial:'BLES-01093',edition:'platinum'},{serial:'BLES-01093',edition:'essentials'}]);
+    fixture.detectChanges();
+    const details=fixture.nativeElement.querySelector('details');
+    expect(details).not.toBeNull();
+    details.querySelector('summary').click();
+    expect(details.open).toBe(true);
+    expect(details.querySelectorAll('li')).toHaveLength(1);
+    expect(details.textContent).toContain('Platinum');
+    expect(details.textContent).toContain('Essentials');
+    expect(details.textContent).not.toContain('Обычное');
+    fixture.destroy();
+  });
   it('retains order, exposes every code and stops parent card navigation', () => {
     const fixture = TestBed.createComponent(SerialListComponent);
     fixture.componentRef.setInput('serials', ['SLUS-12345', 'CUSA-12345', 'CUSA12345']);

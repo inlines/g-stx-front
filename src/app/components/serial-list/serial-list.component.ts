@@ -5,9 +5,9 @@ import { canonicalSerial, displaySerials } from '@app/shared/serial-number';
   selector: 'app-serial-list',
   imports: [NgbTooltipModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `@if (values.length === 1) {
+  template: `@if (values.length === 1 && !editions.length) {
       <small class="single" [class.owned]="isOwned(values[0])" [attr.aria-label]="'Серийник: ' + values[0]">{{ values[0] }}</small>
-    } @else if (values.length > 1) {
+    } @else if (values.length > 0) {
       <details class="serials" (click)="$event.stopPropagation()">
         <summary
           [ngbTooltip]="preview"
@@ -15,11 +15,11 @@ import { canonicalSerial, displaySerials } from '@app/shared/serial-number';
           container="body"
           aria-label="Раскрыть серийники"
         >
-          <b [class.owned]="isOwned(values[0])">{{ values[0] }}</b> <span>+{{ values.length - 1 }}</span>
+          <b [class.owned]="isOwned(values[0])">{{ values[0] }}</b> @if(values.length > 1){<span>+{{ values.length - 1 }}</span>}
         </summary>
         <ul aria-label="Все серийники">
           @for (serial of values; track serial) {
-            <li [class.owned]="isOwned(serial)">{{ serial }}@if(isOwned(serial)){ <span aria-label="В вашей коллекции">✓</span>}</li>
+            <li [class.owned]="isOwned(serial)">{{ serial }}@if(isOwned(serial)){ <span aria-label="В вашей коллекции">✓</span>}@for(edition of editionsFor(serial);track edition){ <span class="edition">{{edition}}</span>}</li>
           }
         </ul>
       </details>
@@ -35,6 +35,7 @@ import { canonicalSerial, displaySerials } from '@app/shared/serial-number';
       font-size: 13px;
       overflow-wrap: anywhere;
     }
+    .edition { display: inline-block; padding: 1px 5px; border: 1px solid #8d84a7; border-radius: 4px; font-size: 11px; }
     b { font-weight: inherit; }
     .owned { color: #a8edb8; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
     .single {
@@ -71,6 +72,11 @@ import { canonicalSerial, displaySerials } from '@app/shared/serial-number';
   `,
 })
 export class SerialListComponent {
+  @Input() editions: readonly {serial:string; edition:string}[] = [];
+  editionsFor(serial:string): string[] {
+    const labels:Record<string,string>={standard:'Обычное',platinum:'Platinum',essentials:'Essentials'};
+    return [...new Set(this.editions.filter(e=>canonicalSerial(e.serial)===canonicalSerial(serial)).map(e=>labels[e.edition]).filter(Boolean))];
+  }
   @Input() ownedSerials: readonly string[] = [];
   isOwned(serial: string): boolean { return this.ownedSerials.some(value => canonicalSerial(value) === canonicalSerial(serial)); }
   values: string[] = [];

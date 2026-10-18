@@ -52,7 +52,13 @@ describe('Personal library server pages',()=>{
   expect(text).toContain(kind==='wts'?'Снять с продажи':'Удалить из вишлиста');expect(text).not.toContain('Удалить из коллекции');expect(fixture.nativeElement.querySelector('.ownership-mark')).toBeNull();
  });
  it('prepopulates copy details and saves false separately from unknown, with the selected release serial',()=>{
-  const c=mount();c.editCopy(items[0]);fixture.detectChanges();expect(c.copyCib.value).toBeNull();expect(c.copySerial.value).toBeNull();c.copyCib.setValue(false);c.copySerial.setValue('CUSA-00002');c.saveCopy();const req=http.expectOne('/api/collection-copy');expect(req.request.body).toEqual({release_id:1,selected_serial:'CUSA-00002',cib:false});req.flush(null);http.expectOne('/api/collection-stats').flush([]);flush(pending());expect(document.querySelector('.modal')).toBeNull();
+  const c=mount();c.editCopy(items[0]);fixture.detectChanges();expect(c.copyCib.value).toBeNull();expect(c.copySerial.value).toBeNull();c.copyCib.setValue(false);c.copySerial.setValue('CUSA-00002');c.saveCopy();const req=http.expectOne('/api/collection-copy');expect(req.request.body).toEqual({release_id:1,selected_serial:'CUSA-00002',cib:false,selected_edition:null});req.flush(null);http.expectOne('/api/collection-stats').flush([]);flush(pending());expect(document.querySelector('.modal')).toBeNull();
+ });
+ it('keeps unknown edition unknown and saves an explicitly selected edition independently of serial',()=>{
+  const c=mount();c.editCopy({...items[0],serial:['BLES-01093']});expect(c.copyEdition.value).toBeNull();
+  c.copyEdition.setValue('platinum');c.saveCopy();const req=http.expectOne('/api/collection-copy');
+  expect(req.request.body.selected_edition).toBe('platinum');expect(req.request.body.selected_serial).toBe('BLES-01093');
+  req.flush(null);http.expectOne('/api/collection-stats').flush([]);flush(pending());
  });
  it('keeps the copy editor open after failed validation',()=>{const c=mount();c.editCopy(items[0]);c.saveCopy();http.expectOne('/api/collection-copy').flush('wrong serial',{status:400,statusText:'Bad Request'});fixture.detectChanges();expect(document.querySelector('.modal')).not.toBeNull();http.expectNone(r=>r.url==='/api/library/collection');});
  it('saves a zero purchase price without touching copy fields',()=>{const c=mount();c.edit(items[0]);expect(c.price.value).toBe(0);c.savePrice();const req=http.expectOne('/api/set_release_price');expect(req.request.body).toEqual({release_id:1,price:0});req.flush(null);http.expectOne('/api/collection-stats').flush([]);flush(pending());});
