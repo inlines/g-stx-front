@@ -1,3 +1,5 @@
+import { OwnedSerialsService } from '@app/shared/owned-serials.service';
+import { canonicalSerial } from '@app/shared/serial-number';
 import {caseRegion} from '../../shared/ps3-case';
 import { GameCoverComponent } from '../game-cover/game-cover.component';
 import { BreakpointObserver } from '@angular/cdk/layout';
@@ -49,6 +51,11 @@ import { BehaviorSubject, combineLatest, map, Observable } from 'rxjs';
   standalone: true,
 })
 export class ProductPropertiesComponent implements OnInit {
+  readonly ownedSerials = inject(OwnedSerialsService);
+  ownsSerial(productId: number, platform: number, serial: string): boolean {
+    return this.ownedSerials.forGame(productId, platform).includes(canonicalSerial(serial));
+  }
+
   @Input() embedded = false;
   @Input() coverRegion: string|number|null|undefined;
   @Input() coverDate: number|null|undefined;
@@ -106,6 +113,7 @@ export class ProductPropertiesComponent implements OnInit {
         const sales = new Set(ownership.flatMap((item) => item.wts_ids ?? []));
         return (properties?.releases ?? [])
           .filter((release) => release.release_status !== 5)
+          .sort((a, b) => releaseRegionOrder(a.release_region) - releaseRegionOrder(b.release_region))
           .map((release) => ({
             ...release,
             owned: have.has(release.release_id),
@@ -327,4 +335,8 @@ export class ProductPropertiesComponent implements OnInit {
   public goBack() {
     this.location.back();
   }
+}
+
+function releaseRegionOrder(region: string): number {
+  return ({ japan: 0, america: 1, europe: 2, australia: 3, unknown: 4 })[caseRegion(region)] ?? 4;
 }

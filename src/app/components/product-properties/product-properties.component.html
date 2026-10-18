@@ -143,12 +143,13 @@
               <span>{{ release.release_region }}</span>
               <span>{{ release.release_date ? (release.release_date | date:'dd.MM.yy':'UTC') : 'Дата неизвестна' }}</span>
             </div>
+            @if (!release.digital_only) {
             <div class="release-serials" [class.no-serials]="!release.serial?.length">
             @if (release.serial?.length) {
               <details class="serials" open>
                 <summary [ngbTooltip]="serialPreview(release)" triggers="mouseenter:mouseleave" container="body">Серийники · {{ release.serial.length }}</summary>
                 <ul aria-label="Все серийники">
-                  @for (serial of release.serial; track $index) { <li><button type="button" class="serial-copy" appCopyToClipboard [attr.aria-label]="'Скопировать серийник ' + serial" title="Скопировать серийник">{{ serial }}</button></li> }
+                  @for (serial of release.serial; track $index) { <li><button type="button" class="serial-copy" [class.owned-serial]="ownsSerial(productProperties.product.id, release.platform_id, serial)" appCopyToClipboard [attr.aria-label]="'Скопировать серийник ' + serial" title="Скопировать серийник">{{ serial }}</button></li> }
                 </ul>
               </details>
             }
@@ -157,6 +158,7 @@
               <button type="button" class="suggest-serial kudos-link" (click)="suggestSerial(release, isAdmin)" aria-label="Уточнить серийник" [title]="isAdmin ? 'Добавить серийник сразу в каталог' : 'Уточнить серийник · +10 Kudos после принятия заявки'"><span class="contribution-label">Уточнить</span>@if (!isAdmin) { <span class="contribution-reward" aria-hidden="true">+10 <b>K</b></span> }</button>
             }
             </div>
+            }
             @if (release.digital_only) { <div class="digital-label">Цифровая версия</div> }
             <ng-container *ngTemplateOutlet="releaseActions; context: { $implicit: release }" />
           </li>
@@ -166,28 +168,16 @@
           <div class="release-actions">
             <button type="button" class="btn-blue small"
               [disabled]="release.owned || release.digital_only || !isReleased(release) || (collectionChanging$ | async)"
-              [hidden]="release.owned"
+
               (click)="addToCollection(release.release_id, productProperties.product.id)">
-              В коллекцию
+              {{ release.owned ? 'Уже в коллекции' : 'Добавить в коллекцию' }}
             </button>
-            @if (release.owned) {
-              <button type="button" class="btn-pink active" [disabled]="(collectionChanging$ | async)"
-                [attr.aria-pressed]="release.forSale" (click)="toggleSale(release)">
-                {{ release.forSale ? 'Снять с продажи' : 'Хочу продать' }}
-              </button>
-            }
             <button type="button" class="btn-blue small"
               [disabled]="release.wished || (collectionChanging$ | async)"
-              [hidden]="release.wished"
+
               (click)="addWish(release.release_id)">
-              В вишлист
+              {{ release.wished ? 'Уже в вишлисте' : 'Добавить в вишлист' }}
             </button>
-            @if (release.seller_logins?.length) {
-              <button type="button" class="btn-blue small"
-                (click)="openSellersModal(release)">
-                Кто продаёт
-              </button>
-            }
           </div>
         }
       </ng-template>
@@ -268,8 +258,8 @@
                       class="bi bi-person-circle text-secondary" viewBox="0 0 16 16">
                       <path d="M11 10a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
                       <path fill-rule="evenodd"
-                          d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37c.273-.58.58-1.036 
-                            1.02-1.43C4.972 10.356 6.387 10 8 10s3.028.356 4.448 1.94c.44.394.747.85 
+                          d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37c.273-.58.58-1.036
+                            1.02-1.43C4.972 10.356 6.387 10 8 10s3.028.356 4.448 1.94c.44.394.747.85
                             1.02 1.43A7 7 0 0 0 8 1z"/>
                     </svg>
                   </div>

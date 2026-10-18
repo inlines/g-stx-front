@@ -10,7 +10,7 @@
     </nav>
     @if(vm.selectedPlatform){<app-region-filters [contextLabel]="vm.login || ''" [platformId]="vm.selectedPlatform" [selected]="vm.regions" [totals]="vm.regionTotals" [owned]="vm.ownedRegions" (regionToggle)="toggleRegion($event)"/>}
   }
-  <div class="demo-options">@if(vm.tab === 'collection'){<label>Сортировка<select [value]="vm.sort" (change)="sort($any($event.target).value)"><option value="name">По названию</option><option value="date">По дате релиза</option></select></label>}<app-game-demo [items]="vm.items" [platform]="vm.selectedPlatform" [offset]="vm.offset" [limit]="vm.size" [total]="vm.total" [busy]="vm.loading" [failed]="vm.failed" (pageChange)="page($event)" (activeChange)="demoOpen = $event" (closed)="demoClosed()"/></div>
+  <div class="demo-options">@if(vm.tab === 'collection'){<label>Сортировка<select [value]="vm.sort" (change)="sort($any($event.target).value)"><option value="name">По названию</option><option value="date">По дате релиза</option></select></label>}<app-game-demo [section]="(vm.tab === 'collection' ? 'Коллекция ' : 'Продажи ') + vm.login" [region]="vm.regions.join(',')" [items]="vm.items" [platform]="vm.selectedPlatform" [offset]="vm.offset" [limit]="vm.size" [total]="vm.total" [busy]="vm.loading" [failed]="vm.failed" (pageChange)="page($event)" (activeChange)="demoOpen = $event" (closed)="demoClosed()"/></div>
   @if(vm.failed){<div class="status" role="alert">Не удалось загрузить список. <button type="button" (click)="retry()">Повторить</button></div>}
   @else if(vm.total){
     <div class="list-info" aria-live="polite"><span>Релизов: {{vm.total}}</span><span>{{vm.offset+1}}–{{vm.offset+vm.items.length}} из {{vm.total}}</span></div>

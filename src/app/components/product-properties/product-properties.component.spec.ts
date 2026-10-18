@@ -125,6 +125,7 @@ describe('ProductPropertiesComponent', () => {
     expect(component).toBeTruthy();
   });
   afterEach(() => {
+    TestBed.inject(HttpTestingController).match(req => req.url === '/api/collection').forEach(req => req.flush({items: [], total_count: 0}));
     TestBed.inject(NgbModal).dismissAll();
     fixture.destroy();
     TestBed.inject(HttpTestingController).verify();
@@ -587,8 +588,8 @@ describe('ProductPropertiesComponent', () => {
     expect(rows).toHaveLength(platform ? 1 : 2);
     rows.forEach((row, i) => {
       const buttons = Array.from(row.querySelectorAll('button'));
-      const collection = buttons.find((button) => button.textContent?.trim() === 'В коллекцию')!;
-      const wishlist = buttons.find((button) => button.textContent?.trim() === 'В вишлист')!;
+      const collection = buttons.find((button) => button.textContent?.trim() === 'Добавить в коллекцию')!;
+      const wishlist = buttons.find((button) => button.textContent?.trim() === 'Добавить в вишлист')!;
       expect(collection.hidden || collection.disabled).toBe(false);
       expect(wishlist.hidden || wishlist.disabled).toBe(false);
       collection.click();
@@ -621,8 +622,8 @@ describe('ProductPropertiesComponent', () => {
     fixture.detectChanges();
     const dispatch = vi.spyOn(store, 'dispatch').mockReturnValue(of(undefined));
     const buttons = Array.from(fixture.nativeElement.querySelectorAll('.release-actions button')) as HTMLButtonElement[];
-    const collection = buttons.find(b => b.textContent?.trim() === 'В коллекцию')!;
-    const wishlist = buttons.find(b => b.textContent?.trim() === 'В вишлист')!;
+    const collection = buttons.find(b => b.textContent?.trim() === 'Добавить в коллекцию')!;
+    const wishlist = buttons.find(b => b.textContent?.trim() === 'Добавить в вишлист')!;
     expect(collection.disabled).toBe(dates.release_date !== null);
     collection.click();
     if (dates.release_date === null) expect(dispatch).toHaveBeenCalledWith(new CollectionActions.AddToCollectionRequest({release_id: -10, product_id: 1}));
@@ -632,7 +633,28 @@ describe('ProductPropertiesComponent', () => {
     expect(dispatch).toHaveBeenCalledWith(new CollectionActions.AddWishRequest({ release_id: -10 }));
     dispatch.mockRestore();
   });
-  it('offers owned releases for sale with price and CIB, then withdraws the sale', () => {
+  it('orders regional releases and hides serial controls for digital editions', () => {
+    component.isAuthorised$ = of(true);
+    const store = TestBed.inject(Store);
+    store.dispatch(new ProductsActions.LoadProperties(1));
+    TestBed.inject(HttpTestingController).expectOne('/api/products/1').flush({
+      product: {id: 1, name: 'Game'},
+      releases: ['Europe', 'North America', 'Japan'].map((region, i) => ({
+        release_id: i + 1, platform_id: 9, platform_name: 'PS3', release_region: region,
+        release_date: null, release_status: null, digital_only: region === 'Europe', serial: [],
+      })), companies: [], franschises: [], screenshots: [],
+    });
+    fixture.detectChanges();
+    const rows = Array.from(fixture.nativeElement.querySelectorAll('.release-item')) as HTMLElement[];
+    expect(rows.map(row => row.querySelector('.release-meta')!.textContent)).toEqual([
+      expect.stringContaining('Japan'), expect.stringContaining('North America'), expect.stringContaining('Europe'),
+    ]);
+    expect(rows[2].querySelector('.release-serials')).toBeNull();
+    expect(rows[2].querySelector('.suggest-serial')).toBeNull();
+    expect(rows[0].querySelector('.suggest-serial')).not.toBeNull();
+  });
+
+  it('keeps owned and wished actions visible and disabled without sales actions', () => {
     const store = TestBed.inject(Store);
     const http = TestBed.inject(HttpTestingController);
     const ownership = (wts: number[]) => [
@@ -641,8 +663,8 @@ describe('ProductPropertiesComponent', () => {
         have_ids: [10],
         have_count: 1,
         have_prod_ids: [1],
-        wish_ids: [],
-        wish_count: 0,
+        wish_ids: [10],
+        wish_count: 1,
         wts_ids: wts,
         wts_count: wts.length,
         total_spent: 0,
@@ -674,35 +696,12 @@ describe('ProductPropertiesComponent', () => {
       Array.from(fixture.nativeElement.querySelectorAll('button') as NodeListOf<HTMLButtonElement>).find(
         (item) => item.textContent?.trim() === label,
       )!;
-    expect(fixture.nativeElement.querySelectorAll('.release-actions .btn-pink')).toHaveLength(1);
-    button('Хочу продать').click();
-    fixture.detectChanges();
-    expect(component.salePrice.value).toBeNull();
-    expect(component.saleCib.value).toBe(false);
-    component.salePrice.setValue(-1);
-    component.saveSale();
-    http.expectNone('/api/add_wts');
-    component.salePrice.setValue(0);
-    component.saleCib.setValue(true);
-    fixture.detectChanges();
-    (document.querySelector('.sale-dialog button[type=submit]') as HTMLButtonElement).click();
-    const request = http.expectOne('/api/add_wts');
-    expect(request.request.body).toEqual({ release_id: 10, price: 0, cib: true });
-    request.flush(null);
-    http.expectOne('/api/collection-stats').flush(ownership([10]));
-    fixture.detectChanges();
-    button('Снять с продажи').click();
-    const removal = http.expectOne('/api/remove_wts');
-    expect(removal.request.body).toEqual({ release_id: 10 });
-    removal.flush(null);
-    http.expectOne('/api/collection-stats').flush(ownership([]));
-    fixture.detectChanges();
-    expect(button('Хочу продать')).toBeTruthy();
-    button('Кто продаёт').click();
-    fixture.detectChanges();
-    expect(document.querySelector('ngb-modal-window')?.textContent).toContain('bob');
-    expect(document.querySelector('ngb-modal-window')?.textContent).toContain('Написать игроку');
-    http.expectNone('/api/add_bid');
-    http.expectNone('/api/remove_bid');
+    expect(button('Уже в коллекции').disabled).toBe(true);
+    expect(button('Уже в коллекции').hidden).toBe(false);
+    expect(button('Уже в вишлисте').disabled).toBe(true);
+    expect(button('Добавить в коллекцию').disabled).toBe(false);
+    expect(fixture.nativeElement.querySelectorAll('.release-actions button')).toHaveLength(4);
+    expect(button('Хочу продать')).toBeUndefined();
+    expect(button('Кто продаёт')).toBeUndefined();
   });
 });

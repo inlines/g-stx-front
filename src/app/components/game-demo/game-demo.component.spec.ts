@@ -27,6 +27,13 @@ describe('Demo browsing', () => {
     http.expectOne(`/api/products/${id}`).flush({product:{id, name:`Game ${id}`, image_url:null}, releases:[], screenshots:[], companies:[], franschises:[]});
     fixture.detectChanges();
   }
+  it('labels the demo with its list context and region', () => {
+    fixture.componentRef.setInput('section', 'Коллекция alice');
+    fixture.componentRef.setInput('region', 'japan,europe');
+    fixture.detectChanges();
+    expect(demo.heading).toContain('Коллекция alice / ');
+    expect(demo.heading).toContain('Япония, Европа');
+  });
   it('opens on the first toggle click and shows only the active mode as pressed', () => {
     const buttons = fixture.nativeElement.querySelectorAll('.view-toggle button') as NodeListOf<HTMLButtonElement>;
     buttons[1].click();

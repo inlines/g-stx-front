@@ -1,3 +1,4 @@
+import { OwnedSerialsService } from '@app/shared/owned-serials.service';
 import { TestBed } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { provideRouter } from '@angular/router';
@@ -10,7 +11,7 @@ describe('Safe interactive tutorial', () => {
     close.mockClear();
     TestBed.configureTestingModule({
       imports: [OnboardingComponent],
-      providers: [provideRouter([]), { provide: NgbActiveModal, useValue: { close } }],
+      providers: [{provide: OwnedSerialsService, useValue: {forGame: () => []}}, provideRouter([]), { provide: NgbActiveModal, useValue: { close } }],
     });
   });
   afterEach(() => {

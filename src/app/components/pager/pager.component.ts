@@ -40,7 +40,7 @@ export class PagerComponent implements OnChanges, OnInit {
   }
   @HostListener('window:resize')
   resize(): void {
-    this.range = window.innerWidth < 576 ? 1 : 5;
+    this.range = window.innerWidth < 420 ? 0 : window.innerWidth < 768 ? 1 : 5;
     this.ngOnChanges();
   }
 

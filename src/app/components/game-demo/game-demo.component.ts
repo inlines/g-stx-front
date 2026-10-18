@@ -1,3 +1,4 @@
+import { PlatformState } from '@app/states/platforms/states/platforms.state';
 import { LoadingPanelComponent } from '../loading-panel/loading-panel.component';
 import { AsyncPipe } from '@angular/common';
 import { Component, DestroyRef, ElementRef, EventEmitter, HostListener, Input, OnChanges, Output, TemplateRef, ViewChild, inject } from '@angular/core';
@@ -20,6 +21,7 @@ export interface DemoItem { id?: number; product_id?: number; platform_id?: numb
   styleUrl: './game-demo.component.scss',
 })
 export class GameDemoComponent implements OnChanges {
+  @Input() section = 'Каталог';
   @Input() items: readonly DemoItem[] | null = [];
   @Input() platform: number | null | undefined;
   @Input() region: string|number|null|undefined;
@@ -35,6 +37,13 @@ export class GameDemoComponent implements OnChanges {
   @ViewChild('content') content?: ElementRef<HTMLElement>;
   private readonly modals = inject(NgbModal);
   private readonly store = inject(Store);
+  private readonly platforms = this.store.selectSignal(PlatformState.loadedPlatforms);
+  get heading(): string {
+    const platform = this.platforms().find(p => p.id === this.platform);
+    const labels: Record<string, string> = {europe: 'Европа', america: 'США', japan: 'Япония', other: 'Другие'};
+    const regions = String(this.region ?? '').split(',').filter(Boolean).map(r => labels[r] ?? r);
+    return [this.section, platform?.abbreviation || platform?.name || 'Все платформы', regions.join(', ') || 'Все регионы'].join(' / ');
+  }
   private readonly destroyRef = inject(DestroyRef);
   private ref?: NgbModalRef;
   readonly failure$ = this.store.select(ProductsState.propertiesFailure);

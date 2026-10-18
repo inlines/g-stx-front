@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
-import { displaySerials } from '@app/shared/serial-number';
+import { canonicalSerial, displaySerials } from '@app/shared/serial-number';
 @Component({
   selector: 'app-serial-list',
   imports: [NgbTooltipModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `@if (values.length === 1) {
-      <small class="single" [attr.aria-label]="'Серийник: ' + values[0]">{{ values[0] }}</small>
+      <small class="single" [class.owned]="isOwned(values[0])" [attr.aria-label]="'Серийник: ' + values[0]">{{ values[0] }}</small>
     } @else if (values.length > 1) {
       <details class="serials" (click)="$event.stopPropagation()">
         <summary
@@ -15,11 +15,11 @@ import { displaySerials } from '@app/shared/serial-number';
           container="body"
           aria-label="Раскрыть серийники"
         >
-          {{ values[0] }} <span>+{{ values.length - 1 }}</span>
+          <b [class.owned]="isOwned(values[0])">{{ values[0] }}</b> <span>+{{ values.length - 1 }}</span>
         </summary>
         <ul aria-label="Все серийники">
           @for (serial of values; track serial) {
-            <li>{{ serial }}</li>
+            <li [class.owned]="isOwned(serial)">{{ serial }}@if(isOwned(serial)){ <span aria-label="В вашей коллекции">✓</span>}</li>
           }
         </ul>
       </details>
@@ -35,6 +35,8 @@ import { displaySerials } from '@app/shared/serial-number';
       font-size: 13px;
       overflow-wrap: anywhere;
     }
+    b { font-weight: inherit; }
+    .owned { color: #a8edb8; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
     .single {
       font-size: inherit;
     }
@@ -69,6 +71,8 @@ import { displaySerials } from '@app/shared/serial-number';
   `,
 })
 export class SerialListComponent {
+  @Input() ownedSerials: readonly string[] = [];
+  isOwned(serial: string): boolean { return this.ownedSerials.some(value => canonicalSerial(value) === canonicalSerial(serial)); }
   values: string[] = [];
   preview = '';
   @Input() set serials(values: readonly string[] | null | undefined) {

@@ -44,6 +44,15 @@ describe('PagerComponent', () => {
     expect(changes).toHaveBeenCalledTimes(2);
     input.remove();
   });
+  it('bounds mobile pagination even in the middle of thousands of pages', () => {
+    const original = window.innerWidth;
+    Object.defineProperty(window, 'innerWidth', {value: 375, configurable: true});
+    component.totalCount = 11150;
+    component.offset = 5000;
+    component.resize();
+    expect(component.pages).toEqual([1, '...', 501, '...', 1115]);
+    Object.defineProperty(window, 'innerWidth', {value: original, configurable: true});
+  });
   it('should create', () => {
     expect(component).toBeTruthy();
   });
