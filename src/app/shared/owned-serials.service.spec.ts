@@ -1,22 +1,14 @@
 import { copySerials } from './owned-serials.service';
 describe('Owned copy serials', () => {
-  const resistance = ['BCES-00001', 'BCES-00001/E', 'BCES-00001/P/BBFC', 'BCES-00001/P/UK'];
-  it('highlights all serials of an owned release without a selected code', () => {
-    expect(copySerials({serial: resistance, selected_serial: null})).toEqual(resistance);
+  const serial = ['BCES-00001', 'BCES-00001/E', 'BCES-00001/P/UK'];
+  it('highlights only the explicitly selected serial', () => {
+    expect(copySerials({serial, selected_serial: 'bces00001'})).toEqual(['BCES-00001']);
+    expect(copySerials({serial, selected_serial: 'BCES-00001/P/UK'})).toEqual(['BCES-00001/P/UK']);
   });
-  it('uses an explicit reissue selection instead of the inferred base', () => {
-    expect(copySerials({serial: resistance, selected_serial: 'BCES-00001/P/UK'})).toEqual(['BCES-00001/P/UK']);
-  });
-  it('includes reissues and different codes belonging to the owned release', () => {
-    expect(copySerials({serial: resistance.slice(1)})).toEqual(resistance.slice(1));
-    expect(copySerials({serial: [...resistance, 'BCES-00002/P']})).toEqual([...resistance, 'BCES-00002/P']);
-  });
-  it('highlights only the selected edition', () => {
-    expect(copySerials({serial: ['BCES-00001', 'BCES-00002'], selected_serial: 'bces00002'})).toEqual(['BCES-00002']);
-  });
-  it('uses release serials when no edition is selected', () => {
-    expect(copySerials({serial: ['BCES-00001', 'BCES-00002']})).toEqual(['BCES-00001', 'BCES-00002']);
-    expect(copySerials({serial: ['bces00001']})).toEqual(['BCES-00001']);
+  it('does not highlight unspecified copies, even with only one possible code', () => {
+    expect(copySerials({serial, selected_serial: null})).toEqual([]);
+    expect(copySerials({serial: ['BCES-00001']})).toEqual([]);
+    expect(copySerials({serial, selected_serial: ''})).toEqual([]);
   });
 });
 
@@ -52,7 +44,7 @@ describe('Owned serial cache', () => {
     store.dispatch(new CollectionActions.SetCopySuccess());
     http.expectOne('/api/collection-stats').flush([]);
     http.expectOne(req => req.url === '/api/collection').flush({items: [{...row, selected_serial: null}], total_count: 1});
-    expect(service.forGame(1, 9)).toEqual(['BCES-00001', 'BCES-00002']);
+    expect(service.forGame(1, 9)).toEqual([]);
     store.reset({...store.snapshot(), Auth: {...state.Auth, login: null, token: null}});
     expect(service.forGame(1, 9)).toEqual([]);
     http.verify();

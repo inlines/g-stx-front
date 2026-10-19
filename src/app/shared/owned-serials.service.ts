@@ -5,11 +5,11 @@ import { catchError, map, of, startWith, switchMap } from 'rxjs';
 import { AuthState } from '@app/states/auth/states/auth.state';
 import { CollectionActions } from '@app/states/collection/states/collection-actions';
 import { CollectionService } from '@app/states/collection/services/collection.service';
-import { canonicalSerial, displaySerials } from './serial-number';
+import { canonicalSerial } from './serial-number';
 
 export function copySerials(item: {selected_serial?: string | null; serial: string[]}): string[] {
   if (item.selected_serial) return [canonicalSerial(item.selected_serial)];
-  return displaySerials(item.serial).map(canonicalSerial);
+  return [];
 }
 
 @Injectable({providedIn: 'root'})
