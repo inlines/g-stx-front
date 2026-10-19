@@ -7,6 +7,18 @@ describe('Release card gestures and copy data',()=>{
  afterEach(()=>{vi.useRealTimers();vi.unstubAllGlobals();});
  function setup(readOnly=false){const f=TestBed.createComponent(ReleaseCardComponent);f.componentRef.setInput('item',{...item});f.componentRef.setInput('collection',true);f.componentRef.setInput('readOnly',readOnly);f.detectChanges();return f;}
  function down(target:HTMLElement){return {pointerType:'touch',isPrimary:true,clientX:10,clientY:10,target} as unknown as PointerEvent;}
+ it('styles the selected copy edition through the full card chain, including public collections',()=>{
+  const f=setup(true);
+  for(const platform_id of [7,8,9,38]){
+   for(const selected_edition of ['platinum','essentials','standard',null]){
+    f.componentRef.setInput('item',{...item,platform_id,selected_edition});f.detectChanges();
+    const cover=f.nativeElement.querySelector('app-game-cover .cover');
+    expect(cover.getAttribute('data-edition')).toBe(selected_edition==='standard'?null:selected_edition);
+   }
+  }
+  f.componentRef.setInput('item',{...item,platform_id:9,selected_edition:'platinum',digital_only:true});f.detectChanges();
+  expect(f.nativeElement.querySelector('.edition-label')).toBeNull();f.destroy();
+ });
  it('opens on a stationary long press, cancels on movement and suppresses only the resulting click',()=>{
   const f=setup(),c=f.componentInstance,a=f.nativeElement.querySelector('a');c.beginHold(down(a));c.moveHold({...down(a),clientX:30});vi.advanceTimersByTime(600);expect(c.menuOpen).toBe(false);
   c.beginHold(down(a));vi.advanceTimersByTime(550);expect(c.menuOpen).toBe(true);c.cancelHold();const click=new MouseEvent('click',{bubbles:true,cancelable:true});a.dispatchEvent(click);expect(click.defaultPrevented).toBe(true);c.closeMenu();c.beginHold(down(a));c.cancelHold();expect(c.menuOpen).toBe(false);f.destroy();

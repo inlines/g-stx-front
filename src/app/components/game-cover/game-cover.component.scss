@@ -51,3 +51,21 @@
 /* Keep the complete CD artwork below the brand strip inside the fixed square case. */
 .jewel{padding-top:16%}
 .jewel .art img{object-fit:contain}
+
+/* Explicit copy edition, supplied only by collection cards. */
+.cover[data-edition]{padding-top:22%}
+.cover[data-edition] .art img{object-fit:contain}
+.cover[data-edition] .brand{top:6%;height:9%}
+.edition-label{position:absolute;z-index:2;top:15%;left:12%;right:3%;height:7%;display:flex;align-items:center;justify-content:center;font:700 4cqw Arial;letter-spacing:.16em;box-sizing:border-box}
+.cover[data-edition=platinum]{background:linear-gradient(100deg,#777f87,#e5e7e9 7%,#a9afb5 12%,#dce0e3);border-color:#d4d8dc}
+.cover[data-edition=platinum] .brand,.cover[data-edition=platinum] .spine{background:linear-gradient(90deg,#aab0b7,#e2e5e8);color:#17191d}
+.cover[data-edition=platinum] .spine-title,.cover[data-edition=platinum] .spine-logo{color:#17191d}
+.cover[data-edition=platinum] .spine-logo{background:#c4c9cf}
+.cover[data-edition=platinum] .edition-label{background:#c7ccd1;color:#191b20}
+.cover[data-case=black][data-edition=platinum] .edition-label{background:#e6cb32;color:#17191d}
+.cover[data-edition=essentials] .edition-label{background:#c7212b;color:#fff}
+.cover[data-edition=essentials] .brand{background:#f1f1f1;color:#17191d}
+.cover[data-edition=essentials] .spine-logo{background:#c7212b;color:#fff}
+.cover.jewel[data-edition]{padding-top:23%}
+.cover.jewel[data-edition] .brand{top:2%;height:12%}
+.cover.jewel[data-edition] .edition-label{top:14%;height:9%}

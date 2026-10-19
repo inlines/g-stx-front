@@ -12,7 +12,7 @@ import { SerialListComponent } from '../serial-list/serial-list.component';
    @if(owned){<span class="ownership-mark" role="img" aria-label="В вашей коллекции"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg></span>}
    @if(showMissing){<span class="missing-serial" aria-label="Серийники пока не указаны">?</span>}
    <a class="catalog-cover" [routerLink]="link" [attr.aria-label]="game.name">
-     <app-game-cover [src]="game.image_url" [name]="game.name" [platform]="platform ?? link?.[2]?.platform" [region]="region" [date]="game.release_date" [digital]="game.digital_only ?? false" [priority]="priority"/>
+     <app-game-cover [edition]="edition" [src]="game.image_url" [name]="game.name" [platform]="platform ?? link?.[2]?.platform" [region]="region" [date]="game.release_date" [digital]="game.digital_only ?? false" [priority]="priority"/>
    </a>
    <div class="game-content">
      <a class="title" [title]="game.name" [routerLink]="link">{{game.name}}</a>
@@ -28,6 +28,7 @@ export class GameCardComponent {
  @Input() region:string|number|null|undefined;
  @Input({required:true}) game!: IProductListItem;
  @Input({required:true}) link!: any[];
+ @Input() edition:string|null|undefined;
  @Input() priority=false;
  @Input() owned=false;
  @Input() missing=false;
