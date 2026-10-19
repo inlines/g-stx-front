@@ -1,5 +1,16 @@
 import { copySerials } from './owned-serials.service';
 describe('Owned copy serials', () => {
+  const resistance = ['BCES-00001', 'BCES-00001/E', 'BCES-00001/P/BBFC', 'BCES-00001/P/UK'];
+  it('keeps the common base highlighted after adding Resistance reissues', () => {
+    expect(copySerials({serial: resistance, selected_serial: null})).toEqual(['BCES-00001']);
+  });
+  it('uses an explicit reissue selection instead of the inferred base', () => {
+    expect(copySerials({serial: resistance, selected_serial: 'BCES-00001/P/UK'})).toEqual(['BCES-00001/P/UK']);
+  });
+  it('does not invent a missing base or guess between distinct regional codes', () => {
+    expect(copySerials({serial: resistance.slice(1)})).toEqual([]);
+    expect(copySerials({serial: [...resistance, 'BCES-00002/P']})).toEqual([]);
+  });
   it('highlights only the selected edition', () => {
     expect(copySerials({serial: ['BCES-00001', 'BCES-00002'], selected_serial: 'bces00002'})).toEqual(['BCES-00002']);
   });

@@ -10,8 +10,14 @@ import { canonicalSerial, displaySerials } from './serial-number';
 export function copySerials(item: {selected_serial?: string | null; serial: string[]}): string[] {
   if (item.selected_serial) return [canonicalSerial(item.selected_serial)];
   const serials = displaySerials(item.serial);
-  // An unspecified copy with multiple editions does not identify any one serial.
-  return serials.length === 1 ? serials : [];
+  if (serials.length === 1) return serials;
+  // Reissue variants must not erase the inferred ownership of their common base.
+  // Only infer when the base itself exists and every code shares that base.
+  const bases = serials.filter(serial => /^[A-Z]{4}-[0-9]{5}$/.test(serial));
+  if (bases.length !== 1) return [];
+  const base = bases[0];
+  return serials.every(serial => serial === base ||
+    serial.startsWith(base + '/') || serial.startsWith(base + '-')) ? [base] : [];
 }
 
 @Injectable({providedIn: 'root'})
