@@ -26,7 +26,10 @@ describe('Owned serial cache', () => {
     const state = store.snapshot();
     store.reset({...state, Auth: {...state.Auth, login: 'alice', token: 'token'}});
     const row = {release_id: 42, product_id: 1, platform_id: 9, serial: ['BCES-00001', 'BCES-00002'], selected_serial: 'BCES-00002'};
-    http.expectOne(req => req.url === '/api/collection').flush({items: [row], total_count: 1});
+    const request = http.expectOne(req => req.url === '/api/collection');
+    // Deployed APIs require cat even when reading every platform.
+    expect(request.request.params.get('cat')).toBe('0');
+    request.flush({items: [row], total_count: 1});
     expect(service.forGame(1, 9)).toEqual(['BCES-00002']);
     expect(service.forGame(1, 48)).toEqual([]);
     expect(TestBed.inject(OwnedSerialsService)).toBe(service);

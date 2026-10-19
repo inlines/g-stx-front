@@ -23,7 +23,7 @@ export class OwnedSerialsService {
     switchMap(login => !login ? of([]) : this.actions.pipe(
       ofActionSuccessful(CollectionActions.AddToCollectionSuccess, CollectionActions.RemoveFromCollectionSuccess, CollectionActions.SetCopySuccess),
       startWith(null),
-      switchMap(() => this.service.getCompleteCollection({include_unreleased: true, ignore_digital: false}).pipe(
+      switchMap(() => this.service.getCompleteCollection({cat: 0, include_unreleased: true, ignore_digital: false}).pipe(
         map(response => response.items),
         catchError(() => of([])),
       )),
