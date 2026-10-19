@@ -4,7 +4,7 @@ import { Actions, Store, ofActionSuccessful } from '@ngxs/store';
 import { catchError, map, of, startWith, switchMap } from 'rxjs';
 import { AuthState } from '@app/states/auth/states/auth.state';
 import { CollectionActions } from '@app/states/collection/states/collection-actions';
-import { CollectionService } from '@app/states/collection/services/collection.service';
+import { LibraryPageService } from './library-page.service';
 import { canonicalSerial } from './serial-number';
 
 export function copySerials(item: {selected_serial?: string | null; serial: string[]}): string[] {
@@ -15,13 +15,13 @@ export function copySerials(item: {selected_serial?: string | null; serial: stri
 @Injectable({providedIn: 'root'})
 export class OwnedSerialsService {
   private readonly store = inject(Store);
-  private readonly service = inject(CollectionService);
+  private readonly service = inject(LibraryPageService);
   private readonly actions = inject(Actions);
   readonly copies = toSignal(this.store.select(AuthState.login).pipe(
     switchMap(login => !login ? of([]) : this.actions.pipe(
       ofActionSuccessful(CollectionActions.AddToCollectionSuccess, CollectionActions.RemoveFromCollectionSuccess, CollectionActions.SetCopySuccess),
       startWith(null),
-      switchMap(() => this.service.getCompleteCollection({cat: 0, include_unreleased: true, ignore_digital: false}).pipe(
+      switchMap(() => this.service.all('collection', {limit: 1000, offset: 0}).pipe(
         map(response => response.items),
         catchError(() => of([])),
       )),
