@@ -1,6 +1,5 @@
-import { OwnedSerialsService } from '@app/shared/owned-serials.service';
 import { GameCoverComponent } from '../game-cover/game-cover.component';
-import { Component, Input, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { IProductListItem } from '@app/states/products/interfaces/product-list-item.interface';
@@ -18,14 +17,13 @@ import { SerialListComponent } from '../serial-list/serial-list.component';
    <div class="game-content">
      <a class="title" [title]="game.name" [routerLink]="link">{{game.name}}</a>
      <app-game-stats [game]="game"/>
-     @if(game.serial?.length){<app-serial-list [serials]="game.serial" [editions]="game.serial_editions ?? []" [ownedSerials]="ownedSerials.forGame(game.id, platform ?? link?.[2]?.platform)"/>}
+     @if(game.serial?.length){<app-serial-list [serials]="game.serial" [editions]="game.serial_editions ?? []"/>}
      @else if(showMissing){<a class="missing-hint" [routerLink]="link">Знаете серийник? Дополните →</a>}
      <div class="game-first-release">{{game.release_date != null ? 'с ' + (game.release_date | date:'dd.MM.yy':'UTC') : 'Дата неизвестна'}}</div>
      <ng-content/>
    </div>
  </article>`,styleUrl:'./game-card.component.scss'})
 export class GameCardComponent {
- readonly ownedSerials = inject(OwnedSerialsService);
  @Input() platform:number|null|undefined;
  @Input() region:string|number|null|undefined;
  @Input({required:true}) game!: IProductListItem;

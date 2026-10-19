@@ -25,9 +25,7 @@ describe('Regional serial badge',()=>{
   const game={id:1,name:'Regional',has_serials:true,serial:[],is_released:true};
   f.componentRef.setInput('game',game);f.detectChanges();expect(f.nativeElement.querySelector('.missing-serial')).not.toBeNull();
   f.componentRef.setInput('game',{...game,serial:['BCES-00001','BCES-00002']});f.detectChanges();
-  const owned = f.nativeElement.querySelector('app-serial-list li.owned');
-  expect(owned.textContent).toContain('BCES-00002');
-  expect(f.nativeElement.querySelectorAll('app-serial-list li.owned')).toHaveLength(1);
+  expect(f.nativeElement.querySelectorAll('app-serial-list li.owned')).toHaveLength(0);
   f.componentRef.setInput('game',{...game,digital_only:true});f.detectChanges();expect(f.nativeElement.querySelector('.missing-serial')).toBeNull();
   f.componentRef.setInput('game',{...game,is_released:false});f.detectChanges();expect(f.nativeElement.querySelector('.missing-serial')).toBeNull();
  });

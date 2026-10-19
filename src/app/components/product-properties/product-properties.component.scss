@@ -386,4 +386,5 @@
 
 .similar-case{aspect-ratio:3/4;height:auto;display:block}
 
-.serial-copy.owned-serial { color: #a8edb8; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.serials .owned-serial { background: #a73576; color: #fff; }
+.owned-serial .edition-badge { color: #fff; }

@@ -25,7 +25,7 @@ describe('Owned serial cache', () => {
     http.expectNone(req => req.url === '/api/collection');
     const state = store.snapshot();
     store.reset({...state, Auth: {...state.Auth, login: 'alice', token: 'token'}});
-    const row = {product_id: 1, platform_id: 9, serial: ['BCES-00001', 'BCES-00002'], selected_serial: 'BCES-00002'};
+    const row = {release_id: 42, product_id: 1, platform_id: 9, serial: ['BCES-00001', 'BCES-00002'], selected_serial: 'BCES-00002'};
     http.expectOne(req => req.url === '/api/collection').flush({items: [row], total_count: 1});
     expect(service.forGame(1, 9)).toEqual(['BCES-00002']);
     expect(service.forGame(1, 48)).toEqual([]);
@@ -35,6 +35,13 @@ describe('Owned serial cache', () => {
     http.expectOne('/api/collection-stats').flush([]);
     http.expectOne(req => req.url === '/api/collection').flush({items: [{...row, selected_serial: 'BCES-00001'}], total_count: 1});
     expect(service.forGame(1, 9)).toEqual(['BCES-00001']);
+    expect(service.hasUnspecifiedCopy(42)).toBe(false);
+    store.dispatch(new CollectionActions.SetCopySuccess());
+    http.expectOne('/api/collection-stats').flush([]);
+    http.expectOne(req => req.url === '/api/collection').flush({items: [{...row, selected_serial: null}], total_count: 1});
+    expect(service.forGame(1, 9)).toEqual([]);
+    expect(service.hasUnspecifiedCopy(42)).toBe(true);
+    expect(service.hasUnspecifiedCopy(43)).toBe(false);
     store.reset({...store.snapshot(), Auth: {...state.Auth, login: null, token: null}});
     expect(service.forGame(1, 9)).toEqual([]);
     http.verify();

@@ -31,6 +31,10 @@ export class OwnedSerialsService {
     )),
   ), {initialValue: []});
 
+  hasUnspecifiedCopy(releaseId: number): boolean {
+    return this.copies().some(item => item.release_id === releaseId && !item.selected_serial && copySerials(item).length === 0);
+  }
+
   forGame(productId: number, platform?: number | null): string[] {
     return this.copies().filter(item => item.product_id === productId && (!platform || item.platform_id === platform))
       .flatMap(copySerials);
