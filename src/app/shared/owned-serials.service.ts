@@ -9,15 +9,7 @@ import { canonicalSerial, displaySerials } from './serial-number';
 
 export function copySerials(item: {selected_serial?: string | null; serial: string[]}): string[] {
   if (item.selected_serial) return [canonicalSerial(item.selected_serial)];
-  const serials = displaySerials(item.serial);
-  if (serials.length === 1) return serials;
-  // Reissue variants must not erase the inferred ownership of their common base.
-  // Only infer when the base itself exists and every code shares that base.
-  const bases = serials.filter(serial => /^[A-Z]{4}-[0-9]{5}$/.test(serial));
-  if (bases.length !== 1) return [];
-  const base = bases[0];
-  return serials.every(serial => serial === base ||
-    serial.startsWith(base + '/') || serial.startsWith(base + '-')) ? [base] : [];
+  return displaySerials(item.serial).map(canonicalSerial);
 }
 
 @Injectable({providedIn: 'root'})
@@ -36,10 +28,6 @@ export class OwnedSerialsService {
       startWith([]),
     )),
   ), {initialValue: []});
-
-  hasUnspecifiedCopy(releaseId: number): boolean {
-    return this.copies().some(item => item.release_id === releaseId && !item.selected_serial && copySerials(item).length === 0);
-  }
 
   forGame(productId: number, platform?: number | null): string[] {
     return this.copies().filter(item => item.product_id === productId && (!platform || item.platform_id === platform))

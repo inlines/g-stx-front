@@ -152,7 +152,6 @@
                   @for (serial of release.serial; track $index) { <li [class.owned-serial]="ownsSerial(productProperties.product.id, release.platform_id, serial)"><button type="button" class="serial-copy" appCopyToClipboard [attr.aria-label]="'Скопировать серийник ' + serial" title="Скопировать серийник">{{ serial }}</button>@for (edition of editionsFor(release, serial); track edition) { <span class="edition-badge genre-badge" aria-label="Подтверждённое издание">{{ edition }}</span> }</li> }
                 </ul>
               </details>
-              @if (release.owned && ownedSerials.hasUnspecifiedCopy(release.release_id)) { <p class="unspecified-copy">Игра в коллекции. Выберите серийник своего экземпляра в разделе «Моё», чтобы выделить его здесь.</p> }
             }
             @if (!release.serial?.length) { <div class="empty-serials-label">Серийники · 0</div> }
             @if ((isAuthorised$ | async) && canSuggestSerial(release)) {
