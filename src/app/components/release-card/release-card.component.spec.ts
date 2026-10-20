@@ -19,6 +19,15 @@ describe('Release card gestures and copy data',()=>{
   f.componentRef.setInput('item',{...item,platform_id:9,selected_edition:'platinum',digital_only:true});f.detectChanges();
   expect(f.nativeElement.querySelector('.edition-label')).toBeNull();f.destroy();
  });
+ it('styles the selected unsuffixed serial using catalogue edition metadata',()=>{
+  const f=setup();
+  for(const edition of ['platinum','essentials']){
+   f.componentRef.setInput('item',{...item,platform_id:9,selected_serial:'BLES-00615',selected_edition:'standard',serial:['BLES-00615'],serial_editions:[{serial:'BLES-00615',edition}]});f.detectChanges();
+   expect(f.nativeElement.querySelector('.cover').getAttribute('data-edition')).toBe(edition);
+   expect(f.nativeElement.querySelector('.edition-label').textContent).toBe(edition.toUpperCase());
+  }
+  f.destroy();
+ });
  it('opens on a stationary long press, cancels on movement and suppresses only the resulting click',()=>{
   const f=setup(),c=f.componentInstance,a=f.nativeElement.querySelector('a');c.beginHold(down(a));c.moveHold({...down(a),clientX:30});vi.advanceTimersByTime(600);expect(c.menuOpen).toBe(false);
   c.beginHold(down(a));vi.advanceTimersByTime(550);expect(c.menuOpen).toBe(true);c.cancelHold();const click=new MouseEvent('click',{bubbles:true,cancelable:true});a.dispatchEvent(click);expect(click.defaultPrevented).toBe(true);c.closeMenu();c.beginHold(down(a));c.cancelHold();expect(c.menuOpen).toBe(false);f.destroy();

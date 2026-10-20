@@ -57,11 +57,11 @@ export class ProductPropertiesComponent implements OnInit {
     return this.ownedSerials.forGame(productId, platform).includes(canonicalSerial(serial));
   }
 
-  coverEdition(productId: number, platform: number, region: string | number | null | undefined): string | null {
+  coverEdition(productId: number, platform: number, region: string | number | null | undefined, releases: IReleaseItem[]): string | null {
     const copies = this.ownedSerials.copies().filter(item =>
       item.product_id === productId && item.platform_id === platform &&
       (caseRegion(region) === 'unknown' || caseRegion(item.region_id ?? item.region_name) === caseRegion(region)));
-    const editions = [...new Set(copies.map(copyEdition))];
+    const editions = [...new Set(copies.map(item => copyEdition({...item, serial_editions: item.serial_editions ?? releases.find(r => r.release_id === item.release_id)?.serial_editions})))];
     return editions.length === 1 && (editions[0] === 'platinum' || editions[0] === 'essentials') ? editions[0] : null;
   }
 

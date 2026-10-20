@@ -39,14 +39,14 @@ describe('Owned serial rendering', () => {
     const serial = ['BCES-00001', 'BCES-00001/E', 'BCES-00001/P/UK'];
     http.expectOne(req => req.url === '/api/library/collection').flush({
       items: [{release_id: 105244, product_id: 1278, platform_id: 9, region_id: 1, serial,
-        selected_serial: 'BCES-00001', selected_edition: edition}], total_count: 1,
+        selected_serial: 'BCES-00001', selected_edition: 'standard'}], total_count: 1,
     });
     http.expectNone(req => req.url === '/api/collection');
     store.dispatch(new ProductsActions.LoadProperties(1278));
     http.expectOne('/api/products/1278').flush({
       product: {id: 1278, name: 'Resistance: Fall of Man'},
       releases: [{release_id: 105244, platform_id: 9, platform_name: 'PS3',
-        release_region: 'europe', release_date: 1174608000, serial, digital_only: false}],
+        release_region: 'europe', release_date: 1174608000, serial, digital_only: false, serial_editions: edition ? [{serial:'BCES-00001', edition}] : []}],
       companies: [], franschises: [], screenshots: [],
     });
     fixture.detectChanges();
