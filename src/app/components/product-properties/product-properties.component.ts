@@ -1,3 +1,4 @@
+import { copyEdition } from '@app/shared/copy-edition';
 import { OwnedSerialsService } from '@app/shared/owned-serials.service';
 import { canonicalSerial } from '@app/shared/serial-number';
 import {caseRegion} from '../../shared/ps3-case';
@@ -54,6 +55,14 @@ export class ProductPropertiesComponent implements OnInit {
   readonly ownedSerials = inject(OwnedSerialsService);
   ownsSerial(productId: number, platform: number, serial: string): boolean {
     return this.ownedSerials.forGame(productId, platform).includes(canonicalSerial(serial));
+  }
+
+  coverEdition(productId: number, platform: number, region: string | number | null | undefined): string | null {
+    const copies = this.ownedSerials.copies().filter(item =>
+      item.product_id === productId && item.platform_id === platform &&
+      (caseRegion(region) === 'unknown' || caseRegion(item.region_id ?? item.region_name) === caseRegion(region)));
+    const editions = [...new Set(copies.map(copyEdition))];
+    return editions.length === 1 && (editions[0] === 'platinum' || editions[0] === 'essentials') ? editions[0] : null;
   }
 
   @Input() embedded = false;

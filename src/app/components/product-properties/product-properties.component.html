@@ -79,7 +79,7 @@
     <div class="col-12 col-lg-4 product-sidebar">
       <div class="text-white product-info">
         @let cover = coverContext(productProperties.releases, (platformId$ | async) || 0);
-        <app-game-cover class="detail-case" [src]="productProperties.product.image_url" [name]="productProperties.product.name" [platform]="(platformId$ | async) || 0" [region]="cover.region" [date]="cover.date" [digital]="cover.digital" [priority]="true"/>
+        <app-game-cover class="detail-case" [edition]="coverEdition(productProperties.product.id, (platformId$ | async) || 0, cover.region)" [src]="productProperties.product.image_url" [name]="productProperties.product.name" [platform]="(platformId$ | async) || 0" [region]="cover.region" [date]="cover.date" [digital]="cover.digital" [priority]="true"/>
         @if (!(compactLayout$ | async)) {
           <ng-container *ngTemplateOutlet="productMetadata" />
         }

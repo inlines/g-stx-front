@@ -19,7 +19,7 @@ describe('Owned serial rendering', () => {
     await TestBed.configureTestingModule({
       providers: [
         ...TEST_PROVIDERS,
-        { provide: ActivatedRoute, useValue: { snapshot: {paramMap: convertToParamMap({})}, paramMap: of(convertToParamMap({})) } },
+        { provide: ActivatedRoute, useValue: { snapshot: {paramMap: convertToParamMap({platform:'9'})}, paramMap: of(convertToParamMap({platform:'9'})) } },
       ],
       imports: [ProductPropertiesComponent],
     }).compileComponents();
@@ -30,15 +30,16 @@ describe('Owned serial rendering', () => {
     fixture.detectChanges();
   });
 
-  it('highlights Resistance selected_serial from the library response in the rendered card', () => {
+  for (const edition of ['standard', 'platinum', 'essentials', null]) it(`renders selected serial and ${edition} copy edition`, () => {
     const store = TestBed.inject(Store);
     const http = TestBed.inject(HttpTestingController);
     const state = store.snapshot();
     store.reset({...state, Auth: {...state.Auth, login: 'segasanshiro', token: 'test'}});
+    component.demoPlatform = 9;
     const serial = ['BCES-00001', 'BCES-00001/E', 'BCES-00001/P/UK'];
     http.expectOne(req => req.url === '/api/library/collection').flush({
-      items: [{release_id: 105244, product_id: 1278, platform_id: 9, serial,
-        selected_serial: 'BCES-00001', selected_edition: 'standard'}], total_count: 1,
+      items: [{release_id: 105244, product_id: 1278, platform_id: 9, region_id: 1, serial,
+        selected_serial: 'BCES-00001', selected_edition: edition}], total_count: 1,
     });
     http.expectNone(req => req.url === '/api/collection');
     store.dispatch(new ProductsActions.LoadProperties(1278));
@@ -49,6 +50,7 @@ describe('Owned serial rendering', () => {
       companies: [], franschises: [], screenshots: [],
     });
     fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.detail-case .cover').getAttribute('data-edition')).toBe(edition === 'standard' ? null : edition);
     const highlighted = fixture.nativeElement.querySelectorAll('.owned-serial');
     expect(highlighted).toHaveLength(1);
     expect(highlighted[0].querySelector('.serial-copy').textContent.trim()).toBe('BCES-00001');
